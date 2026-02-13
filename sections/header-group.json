@@ -1,0 +1,540 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "type": "header",
+  "name": "Header Group",
+  "sections": {
+    "announcement_slider_UPFf3t": {
+      "type": "announcement-slider",
+      "blocks": {
+        "announcement_aX4F9n": {
+          "type": "announcement",
+          "settings": {
+            "announcement_text": "Get Flat ₹50 off + ₹50 Voucher on your first order"
+          }
+        },
+        "announcement_iNFrKe": {
+          "type": "announcement",
+          "settings": {
+            "announcement_text": "Flat ₹100 off on orders above ₹1000"
+          }
+        }
+      },
+      "block_order": [
+        "announcement_aX4F9n",
+        "announcement_iNFrKe"
+      ],
+      "disabled": true,
+      "name": "announcement Slider",
+      "settings": {
+        "enable_autoplay": true,
+        "autoplay_duration": 3000,
+        "enable_navigation": false,
+        "enable_pagination": false,
+        "enable_loop": true
+      }
+    },
+    "static-navbar": {
+      "type": "navbar",
+      "settings": {
+        "menuLinks": "main-menu"
+      }
+    },
+    "badges_navigation_LC48P9": {
+      "type": "badges-navigation",
+      "blocks": {
+        "collections_NNKb8c": {
+          "type": "collections",
+          "disabled": true,
+          "settings": {
+            "collection": "mad-about-cars",
+            "collection_img": "shopify://shop_images/My_dopamine_and_adrenaline_rushes_on_wheels.webp"
+          }
+        },
+        "collections_WtBKpA": {
+          "type": "collections",
+          "disabled": true,
+          "settings": {
+            "collection": "its-football",
+            "collection_img": "shopify://shop_images/Football_mascot.webp"
+          }
+        },
+        "collections_JghW43": {
+          "type": "collections",
+          "disabled": true,
+          "settings": {
+            "collection": "music-therapy",
+            "collection_img": "shopify://shop_images/taking_wrong_turn_to_find_right_places.webp"
+          }
+        },
+        "collections_tFwM8U": {
+          "type": "collections",
+          "disabled": true,
+          "settings": {
+            "collection": "bumbling-my-life",
+            "collection_img": "shopify://shop_images/bumbling_my_life.webp"
+          }
+        },
+        "collections_dg7r4H": {
+          "type": "collections",
+          "disabled": true,
+          "settings": {
+            "collection": "friday-night-beer",
+            "collection_img": "shopify://shop_images/friday_night_beer.webp"
+          }
+        },
+        "collections_RGfQzm": {
+          "type": "collections",
+          "disabled": true,
+          "settings": {
+            "collection": "gamer-by-profession",
+            "collection_img": "shopify://shop_images/gamer_by_profession.webp"
+          }
+        },
+        "collections_B47C8V": {
+          "type": "collections",
+          "disabled": true,
+          "settings": {
+            "collection": "gym-fitness-freak",
+            "collection_img": "shopify://shop_images/gym_and_fitness_freak.webp"
+          }
+        },
+        "collections_m8nadQ": {
+          "type": "collections",
+          "disabled": true,
+          "settings": {
+            "collection": "live-to-dance",
+            "collection_img": "shopify://shop_images/dance_mascot.webp"
+          }
+        },
+        "collections_MPHjnf": {
+          "type": "collections",
+          "disabled": true,
+          "settings": {
+            "collection": "mysterious-hot",
+            "collection_img": "shopify://shop_images/mysterious_and_hot.webp"
+          }
+        },
+        "collections_yt8zmx": {
+          "type": "collections",
+          "disabled": true,
+          "settings": {
+            "collection": "road-royalty",
+            "collection_img": "shopify://shop_images/road_royalty.webp"
+          }
+        },
+        "collections_8fpbTn": {
+          "type": "collections",
+          "disabled": true,
+          "settings": {
+            "collection": "shuttlers-arena",
+            "collection_img": "shopify://shop_images/Big_goals._Bigger_hustle._Biggest_achievements.webp"
+          }
+        },
+        "collections_bm4zbB": {
+          "type": "collections",
+          "disabled": true,
+          "settings": {
+            "collection": "surviving-on-caffeine",
+            "collection_img": "shopify://shop_images/caffeine_addict.webp"
+          }
+        },
+        "collections_xHKfEe": {
+          "type": "collections",
+          "disabled": true,
+          "settings": {
+            "collection": "technologist-on-toes",
+            "collection_img": "shopify://shop_images/technologist_on_toes.webp"
+          }
+        },
+        "collections_XDbWwh": {
+          "type": "collections",
+          "disabled": true,
+          "settings": {
+            "collection": "the-ultimate-husband-material",
+            "collection_img": "shopify://shop_images/the_ultimate_husband_material.webp"
+          }
+        },
+        "collections_wD9GHi": {
+          "type": "collections",
+          "disabled": true,
+          "settings": {
+            "collection": "the-mindful-adventurer",
+            "collection_img": "shopify://shop_images/the_mindful_adventurer.webp"
+          }
+        },
+        "collections_JpNGmJ": {
+          "type": "collections",
+          "disabled": true,
+          "settings": {
+            "collection": "the-modern-influencer",
+            "collection_img": "shopify://shop_images/the_modern_infleuncer.webp"
+          }
+        },
+        "collections_HtPCrX": {
+          "type": "collections",
+          "disabled": true,
+          "settings": {
+            "collection": "the-sarcastic-rizzler",
+            "collection_img": "shopify://shop_images/the_sarcastic_rizzler.webp"
+          }
+        },
+        "collections_dFF4Wk": {
+          "type": "collections",
+          "disabled": true,
+          "settings": {
+            "collection": "wanna-be-unicorn",
+            "collection_img": "shopify://shop_images/Wanna_Be_unicorn.webp"
+          }
+        },
+        "collections_t7fjhQ": {
+          "type": "collections",
+          "disabled": true,
+          "settings": {
+            "collection": "cricket-fever",
+            "collection_img": "shopify://shop_images/cricket_mascot.webp"
+          }
+        }
+      },
+      "block_order": [
+        "collections_NNKb8c",
+        "collections_WtBKpA",
+        "collections_JghW43",
+        "collections_tFwM8U",
+        "collections_dg7r4H",
+        "collections_RGfQzm",
+        "collections_B47C8V",
+        "collections_m8nadQ",
+        "collections_MPHjnf",
+        "collections_yt8zmx",
+        "collections_8fpbTn",
+        "collections_bm4zbB",
+        "collections_xHKfEe",
+        "collections_XDbWwh",
+        "collections_wD9GHi",
+        "collections_JpNGmJ",
+        "collections_HtPCrX",
+        "collections_dFF4Wk",
+        "collections_t7fjhQ"
+      ],
+      "name": "Badges Navigation",
+      "settings": {
+        "url_1": "/",
+        "url_title_1": "T-Shirts",
+        "url_2": "shopify://pages/hoodies",
+        "url_title_2": "Hoodies"
+      }
+    },
+    "card_grid_BeJ7Bx": {
+      "type": "card-grid",
+      "blocks": {
+        "url_MLJrNH": {
+          "type": "url",
+          "name": "IITIAN",
+          "settings": {
+            "url": "shopify://collections/iitian",
+            "url_img": "shopify://shop_images/iitian.webp",
+            "url_title": "IITIAN"
+          }
+        },
+        "url_XzrcCi": {
+          "type": "url",
+          "name": "NITIAN",
+          "settings": {
+            "url": "shopify://collections/nitian",
+            "url_img": "shopify://shop_images/My_Pet_Name_is_NITian_custom_BATCH_YEAR.png",
+            "url_title": "NITIAN"
+          }
+        }
+      },
+      "block_order": [
+        "url_MLJrNH",
+        "url_XzrcCi"
+      ],
+      "disabled": true,
+      "name": "Card Grid",
+      "settings": {
+        "section_title": "SHOP BY YOUR IDENTITY"
+      }
+    },
+    "narrative_stories_7Y4qNE": {
+      "type": "narrative-stories",
+      "blocks": {
+        "narrative_AYmGJQ": {
+          "type": "narrative",
+          "settings": {
+            "narrative_collection": "music-therapy",
+            "custom_thumbnail": "shopify://shop_images/MN_music_badge_icon_83f5dd8d-347b-41b1-ab0e-809b122d299e.png",
+            "cta_text": "EXPLORE ALL",
+            "cta_link_mode": "collection",
+            "cta_custom_url": "",
+            "story_image_1": "shopify://shop_images/11.png",
+            "story_video_2": "shopify://files/videos/Video-353.mp4"
+          }
+        },
+        "narrative_6BkpCW": {
+          "type": "narrative",
+          "settings": {
+            "narrative_collection": "mad-about-cars",
+            "custom_thumbnail": "shopify://shop_images/MN_car_badge_icon_f72b4f3a-53c4-4a53-ba52-f4b48e205e47.png",
+            "cta_text": "EXPLORE ALL",
+            "cta_link_mode": "collection",
+            "cta_custom_url": "",
+            "story_image_1": "shopify://shop_images/1.png",
+            "story_video_2": "shopify://files/videos/IMG_5910.MOV",
+            "story_image_2": "shopify://shop_images/2.png"
+          }
+        },
+        "narrative_4pBQdy": {
+          "type": "narrative",
+          "settings": {
+            "narrative_collection": "gym-fitness-freak",
+            "custom_thumbnail": "shopify://shop_images/MN_gym_badge_icon_28031004-5036-45d4-87a3-1bdec392cd38.png",
+            "cta_text": "EXPLORE ALL",
+            "cta_link_mode": "collection",
+            "cta_custom_url": "",
+            "story_image_1": "shopify://shop_images/5.png",
+            "story_image_2": "shopify://shop_images/6.png"
+          }
+        },
+        "narrative_PFCV9k": {
+          "type": "narrative",
+          "settings": {
+            "narrative_collection": "wanna-be-unicorn",
+            "custom_thumbnail": "shopify://shop_images/MN_startup_badge_icon_3aecbda9-3b09-404e-8efd-a0e9a68ea804.png",
+            "cta_text": "EXPLORE ALL",
+            "cta_link_mode": "collection",
+            "cta_custom_url": "",
+            "story_image_1": "shopify://shop_images/33.png",
+            "story_image_2": "shopify://shop_images/34.png"
+          }
+        },
+        "narrative_JbYprb": {
+          "type": "narrative",
+          "settings": {
+            "narrative_collection": "the-sarcastic-rizzler",
+            "custom_thumbnail": "shopify://shop_images/MN_rizz_badge_icon_afff7ceb-c448-4ad8-bb1f-9dae6651cabf.png",
+            "cta_text": "EXPLORE ALL",
+            "cta_link_mode": "collection",
+            "cta_custom_url": "",
+            "story_image_1": "shopify://shop_images/30.png",
+            "story_image_2": "shopify://shop_images/31.png",
+            "story_image_3": "shopify://shop_images/32.png"
+          }
+        },
+        "narrative_CjtjEq": {
+          "type": "narrative",
+          "settings": {
+            "narrative_collection": "the-ultimate-husband-material",
+            "custom_thumbnail": "shopify://shop_images/MN_hubby_badge_icon_2b35d469-7adc-4f58-b7e0-49a4cfbb4af8.png",
+            "cta_text": "EXPLORE ALL",
+            "cta_link_mode": "collection",
+            "cta_custom_url": "",
+            "story_image_1": "shopify://shop_images/25.png",
+            "story_image_2": "shopify://shop_images/26.png"
+          }
+        },
+        "narrative_8hmHwe": {
+          "type": "narrative",
+          "settings": {
+            "narrative_collection": "friday-night-beer",
+            "custom_thumbnail": "shopify://shop_images/MN_beer_badge_icon_d43be2ee-5435-444a-ab65-6ec1a4641410.png",
+            "cta_text": "EXPLORE ALL",
+            "cta_link_mode": "collection",
+            "cta_custom_url": "",
+            "story_image_1": "shopify://shop_images/My_Narrative_party_Hero_Poster2.png",
+            "story_image_2": "shopify://shop_images/My_Narrative_party_Hero_Poster3_1fa82fed-e3d0-47f0-aff5-00a00f05536b.png",
+            "story_image_3": "shopify://shop_images/My_Narrative_party_Hero_Poster4.png"
+          }
+        },
+        "narrative_BcaEQB": {
+          "type": "narrative",
+          "settings": {
+            "narrative_collection": "the-modern-influencer",
+            "custom_thumbnail": "shopify://shop_images/MN_inf_badge_icon_057d3a8f-5dab-4349-ae8c-6960c9c8892e.png",
+            "cta_text": "EXPLORE ALL",
+            "cta_link_mode": "collection",
+            "cta_custom_url": "",
+            "story_image_1": "shopify://shop_images/27.png",
+            "story_image_2": "shopify://shop_images/28.png",
+            "story_image_3": "shopify://shop_images/29.png"
+          }
+        },
+        "narrative_GAdnJi": {
+          "type": "narrative",
+          "settings": {
+            "narrative_collection": "the-mindful-adventurer",
+            "custom_thumbnail": "shopify://shop_images/MN_adv_badge_icon_64e9e50f-aa57-4fda-a68b-247f29f63dc5.png",
+            "cta_text": "EXPLORE ALL",
+            "cta_link_mode": "collection",
+            "cta_custom_url": "",
+            "story_image_1": "shopify://shop_images/22.png",
+            "story_image_2": "shopify://shop_images/23.png",
+            "story_image_3": "shopify://shop_images/24.png"
+          }
+        },
+        "narrative_eCebGd": {
+          "type": "narrative",
+          "settings": {
+            "narrative_collection": "technologist-on-toes",
+            "custom_thumbnail": "shopify://shop_images/MN_tech_badge_icon_b4e9b4e3-aba0-4616-8a8c-5b45d17aa1b4.png",
+            "cta_text": "EXPLORE ALL",
+            "cta_link_mode": "collection",
+            "cta_custom_url": "",
+            "story_image_1": "shopify://shop_images/21.png"
+          }
+        },
+        "narrative_kTrDeH": {
+          "type": "narrative",
+          "settings": {
+            "narrative_collection": "surviving-on-caffeine",
+            "custom_thumbnail": "shopify://shop_images/9.png",
+            "cta_text": "EXPLORE ALL",
+            "cta_link_mode": "collection",
+            "cta_custom_url": "",
+            "story_image_1": "shopify://shop_images/19.png",
+            "story_image_2": "shopify://shop_images/20.png",
+            "story_image_3": "shopify://shop_images/35.png"
+          }
+        },
+        "narrative_rpAE8M": {
+          "type": "narrative",
+          "settings": {
+            "narrative_collection": "shuttlers-arena",
+            "custom_thumbnail": "shopify://shop_images/MN_badminton_badge_icon_a15f7c44-b9d8-471a-a624-e43a71c0c5c4.png",
+            "cta_text": "EXPLORE ALL",
+            "cta_link_mode": "collection",
+            "cta_custom_url": "",
+            "story_image_1": "shopify://shop_images/16.png",
+            "story_image_2": "shopify://shop_images/17.png",
+            "story_image_3": "shopify://shop_images/18.png"
+          }
+        },
+        "narrative_RaBYCT": {
+          "type": "narrative",
+          "settings": {
+            "narrative_collection": "bumbling-my-life",
+            "custom_thumbnail": "shopify://shop_images/MN_breakup_badge_icon_35add0c4-88c4-4cc8-9e47-2f74ea3ad542.png",
+            "cta_text": "EXPLORE ALL",
+            "cta_link_mode": "collection",
+            "cta_custom_url": "",
+            "story_image_1": "shopify://shop_images/My_Narrative_dating_Hero_Poster1.png",
+            "story_image_2": "shopify://shop_images/My_Narrative_dating_Hero_Poster.png",
+            "story_image_3": "shopify://shop_images/My_Narrative_dating_Hero_Poster2.png"
+          }
+        },
+        "narrative_znUXem": {
+          "type": "narrative",
+          "settings": {
+            "narrative_collection": "road-royalty",
+            "custom_thumbnail": "shopify://shop_images/MN_bike_badge_icon_3911cb05-3617-4ebb-a374-6c02ef476a38.png",
+            "cta_text": "EXPLORE ALL",
+            "cta_link_mode": "collection",
+            "cta_custom_url": "",
+            "story_image_1": "shopify://shop_images/14.png",
+            "story_image_2": "shopify://shop_images/15.png"
+          }
+        },
+        "narrative_9CcbB7": {
+          "type": "narrative",
+          "settings": {
+            "narrative_collection": "mysterious-hot",
+            "custom_thumbnail": "shopify://shop_images/MN_hot_badge_icon2.png",
+            "cta_text": "EXPLORE ALL",
+            "cta_link_mode": "collection",
+            "cta_custom_url": "",
+            "story_image_1": "shopify://shop_images/12.png",
+            "story_image_2": "shopify://shop_images/13.png"
+          }
+        },
+        "narrative_tiVHEk": {
+          "type": "narrative",
+          "settings": {
+            "narrative_collection": "live-to-dance",
+            "custom_thumbnail": "shopify://shop_images/MN_dance_badge_icon_284a6385-c359-4911-a6b6-5c3c09b99377.png",
+            "cta_text": "EXPLORE ALL",
+            "cta_link_mode": "collection",
+            "cta_custom_url": "",
+            "story_image_1": "shopify://shop_images/9_696b62b8-993a-48a6-8e4d-32d6c6bef130.png",
+            "story_image_2": "shopify://shop_images/10.png"
+          }
+        },
+        "narrative_kkF9Nw": {
+          "type": "narrative",
+          "settings": {
+            "narrative_collection": "its-football",
+            "custom_thumbnail": "shopify://shop_images/MN_football_badge_icon_4171a4ae-6f71-4eba-8d5a-3d2e79424d13.png",
+            "cta_text": "EXPLORE ALL",
+            "cta_link_mode": "collection",
+            "cta_custom_url": "",
+            "story_image_1": "shopify://shop_images/8.png",
+            "story_image_2": "shopify://shop_images/7.png"
+          }
+        },
+        "narrative_6YLzei": {
+          "type": "narrative",
+          "settings": {
+            "narrative_collection": "cricket-fever",
+            "custom_thumbnail": "shopify://shop_images/MN_cricket_badge_icon_b31c00bc-c904-4264-a384-739d47c10da1.png",
+            "cta_text": "EXPLORE ALL",
+            "cta_link_mode": "collection",
+            "cta_custom_url": "",
+            "story_image_1": "shopify://shop_images/My_Narrative_Cricket_Hero_Poster.png",
+            "story_image_2": "shopify://shop_images/My_Narrative_Cricket_Hero_Poster1.png"
+          }
+        },
+        "narrative_C9CX7k": {
+          "type": "narrative",
+          "disabled": true,
+          "settings": {
+            "narrative_collection": "gamer-by-profession",
+            "cta_text": "EXPLORE ALL",
+            "cta_link_mode": "collection",
+            "cta_custom_url": "",
+            "story_image_1": "shopify://shop_images/3.png"
+          }
+        }
+      },
+      "block_order": [
+        "narrative_AYmGJQ",
+        "narrative_6BkpCW",
+        "narrative_4pBQdy",
+        "narrative_PFCV9k",
+        "narrative_JbYprb",
+        "narrative_CjtjEq",
+        "narrative_8hmHwe",
+        "narrative_BcaEQB",
+        "narrative_GAdnJi",
+        "narrative_eCebGd",
+        "narrative_kTrDeH",
+        "narrative_rpAE8M",
+        "narrative_RaBYCT",
+        "narrative_znUXem",
+        "narrative_9CcbB7",
+        "narrative_tiVHEk",
+        "narrative_kkF9Nw",
+        "narrative_6YLzei",
+        "narrative_C9CX7k"
+      ],
+      "name": "Narrative Stories",
+      "settings": {
+        "bg_color": "#000000",
+        "text_color": "#ffffff"
+      }
+    }
+  },
+  "order": [
+    "announcement_slider_UPFf3t",
+    "static-navbar",
+    "badges_navigation_LC48P9",
+    "card_grid_BeJ7Bx",
+    "narrative_stories_7Y4qNE"
+  ]
+}

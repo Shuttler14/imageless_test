@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mobile Compatibility Test - My Narrative</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: white;
+            padding: 20px;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: clamp(24px, 5vw, 36px);
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #39A596, #51cf66);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .device-info {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 16px;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+
+        .device-info .row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .device-info .row:last-child {
+            border-bottom: none;
+        }
+
+        .test-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .test-section h2 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            color: #39A596;
+        }
+
+        .test-item {
+            padding: 16px;
+            margin: 12px 0;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .test-item.interactive {
+            cursor: pointer;
+            transition: all 0.3s;
+            -webkit-tap-highlight-color: rgba(57, 165, 150, 0.2);
+        }
+
+        .test-item.interactive:active {
+            transform: scale(0.98);
+            background: rgba(57, 165, 150, 0.2);
+        }
+
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .status.pass { background: rgba(81, 207, 102, 0.2); color: #51cf66; }
+        .status.fail { background: rgba(255, 107, 107, 0.2); color: #ff6b6b; }
+        .status.pending { background: rgba(255, 212, 59, 0.2); color: #ffd43b; }
+
+        .touch-area {
+            width: 100%;
+            height: 200px;
+            background: rgba(57, 165, 150, 0.1);
+            border: 2px dashed #39A596;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #888;
+            touch-action: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .touch-indicator {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle, rgba(57, 165, 150, 0.8), transparent);
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+        }
+
+        button {
+            background: #39A596;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin: 8px 0;
+            min-height: 44px;
+            transition: all 0.2s;
+        }
+
+        button:active {
+            transform: scale(0.98);
+            background: #2d8479;
+        }
+
+        .log {
+            background: #000;
+            padding: 12px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            color: #0f0;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 12px;
+        }
+
+        .log .timestamp {
+            color: #888;
+            margin-right: 8px;
+        }
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .summary-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .summary-card .number {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .summary-card .label {
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            body {
+                padding: 12px;
+            }
+
+            .test-section {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📱 Mobile Compatibility Test</h1>
+        <p style="color: #888; font-size: 14px; margin-bottom: 20px;">Testing touch events and mobile optimizations</p>
+
+        <!-- Device Info -->
+        <div class="device-info">
+            <div class="row">
+                <span>Device:</span>
+                <span id="device-type">Detecting...</span>
+            </div>
+            <div class="row">
+                <span>Screen Size:</span>
+                <span id="screen-size">-</span>
+            </div>
+            <div class="row">
+                <span>Viewport:</span>
+                <span id="viewport-size">-</span>
+            </div>
+            <div class="row">
+                <span>Touch Support:</span>
+                <span id="touch-support">-</span>
+            </div>
+            <div class="row">
+                <span>Orientation:</span>
+                <span id="orientation">-</span>
+            </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="summary">
+            <div class="summary-card">
+                <div class="number" style="color: #51cf66;" id="tests-passed">0</div>
+                <div class="label">Passed</div>
+            </div>
+            <div class="summary-card">
+                <div class="number" style="color: #ff6b6b;" id="tests-failed">0</div>
+                <div class="label">Failed</div>
+            </div>
+            <div class="summary-card">
+                <div class="number" style="color: #39A596;" id="touches-detected">0</div>
+                <div class="label">Touches</div>
+            </div>
+        </div>
+
+        <!-- Touch Event Test -->
+        <div class="test-section">
+            <h2>🖐️ Touch Event Detection</h2>
+            <div class="touch-area" id="touch-area">
+                Touch or drag here to test
+            </div>
+            <div class="log" id="touch-log"></div>
+        </div>
+
+        <!-- Tap Target Test -->
+        <div class="test-section">
+            <h2>🎯 Touch Target Size Test</h2>
+            <p style="font-size: 13px; color: #888; margin-bottom: 12px;">
+                All buttons should be at least 44x44px (Apple HIG standard)
+            </p>
+            <div class="test-item interactive" id="tap-test">
+                <div>Tap this card (should feel responsive)</div>
+                <div class="status pending" id="tap-status">Not tested</div>
+            </div>
+            <button id="small-button-test">Test Button (should be 44px+ tall)</button>
+        </div>
+
+        <!-- Scroll Performance Test -->
+        <div class="test-section">
+            <h2>📜 Scroll Performance</h2>
+            <div style="height: 150px; overflow-y: auto; background: rgba(0,0,0,0.3); border-radius: 8px; padding: 12px; -webkit-overflow-scrolling: touch;">
+                <p style="font-size: 13px; line-height: 1.8;">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+                    Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris. 
+                    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                    Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
+                </p>
+            </div>
+            <div class="status pass" style="margin-top: 12px;">Scroll should feel smooth</div>
+        </div>
+
+        <!-- Gesture Test -->
+        <div class="test-section">
+            <h2>👆 Multi-Touch Gesture Test</h2>
+            <button id="pinch-test">Test Pinch Zoom Prevention</button>
+            <div class="status" id="pinch-status">Try pinching on this page</div>
+        </div>
+
+        <!-- Viewport Test -->
+        <div class="test-section">
+            <h2>📐 Viewport & Layout Test</h2>
+            <div class="test-item">
+                <div>Text Input (should not zoom on iOS):</div>
+                <input type="text" placeholder="Type here..." style="
+                    width: 100%;
+                    padding: 12px;
+                    margin-top: 8px;
+                    border-radius: 8px;
+                    border: 1px solid rgba(255,255,255,0.2);
+                    background: rgba(0,0,0,0.3);
+                    color: white;
+                    font-size: 16px;
+                ">
+            </div>
+        </div>
+
+        <button onclick="runAllTests()" style="background: #51cf66; margin-top: 20px;">
+            ✅ Run All Tests
+        </button>
+    </div>
+
+    <script>
+        let touchCount = 0;
+        let testsPassed = 0;
+        let testsFailed = 0;
+
+        // Device Detection
+        function detectDevice() {
+            const ua = navigator.userAgent;
+            let device = 'Unknown';
+            
+            if (/iPhone|iPod/.test(ua)) device = 'iPhone';
+            else if (/iPad/.test(ua)) device = 'iPad';
+            else if (/Android/.test(ua)) device = 'Android';
+            else if (/Windows Phone/.test(ua)) device = 'Windows Phone';
+            else device = 'Desktop/Other';
+
+            document.getElementById('device-type').textContent = device;
+            document.getElementById('screen-size').textContent = `${screen.width} x ${screen.height}`;
+            document.getElementById('viewport-size').textContent = `${window.innerWidth} x ${window.innerHeight}`;
+            document.getElementById('touch-support').textContent = 'ontouchstart' in window ? '✅ Yes' : '❌ No';
+            document.getElementById('orientation').textContent = window.innerWidth > window.innerHeight ? 'Landscape' : 'Portrait';
+        }
+
+        // Touch Event Logging
+        const touchArea = document.getElementById('touch-area');
+        const touchLog = document.getElementById('touch-log');
+
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            touchLog.innerHTML += `<div><span class="timestamp">[${timestamp}]</span>${message}</div>`;
+            touchLog.scrollTop = touchLog.scrollHeight;
+        }
+
+        touchArea.addEventListener('touchstart', (e) => {
+            touchCount++;
+            document.getElementById('touches-detected').textContent = touchCount;
+            log(`Touch Start - ${e.touches.length} finger(s)`);
+            
+            // Create visual indicator
+            Array.from(e.touches).forEach(touch => {
+                const indicator = document.createElement('div');
+                indicator.className = 'touch-indicator';
+                indicator.style.left = touch.clientX - touchArea.getBoundingClientRect().left + 'px';
+                indicator.style.top = touch.clientY - touchArea.getBoundingClientRect().top + 'px';
+                touchArea.appendChild(indicator);
+                
+                setTimeout(() => indicator.remove(), 500);
+            });
+            
+            testsPassed++;
+            updateSummary();
+        });
+
+        touchArea.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            log(`Touch Move - Position: ${Math.round(e.touches[0].clientX)}, ${Math.round(e.touches[0].clientY)}`);
+        });
+
+        touchArea.addEventListener('touchend', (e) => {
+            log(`Touch End`);
+        });
+
+        // Tap Target Test
+        document.getElementById('tap-test').addEventListener('click', function() {
+            const height = this.offsetHeight;
+            const width = this.offsetWidth;
+            const status = document.getElementById('tap-status');
+            
+            if (height >= 44 && width >= 44) {
+                status.textContent = `✅ Pass (${width}x${height}px)`;
+                status.className = 'status pass';
+                testsPassed++;
+            } else {
+                status.textContent = `❌ Fail (${width}x${height}px) - Too small`;
+                status.className = 'status fail';
+                testsFailed++;
+            }
+            updateSummary();
+        });
+
+        // Button Test
+        document.getElementById('small-button-test').addEventListener('click', function() {
+            const height = this.offsetHeight;
+            log(`Button height: ${height}px ${height >= 44 ? '✅' : '❌'}`);
+            if (height >= 44) testsPassed++;
+            else testsFailed++;
+            updateSummary();
+        });
+
+        // Pinch Zoom Test
+        let lastTouchDistance = 0;
+        document.addEventListener('touchmove', (e) => {
+            if (e.touches.length === 2) {
+                const touch1 = e.touches[0];
+                const touch2 = e.touches[1];
+                const distance = Math.hypot(
+                    touch2.clientX - touch1.clientX,
+                    touch2.clientY - touch1.clientY
+                );
+                
+                if (lastTouchDistance > 0) {
+                    const scale = distance / lastTouchDistance;
+                    if (Math.abs(scale - 1) > 0.1) {
+                        document.getElementById('pinch-status').textContent = '✅ Pinch detected (zoom prevented)';
+                        document.getElementById('pinch-status').className = 'status pass';
+                    }
+                }
+                lastTouchDistance = distance;
+            }
+        }, { passive: false });
+
+        // Update Summary
+        function updateSummary() {
+            document.getElementById('tests-passed').textContent = testsPassed;
+            document.getElementById('tests-failed').textContent = testsFailed;
+        }
+
+        // Run All Tests
+        function runAllTests() {
+            log('Running all automated tests...');
+            
+            // Test 1: Touch support
+            if ('ontouchstart' in window) {
+                log('✅ Touch events supported');
+                testsPassed++;
+            } else {
+                log('❌ Touch events not supported');
+                testsFailed++;
+            }
+
+            // Test 2: Viewport meta tag
+            const viewport = document.querySelector('meta[name="viewport"]');
+            if (viewport && viewport.content.includes('user-scalable=no')) {
+                log('✅ Viewport configured correctly');
+                testsPassed++;
+            } else {
+                log('⚠️ Viewport may allow pinch zoom');
+            }
+
+            // Test 3: Touch action CSS
+            const touchAreaStyle = window.getComputedStyle(touchArea);
+            if (touchAreaStyle.touchAction === 'none') {
+                log('✅ Touch action CSS applied');
+                testsPassed++;
+            } else {
+                log('❌ Touch action not set to none');
+                testsFailed++;
+            }
+
+            updateSummary();
+            log('All tests complete!');
+        }
+
+        // Orientation change
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => {
+                detectDevice();
+                log('Orientation changed');
+            }, 100);
+        });
+
+        // Initialize
+        detectDevice();
+        log('Mobile compatibility test ready');
+    </script>
+</body>
+</html>

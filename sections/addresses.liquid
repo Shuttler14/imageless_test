@@ -1,0 +1,389 @@
+{{ 'customer.css' | asset_url | stylesheet_tag }}
+
+<div class="customer addresses section-{{ section.id }}-padding" data-customer-addresses>
+  <div class="container mx-auto px-4 py-8 max-w-4xl text-white font-sans relative z-0">
+    
+    <div class="flex flex-col md:flex-row justify-between items-center mb-8 border-b border-gray-800 pb-6 gap-4">
+      <div class="text-center md:text-left">
+        <h1 class="heading-font text-3xl font-bold uppercase tracking-wider text-white">
+          Address Book
+        </h1>
+        <p class="text-gray-400 text-xs mt-1">Manage your shipping destinations</p>
+      </div>
+      <div class="flex gap-4">
+        <a href="{{ routes.account_url }}" class="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-white transition-colors border border-gray-800 px-4 py-2 mb-2 rounded-full hover:border-gray-500">
+          ← Return to Account
+        </a>
+      </div>
+    </div>
+  
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-0">
+      
+      <div onclick="openModal('add_address_modal')" class="cursor-pointer group border border-dashed border-gray-700 bg-[#0a0a0a] rounded-lg p-8 flex flex-col items-center justify-center hover:border-[#39A596] hover:bg-[#39A596]/5 transition-all duration-300 min-h-[200px]">
+        <div class="w-12 h-12 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 group-hover:bg-[#39A596] group-hover:text-black transition-colors mb-3">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        </div>
+        <span class="text-sm font-bold uppercase tracking-widest text-gray-400 group-hover:text-[#39A596]">Add New Address</span>
+      </div>
+  
+      {% for address in customer.addresses %}
+        <div class="relative bg-[#111] border border-gray-800 rounded-lg p-6 flex flex-col justify-between h-full group hover:border-gray-600 transition-colors">
+          
+          <div>
+            {% if address == customer.default_address %}
+              <div 
+                class="absolute bg-[#39A596] heading-font text-white text-[9px] font-normal px-2 py-0.5 rounded uppercase tracking-widest z-[1]"
+                style="top: 1rem; right: 1rem;"
+              >
+                Default
+              </div>
+            {% endif %}
+            
+            <div class="flex items-center gap-3 mb-4 pb-4 border-b border-gray-800/50">
+                {% assign title_handle = address.company | downcase %}
+                <div class="w-10 h-10 rounded-md bg-gray-900 flex items-center justify-center border border-gray-800 text-lg">
+                  {% if title_handle contains 'home' %}
+                    🏠
+                  {% elsif title_handle contains 'work' %}
+                    💼
+                  {% elsif title_handle contains 'partner' or title_handle contains 'love' %}
+                    ❤️
+                  {% elsif title_handle contains 'family' %}
+                    👨‍👩‍👧
+                  {% elsif title_handle contains 'friend' %}
+                    👤
+                  {% else %}
+                    📍
+                  {% endif %}
+                </div>
+                <div>
+                  <h3 class="text-white font-bold uppercase tracking-wider text-sm">
+                    {% if address.company != blank %}{{ address.company }}{% else %}Address{% endif %}
+                  </h3>
+                  <p class="text-[10px] text-gray-500">{{ address.city | default: 'Saved Location' }}</p>
+                </div>
+            </div>
+            <div class="text-gray-300 text-sm leading-relaxed mb-6 font-mono opacity-80">
+              {{ address | format_address }}
+            </div>
+          </div>
+  
+          <div class="flex gap-3 border-t border-gray-800 pt-4 mt-auto">
+            <button onclick="openModal('edit_modal_{{ address.id }}')" class="flex-1 text-[10px] font-bold uppercase tracking-widest bg-gray-800 text-gray-300 hover:bg-white hover:text-black py-2 rounded transition-colors">
+              Edit
+            </button>
+            
+            <form
+              method="post"
+              action="/account/addresses/{{ address.id }}"
+              onsubmit="return confirm('Are you sure you want to delete this address?');"
+              class="flex-1"
+            >
+              <input type="hidden" name="_method" value="delete">
+              <button type="submit" class="w-full text-[10px] font-bold uppercase tracking-widest border border-red-900/50 text-red-500 hover:bg-red-900 hover:text-white py-2 rounded transition-colors">
+                Delete
+              </button>
+            </form>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<div id="add_address_modal" class="custom-modal-overlay hidden">
+  <div class="custom-modal-content">
+    
+    <div class="flex justify-between items-center mb-6 border-b border-gray-800 pb-4">
+      <h2 class="heading-font text-xl text-white uppercase tracking-widest truncate">Add New Address</h2>
+      <button onclick="closeModal('add_address_modal')" class="text-gray-400 hover:text-white text-3xl leading-none">&times;</button>
+    </div>
+    
+    {% form 'customer_address', customer.new_address %}
+      
+      <div class="mb-6">
+        <label class="heading-font text-[10px] uppercase text-gray-500 mb-2 block tracking-widest text-center">Save Address As</label>
+        
+        <div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar justify-start" id="label-container-new">
+           <button type="button" onclick="setLabel('Home', 'new')" class="label-btn group flex flex-col items-center justify-center flex-shrink-0">
+             <span class="text-sm mb-0.5 block">🏠</span> <span class="text-[7px] uppercase font-bold">Home</span>
+           </button>
+           <button type="button" onclick="setLabel('Work', 'new')" class="label-btn group flex flex-col items-center justify-center flex-shrink-0">
+             <span class="text-sm mb-0.5 block">💼</span> <span class="text-[7px] uppercase font-bold">Work</span>
+           </button>
+           <button type="button" onclick="setLabel('Friend', 'new')" class="label-btn group flex flex-col items-center justify-center flex-shrink-0">
+             <span class="text-sm mb-0.5 block">👤</span> <span class="text-[7px] uppercase font-bold">Friend</span>
+           </button>
+           <button type="button" onclick="setLabel('Partner', 'new')" class="label-btn group flex flex-col items-center justify-center flex-shrink-0">
+             <span class="text-sm mb-0.5 block">❤️</span> <span class="text-[7px] uppercase font-bold">Partner</span>
+           </button>
+           <button type="button" onclick="setLabel('Family', 'new')" class="label-btn group flex flex-col items-center justify-center flex-shrink-0">
+             <span class="text-sm mb-0.5 block">👨‍👩‍👧</span> <span class="text-[7px] uppercase font-bold">Family</span>
+           </button>
+        </div>
+        <input type="text" id="address_company_new" name="address[company]" value="{{ form.company }}" placeholder="Address Title (e.g. Home, Work)" class="cyber-input mt-2 border-dashed border-gray-700 text-gray-400 text-xs text-center" required>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <input type="text" name="address[first_name]" value="{{ form.first_name }}" placeholder="First Name" class="cyber-input" required>
+        <input type="text" name="address[last_name]" value="{{ form.last_name }}" placeholder="Last Name" class="cyber-input" required>
+      </div>
+      
+      <input type="text" name="address[address1]" value="{{ form.address1 }}" placeholder="Address Line 1" class="cyber-input mb-4" required>
+      <input type="text" name="address[address2]" value="{{ form.address2 }}" placeholder="Address Line 2" class="cyber-input mb-4" required>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <input type="text" name="address[city]" value="{{ form.city }}" placeholder="City" class="cyber-input" required>
+        <input type="text" name="address[zip]" value="{{ form.zip }}" placeholder="Postal/Zip Code" class="cyber-input" required>
+      </div>
+      
+      {% comment %} <div class="mb-4">
+          <label class="text-[10px] uppercase text-gray-500 mb-1 block">Country</label>
+          <div class="select-wrapper">
+            <select id="AddressCountryNew" name="address[country]" data-default="{{ form.country }}" class="cyber-input w-full bg-[#0a0a0a]" autocomplete="country" required>{{ all_country_option_tags }}</select>
+          </div>
+      </div> {% endcomment %}
+      <div id="AddressProvinceContainerNew" class="mb-4" style="display:none;">
+          <label class="text-[10px] uppercase text-gray-500 mb-1 block">Province/State</label>
+          <div class="select-wrapper">
+            <select id="AddressProvinceNew" name="address[province]" data-default="{{ form.province }}" class="cyber-input w-full bg-[#0a0a0a]" autocomplete="address-level1"></select>
+          </div>
+      </div>
+
+      <input type="tel" name="address[phone]" value="{{ form.phone }}" placeholder="Phone" class="cyber-input mb-6" required>
+      
+      <div class="flex items-center gap-2 mb-6">
+        {{ form.set_as_default_checkbox }}
+        <label for="address_default_address_new" class="text-xs text-gray-400 uppercase tracking-wide cursor-pointer">Set as default address</label>
+      </div>
+
+      <div class="flex gap-4">
+        <button type="submit" class="flex-1 bg-[#39A596] text-black font-bold uppercase tracking-widest py-3 rounded hover:bg-white transition-colors shadow-[0_0_15px_rgba(126,217,87,0.3)]">Add Address</button>
+        <button type="button" onclick="closeModal('add_address_modal')" class="px-6 border border-gray-700 text-gray-400 uppercase tracking-widest text-xs font-bold rounded hover:border-white hover:text-white transition-colors">Cancel</button>
+      </div>
+    {% endform %}
+  </div>
+</div>
+
+{% for address in customer.addresses %}
+  <div id="edit_modal_{{ address.id }}" class="custom-modal-overlay hidden">
+    <div class="custom-modal-content">
+      
+      <div class="flex justify-between items-center mb-6 border-b border-gray-800 pb-4">
+         <h2 class="heading-font text-xl text-white uppercase tracking-widest truncate">Edit Address</h2>
+         <button onclick="closeModal('edit_modal_{{ address.id }}')" class="text-gray-400 hover:text-white text-3xl leading-none">&times;</button>
+      </div>
+      
+      {% form 'customer_address', address %}
+      
+        <div class="mb-6">
+          <label class="heading-font text-[10px] uppercase text-gray-500 mb-2 block tracking-widest text-center">Save Address As</label>
+          
+          <div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar justify-start" id="label-container-{{ address.id }}">
+             {% assign current_val = form.company %}
+             <button type="button" onclick="setLabel('Home', '{{ address.id }}')" class="label-btn group flex flex-col items-center justify-center flex-shrink-0 {% if current_val == 'Home' %}active{% endif %}">
+               <span class="text-sm mb-0.5 block">🏠</span> <span class="text-[7px] uppercase font-bold">Home</span>
+             </button>
+             <button type="button" onclick="setLabel('Work', '{{ address.id }}')" class="label-btn group flex flex-col items-center justify-center flex-shrink-0 {% if current_val == 'Work' %}active{% endif %}">
+               <span class="text-sm mb-0.5 block">💼</span> <span class="text-[7px] uppercase font-bold">Work</span>
+             </button>
+             <button type="button" onclick="setLabel('Friend', '{{ address.id }}')" class="label-btn group flex flex-col items-center justify-center flex-shrink-0 {% if current_val == 'Friend' %}active{% endif %}">
+               <span class="text-sm mb-0.5 block">👤</span> <span class="text-[7px] uppercase font-bold">Friend</span>
+             </button>
+             <button type="button" onclick="setLabel('Partner', '{{ address.id }}')" class="label-btn group flex flex-col items-center justify-center flex-shrink-0 {% if current_val == 'Partner' %}active{% endif %}">
+               <span class="text-sm mb-0.5 block">❤️</span> <span class="text-[7px] uppercase font-bold">Partner</span>
+             </button>
+             <button type="button" onclick="setLabel('Family', '{{ address.id }}')" class="label-btn group flex flex-col items-center justify-center flex-shrink-0 {% if current_val == 'Family' %}active{% endif %}">
+               <span class="text-sm mb-0.5 block">👨‍👩‍👧</span> <span class="text-[7px] uppercase font-bold">Family</span>
+             </button>
+          </div>
+          <input type="text" id="address_company_{{ address.id }}" name="address[company]" value="{{ form.company }}" placeholder="Address Title (e.g. Home, Work)" class="cyber-input mt-2 border-dashed border-gray-700 text-gray-400 text-xs text-center" required>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <input type="text" name="address[first_name]" value="{{ form.first_name }}" placeholder="First Name" class="cyber-input" required>
+          <input type="text" name="address[last_name]" value="{{ form.last_name }}" placeholder="Last Name" class="cyber-input" required>
+        </div>
+        
+        <input type="text" name="address[address1]" value="{{ form.address1 }}" placeholder="Address Line 1" class="cyber-input mb-4" required>
+        <input type="text" name="address[address2]" value="{{ form.address2 }}" placeholder="Address Line 2" class="cyber-input mb-4" required>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <input type="text" name="address[city]" value="{{ form.city }}" placeholder="City" class="cyber-input" required>
+          <input type="text" name="address[zip]" value="{{ form.zip }}" placeholder="Postal/Zip Code" class="cyber-input" required>
+        </div>
+        
+        {% comment %} <div class="mb-4">
+           <label class="text-[10px] uppercase text-gray-500 mb-1 block">Country</label>
+           <div class="select-wrapper">
+             <select id="AddressCountry_{{ form.id }}" name="address[country]" data-default="{{ form.country }}" data-form-id="{{ form.id }}" class="cyber-input w-full bg-[#0a0a0a]" autocomplete="country" required>{{ all_country_option_tags }}</select>
+           </div>
+        </div> {% endcomment %}
+        <div id="AddressProvinceContainer_{{ form.id }}" class="mb-4" style="display:none;">
+           <label class="text-[10px] uppercase text-gray-500 mb-1 block">Province/State</label>
+           <div class="select-wrapper">
+             <select id="AddressProvince_{{ form.id }}" name="address[province]" data-default="{{ form.province }}" class="cyber-input w-full bg-[#0a0a0a]" autocomplete="address-level1"></select>
+           </div>
+        </div>
+
+        <input type="tel" name="address[phone]" value="{{ form.phone }}" placeholder="Phone" class="cyber-input mb-6" required>
+        
+        <div class="flex items-center gap-2 mb-6">
+          {{ form.set_as_default_checkbox }}
+          <label for="address_default_address_{{ form.id }}" class="text-xs text-gray-400 uppercase tracking-wide cursor-pointer">Set as default address</label>
+        </div>
+
+        <div class="flex gap-4">
+          <button type="submit" class="flex-1 bg-[#39A596] text-black font-bold uppercase tracking-widest py-3 rounded hover:bg-white transition-colors shadow-[0_0_15px_rgba(126,217,87,0.3)]">Update</button>
+          <button type="button" onclick="closeModal('edit_modal_{{ address.id }}')" class="px-6 border border-gray-700 text-gray-400 uppercase tracking-widest text-xs font-bold rounded hover:border-white hover:text-white transition-colors">Cancel</button>
+        </div>
+      {% endform %}
+    </div>
+  </div>
+{% endfor %}
+
+<style>
+  /* Import Montserrat from Google Fonts */
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&display=swap');
+  
+  /* Apply Montserrat to headings */
+  .heading-font { font-family: 'Montserrat', sans-serif; }
+  
+  /* MODAL STYLES */
+  .custom-modal-overlay {
+    position: fixed !important;
+    top: 0; left: 0; right: 0; bottom: 0;
+    width: 100%; height: 100vh;
+    background-color: rgba(0, 0, 0, 0.95);
+    backdrop-filter: blur(5px);
+    z-index: 2147483647 !important; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+  
+  .custom-modal-overlay.hidden { display: none !important; }
+
+  .custom-modal-content {
+    background: #111;
+    border: 1px solid #333;
+    border-top: 4px solid #39A596;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 0 50px rgba(0,0,0,0.9);
+  }
+
+  /* LABEL BUTTON STYLES */
+  .label-btn {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    color: #888;
+    padding: 8px 12px; /* reduced padding */
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    min-width: 60px; /* fixed width prevents squishing */
+    transition: all 0.2s ease;
+  }
+  .label-btn:hover {
+    border-color: #39A596;
+    background: rgba(126, 217, 87, 0.05);
+    color: white;
+  }
+  .label-btn.active {
+    background: #39A596;
+    color: black;
+    border-color: #39A596;
+    box-shadow: 0 0 15px rgba(126, 217, 87, 0.3);
+  }
+
+  /* INPUTS */
+  .cyber-input {
+    width: 100%;
+    background: #050505;
+    border: 1px solid #333;
+    color: white;
+    padding: 12px;
+    font-size: 14px;
+    border-radius: 4px;
+    outline: none;
+    transition: all 0.3s ease;
+  }
+  .cyber-input:focus {
+    border-color: #39A596;
+    box-shadow: 0 0 10px rgba(126,217,87,0.1);
+    background: #000;
+  }
+  .cyber-input::placeholder { color: #555; }
+  
+  /* UTILS */
+  input[type="checkbox"] { accent-color: #39A596; width: 16px; height: 16px; cursor: pointer; }
+  select.cyber-input { appearance: none; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%237ed957%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right .7em top 50%; background-size: .65em auto; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+</style>
+
+<script>
+  window.onload = () => { typeof CustomerAddresses !== 'undefined' && new CustomerAddresses(); }
+
+  // Logic to handle clicking the Label Buttons
+  function setLabel(value, idSuffix) {
+    // 1. Update the hidden input
+    const input = document.getElementById('address_company_' + idSuffix);
+    if(input) input.value = value;
+
+    // 2. Update visual buttons state
+    const container = document.getElementById('label-container-' + idSuffix);
+    if(container) {
+      const buttons = container.getElementsByTagName('button');
+      for (let btn of buttons) {
+        // We look for the text inside the span to match
+        if (btn.innerText.includes(value.toUpperCase())) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      }
+    }
+  }
+
+  function openModal(id) {
+    const el = document.getElementById(id);
+    if(el) {
+      el.classList.remove('hidden');
+      document.body.style.overflow = 'hidden'; 
+    }
+  }
+
+  function closeModal(id) {
+    const el = document.getElementById(id);
+    if(el) {
+      el.classList.add('hidden');
+      document.body.style.overflow = 'auto'; 
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    if (typeof Shopify !== 'undefined' && Shopify.CountryProvinceSelector) {
+      new Shopify.CountryProvinceSelector('AddressCountryNew', 'AddressProvinceNew', { hideElement: 'AddressProvinceContainerNew' });
+      {% for address in customer.addresses %}
+        new Shopify.CountryProvinceSelector('AddressCountry_{{ address.id }}', 'AddressProvince_{{ address.id }}', { hideElement: 'AddressProvinceContainer_{{ address.id }}' });
+      {% endfor %}
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Addresses",
+  "settings": [
+    { "type": "header", "content": "Section Padding" }
+  ]
+}
+{% endschema %}

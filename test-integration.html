@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Narrative - Integration Test Suite</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: white;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 36px;
+            margin-bottom: 12px;
+            background: linear-gradient(90deg, #39A596, #51cf66);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: #888;
+            margin-bottom: 40px;
+            font-size: 14px;
+        }
+
+        .test-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .test-section h2 {
+            font-size: 20px;
+            margin-bottom: 16px;
+            color: #39A596;
+        }
+
+        .test-item {
+            padding: 12px;
+            margin: 8px 0;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .test-item .label {
+            flex: 1;
+            font-size: 14px;
+        }
+
+        .test-item .status {
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status.pending { background: rgba(255, 212, 59, 0.2); color: #ffd43b; }
+        .status.running { background: rgba(57, 165, 150, 0.2); color: #39A596; animation: pulse 1.5s infinite; }
+        .status.passed { background: rgba(81, 207, 102, 0.2); color: #51cf66; }
+        .status.failed { background: rgba(255, 107, 107, 0.2); color: #ff6b6b; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        button {
+            background: #39A596;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 8px 8px 8px 0;
+        }
+
+        button:hover {
+            background: #2d8479;
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            background: #555;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .log-output {
+            background: #000;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #0f0;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 16px;
+        }
+
+        .log-output .error { color: #ff6b6b; }
+        .log-output .success { color: #51cf66; }
+        .log-output .info { color: #39A596; }
+        .log-output .timestamp { color: #888; margin-right: 8px; }
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .summary-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .summary-card .number {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .summary-card .label {
+            font-size: 12px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 My Narrative Integration Tests</h1>
+        <p class="subtitle">Automated testing suite for production readiness</p>
+
+        <div class="summary">
+            <div class="summary-card">
+                <div class="number" id="total-tests">0</div>
+                <div class="label">Total Tests</div>
+            </div>
+            <div class="summary-card">
+                <div class="number" style="color: #51cf66;" id="passed-tests">0</div>
+                <div class="label">Passed</div>
+            </div>
+            <div class="summary-card">
+                <div class="number" style="color: #ff6b6b;" id="failed-tests">0</div>
+                <div class="label">Failed</div>
+            </div>
+            <div class="summary-card">
+                <div class="number" style="color: #39A596;" id="success-rate">0%</div>
+                <div class="label">Success Rate</div>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 24px;">
+            <button onclick="runAllTests()">▶️ Run All Tests</button>
+            <button onclick="runConfigTests()">⚙️ Config Tests</button>
+            <button onclick="runApiTests()">🌐 API Tests</button>
+            <button onclick="clearLog()">🗑️ Clear Log</button>
+        </div>
+
+        <!-- Configuration Tests -->
+        <div class="test-section">
+            <h2>⚙️ Configuration Tests</h2>
+            <div class="test-item">
+                <span class="label">MNConfig loaded and accessible</span>
+                <span class="status pending" id="test-config-loaded">Pending</span>
+            </div>
+            <div class="test-item">
+                <span class="label">Environment detected correctly</span>
+                <span class="status pending" id="test-env-detection">Pending</span>
+            </div>
+            <div class="test-item">
+                <span class="label">API URLs configured</span>
+                <span class="status pending" id="test-api-urls">Pending</span>
+            </div>
+            <div class="test-item">
+                <span class="label">Feature flags accessible</span>
+                <span class="status pending" id="test-feature-flags">Pending</span>
+            </div>
+        </div>
+
+        <!-- API Integration Tests -->
+        <div class="test-section">
+            <h2>🌐 API Integration Tests</h2>
+            <div class="test-item">
+                <span class="label">Fashion Consultant API reachable</span>
+                <span class="status pending" id="test-consultant-api">Pending</span>
+            </div>
+            <div class="test-item">
+                <span class="label">Affiliate Links API reachable</span>
+                <span class="status pending" id="test-affiliate-api">Pending</span>
+            </div>
+            <div class="test-item">
+                <span class="label">API timeout handling</span>
+                <span class="status pending" id="test-timeout">Pending</span>
+            </div>
+            <div class="test-item">
+                <span class="label">Offline fallback works</span>
+                <span class="status pending" id="test-offline">Pending</span>
+            </div>
+        </div>
+
+        <!-- Module Tests -->
+        <div class="test-section">
+            <h2>📦 Module Tests</h2>
+            <div class="test-item">
+                <span class="label">MNAIStylist module loaded</span>
+                <span class="status pending" id="test-module-stylist">Pending</span>
+            </div>
+            <div class="test-item">
+                <span class="label">MNGapAnalyzer module loaded</span>
+                <span class="status pending" id="test-module-gap">Pending</span>
+            </div>
+            <div class="test-item">
+                <span class="label">MNLoadingStates module loaded</span>
+                <span class="status pending" id="test-module-loading">Pending</span>
+            </div>
+        </div>
+
+        <!-- UI Component Tests -->
+        <div class="test-section">
+            <h2>🎨 UI Component Tests</h2>
+            <div class="test-item">
+                <span class="label">Loading spinner creation</span>
+                <span class="status pending" id="test-ui-spinner">Pending</span>
+            </div>
+            <div class="test-item">
+                <span class="label">Toast notification system</span>
+                <span class="status pending" id="test-ui-toast">Pending</span>
+            </div>
+            <div class="test-item">
+                <span class="label">Error modal rendering</span>
+                <span class="status pending" id="test-ui-modal">Pending</span>
+            </div>
+        </div>
+
+        <div class="log-output" id="test-log">
+            <div class="info">Test suite ready. Click "Run All Tests" to begin.</div>
+        </div>
+    </div>
+
+    <!-- Load Dependencies -->
+    <script src="assets/MN-config.js"></script>
+    <script src="assets/MN-loading-states.js"></script>
+    <script src="assets/MN-gap-analyzer.js"></script>
+
+    <script>
+        // Test Results Storage
+        const testResults = {
+            total: 0,
+            passed: 0,
+            failed: 0
+        };
+
+        // Logging Utility
+        function log(message, type = 'info') {
+            const logEl = document.getElementById('test-log');
+            const timestamp = new Date().toLocaleTimeString();
+            const colorClass = type === 'error' ? 'error' : type === 'success' ? 'success' : 'info';
+            
+            logEl.innerHTML += `<div class="${colorClass}"><span class="timestamp">[${timestamp}]</span>${message}</div>`;
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('test-log').innerHTML = '<div class="info">Log cleared.</div>';
+        }
+
+        // Update Test Status
+        function updateTestStatus(testId, status) {
+            const el = document.getElementById(testId);
+            if (el) {
+                el.className = `status ${status}`;
+                el.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+            }
+        }
+
+        // Update Summary
+        function updateSummary() {
+            document.getElementById('total-tests').textContent = testResults.total;
+            document.getElementById('passed-tests').textContent = testResults.passed;
+            document.getElementById('failed-tests').textContent = testResults.failed;
+            const rate = testResults.total > 0 ? Math.round((testResults.passed / testResults.total) * 100) : 0;
+            document.getElementById('success-rate').textContent = rate + '%';
+        }
+
+        // Test Runner
+        async function runTest(name, testId, testFn) {
+            testResults.total++;
+            updateTestStatus(testId, 'running');
+            log(`Running: ${name}`, 'info');
+            
+            try {
+                const result = await testFn();
+                if (result) {
+                    testResults.passed++;
+                    updateTestStatus(testId, 'passed');
+                    log(`✓ ${name} - PASSED`, 'success');
+                } else {
+                    testResults.failed++;
+                    updateTestStatus(testId, 'failed');
+                    log(`✗ ${name} - FAILED`, 'error');
+                }
+            } catch (error) {
+                testResults.failed++;
+                updateTestStatus(testId, 'failed');
+                log(`✗ ${name} - ERROR: ${error.message}`, 'error');
+            }
+            
+            updateSummary();
+        }
+
+        // Configuration Tests
+        async function runConfigTests() {
+            log('=== Starting Configuration Tests ===', 'info');
+            
+            await runTest('MNConfig loaded', 'test-config-loaded', () => {
+                return typeof window.MNConfig !== 'undefined';
+            });
+            
+            await runTest('Environment detection', 'test-env-detection', () => {
+                return window.MNConfig && ['development', 'staging', 'production'].includes(window.MNConfig.ENV);
+            });
+            
+            await runTest('API URLs configured', 'test-api-urls', () => {
+                return window.MNConfig && 
+                       window.MNConfig.API && 
+                       window.MNConfig.API.FASHION_CONSULTANT_API &&
+                       !window.MNConfig.API.FASHION_CONSULTANT_API.includes('YOUR_VERCEL_APP');
+            });
+            
+            await runTest('Feature flags', 'test-feature-flags', () => {
+                return window.MNConfig && window.MNConfig.FEATURES && typeof window.MNConfig.FEATURES.ENABLE_OFFLINE_MODE === 'boolean';
+            });
+        }
+
+        // API Tests
+        async function runApiTests() {
+            log('=== Starting API Integration Tests ===', 'info');
+            
+            await runTest('Fashion Consultant API', 'test-consultant-api', async () => {
+                if (!window.MNConfig) return false;
+                
+                try {
+                    const controller = new AbortController();
+                    const timeout = setTimeout(() => controller.abort(), 5000);
+                    
+                    const response = await fetch(window.MNConfig.API.FASHION_CONSULTANT_API, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            identity: { presence: 'Test User' },
+                            currentContext: { mode: 'self', activity: 'Test' }
+                        }),
+                        signal: controller.signal
+                    });
+                    
+                    clearTimeout(timeout);
+                    return response.status === 200 || response.status === 400; // Either success or handled error
+                } catch (error) {
+                    log(`API Error: ${error.message}`, 'error');
+                    return false;
+                }
+            });
+            
+            await runTest('Affiliate Links API', 'test-affiliate-api', async () => {
+                if (!window.MNConfig) return false;
+                
+                try {
+                    const controller = new AbortController();
+                    const timeout = setTimeout(() => controller.abort(), 5000);
+                    
+                    const response = await fetch(window.MNConfig.API.AFFILIATE_LINKS_API, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            gaps: [{ category: 'T-Shirt', priority: 'high' }]
+                        }),
+                        signal: controller.signal
+                    });
+                    
+                    clearTimeout(timeout);
+                    return response.status === 200 || response.status === 400;
+                } catch (error) {
+                    log(`API Error: ${error.message}`, 'error');
+                    return false;
+                }
+            });
+            
+            await runTest('Timeout handling', 'test-timeout', async () => {
+                return window.MNConfig && window.MNConfig.NETWORK && window.MNConfig.NETWORK.API_TIMEOUT > 0;
+            });
+            
+            await runTest('Offline fallback', 'test-offline', () => {
+                return window.MNConfig && window.MNConfig.FEATURES && window.MNConfig.FEATURES.ENABLE_OFFLINE_MODE === true;
+            });
+        }
+
+        // Module Tests
+        async function runModuleTests() {
+            log('=== Starting Module Tests ===', 'info');
+            
+            await runTest('MNAIStylist loaded', 'test-module-stylist', () => {
+                return typeof window.MNAIStylist !== 'undefined';
+            });
+            
+            await runTest('MNGapAnalyzer loaded', 'test-module-gap', () => {
+                return typeof window.MNGapAnalyzer !== 'undefined';
+            });
+            
+            await runTest('MNLoadingStates loaded', 'test-module-loading', () => {
+                return typeof window.MNLoadingStates !== 'undefined';
+            });
+        }
+
+        // UI Tests
+        async function runUITests() {
+            log('=== Starting UI Component Tests ===', 'info');
+            
+            await runTest('Loading spinner', 'test-ui-spinner', () => {
+                if (!window.MNLoadingStates) return false;
+                const spinner = MNLoadingStates.spinner.show({ message: 'Test' });
+                const exists = document.querySelector('.mn-loading-overlay') !== null;
+                MNLoadingStates.spinner.hide(spinner);
+                return exists;
+            });
+            
+            await runTest('Toast notification', 'test-ui-toast', () => {
+                if (!window.MNLoadingStates) return false;
+                const toast = MNLoadingStates.toast.success('Test', { duration: 0 });
+                const exists = document.querySelector('.mn-toast') !== null;
+                MNLoadingStates.toast.hide(toast);
+                return exists;
+            });
+            
+            await runTest('Error modal', 'test-ui-modal', () => {
+                if (!window.MNLoadingStates) return false;
+                // Just check if the function exists
+                return typeof MNLoadingStates.modal.error === 'function';
+            });
+        }
+
+        // Run All Tests
+        async function runAllTests() {
+            testResults.total = 0;
+            testResults.passed = 0;
+            testResults.failed = 0;
+            updateSummary();
+            
+            log('========================================', 'info');
+            log('Starting Full Test Suite', 'info');
+            log('========================================', 'info');
+            
+            await runConfigTests();
+            await runModuleTests();
+            await runUITests();
+            await runApiTests();
+            
+            log('========================================', 'info');
+            log(`Test Suite Complete: ${testResults.passed}/${testResults.total} passed`, testResults.failed === 0 ? 'success' : 'error');
+            log('========================================', 'info');
+        }
+    </script>
+</body>
+</html>

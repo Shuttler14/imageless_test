@@ -1,0 +1,104 @@
+{% capture slider_attributes %}
+    data-autoplay="{{ section.settings.enable_autoplay }}"
+    data-autoplay-duration="{{ section.settings.autoplay_duration }}"
+    data-navigation="{{ section.settings.enable_navigation }}"
+    data-pagination="{{ section.settings.enable_pagination }}"
+    data-loop="{{ section.settings.enable_loop }}"
+{% endcapture %}
+
+<div class="announcement-slider-container bg-[#39A596]">
+  <div class="announcement-slider-wrapper" {{ slider_attributes }}>
+
+    <div class="">
+      <div class="overflow-hidden js-announcement-slider">
+        <div class="swiper-wrapper">
+          {% for block in section.blocks %}
+            <div class="swiper-slide">
+              <p class="leading-none text-xs md:text-sm normal-font text-center px-0.5 py-2 whitespace-nowrap">
+                {{ block.settings.announcement_text }}
+              </p>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation, Pagination, and Scrollbar outside the slider -->
+    <div class="announcement-slider-controls flex justify-center items-center gap-4">
+      {% if section.settings.enable_navigation %}
+        <button class="announcement-slider-prev p-2 bg-white/20 hidden md:flex justify-center items-center cursor-pointer disabled:cursor-not-allowed">
+          <i class="bi bi-chevron-left"></i>
+        </button>
+      {% endif %}
+      {% if section.settings.enable_pagination %}
+        <div class="announcement-slider-pagination flex items-center justify-center gap-2 max-w-fit"></div>
+      {% endif %}
+      {% if section.settings.enable_navigation %}
+        <button class="announcement-slider-next p-2 bg-white/20 hidden md:flex justify-center items-center cursor-pointer disabled:cursor-not-allowed">
+          <i class="bi bi-chevron-right"></i>
+        </button>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+  {
+    "name": "announcement Slider",
+    "tag": "section",
+  
+    "settings": [
+  
+      {
+        "type": "checkbox",
+        "id": "enable_autoplay",
+        "label": "Enable Autoplay",
+        "default": true
+      },
+      {
+        "type": "range",
+        "id": "autoplay_duration",
+        "label": "Autoplay Speed (ms)",
+        "min": 1000,
+        "max": 5000,
+        "step": 500,
+        "default": 3000
+      }, {
+        "type": "checkbox",
+        "id": "enable_navigation",
+        "label": "Enable Navigation Arrows",
+        "default": true
+      }, {
+        "type": "checkbox",
+        "id": "enable_pagination",
+        "label": "Enable Pagination Dots",
+        "default": true
+      }, {
+        "type": "checkbox",
+        "id": "enable_loop",
+        "label": "Enable Infinite Loop",
+        "default": true
+      }
+    ],
+    "blocks": [
+      {
+        "type": "announcement",
+        "name": "Announcement",
+        "settings": [
+          {
+            "type": "text",
+            "id": "announcement_text",
+            "label": "Announcement Text"
+          }
+         
+        ]
+      }
+    ],
+    "presets": [
+      {
+        "name": "announcement Slider",
+        "category": "Collection"
+      }
+    ]
+  }
+{% endschema %}

@@ -1,0 +1,87 @@
+{% comment %} 
+  PREMIUM DARK MODE SEARCH RESULTS
+  Style: Luxury Streetwear (My Narrative)
+  Background: Black | Text: White
+{% endcomment %}
+
+<style>
+  /* Smooth Fade Up Animation */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate-fade-in {
+    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+</style>
+
+<div class="min-h-screen bg-black text-white">
+    
+    {% render 'filter-and-sort', collection: search.results %}
+    
+    {% if search.results_count > 0 %}
+
+    <div class="container max-w-screen-xl mx-auto px-4 md:px-6 my-8 md:my-10 text-center md:text-left">
+       <p class="text-xs md:text-sm font-light uppercase tracking-[0.2em] text-gray-400 animate-fade-in">
+          {{ search.results_count }} Matches found for <span class="text-white font-medium border-b border-white pb-0.5">{{ search.terms | highlight: search.terms }}</span>
+       </p>
+    </div>
+
+    {% paginate search.results by 15 %}
+    {% if search.performed %}
+    
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-3 gap-y-3 md:gap-x-5 md:gap-y-12 my-6 md:my-12 px-2 md:px-6 container max-w-screen-xl mx-auto opacity-0 animate-fade-in"
+        style="animation-delay: 0.2s; animation-fill-mode: forwards;"
+        data-next-url="{{ paginate.next.url }}" 
+        data-for="collection-container">
+        
+        {% for item in search.results %}
+            {% if item.object_type == 'product'%}
+                <div class="product-grid-item">
+                    {% render 'product-card' product:item, wishlist:true %}
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if paginate.next %}
+    <div class="flex justify-center items-center my-12 md:my-20 px-4 md:px-6 container max-w-screen-xl mx-auto"
+        data-for="load-more-btn-container" data-btn-loading="false">
+        
+        <button class="bg-black text-white border border-white py-3 px-8 text-xs md:text-sm uppercase tracking-[0.15em] hover:bg-white hover:text-black transition-all duration-300 ease-out cursor-pointer" 
+                data-for="load-more-btn">
+            Load More
+        </button>
+    </div>
+    {% endif %}
+    {% endpaginate %}
+    
+    {% else %}
+    
+    <div class="flex flex-col gap-6 items-center justify-center p-4 md:p-6 min-h-[60vh] text-center animate-fade-in">
+        <h1 class="text-3xl md:text-5xl font-bold uppercase tracking-tighter text-white">
+            No Results
+        </h1>
+        <p class="text-sm md:text-base text-gray-400 font-light tracking-wide max-w-md mx-auto text-balance">
+            No matches found for <span class="text-white font-medium">"{{ search.terms | escape }}"</span>.
+        </p>
+        <a href="/" class="mt-6 border-b border-white pb-1 text-xs uppercase tracking-[0.2em] text-white hover:text-gray-400 transition-colors duration-300">
+            Back to Homepage
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+{% schema %}
+{
+"name": "Search",
+"tag": "section",
+"settings": [],
+"presets": [
+{
+"name": "Search"
+}
+]
+}
+{% endschema %}

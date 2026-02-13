@@ -1,0 +1,88 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "placeholder": {
+      "type": "placeholder",
+      "disabled": true,
+      "settings": {}
+    },
+    "rich_text_content_TA8G7C": {
+      "type": "rich-text-content",
+      "blocks": {
+        "text_block_HnKLMm": {
+          "type": "text_block",
+          "settings": {
+            "main_content": "<p>Welcome to My Narrative, where fashion meets individuality. We believe that every outfit tells a story, and we’re here to help you create yours.</p>"
+          }
+        },
+        "text_block_iG4iFD": {
+          "type": "text_block",
+          "settings": {
+            "main_content": "<h2>Our Story</h2><p>Born out of a passion for creativity and self-expression, My Narrative is more than just a fashion brand—it’s a movement that celebrates the uniqueness of every individual. We started with a simple idea: to design outfits that resonate with your personality and narrate your journey.</p><p>At My Narrative, we merge timeless elegance with contemporary trends to craft pieces that are as unique as the people who wear them. Each product is thoughtfully designed, keeping comfort, quality, and style in mind.</p>"
+          }
+        },
+        "text_block_zCwwig": {
+          "type": "text_block",
+          "settings": {
+            "main_content": "<h2>Our Vision</h2><p>To inspire confidence and empower individuality through fashion.</p><p>We aim to create a world where everyone feels free to express their true selves through their wardrobe. Whether you’re dressing for a special occasion or just your everyday adventures, My Narrative has something special for you.</p>"
+          }
+        },
+        "text_block_CFWbKf": {
+          "type": "text_block",
+          "settings": {
+            "main_content": "<h2>Our Commitment</h2><ul><li>Quality You Can Trust: Every piece is made with premium materials and meticulous attention to detail to ensure it meets the highest standards.</li><li>Sustainability Matters: We’re committed to making eco-conscious choices by incorporating sustainable practices into our design and production processes.</li><li>Inclusive Fashion: Our collections are designed to cater to diverse styles, body types, and preferences, because fashion should be for everyone.</li></ul>"
+          }
+        },
+        "text_block_W3A9Ay": {
+          "type": "text_block",
+          "settings": {
+            "main_content": "<h2>What Makes Us Different</h2><p>At My Narrative, we’re all about creating a personal connection with our customers. Our collections aren’t just about trends—they’re about helping you tell your story through fashion.</p><ul><li>Custom Tailoring: Personalize your outfits to fit your style and size perfectly.</li><li>Fashion with Meaning: From casual wear to statement pieces, our designs are inspired by stories, art, and culture.</li><li>Community-Driven: We’re more than a brand; we’re a community of storytellers who celebrate individuality.</li></ul>"
+          }
+        },
+        "text_block_7b9AWd": {
+          "type": "text_block",
+          "settings": {
+            "main_content": "<h2>Meet the Team</h2><p>Behind My Narrative is a passionate team of designers, creators, and dreamers led by a shared mission: to redefine fashion as a medium of self-expression.</p>"
+          }
+        },
+        "text_block_MFyhGX": {
+          "type": "text_block",
+          "settings": {
+            "main_content": "<h2>Join the Narrative</h2><p>At My Narrative, every piece you wear is a page in your story. Let us be a part of your journey, helping you express who you are, one outfit at a time.</p><p>Ready to begin your narrative?<br/> Explore our collections, and let’s create something extraordinary together.</p>"
+          }
+        },
+        "text_block_VXUdfg": {
+          "type": "text_block",
+          "settings": {
+            "main_content": "<h2>Connect With Us</h2><p>Have questions, feedback, or just want to say hi? We’d love to hear from you!</p><ul><li>Email: contact@mynarrative.store</li><li>Phone: +91-8497003530</li><li>Address : 90, 100 ft road, Indiranagar, Bangalore, Karnataka 560008</li></ul><p>Thank you for making My Narrative a part of your story.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "text_block_HnKLMm",
+        "text_block_iG4iFD",
+        "text_block_zCwwig",
+        "text_block_CFWbKf",
+        "text_block_W3A9Ay",
+        "text_block_7b9AWd",
+        "text_block_MFyhGX",
+        "text_block_VXUdfg"
+      ],
+      "settings": {
+        "section_title": "About Us"
+      }
+    }
+  },
+  "order": [
+    "placeholder",
+    "rich_text_content_TA8G7C"
+  ]
+}

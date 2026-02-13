@@ -1,0 +1,133 @@
+<!-- ═══════════════════════════════════════════════════════════
+     MY NARRATIVE - PERSISTENT AI STYLIST WIDGET
+     State-Aware | Memory-Enabled | Expandable Widget
+     ENHANCED UI with Advanced Animations & Hover Effects
+    ═══════════════════════════════════════════════════════════ -->
+
+<div id="mn-ai-widget" class="mn-ai-widget">
+  
+  <!-- STATE A: MINIMIZED WIDGET (Bottom-Right Card) -->
+  <div id="mn-widget-minimized" class="mn-widget-minimized">
+    <!-- Animated Background Particles -->
+    <div class="mn-particles">
+      <span class="mn-particle"></span>
+      <span class="mn-particle"></span>
+      <span class="mn-particle"></span>
+    </div>
+    
+    <div class="mn-mini-content">
+      <!-- Circular Avatar with Multi-Layer Pulse -->
+      <div class="mn-avatar-container">
+        <div class="mn-avatar-pulse-ring mn-pulse-1"></div>
+        <div class="mn-avatar-pulse-ring mn-pulse-2"></div>
+        <div class="mn-avatar-pulse-ring mn-pulse-3"></div>
+        <div class="mn-avatar-core">
+          <div class="mn-avatar-glow"></div>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+        </div>
+      </div>
+      
+      <!-- Text Label with Typing Animation -->
+      <div class="mn-mini-text">
+        <div class="mn-mini-title">
+          <span class="mn-title-gradient">AI Stylist</span>
+          <span class="mn-sparkle">✨</span>
+        </div>
+        <div class="mn-mini-subtitle">
+          <span class="mn-typing-text">Ready to help</span>
+        </div>
+      </div>
+      
+      <!-- Enhanced Notification Dot with Ripple -->
+      <div class="mn-notification-wrapper">
+        <div class="mn-notification-dot"></div>
+        <div class="mn-notification-ripple"></div>
+      </div>
+    </div>
+    
+    <!-- Hover Indicator -->
+    <div class="mn-hover-indicator">
+      <span class="mn-hover-text">Click to begin</span>
+      <svg class="mn-hover-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M5 12h14M12 5l7 7-7 7"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- STATE B: EXPANDED WIDGET (Fullscreen Modal) -->
+  <div id="mn-widget-expanded" class="mn-widget-expanded" aria-hidden="true">
+    
+    <!-- Animated Background -->
+    <div class="mn-expanded-bg">
+      <div class="mn-bg-gradient"></div>
+      <div class="mn-bg-grid"></div>
+      <div class="mn-bg-orbs">
+        <div class="mn-orb mn-orb-1"></div>
+        <div class="mn-orb mn-orb-2"></div>
+        <div class="mn-orb mn-orb-3"></div>
+      </div>
+    </div>
+    
+    <!-- Header Bar -->
+    <div class="mn-expanded-header">
+      <div class="mn-brand-logo">
+        <span class="mn-brand-dot">
+          <span class="mn-dot-pulse"></span>
+        </span>
+        <span class="mn-brand-text">
+          <span class="mn-letter">M</span>
+          <span class="mn-letter">Y</span>
+          <span class="mn-space"> </span>
+          <span class="mn-letter">N</span>
+          <span class="mn-letter">A</span>
+          <span class="mn-letter">R</span>
+          <span class="mn-letter">R</span>
+          <span class="mn-letter">A</span>
+          <span class="mn-letter">T</span>
+          <span class="mn-letter">I</span>
+          <span class="mn-letter">V</span>
+          <span class="mn-letter">E</span>
+        </span>
+        <span class="mn-brand-subtitle">
+          <span class="mn-subtitle-icon">✨</span> AI Stylist
+        </span>
+      </div>
+      
+      <!-- Minimize Button with Tooltip -->
+      <div class="mn-minimize-wrapper">
+        <span class="mn-minimize-tooltip">Close (Esc)</span>
+        <button id="mn-minimize-btn" class="mn-minimize-btn" aria-label="Minimize Widget">
+          <span class="mn-btn-ripple"></span>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Progress Bar (for calibration) -->
+    <div id="mn-progress-bar" class="mn-progress-bar">
+      <div class="mn-progress-fill"></div>
+      <div class="mn-progress-glow"></div>
+    </div>
+
+    <!-- Dynamic Content Container -->
+    <div id="mn-content-container" class="mn-content-container">
+      <!-- JavaScript will inject Phase 1 (Calibration) or Phase 2 (Context Dashboard) here -->
+    </div>
+
+  </div>
+</div>
+
+<!-- Load Assets -->
+<script>
+  window.MN_CONFIG = {
+    // We removed the apiKey here because Vercel handles it now!
+    studioUrl: "/pages/create-your-own-design" 
+  };
+</script>
+<script src="{{ 'MN-fashion-consultant.js' | asset_url }}" defer></script>
+<link rel="stylesheet" href="{{ 'MN-fashion-consultant.css' | asset_url }}">

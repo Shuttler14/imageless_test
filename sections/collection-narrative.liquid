@@ -1,0 +1,84 @@
+<div class="py-8 md:py-16" data-aos="fade-up">
+  {% if section.settings.heading != blank %}
+  <h1 class="text-2xl md:text-4xl text-center mb-6 md:mb-8 px-4 heading-font">{{ section.settings.heading }}</h1>
+  {% endif %}
+  {% if section.settings.banner != blank and section.settings.preview == 'banner_products' %}
+    <figure class="mb-10 md:mb-12" data-aos="fade-up">
+      <img
+        src="{{ section.settings.banner |  image_url }}"
+        width="100%"
+        height="60%" class="object-cover">
+    </figure>
+  {% endif %}
+  <div data-aos="fade-up" class="container max-w-screen-xl mx-auto px-4 flex flex-col gap-10 md:gap-12">
+    {% for collection in section.settings.collections %}
+      <div class="flex flex-col gap-6 md:gap-8">
+        {% if section.settings.preview == 'collections' %}
+          <h2 data-aos="fade-up" class="text-center text-base md:text-xl heading-font">{{ collection.title }}</h2>
+        {% endif %}
+        <div data-aos="fade-up" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-1 {% if section.settings.preview != 'collections' %} md:gap-4 {% endif %} ">
+          {% for product in collection.products limit: 5 %}
+            {% if section.settings.preview == 'collections' %}
+              <a href="{{ product.url }}" class="overflow-hidden"><img
+              src="{{ product.featured_image |  image_url }}"
+              width=""
+              height="" class="{% if forloop.index > 2  %} hidden md:block {% endif %}"></a>
+              {%  else %}
+              <div class="{% if forloop.index > 2 and forloop.index < 4 %} hidden md:block {%  elsif forloop.index > 3 %} hidden md:hidden lg:block {% endif %}">
+                {%  render 'product-card' product:product,wishlist:true %}
+                </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+        <a href="{{ collection.url }}" class="{% if section.settings.preview == 'collections' %} container max-w-screen-xl mx-auto {% endif %}  border p-2 md:p-4 text-center bg-[#1f1f1f] text-white hover:text-black hover:bg-[white] duration-200 normal-font">View All</a>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% schema %}
+  {
+    "name": "Collection Narrative",
+    "tag": "section",
+    "class": "w-full z-10 top-0 border-b",
+    "settings": [
+      {
+        "type": "text",
+        "id": "heading",
+        "label": "Add Heading",
+        "default": "My Narrative"
+      }, {
+        "type": "select",
+        "id": "preview",
+        "label": "Preview Type",
+        "options": [
+          {
+            "value": "products",
+            "label": "Products"
+          }, {
+            "value": "banner_products",
+            "label": "Banner with Products"
+          }, {
+            "value": "collections",
+            "label": "Collections"
+          }
+        ]
+      }, {
+        "type": "collection_list",
+        "id": "collections",
+        "label": "Add Collection or Collections",
+        "info": "You can add here one or more then one collection as pre your requirements"
+      }, {
+        "type": "image_picker",
+        "id": "banner",
+        "label": "Add Banner Image",
+        "info": "Add banner if required"
+      }
+    ],
+    "presets": [
+      {
+        "name": "Collection Narrative"
+      }
+    ]
+  }
+{% endschema %}

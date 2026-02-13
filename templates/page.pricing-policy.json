@@ -1,0 +1,116 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "placeholder": {
+      "type": "placeholder",
+      "disabled": true,
+      "settings": {}
+    },
+    "rich_text_content_KGUA9H": {
+      "type": "rich-text-content",
+      "blocks": {
+        "text_block_pAWRTF": {
+          "type": "text_block",
+          "settings": {
+            "main_content": "<p>Welcome to My Narrative, where we strive to offer high-quality fashion at fair and transparent prices. This Pricing Policy outlines how we determine, display, and handle pricing on our website.</p>"
+          }
+        },
+        "text_block_qqP4tN": {
+          "type": "text_block",
+          "settings": {
+            "main_content": "<h2>1. Pricing Transparency</h2><p>At My Narrative, we are committed to pricing our products competitively while ensuring top-notch quality.</p><ul><li>The prices displayed on our website are inclusive of applicable taxes, unless stated otherwise.</li><li>Any additional charges, such as shipping fees, will be clearly mentioned at checkout before you finalize your purchase.</li></ul>"
+          }
+        },
+        "text_block_gEP9NJ": {
+          "type": "text_block",
+          "settings": {
+            "main_content": "<h2>2. Currency</h2><p>All prices are listed in Indian Rupees (INR) by default.</p><ul><li>For customers outside India, currency conversions may apply based on your payment provider’s exchange rates.</li><li>Any conversion fees are the responsibility of the customer and may vary depending on your bank or payment provider.</li></ul>"
+          }
+        },
+        "text_block_w4Ngjd": {
+          "type": "text_block",
+          "settings": {
+            "main_content": "<h2>3. Price Changes</h2><p>We reserve the right to change product prices at any time without prior notice.</p><ul><li>Prices may vary during sales, promotions, or special events.</li><li>Once an order is placed, the price at the time of purchase will be honored.</li></ul>"
+          }
+        },
+        "text_block_GFnXr3": {
+          "type": "text_block",
+          "settings": {
+            "main_content": "<h2>4. Discounts and Promotions</h2><p>Occasionally, we offer discounts, promo codes, and special offers to our customers.</p><ul><li>Promotional offers cannot be combined unless explicitly stated.</li><li>Discounts apply only to eligible items and are valid within the specified time frame.</li><li>If a discount or promotion is applied incorrectly, please contact our customer support team at aryan@aryanverma.com for assistance.</li></ul>"
+          }
+        },
+        "text_block_e4UEL3": {
+          "type": "text_block",
+          "settings": {
+            "main_content": "<h2>5. Pricing Errors</h2><p>While we strive for accuracy, pricing errors may occasionally occur.</p><ul><li>If we discover a pricing error in your order, we will notify you as soon as possible.</li><li>In such cases, you may choose to proceed with the corrected price or cancel the order for a full refund.</li><li>My Narrative reserves the right to cancel any order with a pricing error, regardless of whether the order has been confirmed or payment has been made.</li></ul>"
+          }
+        },
+        "text_block_83KN4d": {
+          "type": "text_block",
+          "settings": {
+            "main_content": "<h2>6. GST and Taxes</h2><p>All applicable taxes, including Goods and Services Tax (GST), are calculated and included in the displayed price, unless otherwise specified.</p>"
+          }
+        },
+        "text_block_cwimNH": {
+          "type": "text_block",
+          "settings": {
+            "main_content": "<h2>7. Shipping Costs</h2><p>Shipping costs are not included in the product price unless otherwise mentioned.</p><ul><li>Shipping fees, if applicable, will be displayed at checkout.</li><li>We occasionally offer free shipping as part of promotions or for orders exceeding a certain value, which will be clearly communicated on the website.</li></ul>"
+          }
+        },
+        "text_block_eeRckw": {
+          "type": "text_block",
+          "settings": {
+            "main_content": "<h2>8. Refunds for Price Changes</h2><p>We do not offer refunds or adjustments for price differences on products purchased before a sale or promotional event.</p>"
+          }
+        },
+        "text_block_6qJF9p": {
+          "type": "text_block",
+          "settings": {
+            "main_content": "<h2><strong>9. Bulk Orders and Custom Requests</strong></h2><p><strong>For bulk orders or customized product requests, please contact us at aryan@aryanverma.com. We may offer special pricing or discounts based on the order volume and specifications.</strong></p>"
+          }
+        },
+        "text_block_M9UbQM": {
+          "type": "text_block",
+          "settings": {
+            "main_content": "<h2>10. Contact Us</h2><p>If you have any questions or concerns about our pricing policy, feel free to reach out:</p><ul><li>Email: contact@mynarrative.store</li><li>Phone: +91-8497003530</li></ul><p>Thank you for choosing My Narrative. We are dedicated to offering you the best fashion at the best prices!</p>"
+          }
+        },
+        "text_block_eyNVpT": {
+          "type": "text_block",
+          "settings": {
+            "main_content": "<p><strong>Let me know if any adjustments are needed!</strong></p>"
+          }
+        }
+      },
+      "block_order": [
+        "text_block_pAWRTF",
+        "text_block_qqP4tN",
+        "text_block_gEP9NJ",
+        "text_block_w4Ngjd",
+        "text_block_GFnXr3",
+        "text_block_e4UEL3",
+        "text_block_83KN4d",
+        "text_block_cwimNH",
+        "text_block_eeRckw",
+        "text_block_6qJF9p",
+        "text_block_M9UbQM",
+        "text_block_eyNVpT"
+      ],
+      "settings": {
+        "section_title": "Pricing Policy"
+      }
+    }
+  },
+  "order": [
+    "placeholder",
+    "rich_text_content_KGUA9H"
+  ]
+}

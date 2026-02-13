@@ -1,0 +1,236 @@
+{% if template.name == 'search' %}
+  {% assign data = search %}
+{% else %}
+  {% assign data = collection %}
+{% endif %}
+{% assign show_mini_filter = false %}
+{%- for filter in data.filters -%}
+  {% if filter.label == 'Categories' %}
+    {% assign show_mini_filter = true %}
+  {% endif %}
+{% endfor %}
+
+{% if show_mini_filter %}
+  <div
+    class="flex items-center justify-between container max-w-screen-xl mx-auto px-4 md:px-6 {% if template.name == 'search' %} my-6 md:my-12 {%  else %}  mb-3 md:mb-5 {% endif %}"
+  >
+    <form data-for="mini-filter-form" class="flex-1">
+      {% if template.name == 'search' %}
+        <input type="hidden" name="q" value="{{ search.terms }}">
+      {% endif %}
+
+      {%- for filter in data.filters -%}
+        {% if filter.label == 'Categories' %}
+          <div class="flex flex-col gap-1 flex-1">
+            <div class="flex items-center justify-center mb-2 md:mb-4 text-xl md:text-2xl font-bold">
+              <span>{{ filter.label }}</span>
+              {%- if filter.active_values.size > 0 -%}
+                <span>({{ filter.active_values.size }})</span>
+              {%- endif -%}
+            </div>
+            <ul class="flex flex-wrap justify-center items-center gap-2">
+              {%- case filter.type -%}
+                {%- when 'list' -%}
+                  {%- for value in filter.values -%}
+                    <li class="cursor-pointer text-lg md:text-xl">
+                      <label
+                        class="border py-1 px-2 cursor-pointer has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-50 has-[:checked]:bg-white has-[:checked]:text-black has-[:checked]:ring-2 has-[:checked]:ring-black"
+                      >
+                        <input
+                          class="hidden"
+                          type="checkbox"
+                          name="{{ value.param_name }}"
+                          value="{{ value.value }}"
+                          {% if value.active %}
+                            checked
+                          {% endif %}
+                          {% if value.count == 0 and value.active == false %}
+                            disabled
+                          {% endif %}
+                        >
+                        {{ value.label }} ({{ value.count }})
+                      </label>
+                    </li>
+                  {%- endfor -%}
+              {% endcase %}
+            </ul>
+          </div>
+        {% endif %}
+      {%- endfor -%}
+    </form>
+  </div>
+{% endif %}
+
+<div class="py-2  z-[1] flex flex-col gap-2 normal-font">
+  <div class="flex items-center justify-between container max-w-screen-xl mx-auto px-4 md:px-6">
+    <button
+      class="flex p-1 px-2 border gap-1 bg-black hover:bg-slate-200 hover:text-black transition-all "
+      data-for="filter-slide-btn"
+    >
+      <i class="bi bi-funnel-fill"></i>
+      <p>Filter</p>
+    </button>
+    <button
+      class="flex p-1 px-2 border gap-1 bg-black hover:bg-slate-200 hover:text-black transition-all "
+      data-for="sort-slide-btn"
+    >
+      <i class="bi bi-sort-alpha-down"></i>
+      <p>Sort By</p>
+    </button>
+  </div>
+  {% assign active_filters_count = 0 %}
+  {% for filter in data.filters %}
+    {% assign active_filters_count = active_filters_count | plus: filter.active_values.size %}
+  {% endfor %}
+  {% if active_filters_count > 0 %}
+    <div class="flex flex-wrap gap-1 items-center container max-w-screen-xl mx-auto py-2 px-4 md:px-6">
+      {%- for filter in data.filters -%}
+        {%- for active_value in filter.active_values -%}
+          <div class="border flex justify-between items-center gap-2 px-2 py-1 bg-black">
+            <p>{{ active_value.label }}</p>
+            <a
+              href="{{ active_value.url_to_remove }}"
+              class="hover:bg-slate-200 hover:text-black transition-all aspect-square rounded-full"
+              ><i
+                class="bi bi-x-circle flex justify-between items-center"
+              ></i
+            ></a>
+          </div>
+        {%- endfor -%}
+      {%- endfor -%}
+
+      <a
+        href="{% if template.name == 'collection' %}{{ data.url }}?sort_by={{ data.sort_by }}{% else %}{{ routes.search_url }}?sort_by={{ data.sort_by }}&q={{ data.terms }}{% endif %}"
+        class="border flex justify-between items-center gap-2 px-2 py-1 bg-black hover:bg-slate-200 hover:text-black transition-all"
+      >
+        <p>Clear all</p>
+        <i class="bi bi-x-circle flex justify-between items-center"></i>
+      </a>
+    </div>
+  {% endif %}
+</div>
+<div class="fixed w-screen h-screen top-0 right-0 bg-black opacity-60 z-10 hidden " data-for="collection-overlay"></div>
+<div
+  class="h-screen w-[90vw] max-w-[300px] bg-black fixed top-0 z-[11] overflow-auto normal-font"
+  data-for="sort-slide"
+>
+  <p class="text-lg md:text-xl py-2 px-4 bg-white text-black sticky top-0 heading-font font-bold">Sort By</p>
+  <div class="flex flex-col p-4 gap-2 md:gap-3">
+    {% assign sort_by = data.sort_by | default: data.default_sort_by %}
+    {% for option in data.sort_options %}
+      <label
+        class="flex items-center gap-1 has-[:checked]:bg-indigo-50 has-[:checked]:text-indigo-900 ring-indigo-50 has-[:checked]:ring-indigo-200 p-1  hover:bg-indigo-100 hover:text-black"
+      >
+        <input
+          type="radio"
+          name="sory-by"
+          value="{{ option.value }}"
+          data-for="sort-options"
+          {% if option.value == sort_by %}
+            checked
+          {% endif %}
+          class="checked:border-indigo-500"
+        >
+        {{ option.name }}
+      </label>
+    {% endfor %}
+  </div>
+</div>
+<div
+  class="h-screen w-[90vw] max-w-[300px] bg-black fixed top-0 z-[11] overflow-auto normal-font"
+  data-for="filter-slide"
+>
+  <p class="text-lg md:text-xl py-2 px-4 bg-white text-black sticky top-0 heading-font font-bold">Filter</p>
+  <div class="flex flex-col p-4 gap-2 md:gap-3">
+    <form data-for="filter-form" class="flex flex-col gap-3 md:gap-4">
+      {% if template.name == 'search' %}
+        <input type="hidden" name="q" value="{{ search.terms }}">
+      {% endif %}
+
+      {%- for filter in data.filters -%}
+        <div class="flex flex-col gap-1">
+          <div class="">
+            <span>{{ filter.label }}</span>
+            {%- if filter.active_values.size > 0 -%}
+              <span>({{ filter.active_values.size }})</span>
+            {%- endif -%}
+          </div>
+          <ul class="">
+            {%- case filter.type -%}
+              {%- when 'boolean' -%}
+                <li>
+                  <label>
+                    <input
+                      type="checkbox"
+                      name="{{ filter.param_name }}"
+                      value="{{ filter.true_value.value }}"
+                      {% if filter.true_value.active %}
+                        checked
+                      {% endif %}
+                    >
+                    {{ filter.true_value.label }}
+                  </label>
+                </li>
+                <li>
+                  <label>
+                    <input
+                      type="checkbox"
+                      name="{{ filter.param_name }}"
+                      value="{{ filter.false_value.value }}"
+                      {% if filter.false_value.active %}
+                        checked
+                      {% endif %}
+                    >
+                    {{ filter.false_value.label }}
+                  </label>
+                </li>
+
+              {%- when 'list' -%}
+                {%- for value in filter.values -%}
+                  <li>
+                    <label class="has-[:disabled]:opacity-50">
+                      <input
+                        class=""
+                        type="checkbox"
+                        name="{{ value.param_name }}"
+                        value="{{ value.value }}"
+                        {% if value.active %}
+                          checked
+                        {% endif %}
+                        {% if value.count == 0 and value.active == false %}
+                          disabled
+                        {% endif %}
+                      >
+                      {{ value.label }} ({{ value.count }})
+                    </label>
+                  </li>
+                {%- endfor -%}
+
+              {%- when 'price_range' -%}
+                <li class="flex gap-1">
+                  <input
+                    name="{{ filter.min_value.param_name }}"
+                    type="number"
+                    class="shadow appearance-none border  w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    value="{{ filter.min_value.value | money_without_currency | default: '' }}"
+                    min="0"
+                    max="{{ filter.range_max }}"
+                    placeholder="Min Value"
+                  >
+                  <input
+                    name="{{ filter.max_value.param_name }}"
+                    type="number"
+                    class="shadow appearance-none border  w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    value="{{ filter.max_value.value | money_without_currency | default: '' }}"
+                    min="0"
+                    max="{{ filter.range_max }}"
+                    placeholder="Max Value"
+                  >
+                </li>
+            {% endcase %}
+          </ul>
+        </div>
+      {%- endfor -%}
+    </form>
+  </div>
+</div>

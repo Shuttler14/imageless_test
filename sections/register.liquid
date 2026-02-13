@@ -1,0 +1,54 @@
+<div class="max-w-[500px] bg-white my-8 text-black mx-4 md:mx-6 p-8  w-full" data-for="forget-password-form">
+  <h2 class="text-2xl md:text-4xl text-center mb-6 md:mb-9 lg:mb-14 heading-font">Create Account</h2>
+  {% form 'create_customer' %}
+    <div class="mb-2 text-red-500 normal-font">
+      {{ form.errors | default_errors }}
+    </div>
+    <div class="flex flex-col gap-4 md:gap-6 normal-font">
+      <input
+        type="text"
+        value=""
+        name="customer[name]"
+        autofocus
+        placeholder="Enter Your Name"
+        class="border p-1 md:p-2 focus:outline-none w-full "
+      >
+      
+      <input
+        type="email"
+        value=""
+        name="customer[email]"
+        placeholder="Enter Your Email"
+        class="border p-1 md:p-2 focus:outline-none w-full "
+      >
+      <input
+        type="password"
+        value=""
+        name="customer[password]"
+        placeholder="Set Your Password"
+        class="border p-1 md:p-2 focus:outline-none w-full "
+      >
+      <button
+        type="submit"
+        class="border p-1 md:p-2 uppercase text-sm md:text-xl bg-black text-white hover:bg-white hover:text-black transition-all shadow-inner "
+      >
+        Create
+      </button>
+    </div>
+  {% endform %}
+</div>
+
+{% schema %}
+{
+  "name": "Register",
+  "tag": "section",
+  "class": "container max-w-screen-xl mx-auto flex justify-center",
+  "limit": 1,
+  "settings": [],
+  "presets": [
+    {
+      "name": "Register"
+    }
+  ]
+}
+{% endschema %}

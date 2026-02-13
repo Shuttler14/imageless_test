@@ -1,0 +1,609 @@
+<script>
+    // If the user has already seen the animation in this session, 
+    // we inject a style to HIDE the overlay immediately before it renders.
+    if (sessionStorage.getItem('mn_preloader_seen')) {
+        document.write('<style>#mn-preloader-overlay { display: none !important; visibility: hidden !important; }</style>');
+    }
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+
+<style>
+    /* Scoped Variables */
+    :root { 
+        --mn-brand-teal: #39A596; 
+        --mn-bg-dark: #000000;
+    }
+
+    #mn-preloader-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 2147483647; 
+        background-color: var(--mn-bg-dark);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Montserrat', sans-serif;
+        overflow: hidden;
+        transition: opacity 1s ease, visibility 1s ease;
+    }
+
+    /* --- ATMOSPHERE --- */
+    .mn-glass-layer-1 {
+        position: absolute; inset: 0;
+        background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.03) 0%, transparent 70%);
+        animation: mnGlassDrift 8s ease-in-out infinite;
+        filter: blur(80px); z-index: 0;
+    }
+    .mn-glass-layer-2 {
+        position: absolute; inset: 0;
+        background: radial-gradient(circle at 30% 40%, rgba(57,165,150,0.08) 0%, transparent 60%);
+        animation: mnGlassDrift 10s ease-in-out infinite reverse;
+        filter: blur(100px); z-index: 0;
+    }
+    .mn-vignette {
+        position: absolute; inset: 0;
+        background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.95) 100%);
+        pointer-events: none; z-index: 2;
+    }
+
+    .mn-container {
+        position: relative; display: flex; flex-direction: column; align-items: center; gap: 64px; z-index: 10;
+        width: 100%; height: 100%; justify-content: center;
+    }
+
+    .mn-visualization {
+        position: relative; width: 320px; height: 320px;
+        display: flex; align-items: center; justify-content: center;
+    }
+
+    /* --- WAVES --- */
+    .mn-wave {
+        position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    }
+    .mn-wave-circle {
+        width: 100%; height: 100%; border-radius: 50%; border: 1px solid;
+    }
+
+    /* --- CORE SPHERE --- */
+    .mn-core-glow {
+        position: absolute; width: 128px; height: 128px;
+        left: 50%; top: 50%; transform: translate(-50%, -50%);
+        background: radial-gradient(circle, rgba(57,165,150,0.3) 0%, transparent 70%);
+        animation: mnCoreGlow 2s ease-in-out infinite;
+        filter: blur(20px); border-radius: 50%;
+    }
+
+    .mn-sphere {
+        position: relative; width: 96px; height: 96px; border-radius: 50%;
+        background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.4) 0%, rgba(57,165,150,1) 25%, rgba(45,135,130,1) 60%, rgba(20,70,65,1) 100%);
+        box-shadow: inset -10px -10px 30px rgba(0,0,0,0.5), inset 5px 5px 20px rgba(255,255,255,0.3), 0 0 30px rgba(57,165,150,0.6);
+        animation: mnPlanetPulse 3s ease-in-out infinite; z-index: 10;
+        transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .mn-longitude-container { position: absolute; inset: 0; overflow: visible; }
+    .mn-latitude {
+        position: absolute; left: 50%; transform: translateX(-50%); height: 1px;
+        background: linear-gradient(to right, transparent, rgba(34,211,238,0.3), transparent);
+        border-radius: 50%;
+    }
+    .mn-equator {
+        position: absolute; left: 50%; top: 50%; width: 96px; height: 2px;
+        transform: translate(-50%, -50%);
+        background: linear-gradient(to right, transparent, rgba(57,165,150,0.6), transparent);
+        box-shadow: 0 0 10px rgba(57,165,150,0.8);
+        animation: mnEquatorPulse 2s ease-in-out infinite; border-radius: 50%;
+    }
+    .mn-highlight {
+        position: absolute; width: 50px; height: 50px; left: 20%; top: 20%;
+        background: radial-gradient(circle, rgba(255,255,255,0.5) 0%, transparent 70%);
+        filter: blur(8px); animation: mnHighlightShift 4s ease-in-out infinite; border-radius: 50%;
+    }
+
+    /* --- ORBITING PARTICLES --- */
+    .mn-orbit-container {
+        position: absolute; left: 50%; top: 50%; width: 100%; height: 100%;
+    }
+    
+    .mn-particle {
+        position: absolute; width: 10px; height: 10px;
+        left: calc(50% + 140px); top: 50%;
+        transform: translate(-50%, -50%);
+        background: #fff; 
+        box-shadow: 0 0 10px #fff, 0 0 20px rgba(57,165,150,0.8);
+        filter: blur(0.5px); border-radius: 50%;
+        animation: mnParticlePulse 2s ease-in-out infinite;
+        transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .mn-particle.hero {
+        width: 14px; height: 14px;
+        background: var(--mn-brand-teal);
+        box-shadow: 0 0 30px var(--mn-brand-teal), 0 0 60px var(--mn-brand-teal);
+        z-index: 100;
+    }
+    
+    .mn-particle.surge {
+        width: 12px; height: 12px;
+        box-shadow: 0 0 20px #fff, 0 0 40px var(--mn-brand-teal);
+    }
+
+    .mn-particle.hero.center-stage {
+        left: 50% !important; 
+        top: 50% !important;
+        transform: translate(-50%, -50%) scale(4); 
+        background: var(--mn-brand-teal);
+        box-shadow: 0 0 80px var(--mn-brand-teal), 0 0 150px var(--mn-brand-teal);
+        opacity: 1;
+    }
+
+    .mn-particle.fade-out {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0);
+    }
+
+    /* --- BRAND REVEAL SECTION --- */
+    .mn-brand-reveal {
+        position: absolute; top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        display: none; flex-direction: column; align-items: center;
+        z-index: 2000; pointer-events: none;
+        width: 100%;
+    }
+
+    .mn-reveal-logo {
+        width: 180px; height: auto;
+        margin-bottom: 14px;
+        opacity: 0;
+        filter: blur(15px) drop-shadow(0 0 25px rgba(57,165,150,0.6));
+        transform: scale(0.9);
+        transition: all 1.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .mn-reveal-logo.visible {
+        opacity: 1;
+        filter: blur(0px) drop-shadow(0 0 25px rgba(57,165,150,0.6));
+        transform: scale(1);
+    }
+
+    .mn-brand-title {
+        font-family: 'Times New Roman', Times, serif; 
+        font-size: 38px; 
+        color: #fff;
+        letter-spacing: 2px; 
+        margin-bottom: 12px; 
+        font-weight: 400;
+        text-align: center;
+        text-shadow: 0 0 30px rgba(57,165,150,0.4);
+        display: flex; gap: 4px;
+    }
+    .mn-brand-letter {
+        display: inline-block;
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    .mn-brand-slogan {
+        font-family: 'Montserrat', sans-serif; 
+        font-size: 13px;
+        color: var(--mn-brand-teal);
+        letter-spacing: 5px; 
+        text-transform: uppercase; 
+        font-weight: 500;
+        text-align: center;
+        opacity: 0;
+        transform: translateY(10px);
+        transition: all 0.6s ease;
+    }
+    .mn-brand-slogan.visible {
+        opacity: 0.8;
+        transform: translateY(0);
+    }
+
+    .mn-micro-copy {
+        margin-top: 40px; font-size: 14px; color: rgba(229, 231, 235, 0.9);
+        font-weight: 500; letter-spacing: 3px; text-transform: uppercase;
+        text-shadow: 0 0 15px rgba(57,165,150,0.5); text-align: center;
+        height: 28px; transition: opacity 0.3s ease;
+    }
+
+    .mn-phase-indicators { display: flex; gap: 10px; margin-top: 15px; }
+    .mn-phase-dot {
+        width: 6px; height: 6px; border-radius: 50%;
+        background-color: rgba(255,255,255,0.1); transition: all 0.5s;
+    }
+    .mn-phase-dot.active {
+        background-color: var(--mn-brand-teal);
+        box-shadow: 0 0 10px var(--mn-brand-teal);
+        transform: scale(1.2);
+    }
+
+    @keyframes mnGlassDrift { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(2px, 1px); } }
+    @keyframes mnPlanetPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+    @keyframes mnCoreGlow { 0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.2; } 50% { transform: translate(-50%, -50%) scale(1.5); opacity: 0.4; } }
+    @keyframes mnEquatorPulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+    @keyframes mnHighlightShift { 0%, 100% { transform: translate(0, 0); opacity: 0.5; } 50% { transform: translate(10px, 5px); opacity: 0.8; } }
+    @keyframes mnParticlePulse { 0%, 100% { opacity: 0.8; } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); } }
+    @keyframes mnRotateLongitude { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(360deg); } }
+    @keyframes mnSignalPulse { 0%, 100% { transform: scale(0.7); opacity: 0; } 50% { transform: scale(1.2); opacity: 0.6; } }
+    @keyframes mnSignalSync { 0%, 100% { transform: scale(0.5); opacity: 0.2; } 50% { transform: scale(0.9); opacity: 0.8; } }
+    @keyframes mnHeartSync { 0%, 100% { transform: scale(0.2); opacity: 0.5; } 50% { transform: scale(0.4); opacity: 1; } }
+</style>
+
+<div id="mn-preloader-overlay">
+    <div class="mn-glass-layer-1"></div>
+    <div class="mn-glass-layer-2"></div>
+    <div class="mn-vignette"></div>
+
+    <div class="mn-container">
+        <div class="mn-visualization">
+            <div id="mn-outerWaves"></div>
+            <div id="mn-middleWaves"></div>
+            <div id="mn-innerWaves"></div>
+
+            <div id="mn-centralSystem" style="position: relative; z-index: 10;">
+                <div class="mn-core-glow"></div>
+                <div class="mn-sphere" id="mn-sphere">
+                    <div class="mn-longitude-container" id="mn-longitudeLines"></div>
+                    <div class="mn-latitude" style="top: 30%; width: 75px;"></div>
+                    <div class="mn-latitude" style="top: 45%; width: 85px;"></div>
+                    <div class="mn-latitude" style="top: 60%; width: 80px;"></div>
+                    <div class="mn-latitude" style="top: 75%; width: 65px;"></div>
+                    <div class="mn-equator"></div>
+                    <div class="mn-highlight"></div>
+                </div>
+
+                <div id="mn-orbitingParticles"></div>
+            </div>
+
+            <div class="mn-brand-reveal" id="mn-brandReveal">
+                <canvas id="mn-ambientDustCanvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;"></canvas>
+                <canvas id="mn-dustCanvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;"></canvas>
+                
+                <img src="{{ 'MN_LOGO_WHITE.png' | file_url }}" alt="MN" class="mn-reveal-logo" id="mn-revealLogo" style="position:relative;z-index:10;">
+                
+                <div class="mn-brand-title" id="mn-brandTitle" style="position:relative;z-index:10;"></div>
+                <div class="mn-brand-slogan" id="mn-brandSlogan" style="position:relative;z-index:10;">BEING OVER BRANDING</div>
+            </div>
+        </div>
+
+        <p class="mn-micro-copy" id="mn-microCopy">SEARCHING SIGNAL...</p>
+
+        <div class="mn-phase-indicators" id="mn-phaseIndicators">
+            <div class="mn-phase-dot"></div><div class="mn-phase-dot"></div><div class="mn-phase-dot"></div><div class="mn-phase-dot"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const overlay = document.getElementById('mn-preloader-overlay');
+
+        // Double check session in case HTML rendered before head script
+        if (sessionStorage.getItem('mn_preloader_seen')) {
+            overlay.style.display = 'none';
+            return;
+        }
+        
+        // Mark as seen so next time the HEAD script catches it
+        sessionStorage.setItem('mn_preloader_seen', 'true');
+        
+        // --- 1. SETUP VISUALS (WAVES, SPHERE, LINES) ---
+        const createEl = (type, className, styles = {}, parent) => {
+            const el = document.createElement(type);
+            el.className = className;
+            Object.assign(el.style, styles);
+            if(parent) parent.appendChild(el);
+            return el;
+        };
+
+        // Waves Generation
+        ['mn-outerWaves', 'mn-middleWaves', 'mn-innerWaves'].forEach((id, groupIdx) => {
+            const container = document.getElementById(id);
+            if (!container) return;
+            const count = groupIdx + 3; 
+            const anim = ['mnSignalPulse', 'mnSignalSync', 'mnHeartSync'][groupIdx];
+            for(let i=0; i<count; i++) {
+                const wave = createEl('div', 'mn-wave', {
+                    animation: `${anim} ${2 + i*0.5}s ease-in-out infinite`,
+                    animationDelay: `${i*0.3}s`,
+                    opacity: 0.3 + (groupIdx*0.1)
+                }, container);
+                createEl('div', 'mn-wave-circle', {
+                    borderColor: `rgba(57, 165, 150, ${0.3 + (groupIdx*0.2)})`,
+                    transform: `scale(${0.8 - (groupIdx*0.2) + (i*0.1)})`
+                }, wave);
+            }
+        });
+
+        // Longitude Lines
+        const longContainer = document.getElementById('mn-longitudeLines');
+        if (longContainer) {
+            for(let i=0; i<6; i++) {
+                const div = createEl('div', '', {
+                    position: 'absolute', inset: '0',
+                    animation: `mnRotateLongitude ${20 + i*2}s linear infinite`,
+                    animationDelay: `${-i*3}s`
+                }, longContainer);
+                div.innerHTML = `<svg width="96" height="96" viewBox="0 0 96 96" style="overflow:visible"><ellipse cx="48" cy="48" rx="${15 + i*4}" ry="46" fill="none" stroke="rgba(34,211,238,0.3)" stroke-width="0.5" style="filter:blur(0.3px)"/></svg>`;
+            }
+        }
+
+        // --- 2. PARTICLES SETUP ---
+        const particleContainer = document.getElementById('mn-orbitingParticles');
+        const orbitElements = [];
+        const HERO_INDEX = 3; 
+
+        if (particleContainer) {
+            for (let i = 0; i < 8; i++) {
+                const orbit = createEl('div', 'mn-orbit-container', {
+                    transform: `translate(-50%, -50%) rotate(${(360/8)*i}deg)`
+                }, particleContainer);
+                
+                const particle = createEl('div', 'mn-particle', {
+                    animationDelay: `${Math.random()*2}s`
+                }, orbit);
+
+                orbitElements.push({ orbit, particle, angle: (360/8)*i });
+            }
+        }
+
+        // --- 3. ANIMATION TIMELINE LOOP ---
+        let rotationAngle = 0;
+        let heroRotation = 0;
+        let isHeroSequence = false;
+        let rotationInterval;
+
+        const startRotation = () => {
+             rotationInterval = setInterval(() => {
+                rotationAngle += 0.8; 
+                if (isHeroSequence) heroRotation -= 1.2; 
+
+                orbitElements.forEach((elem, i) => {
+                    const isHero = (i === HERO_INDEX);
+                    let finalAngle;
+                    
+                    if (isHeroSequence && isHero) {
+                        finalAngle = elem.angle + heroRotation;
+                        elem.particle.classList.add('hero');
+                    } else {
+                        finalAngle = elem.angle + rotationAngle;
+                    }
+                    elem.orbit.style.transform = `translate(-50%, -50%) rotate(${finalAngle}deg)`;
+                });
+            }, 16);
+        };
+        startRotation();
+
+        // --- 4. THE 8-SECOND NARRATIVE ---
+        updateUI("SEARCHING SIGNAL...", 0);
+
+        setTimeout(() => {
+            isHeroSequence = true;
+            heroRotation = rotationAngle;
+            updateUI("UNIQUENESS DETECTED", 1);
+        }, 2500);
+
+        setTimeout(() => {
+            updateUI("SET YOUR OWN NARRATIVE", 2);
+            orbitElements.forEach(elem => elem.particle.classList.add('surge'));
+        }, 4500);
+
+        setTimeout(() => {
+            updateUI("MERGING NARRATIVE...", 3);
+            const hero = orbitElements[HERO_INDEX];
+            if(hero) hero.particle.classList.add('center-stage'); 
+            
+            const sphere = document.getElementById('mn-sphere');
+            if(sphere) {
+                sphere.style.opacity = '0';
+                sphere.style.transform = 'scale(0)';
+            }
+            
+            orbitElements.forEach((elem, i) => {
+                if(i !== HERO_INDEX) elem.particle.classList.add('fade-out');
+            });
+        }, 5500);
+
+        // Build Letters
+        const brandTitleEl = document.getElementById('mn-brandTitle');
+        if (brandTitleEl) {
+            "MY NARRATIVE".split('').forEach(char => {
+                const span = document.createElement('span');
+                span.className = 'mn-brand-letter';
+                span.textContent = char === ' ' ? '\u00A0' : char; 
+                brandTitleEl.appendChild(span);
+            });
+        }
+
+        // FINAL REVEAL (7s)
+        setTimeout(() => {
+            ['mn-centralSystem', 'mn-outerWaves', 'mn-middleWaves', 'mn-innerWaves', 'mn-microCopy', 'mn-phaseIndicators'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.style.opacity = '0';
+            });
+
+            clearInterval(rotationInterval);
+
+            const brandReveal = document.getElementById('mn-brandReveal');
+            const logo = document.getElementById('mn-revealLogo');
+            if(brandReveal) brandReveal.style.display = 'flex';
+
+            requestAnimationFrame(() => {
+                if(logo) logo.classList.add('visible');
+                if(window.triggerDustBurst) window.triggerDustBurst();
+            });
+
+            setTimeout(() => {
+                const letters = document.querySelectorAll('.mn-brand-letter');
+                letters.forEach((l, idx) => {
+                    setTimeout(() => {
+                        l.style.transition = 'all 0.8s ease';
+                        l.style.opacity = '1';
+                        l.style.transform = 'translateY(0)';
+                    }, idx * 100);
+                });
+
+                setTimeout(() => {
+                    const slogan = document.getElementById('mn-brandSlogan');
+                    if(slogan) slogan.classList.add('visible');
+                }, 1200);
+                
+                // --- END: FADE OUT OVERLAY ---
+                setTimeout(() => {
+                   overlay.style.opacity = 0;
+                   overlay.style.visibility = 'hidden';
+                   setTimeout(() => { overlay.remove(); }, 1000);
+                }, 3000); 
+
+            }, 1000);
+
+        }, 7000);
+
+        // Helper UI
+        function updateUI(text, phaseNum) {
+            const textEl = document.getElementById('mn-microCopy');
+            if(!textEl) return;
+            textEl.style.opacity = 0;
+            setTimeout(() => {
+                textEl.innerText = text;
+                textEl.style.opacity = 1;
+            }, 200);
+
+            const dots = document.querySelectorAll('.mn-phase-dot');
+            dots.forEach((d, i) => i <= phaseNum ? d.classList.add('active') : d.classList.remove('active'));
+        }
+
+        // --- SAND DUST PARTICLE SYSTEM (FULL SCREEN SUSPENDED IRIS) ---
+        (function() {
+            const canvas = document.getElementById('mn-dustCanvas');
+            if(!canvas) return;
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            let animId = null;
+
+            function resize() {
+                canvas.width  = window.innerWidth;
+                canvas.height = window.innerHeight;
+                ctx.scale(1, 1); 
+            }
+            window.addEventListener('resize', resize); // Ensure resizing works
+
+            const COLORS = [
+                { r:57,  g:165, b:150 }, { r:72,  g:185, b:168 }, { r:40,  g:140, b:128 },
+                { r:90,  g:200, b:182 }, { r:55,  g:155, b:142 },
+            ];
+
+            function rand(min, max) { return min + Math.random() * (max - min); }
+            function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+            function spawnBurst() {
+                // Ensure canvas is full screen
+                resize();
+                
+                const cx = canvas.width / 2;
+                const cy = canvas.height / 2;
+                const innerRadius = 15; // Tight Iris
+
+                for (let i = 0; i < 150; i++) { // 20k Particles
+                    const angle = Math.random() * Math.PI * 2;
+                    
+                    // Suspended Motion: Slow Drift
+                    const speed = rand(0.5, 2.0) / 15; 
+                    
+                    particles.push({
+                        x: cx + Math.cos(angle) * innerRadius, 
+                        y: cy + Math.sin(angle) * innerRadius, 
+                        
+                        vx: Math.cos(angle)*speed, 
+                        vy: Math.sin(angle)*speed,
+                        size: rand(0.4, 1.2), 
+                        alpha: rand(0.4, 0.8), alphaMax: rand(0.4, 0.8),
+                        life: 1, 
+                        
+                        // 2X Expansion Perimeter (Half decay = Double distance)
+                        decay: rand(0.01, 0.02) / 30, 
+                        
+                        drag: 0.995, 
+                        color: pick(COLORS)
+                    });
+                }
+            }
+
+            function update() {
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    const p = particles[i];
+                    p.life -= p.decay;
+                    if (p.life <= 0) { particles.splice(i, 1); continue; }
+                    p.vx *= p.drag; p.vy *= p.drag; p.x += p.vx; p.y += p.vy;
+                    p.alpha = p.alphaMax * p.life;
+                }
+            }
+
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                for (const p of particles) {
+                    const { r, g, b } = p.color;
+                    ctx.fillStyle = `rgba(${r},${g},${b},${p.alpha})`;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            function loop() {
+                update(); draw();
+                if (particles.length > 0) animId = requestAnimationFrame(loop);
+            }
+
+            window.triggerDustBurst = function() {
+                resize(); particles = []; spawnBurst();
+                if (animId) cancelAnimationFrame(animId); loop();
+            };
+        })();
+
+        // --- AMBIENT DUST ---
+        (function() {
+            const canvas = document.getElementById('mn-ambientDustCanvas');
+            if(!canvas) return;
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            
+            function initAmbient() {
+                canvas.width  = window.innerWidth;
+                canvas.height = window.innerHeight;
+                for(let i=0; i<150; i++) {
+                    particles.push({
+                         x: Math.random()*canvas.width, y: Math.random()*canvas.height,
+                         vx: (Math.random()-0.5)*0.5, vy: (Math.random()-0.5)*0.5, size: Math.random()*2
+                    });
+                }
+            }
+
+            function loop() {
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+                ctx.fillStyle = "rgba(57,165,150,0.3)";
+                particles.forEach(p => {
+                    p.x += p.vx; p.y += p.vy;
+                    if(p.x < 0) p.x = canvas.width; if(p.x > canvas.width) p.x = 0;
+                    if(p.y < 0) p.y = canvas.height; if(p.y > canvas.height) p.y = 0;
+                    ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); ctx.fill();
+                });
+                requestAnimationFrame(loop);
+            }
+            
+            const observer = new MutationObserver(() => {
+                const brandReveal = document.getElementById('mn-brandReveal');
+                if (brandReveal && brandReveal.style.display === 'flex') {
+                    initAmbient(); loop(); observer.disconnect();
+                }
+            });
+            observer.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['style'] });
+        })();
+    });
+</script>

@@ -1,0 +1,146 @@
+<div class="mx-4 md:mx-6 my-6 md:my-12" data-radar-id="{{ section.id | handleize }}">
+  <p class="text-center text-2xl md:text-4xl my-6 md:my-12 heading-font">{{ section.settings.section_title }}</p>
+  
+  <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-5 lg:gap-6" data-for="collection-container-{{ section.id | handleize }}">
+    {% assign collection_count = 0 %}
+    {% for collection in section.settings.collection_list %}
+      {% assign collection_count = collection_count | plus: 1 %}
+      
+      <a
+        data-for="collection-cards"
+        href="{{ collection.url }}"
+        class="flex flex-col aspect-[2/3] overflow-hidden group {% if forloop.index > 10 %} hidden {% elsif forloop.index > 9 %} hidden md:flex {% endif %}">
+        
+        <figure class="flex-1 overflow-hidden">
+          {% comment %} 
+            RADAR LOGIC:
+            - Start with a tiny transparent pixel.
+            - Store the real image in data-srcset/data-src.
+            - Add 'reveal-on-radar' class so the script can find it.
+          {% endcomment %}
+          
+          <img
+            src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxIiBoZWlnaHQ9IjEiPjwvc3ZnPg=="
+            data-src="{{ collection.featured_image | image_url: width: 300 }}"
+            data-srcset="{{ collection.featured_image | image_url: width: 300 }} 300w, {{ collection.featured_image | image_url: width: 450 }} 450w"
+            sizes="(min-width: 1024px) 20vw, (min-width: 768px) 25vw, 33vw"
+            width="300"
+            height="450"
+            loading="lazy"
+            class="h-full w-full object-cover group-hover:scale-110 transition-all opacity-0 transition-opacity duration-500 reveal-on-radar"
+            alt="{{ collection.title | escape }}"
+          >
+        </figure>
+        
+        <p class="text-center text-sm md:text-xl font-bold leading-none py-2 normal-font">
+          {{ collection.title }}
+        </p>
+      </a>
+    {% endfor %}
+  </div>
+
+  <div class="flex justify-center items-center px-4 md:px-6 mt-6 md:mt-12 container max-w-screen-xl mx-auto ">
+    <button data-for="view-all-{{ section.id | handleize }}" class="border py-2 px-5 cursor-pointer max-w-fit mx-auto hover:bg-white hover:text-black transition-all ">
+      View All ({{ collection_count }})
+    </button>
+    <button data-for="hide-all-{{ section.id | handleize }}" class="border py-2 px-5 cursor-pointer max-w-fit mx-auto hidden hover:bg-white hover:text-black transition-all">
+      View Less
+    </button>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const sectionId = '{{ section.id | handleize }}';
+    const collectionContainer = document.querySelector(`[data-for="collection-container-${sectionId}"]`);
+    const viewAllButton = document.querySelector(`[data-for="view-all-${sectionId}"]`);
+    const viewLessButton = document.querySelector(`[data-for="hide-all-${sectionId}"]`);
+    const collectionCards = collectionContainer.querySelectorAll('[data-for="collection-cards"]');
+  
+    // 1. View All / View Less Logic
+    viewAllButton.addEventListener('click', ()=> {
+      collectionCards.forEach((card) => {
+        card.classList.remove('hidden');
+        // If user clicks "View All", force load any remaining hidden images immediately
+        const lazyImgs = card.querySelectorAll('img.reveal-on-radar');
+        lazyImgs.forEach(img => {
+           if(img.dataset.src) {
+             img.src = img.dataset.src;
+             img.srcset = img.dataset.srcset;
+             img.classList.remove('opacity-0');
+             img.removeAttribute('data-src');
+           }
+        });
+      });
+      viewAllButton.classList.add("hidden");
+      viewLessButton.classList.remove("hidden");
+    });
+  
+    viewLessButton.addEventListener('click', function() {
+      collectionCards.forEach((card, index) => {
+        if (index >= 10) {
+          card.classList.add('hidden');
+        } else if (index >= 9) {
+          card.classList.add('hidden');
+          card.classList.add('md:flex');
+        }
+      });
+      viewAllButton.classList.remove('hidden');
+      viewLessButton.classList.add('hidden');
+    });
+
+    // 2. RADAR SCRIPT (1000px Proximity)
+    const section = document.querySelector(`[data-radar-id="${sectionId}"]`);
+    if (section && 'IntersectionObserver' in window) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            // User is within 1000px. Wake up the visible images.
+            const hiddenImages = section.querySelectorAll('img.reveal-on-radar');
+            hiddenImages.forEach(img => {
+              // Only load images for cards that are NOT hidden
+              const parentCard = img.closest('[data-for="collection-cards"]');
+              if (parentCard && !parentCard.classList.contains('hidden')) {
+                 if (img.dataset.src) {
+                   img.src = img.dataset.src;
+                   if(img.dataset.srcset) img.srcset = img.dataset.srcset;
+                   img.onload = () => img.classList.remove('opacity-0'); // Fade in
+                   img.removeAttribute('data-src');
+                   img.removeAttribute('data-srcset');
+                 }
+              }
+            });
+            observer.unobserve(section);
+          }
+        });
+      }, { rootMargin: '1000px' }); // 1000px Radar
+
+      observer.observe(section);
+    }
+
+  });
+</script>
+
+{% schema %}
+  {
+    "name": "Collection List",
+    "tag": "section",
+    "class": "container max-w-screen-xl mx-auto",
+    "settings": [
+      {
+        "type": "text",
+        "id": "section_title",
+        "label": "Add section Title"
+      }, {
+        "type": "collection_list",
+        "id": "collection_list",
+        "label": "Choose collection List"
+      }
+    ],
+    "presets": [
+      {
+        "name": "Collection List"
+      }
+    ]
+  }
+{% endschema %}

@@ -1,0 +1,132 @@
+{% if request.page_type == 'index' or request.page_type == 'collection' or request.path contains '/pages/t-shirts' or request.path contains '/pages/hoodies' %}
+
+  <div class="mx-4 md:mx-6 my-4 flex flex-col gap-2 md:gap-3">
+    {% if section.settings.url_1 != blank or section.settings.url_2 != blank %}
+      {% if request.path == section.settings.url_1 or request.path == section.settings.url_2 %}
+        <div class="flex gap-2 md:gap-3 rounded-xl self-center  border md:border-2 border-white/30 p-1">
+          {% if section.settings.url_1 != blank and section.settings.url_title_1 != blank %}
+            <a href="{{ section.settings.url_1 }}" class="{% if request.path == section.settings.url_1 %} bg-[#39A596] {% endif %} shrink-0 whitespace-nowrap rounded-[8px] py-1 px-2 flex items-center justify-center">{{ section.settings.url_title_1 }}</a>
+          {% endif %}
+          {% if section.settings.url_2 != blank and section.settings.url_title_2 != blank %}
+            <a href="{{ section.settings.url_2 }}" class="{% if request.path == section.settings.url_2 %} bg-[#39A596] {% endif %} shrink-0 whitespace-nowrap rounded-[8px] py-1 px-2 flex items-center justify-center">{{ section.settings.url_title_2 }}</a>
+          {% endif %}
+        </div>
+      {% endif %}
+    {% endif %}
+
+    {% if section.blocks.size > 0 %}
+    <p class="text-base md:text-xl text-center uppercase heading-font">
+      Shop by Your Type
+    </p>
+
+    <div class="grid [grid-template-rows:repeat(3,auto)] grid-flow-col gap-2 md:gap-3 overflow-y-auto rounded-xl snap-mandatory snap-x justify-start items-start auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
+
+      {% for block in section.blocks %}
+        {% if block.type == 'url' and block.settings.url_img != blank and block.settings.url != blank %}
+          <a href="{{ block.settings.url }}" class="flex items-center snap-start rounded border md:border-2 shrink-0 min-w-max overflow-hidden bg-[#111] border-gray-700">
+            <figure>
+              <img
+                src="{{ block.settings.url_img | image_url: width:120, height:150 }}"
+                height="50"
+                width="40"
+                class="object-cover ">
+            </figure>
+            <p class="leading-none line-clamp-2 text-xs md:text-sm normal-font text-center px-2 whitespace-nowrap">
+              {{ block.settings.url_title }}
+            </p>
+          </a>
+        {% elsif block.type == 'collections' and block.settings.collection != blank %}
+
+          {% if block.settings.collection_img != blank %}
+            {% assign img = block.settings.collection_img %}
+          {% else %}
+            {% assign img = block.settings.collection.featured_image %}
+          {% endif %}
+
+          <a href="{{ block.settings.collection.url }}" class="flex items-center snap-start border shrink-0 min-w-max overflow-hidden bg-[#111] rounded-xl border-white/30">
+            <figure>
+              <img
+                src="{{ img | image_url:width:150, height:150 }}"
+                height="100%"
+                width="50"
+                class="object-contain">
+            </figure>
+            <p class="leading-none line-clamp-2 text-xs md:text-sm normal-font text-center px-2 whitespace-nowrap">
+              {{ block.settings.collection.title }}</p>
+          </a>
+
+        {% endif %}
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+
+{% endif %}
+
+{% schema %}
+  {
+    "name": "Badges Navigation",
+    "tag": "section",
+    "class": "container max-w-screen-xl mx-auto",
+    "limit": 1,
+    "settings": [
+      {
+        "type": "url",
+        "id": "url_1",
+        "label": "First URL"
+      }, {
+        "type": "text",
+        "id": "url_title_1",
+        "label": "First URL Title"
+      }, {
+        "type": "url",
+        "id": "url_2",
+        "label": "Second URL"
+      }, {
+        "type": "text",
+        "id": "url_title_2",
+        "label": "Second URL Title"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "collections",
+        "name": "Collection",
+        "settings": [
+          {
+            "type": "collection",
+            "id": "collection",
+            "label": "Choose Collection"
+          }, {
+            "type": "image_picker",
+            "id": "collection_img",
+            "label": "Choose Collection Image"
+          }
+        ]
+      }, {
+        "type": "url",
+        "name": "URL",
+        "settings": [
+          {
+            "type": "url",
+            "id": "url",
+            "label": "Add URL"
+          }, {
+            "type": "image_picker",
+            "id": "url_img",
+            "label": "Choose Image"
+          }, {
+            "type": "text",
+            "id": "url_title",
+            "label": "Add Title"
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+        "name": "Badges Navigation"
+      }
+    ]
+  }
+{% endschema %}

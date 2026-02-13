@@ -1,0 +1,90 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "title_cNyyM6": {
+      "type": "title",
+      "name": "Title",
+      "settings": {
+        "title": "Affiliate program",
+        "subtitle": "Become our affiliate and Earn money",
+        "description": "Become ambassador to a royal brand, let your influence speak!"
+      }
+    },
+    "collabs": {
+      "type": "apps",
+      "blocks": {
+        "483b3e93-7ff3-486e-9d97-013d47592cd7": {
+          "type": "shopify://apps/collabs/blocks/application-page/54758706-9f25-4fa9-a553-64720a4c998b",
+          "settings": {
+            "heading": "",
+            "show_square_logo": true,
+            "show_partnership_info": false,
+            "button_text": "Apply now",
+            "number_of_images": "4",
+            "logo_position": "above",
+            "corner_style": "square",
+            "button_background_color": "#000000",
+            "button_label_color": "#ffffff",
+            "link_color": "#7ed957"
+          }
+        }
+      },
+      "block_order": [
+        "483b3e93-7ff3-486e-9d97-013d47592cd7"
+      ],
+      "settings": {}
+    },
+    "rich_text_content_yWWL8N": {
+      "type": "rich-text-content",
+      "blocks": {
+        "text_block_yRGF7j": {
+          "type": "text_block",
+          "settings": {
+            "main_content": "<h2>Why Join the My Narrative Affiliate Program?</h2><p>At My Narrative, we believe that stories connect us—and that includes yours. As a My Narrative Affiliate, you’ll partner with a brand that’s rooted in creativity, authenticity, and community. Whether you’re a blogger, vlogger, social media influencer, or just someone who loves sharing cool products with your audience, our program is designed to reward your efforts and amplify your voice.<br/></p><ul><li>Competitive Commissions: Earn a generous percentage on every sale made through your unique affiliate link.</li><li>Exclusive Discount Codes: Share a special discount code with your followers to drive conversions—plus, higher commissions when you hit sales milestones.</li><li>High-Quality Creative Assets: Access professionally designed banners, product images, and text snippets that fit seamlessly into your blog posts, Stories, videos, or newsletters.</li><li>Early Access & Freebies: Get first dibs on new product launches, limited-edition collections, and occasional influencer-exclusive freebies to showcase to your audience.</li><li>Dedicated Affiliate Support: Our affiliate team is here to help you optimize campaigns, answer questions, and track your performance so you can keep growing your earnings.</li></ul>"
+          }
+        },
+        "text_block_hxMygc": {
+          "type": "text_block",
+          "settings": {
+            "main_content": "<h2>How It Works: Step-by-Step</h2><ul><li>Complete the Application Below<br/> Fill out the short form on this page with your contact information, audience details, and social media links. Tell us a bit about your platform—follower count, engagement rate, and the type of content you typically create.<br/></li><li>Get Approved & Onboarded<br/> Once we review your application, you’ll receive an email within 3–5 business days. If approved, we’ll send you:<br/>        -Your unique affiliate link (and discount code)<br/>        -A media kit with logos, banners, and sample post copy<br/>        -Best practices for maximizing clicks and sales<br/></li><li>Share & Promote<br/>    Post your affiliate link and discount code in blog articles, social media posts, Instagram Stories, YouTube descriptions—wherever your audience loves to discover new things. The more authentically you integrate My Narrative products into your content, the better your results will be.<br/></li><li>Earn Commissions<br/>    For every purchase made through your link, you’ll earn a commission (tracked in real time via our affiliate dashboard). Payouts are processed once per month via your preferred payment method (PayPal, direct deposit, or gift card).<br/></li><li>Grow & Scale<br/>    As your affiliate earnings increase, you unlock higher commission tiers, early access to special collections, and bonus incentives—like seasonal giveaways or performance-based cash bonuses.</li></ul>"
+          }
+        },
+        "text_block_pPD47g": {
+          "type": "text_block",
+          "settings": {
+            "main_content": "<h2>Affiliate Commission Structure</h2><p>Our tiered commission model rewards you for building momentum:</p><ul><li>Tier 1 (0– INR 50,000 in monthly sales): 10% commission on all qualifying orders</li><li>Tier 2 (INR 50,001– INR 2,50,000 in monthly sales): 12% commission </li><li>Tier 3 ( INR 2,50,000+ in monthly sales): 15% commission + early access to new launches</li></ul><p><br/>    Note: “Monthly sales” refers to purchases made by first-time customers using your affiliate link or discount code. Existing customer repurchases do not count toward Tier qualification.</p>"
+          }
+        },
+        "text_block_bXArdh": {
+          "type": "text_block",
+          "settings": {
+            "main_content": "<h2>Affiliate Requirements & Guidelines</h2><p>To maintain the integrity of our brand and ensure a positive experience for customers, we ask all affiliates to adhere to these guidelines:</p><ul><li>Authentic Endorsement: Only promote My Narrative products to audiences you genuinely believe will love them. Misleading or exaggerated claims are prohibited.</li><li>Accurate Disclosures: Always include a clear “#ad,” “#affiliate,” or written disclosure (e.g., “As an affiliate, I earn a commission when you purchase through my link”) wherever your link appears.</li><li>Appropriate Content: Content must be family-friendly and align with My Narrative’s values. No hate speech, profanity, or adult-only references.</li><li>Prohibited Traffic Sources: Affiliates may not run paid ads using trademarked My Narrative terms (e.g., “My Narrative hoodies”). Spamming forums, coupon sites, or unauthorized email lists to promote the affiliate link is not allowed.</li><li>Minimum Performance: Affiliates are expected to generate at least one qualified sale every three months to remain active. If no sales occur in 90 days, the affiliate account may be deactivated—but you can reapply at any time.</li></ul>"
+          }
+        }
+      },
+      "block_order": [
+        "text_block_yRGF7j",
+        "text_block_hxMygc",
+        "text_block_pPD47g",
+        "text_block_bXArdh"
+      ],
+      "name": "Rich Text Section",
+      "settings": {
+        "section_title": ""
+      }
+    }
+  },
+  "order": [
+    "title_cNyyM6",
+    "collabs",
+    "rich_text_content_yWWL8N"
+  ]
+}

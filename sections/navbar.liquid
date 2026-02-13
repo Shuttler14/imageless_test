@@ -1,0 +1,455 @@
+{% comment %}
+Navbar Fix: Wishlist Visible on Mobile + Count Badge
+Updated:
+  - Added specific Mobile Wishlist icon (md:hidden) next to Hamburger.
+  - Kept Desktop Login + Wishlist group (hidden md:flex).
+  - Added Wishlist Count Badge to both icons.
+{% endcomment %}
+
+<style>
+/* =========================================
+   NAVBAR STYLES
+   ========================================= */
+.text-brand-green { color: #39A596; }
+.bg-brand-green { background-color: #39A596; }
+
+/* =========================================
+   MOBILE MENU DRAWER STYLES
+   ========================================= */
+.mobile-menu-drawer {
+  display: flex;
+  flex-direction: column;
+  background-color: #000;
+  height: 100vh;
+  width: 90vw;
+  max-width: 500px; 
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 50;
+  transform: translateX(-100%);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+}
+
+.mobile-menu-drawer.active {
+  transform: translateX(0);
+}
+
+.drawer-header {
+  flex-shrink: 0;
+  padding: 20px;
+  background-color: #0a0a0a;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.drawer-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  scrollbar-width: none; 
+  -ms-overflow-style: none;
+}
+.drawer-content::-webkit-scrollbar { display: none; }
+
+/* Narrative Grid Section */
+.narrative-grid-title {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #888;
+  font-weight: 700;
+  margin-bottom: 20px;
+  display: block;
+  text-align: center;
+}
+
+.narrative-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px; 
+  padding-bottom: 40px;
+  min-height: 100px;
+}
+
+.narrative-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  text-decoration: none;
+  animation: fadeIn 0.4s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.narrative-thumb {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.2);
+  margin-bottom: 10px;
+  transition: transform 0.2s ease, border-color 0.2s;
+  background: #1a1a1a;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.narrative-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.narrative-item:active .narrative-thumb {
+  transform: scale(0.95);
+  border-color: #39A596;
+}
+
+.narrative-name {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: #ccc;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* Footer */
+.drawer-footer {
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0.6;
+}
+
+/* =========================================
+   SEARCH RESULTS STYLES (UI MATCH)
+   ========================================= */
+.search-results-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px 16px; 
+  padding-top: 16px;
+}
+
+.search-card {
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.3s ease;
+  position: relative;
+  text-align: left; 
+}
+
+.search-card-img {
+  width: 100%;
+  aspect-ratio: 0.8; 
+  border-radius: 0;  
+  overflow: hidden;
+  background: #1a1a1a;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.search-card-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+.search-card:hover .search-card-img img {
+  transform: scale(1.05);
+}
+
+.search-card-vendor {
+  font-size: 10px;
+  color: #39A596; /* Brand Green */
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+  display: block;
+}
+
+.search-card-title {
+  font-size: 13px;
+  color: #fff;
+  font-weight: 400; 
+  line-height: 1.4;
+  margin-bottom: 6px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.search-card-price {
+  font-size: 13px;
+  color: #fff;
+  font-weight: 600;
+}
+
+.search-loading {
+  text-align: center;
+  color: #666;
+  font-size: 12px;
+  padding: 40px 20px;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+.search-loading span {
+  width: 8px; height: 8px; background: #39A596; border-radius: 50%;
+  animation: pulse 0.8s infinite alternate;
+}
+.search-loading span:nth-child(2) { animation-delay: 0.2s; }
+.search-loading span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes pulse { from { opacity: 0.3; transform: scale(0.8); } to { opacity: 1; transform: scale(1.1); } }
+
+</style>
+
+<nav class="container max-w-screen-xl h-[60px] md:h-[75px] px-3 py-2 md:py-0 md:px-6 mx-auto flex items-center justify-between">
+  
+  <div class="flex flex-1 items-center gap-4 md:gap-7 h-full">
+    
+    <button class="md:hidden flex items-center justify-center" data-for="nav-open-btn">
+      {% render 'icons', icon: 'menu', height: '24px', width: '24px' %}
+    </button>
+
+    <a class="md:hidden flex items-center justify-center text-xl relative" 
+       href="{% if customer %}/pages/wishlist{% else %}{{ routes.account_url }}{% endif %}"
+       title="Wishlist">
+      <i class="bi bi-heart"></i>
+      <span data-wishlist-count class="absolute top-0 right-0 -mr-1 -mt-1 flex h-4 w-4 items-center justify-center rounded-full text-[8px] font-normal leading-none bg-[#39A596] text-white hidden">0</span>
+      </a>
+
+    <div class="hidden md:flex gap-5 items-center">
+      
+      <a class="flex items-center justify-center text-xl md:text-2xl" 
+         href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}"
+         title="{% if customer %}My Account{% else %}Login / Sign Up{% endif %}">
+        <i class="bi bi-person-circle"></i>
+      </a>
+
+      <a class="flex items-center justify-center text-xl md:text-2xl relative" 
+         href="{% if customer %}/pages/wishlist{% else %}{{ routes.account_url }}{% endif %}"
+         title="Wishlist">
+        <i class="bi bi-heart"></i>
+        <span data-wishlist-count class="absolute top-0 right-0 -mr-1 -mt-1 flex h-4 w-4 items-center justify-center rounded-full text-[9px] font-normal leading-none bg-[#39A596] text-white hidden">0</span>
+        </a>
+
+    </div>
+  </div>
+
+  {% if settings.navlogo != blank %}
+    <figure class="h-full flex items-center justify-center">
+      <a href="/" class="block max-w-[100px] md:max-w-28 h-full">
+        {{ settings.navlogo | image_url: width: 500 | image_tag: loading: 'lazy', alt: settings.navlogo.alt, class: 'w-full h-full object-contain' }}
+      </a>
+    </figure>
+  {% endif %}
+
+  <ul class="flex justify-end gap-3 md:gap-5 flex-1 items-center">
+    <li class="flex items-center justify-center text-xl md:text-2xl">
+      <button class="flex justify-center items-center h-full" data-for="search-open-btn"><i class="bi bi-search"></i></button>
+    </li>
+    <li class="flex items-center justify-center text-xl md:text-2xl relative">
+      {% assign is_cart_page = false %}{% if template.name == 'cart' %}{% assign is_cart_page = true %}{% endif %}
+      <a class="flex justify-center items-center h-full relative transition-colors duration-200" href="{{ routes.cart_url }}">
+        <i class="bi bi-handbag {% if is_cart_page %} text-brand-green {% else %} text-white {% endif %}"></i>
+        {% if cart.item_count > 0 %}
+          <span class="absolute top-0 right-0 -mr-1 -mt-1 flex h-4 w-4 items-center justify-center rounded-full text-[8px] font-normal leading-none {% if is_cart_page %} bg-white text-brand-green {% else %} bg-brand-green text-white {% endif %}">{{ cart.item_count }}</span>
+        {% endif %}
+      </a>
+    </li>
+  </ul>
+
+  <div id="mobile-menu-drawer" class="mobile-menu-drawer md:hidden">
+    <div class="drawer-header">
+      {% if customer %}
+        <a href="{{ routes.account_url }}" class="border border-gray-600 rounded px-4 py-1.5 text-sm font-semibold text-white">Hi, {{ customer.first_name }}</a>
+      {% else %}
+        <a href="{{ routes.account_login_url }}" class="border border-gray-600 rounded px-4 py-1.5 text-sm font-semibold text-white">Login / Sign Up</a>
+      {% endif %}
+      <button class="text-xl text-white p-2" data-for="nav-close-btn"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="drawer-content">
+      <span class="narrative-grid-title">Select Narrative</span>
+      <div id="js-narrative-grid" class="narrative-grid">
+        <p class="col-span-3 text-center text-xs text-gray-600 mt-4">Loading Narratives...</p>
+      </div>
+      <div class="drawer-footer">
+         {% render 'icons', icon: 'safe', height: '20px', width: '20px' %}
+         <p class="ml-2 text-xs text-white">100% Safe & Secure</p>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div id="nav-overlay" class="md:hidden fixed top-0 left-0 w-screen h-screen bg-[rgba(0,0,0,0.6)] z-[40] hidden opacity-0 transition-opacity duration-300"></div>
+
+<div class="bg-black text-white fixed top-0 w-screen h-dvh md:max-h-[80vh] p-4 md:p-6 flex-col z-[60]" data-for="search-slide">
+  <div>
+    <div class="flex justify-between items-center mb-2 md:mb-3">
+      <p class="font-bold heading-font uppercase tracking-widest text-lg">Search</p>
+      <button class="text-xl hover:text-gray-400 transition-colors" data-for="search-close-btn" title="Close"><i class="bi bi-x-lg"></i></button>
+    </div>
+    
+    <form action="{{ routes.search_url }}" class="flex justify-between items-center border-b border-white pb-2" data-for="search-form" onsubmit="return true;">
+      <input name="options[prefix]" type="hidden" value="last">
+      <input id="live-search-input" type="text" placeholder="TYPE HERE..." name="q" value="{{ search.terms | escape }}" class="flex-1 p-2 bg-transparent text-white placeholder:text-gray-600 focus:outline-none uppercase tracking-widest text-lg h-12" autocomplete="off">
+      <button class="p-2 min-w-12 text-white hover:text-gray-400 transition-all" type="submit"><i class="bi bi-search"></i></button>
+    </form>
+  </div>
+
+  <div id="predictive-results" class="flex-1 overflow-y-auto flex flex-col gap-2 mt-2">
+      </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  
+  // --- 1. SMART SYNC NARRATIVE LOGIC ---
+  const STORAGE_KEY = 'mynarrative_menu_data';
+  const gridContainer = document.getElementById('js-narrative-grid');
+
+  function getFromPage() {
+    const items = document.querySelectorAll('.sidebar-grid .grid-item, .sidebar-grid .grid-item-link');
+    if(items.length === 0) return null;
+    const data = [];
+    items.forEach(item => {
+      const img = item.querySelector('img');
+      const span = item.querySelector('span');
+      let url = item.getAttribute('href'); 
+      if(!url && item.dataset.handle) url = '/collections/' + item.dataset.handle;
+      if(img && span && url) {
+        data.push({ src: img.src, title: span.innerText, url: url });
+      }
+    });
+    return data;
+  }
+  function renderGrid(data) {
+    if(!gridContainer) return;
+    gridContainer.innerHTML = ''; 
+    if(!data || data.length === 0){
+        gridContainer.innerHTML = '<p class="col-span-3 text-center text-xs text-gray-500">No Narratives Found</p>';
+        return;
+    }
+    data.forEach(item => {
+      const link = document.createElement('a');
+      link.href = item.url;
+      link.className = 'narrative-item';
+      link.innerHTML = `<div class="narrative-thumb"><img src="${item.src}" loading="lazy" alt="${item.title}"></div><span class="narrative-name">${item.title}</span>`;
+      gridContainer.appendChild(link);
+    });
+  }
+  const pageData = getFromPage();
+  if (pageData && pageData.length > 0) {
+    renderGrid(pageData);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(pageData));
+  } else {
+    const savedData = localStorage.getItem(STORAGE_KEY);
+    if (savedData) renderGrid(JSON.parse(savedData));
+    else gridContainer.innerHTML = '<p class="col-span-3 text-center text-xs text-gray-500 pt-4">Visit Homepage to Sync Narratives</p>';
+  }
+
+  // --- 2. MENU TOGGLE ---
+  const menuDrawer = document.getElementById('mobile-menu-drawer');
+  const navOverlay = document.getElementById('nav-overlay');
+  const openBtn = document.querySelector('[data-for="nav-open-btn"]');
+  const closeBtn = document.querySelector('[data-for="nav-close-btn"]');
+  function openMenu() { menuDrawer.classList.add('active'); navOverlay.classList.remove('hidden'); setTimeout(() => navOverlay.classList.remove('opacity-0'), 10); document.body.style.overflow = 'hidden'; }
+  function closeMenu() { menuDrawer.classList.remove('active'); navOverlay.classList.add('opacity-0'); setTimeout(() => navOverlay.classList.add('hidden'), 300); document.body.style.overflow = ''; }
+  if(openBtn) openBtn.addEventListener('click', openMenu);
+  if(closeBtn) closeBtn.addEventListener('click', closeMenu);
+  if(navOverlay) navOverlay.addEventListener('click', closeMenu);
+
+  // --- 3. EXACT UI LIVE SEARCH ---
+  const searchInput = document.getElementById('live-search-input');
+  const resultsContainer = document.getElementById('predictive-results');
+  let searchTimer;
+
+  if (searchInput) {
+    searchInput.addEventListener('input', function(e) {
+      const term = e.target.value.trim();
+      clearTimeout(searchTimer);
+
+      if (term.length === 0) {
+        resultsContainer.innerHTML = '';
+        return;
+      }
+      resultsContainer.innerHTML = '<div class="search-loading"><span></span><span></span><span></span></div>';
+
+      searchTimer = setTimeout(() => {
+        fetch(`${window.Shopify.routes.root}search/suggest.json?q=${term}&resources[type]=product&resources[limit]=6&resources[options][unavailable_products]=last`)
+          .then(response => response.json())
+          .then(data => {
+            const products = data.resources.results.products;
+            
+            if (products && products.length > 0) {
+              let gridHtml = '<div class="search-results-grid">';
+              products.forEach(p => {
+                const image = p.image ? `<img src="${p.image}" alt="${p.title}">` : '';
+                const price = p.price ? '₹' + Math.floor(p.price).toLocaleString() : '';
+                
+                // Use Product Type for Green Subtitle
+                const subtitle = p.type || 'Unisex';
+
+                gridHtml += `
+                  <a href="${p.url}" class="search-card">
+                    <div class="search-card-img">${image}</div>
+                    <span class="search-card-vendor">${subtitle}</span>
+                    <span class="search-card-title">${p.title}</span>
+                    <span class="search-card-price">${price}</span>
+                  </a>
+                `;
+              });
+              gridHtml += '</div>';
+              
+              gridHtml += `<a href="${window.Shopify.routes.root}search?q=${term}" class="block text-center text-xs text-gray-400 font-bold uppercase tracking-widest mt-6 mb-2 py-3 border border-gray-800 rounded hover:bg-white hover:text-black transition-colors">View All Results</a>`;
+              resultsContainer.innerHTML = gridHtml;
+            } else {
+              resultsContainer.innerHTML = '<p class="text-center text-gray-500 text-sm mt-8">No results found.</p>';
+            }
+          })
+          .catch(err => {
+            console.error(err);
+            resultsContainer.innerHTML = '';
+          });
+      }, 300);
+    });
+  }
+});
+</script>
+
+{% schema %}
+  {
+    "name": "Navbar",
+    "tag": "header",
+    "class": "sticky w-full z-10 top-0 border-b bg-black",
+    "limit": 1,
+    "settings": [
+      {
+        "type": "link_list",
+        "id": "menuLinks",
+        "label": "Add Menubar"
+      }
+    ],
+    "presets": [
+      {
+        "name": "Navbar"
+      }
+    ]
+  }
+{% endschema %}

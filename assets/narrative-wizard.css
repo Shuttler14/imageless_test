@@ -1,0 +1,458 @@
+<style>
+    /* ═══════════════════════════════════════════════════════════
+       IDENTITY ARCHITECT - GAMIFIED WIZARD SYSTEM
+       "Choice-First" Interface - High-Tech Personality Test
+    ═══════════════════════════════════════════════════════════ */
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    :root {
+      --brand-teal: #39A596;
+      --brand-teal-dim: #2a7a6f;
+      --brand-glow: #4fffd9;
+      --glass-panel: rgba(30, 30, 30, 0.7);
+      --glass-border: rgba(255, 255, 255, 0.15);
+      --text-main: #ffffff;
+      --text-muted: #aaaaaa;
+      --font-main: 'Montserrat', sans-serif;
+      --font-luxury: 'Montserrat', sans-serif;
+      --font-terminal: 'Courier Prime', monospace;
+    }
+
+    body {
+      min-height: 100vh;
+      background: radial-gradient(circle at top center, #1a2e2b 0%, #000000 70%) !important;
+      background-attachment: fixed !important;
+      font-family: var(--font-main);
+      color: var(--text-main);
+      overflow-x: hidden;
+    }
+
+    .architect-container {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 20px 20px 40px;
+      min-height: 100vh;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       CALIBRATION STATUS BAR (The "Live Calibration" Bar)
+    ═══════════════════════════════════════════════════════════ */
+    
+    .calibration-bar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(0, 0, 0, 0.9);
+      border-bottom: 1px solid var(--glass-border);
+      padding: 15px 20px;
+      backdrop-filter: blur(10px);
+      margin-bottom: 30px;
+    }
+
+    .calibration-label {
+      font-family: var(--font-terminal);
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: var(--brand-teal);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .calibration-step {
+      font-size: 9px;
+      color: var(--text-muted);
+    }
+
+    .calibration-progress-container {
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .calibration-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--brand-teal), var(--brand-glow));
+      width: 0%;
+      transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      box-shadow: 0 0 10px var(--brand-teal);
+    }
+
+    .calibration-progress-bar.glitch {
+      animation: glitchProgress 0.3s ease-in-out;
+    }
+
+    @keyframes glitchProgress {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-3px); }
+      50% { transform: translateX(3px); }
+      75% { transform: translateX(-2px); }
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       WIZARD WINDOW
+    ═══════════════════════════════════════════════════════════ */
+    
+    .wizard-window {
+      background: var(--glass-panel);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 40px 30px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      min-height: 500px;
+    }
+
+    .wizard-question {
+      text-align: center;
+      margin-bottom: 40px;
+      animation: fadeInDown 0.6s ease;
+    }
+
+    .question-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--brand-teal);
+      margin-bottom: 15px;
+    }
+
+    .question-text {
+      font-family: var(--font-luxury);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--text-main);
+      line-height: 1.4;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       SIGNAL CHIPS (The Option Buttons)
+    ═══════════════════════════════════════════════════════════ */
+    
+    .signal-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-bottom: 35px;
+    }
+
+    @media (min-width: 768px) {
+      .signal-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .signal-chip {
+      background: transparent;
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 20px 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+      min-height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .signal-chip::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(57, 165, 150, 0.3) 0%, transparent 70%);
+      transform: translate(-50%, -50%);
+      transition: width 0.4s ease, height 0.4s ease;
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    .signal-chip:hover::before {
+      width: 200px;
+      height: 200px;
+      opacity: 1;
+    }
+
+    .signal-chip:hover {
+      border-color: var(--brand-teal);
+      background: rgba(57, 165, 150, 0.05);
+      transform: translateY(-3px);
+    }
+
+    .signal-chip.active {
+      border-color: var(--brand-teal);
+      background: rgba(57, 165, 150, 0.15);
+      box-shadow: 0 0 15px rgba(57, 165, 150, 0.4);
+    }
+
+    .signal-chip-text {
+      font-family: var(--font-main);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-main);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       VISUAL AESTHETIC CARDS (Image Grid for Step 4)
+    ═══════════════════════════════════════════════════════════ */
+    
+    .visual-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      margin-bottom: 35px;
+    }
+
+    .visual-card {
+      aspect-ratio: 1;
+      background: rgba(0, 0, 0, 0.5);
+      border: 2px solid var(--glass-border);
+      border-radius: 20px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .visual-card:hover {
+      border-color: var(--brand-teal);
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(57, 165, 150, 0.3);
+    }
+
+    .visual-card.active {
+      border-color: var(--brand-teal);
+      box-shadow: 0 0 20px rgba(57, 165, 150, 0.5);
+    }
+
+    .visual-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.7;
+      transition: opacity 0.3s ease;
+    }
+
+    .visual-card:hover img,
+    .visual-card.active img {
+      opacity: 1;
+    }
+
+    .visual-card-label {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 15px;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.95), transparent);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      text-align: center;
+      letter-spacing: 1px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       THE "MIRROR" STATS CARD (Final Step)
+    ═══════════════════════════════════════════════════════════ */
+    
+    .mirror-card {
+      background: linear-gradient(145deg, rgba(57, 165, 150, 0.15), rgba(0, 0, 0, 0.5));
+      border: 2px solid var(--brand-teal);
+      border-radius: 24px;
+      padding: 40px 30px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 30px;
+      animation: holographicFloat 3s ease-in-out infinite;
+    }
+
+    .mirror-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(79, 255, 217, 0.2), transparent);
+      animation: shimmer 3s infinite;
+    }
+
+    @keyframes holographicFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-5px); }
+    }
+
+    @keyframes shimmer {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+
+    .mirror-title {
+      font-family: var(--font-terminal);
+      font-size: 12px;
+      letter-spacing: 3px;
+      color: var(--brand-teal);
+      text-transform: uppercase;
+      margin-bottom: 25px;
+    }
+
+    .mirror-stat {
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .mirror-stat-label {
+      font-size: 10px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 8px;
+    }
+
+    .mirror-stat-value {
+      font-family: var(--font-main);
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-main);
+      letter-spacing: 1px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       MANUAL INPUT (Power User Textarea)
+    ═══════════════════════════════════════════════════════════ */
+    
+    .manual-input-zone {
+      margin-top: 30px;
+      padding-top: 25px;
+      border-top: 1px solid var(--glass-border);
+    }
+
+    .manual-input-label {
+      font-size: 9px;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .manual-input {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 15px 18px;
+      font-family: var(--font-main);
+      font-size: 13px;
+      color: var(--text-main);
+      outline: none;
+      transition: all 0.3s ease;
+      resize: vertical;
+      min-height: 60px;
+    }
+
+    .manual-input:focus {
+      border-color: var(--brand-teal);
+      background: rgba(57, 165, 150, 0.08);
+      box-shadow: 0 0 15px rgba(57, 165, 150, 0.2);
+    }
+
+    .manual-input::placeholder {
+      color: var(--text-muted);
+      font-style: italic;
+      font-size: 12px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       BUTTONS
+    ═══════════════════════════════════════════════════════════ */
+    
+    .wizard-btn {
+      width: 100%;
+      padding: 18px 30px;
+      background: linear-gradient(135deg, var(--brand-teal) 0%, var(--brand-teal-dim) 100%);
+      border: none;
+      border-radius: 30px;
+      color: white;
+      font-family: var(--font-main);
+      font-weight: 800;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      cursor: pointer;
+      box-shadow: 0 5px 20px rgba(57, 165, 150, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .wizard-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(57, 165, 150, 0.4);
+    }
+
+    .wizard-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .wizard-btn-secondary {
+      background: transparent;
+      border: 1px solid var(--glass-border);
+      box-shadow: none;
+      margin-top: 15px;
+    }
+
+    .wizard-btn-secondary:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--text-main);
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       ANIMATIONS & UTILITIES
+    ═══════════════════════════════════════════════════════════ */
+    
+    .hidden {
+      display: none !important;
+    }
+
+    .fade-in {
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      .wizard-window { padding: 30px 20px; }
+      .question-text { font-size: 20px; }
+      .signal-chip { min-height: 80px; padding: 15px 12px; }
+      .signal-chip-text { font-size: 11px; }
+    }
+  </style>

@@ -1,0 +1,54 @@
+<div class="container max-w-screen-xl mx-auto px-4 py-8 md:py-16 flex flex-col md:flex-row justify-center items-center">
+  <div class="w-full" data-aos="fade-up">
+    {{ section.settings.video | video_tag: loop: "loop", muted: true, playsinline: true, autoplay: true, class: "w-full" }}
+  </div>
+  <div class="flex flex-col gap-4 md:gap-6" data-aos="fade-up">
+    <h1 class="text-3xl md:text-5xl heading-font">{{ section.settings.heading }}</h1>
+    <p class="text-lg md:text-2xl normal-font">{{ section.settings.sub_text }}</p>
+    {% if section.settings.button_url != blank %}
+      <a href="{{ section.settings.button_url }}" class="border-2 py-2 text-center hover:text-black hover:bg-white duration-200 ">{{ section.settings.button_text }}</a>
+    {% endif %}
+  </div>
+</div>
+
+
+{% schema %}
+  {
+    "name": "My Narrative",
+    "tag": "section",
+    "class": "w-full z-10 top-0 border-b",
+    "settings": [
+      {
+        "type": "video",
+        "id": "video",
+        "label": "Add Video"
+      },
+      {
+        "type": "text",
+        "id": "heading",
+        "label": "Add Heading",
+        "default": "My Narrative"
+      },
+      {
+        "type": "text",
+        "id": "sub_text",
+        "label": "Add Text"
+      },
+      {
+        "type": "text",
+        "id": "button_text",
+        "label": "Button Text",
+        "default": "View More"
+      }, {
+        "type": "url",
+        "id": "button_url",
+        "label": "Button URL"
+      }
+    ],
+    "presets": [
+      {
+        "name": "My Narrative"
+      }
+    ]
+  }
+{% endschema %}

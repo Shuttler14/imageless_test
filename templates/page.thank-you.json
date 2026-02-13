@@ -1,0 +1,27 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "placeholder": {
+      "type": "placeholder",
+      "disabled": true,
+      "settings": {}
+    },
+    "thank_you_6MdB6H": {
+      "type": "thank-you",
+      "name": "Thank You",
+      "settings": {}
+    }
+  },
+  "order": [
+    "placeholder",
+    "thank_you_6MdB6H"
+  ]
+}

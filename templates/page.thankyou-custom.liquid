@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Thank You | My Narrative</title>
+    <script src="https://cdn.tailwindcss.com" defer></script>
+  </head>
+  <body class="min-h-screen bg-gradient-to-b from-gray-900 to-black flex items-center justify-center px-4 py-10">
+    <style>
+      /* --- CYBERPUNK VAULT STYLES --- */
+      @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&display=swap');
+
+      body, html { margin: 0; padding: 0; background: #000; height: 100%; overflow: hidden; }
+
+      #vault-container {
+        background: #000;
+        color: #00ff41;
+        font-family: 'Rajdhani', sans-serif;
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        background-image: radial-gradient(circle at 50% 50%, #111 0%, #000 70%);
+      }
+
+      /* LOADER ANIMATION */
+      .scanner-wrapper { width: 80%; max-width: 300px; margin: 30px 0; }
+      .scanner-border {
+        width: 100%; height: 6px; border: 1px solid #00ff41; padding: 2px; border-radius: 4px;
+        box-shadow: 0 0 10px rgba(0,255,65,0.2);
+      }
+      .scanner-fill {
+        height: 100%; background: #00ff41; width: 0%;
+        animation: loadingScan 2s infinite linear;
+        box-shadow: 0 0 15px #00ff41;
+      }
+      @keyframes loadingScan { 0% { width: 5%; opacity: 0.5; } 50% { width: 100%; opacity: 1; } 100% { width: 5%; opacity: 0.5; } }
+
+      .glitch-text { font-size: 14px; letter-spacing: 2px; animation: textFlicker 3s infinite; }
+      @keyframes textFlicker { 0% {opacity: 1;} 5% {opacity: 0.5;} 10% {opacity: 1;} 100% {opacity: 1;} }
+
+      /* CARD REVEAL */
+      #card-result { display: none; width: 100%; max-width: 400px; text-align: center; animation: zoomIn 0.8s ease-out; }
+      @keyframes zoomIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+      #final-card-img {
+        width: 90%; border-radius: 12px;
+        border: 2px solid #00ff41;
+        box-shadow: 0 0 30px rgba(0,255,65,0.4);
+        margin-bottom: 20px;
+      }
+
+      /* ACTION BUTTONS */
+      .btn-grid { display: flex; flex-direction: column; gap: 12px; width: 80%; margin: 0 auto; }
+
+      .cyber-btn {
+        padding: 14px; font-size: 16px; font-weight: bold; text-transform: uppercase;
+        text-decoration: none; border-radius: 4px; cursor: pointer; display: flex;
+        align-items: center; justify-content: center; gap: 10px; transition: 0.2s;
+      }
+
+      /* INSTAGRAM BUTTON (Primary) */
+      .btn-insta {
+        background: linear-gradient(45deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d);
+        color: white; border: none; box-shadow: 0 4px 15px rgba(193, 53, 132, 0.4);
+      }
+      .btn-insta:active { transform: scale(0.98); }
+
+      /* DOWNLOAD BUTTON (Secondary) */
+      .btn-download {
+        background: transparent; border: 1px solid #00ff41; color: #00ff41;
+      }
+      .btn-download:hover { background: rgba(0,255,65,0.1); }
+
+      /* SHARE TEXT */
+      .share-hint { font-size: 10px; color: #666; margin-top: 15px; }
+    </style>
+
+    <div id="vault-container">
+      <div id="loading-interface">
+        <h2 style="letter-spacing: 3px; color:white;">VERIFYING ID...</h2>
+        <div class="scanner-wrapper">
+          <div class="scanner-border"><div class="scanner-fill"></div></div>
+        </div>
+        <p class="glitch-text" id="status-text">DECRYPTING SECURE DATA</p>
+      </div>
+
+      <div id="card-result">
+        <h3 style="color:#fff; margin-bottom:15px; letter-spacing:1px;">IDENTITY CONFIRMED</h3>
+
+        <img id="final-card-img" src="" alt="Identity Card">
+
+        <div class="btn-grid">
+          <button id="share-insta-btn" class="cyber-btn btn-insta" onclick="shareToInstagram()">
+            <svg width="20" height="20" fill="white" viewbox="0 0 24 24">
+              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"></path>
+            </svg>
+            SHARE TO STORY
+          </button>
+
+          <a id="download-btn" href="#" class="cyber-btn btn-download" download> ⬇ SAVE TO GALLERY </a>
+        </div>
+
+        <p class="share-hint">TAP 'SHARE' → SELECT INSTAGRAM STORIES</p>
+      </div>
+    </div>
+
+    <script>
+      // --- CONFIGURATION ---
+      const API_URL = 'https://mynarrative-card-gen.vercel.app/api/index'; // REPLACE THIS!
+      let cardImageUrl = ''; // Will store the final URL
+
+      // 1. POLLING LOGIC
+      (function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get('oid');
+        const statusText = document.getElementById('status-text');
+
+        if (!orderId) {
+          statusText.innerText = 'ERROR: NO ORDER ID';
+          statusText.style.color = 'red';
+          return;
+        }
+
+        let attempts = 0;
+        const checkStatus = setInterval(() => {
+          attempts++;
+          statusText.innerText = attempts % 2 === 0 ? 'ANALYZING STYLE...' : 'MINTING CARD...';
+
+          fetch(`${API_URL}?order_id=${orderId}`)
+            .then((res) => res.json())
+            .then((data) => {
+              if (data.status === 'ready' && data.url.includes('http')) {
+                clearInterval(checkStatus);
+                cardImageUrl = data.url; // Save for sharing
+                setTimeout(() => {
+                  revealCard(data.url);
+                }, 1500);
+              }
+            })
+            .catch((err) => console.log(err));
+
+          if (attempts > 30) {
+            clearInterval(checkStatus);
+            statusText.innerText = 'TIMEOUT. CHECK EMAIL.';
+          }
+        }, 3000);
+      })();
+
+      function revealCard(url) {
+        document.getElementById('loading-interface').style.display = 'none';
+        document.getElementById('card-result').style.display = 'block';
+        document.getElementById('final-card-img').src = url;
+        document.getElementById('download-btn').href = url;
+      }
+
+      // 2. THE SMART SHARE FUNCTION (Web Share API)
+      async function shareToInstagram() {
+        if (!cardImageUrl) return;
+
+        // A. Check if browser supports direct file sharing (Mobile)
+        if (navigator.share) {
+          try {
+            // We have to fetch the image as a 'Blob' to share it as a file
+            const response = await fetch(cardImageUrl);
+            const blob = await response.blob();
+            const file = new File([blob], 'identity_card.jpg', { type: 'image/jpeg' });
+
+            await navigator.share({
+              files: [file],
+              title: 'My Narrative Identity',
+              text: 'Verified 1%. #MyNarrative',
+            });
+
+            // Note: On mobile, this opens the system sheet.
+            // User taps "Instagram" -> It opens directly in Story Editor.
+          } catch (err) {
+            console.log('Share failed:', err);
+            // Fallback if user cancels or error
+            alert('Could not open share sheet. Please download the image first.');
+          }
+        } else {
+          // B. Fallback for Desktop (Copy Link)
+          navigator.clipboard.writeText('Check out my #MyNarrative card!');
+          alert('Image saved! Open Instagram to post.');
+          document.getElementById('download-btn').click(); // Auto download
+        }
+      }
+    </script>
+  </body>
+</html>

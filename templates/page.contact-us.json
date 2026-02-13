@@ -1,0 +1,67 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "placeholder": {
+      "type": "placeholder",
+      "disabled": true,
+      "settings": {}
+    },
+    "rich_text_content_f6QEHW": {
+      "type": "rich-text-content",
+      "blocks": {
+        "text_block_jWzDbp": {
+          "type": "text_block",
+          "settings": {
+            "main_content": "<p>We’d love to hear from you! Whether you have a question, feedback, or need assistance, our team is here to help.</p><h2>Reach Out to Us</h2><p>Feel free to get in touch with us through any of the following methods:</p><ul><li>Email: contact@mynarrative.store</li><li>Phone: +91-8497003530</li><li>Address : 90, 100 ft road, Indiranagar, Bangalore, Karnataka 560008</li><li>Social Media:</li><li>Instagram</li><li>YouTube</li><li>LinkedIn</li></ul>"
+          }
+        },
+        "text_block_RixGth": {
+          "type": "text_block",
+          "settings": {
+            "main_content": "<h2>Customer Support Hours</h2><p>We’re available to assist you during the following hours:</p><ul><li>Monday to Sunday: 10:00 AM – 10:00 PM</li></ul><p>For inquiries made outside of these hours, we’ll get back to you as soon as possible on the next working day.</p>"
+          }
+        },
+        "text_block_UAt3Lx": {
+          "type": "text_block",
+          "settings": {
+            "main_content": "<h2>Visit Us</h2><p>Want to connect in person? Stay tuned for our upcoming flagship store location!</p>"
+          }
+        },
+        "text_block_bCEQqn": {
+          "type": "text_block",
+          "settings": {
+            "main_content": "<h2>Frequently Asked Questions (FAQs)</h2><p>Before reaching out, you might find your answer in our FAQ section.</p>"
+          }
+        },
+        "text_block_r7nchK": {
+          "type": "text_block",
+          "settings": {
+            "main_content": "<h2>Feedback</h2><p>We value your opinions and are constantly looking to improve. If you have suggestions or feedback, please let us know!</p><p>Thank you for choosing My Narrative. We’re here to help make your story unforgettable.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "text_block_jWzDbp",
+        "text_block_RixGth",
+        "text_block_UAt3Lx",
+        "text_block_bCEQqn",
+        "text_block_r7nchK"
+      ],
+      "settings": {
+        "section_title": "Contact Us"
+      }
+    }
+  },
+  "order": [
+    "placeholder",
+    "rich_text_content_f6QEHW"
+  ]
+}

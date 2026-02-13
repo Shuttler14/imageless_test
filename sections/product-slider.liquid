@@ -1,0 +1,220 @@
+{% capture slider_attributes %}
+    data-autoplay="{{ section.settings.enable_autoplay }}"
+    data-autoplay-duration="{{ section.settings.autoplay_duration }}"
+    data-navigation="{{ section.settings.enable_navigation }}"
+    data-pagination="{{ section.settings.enable_pagination }}"
+    data-loop="{{ section.settings.enable_loop }}"
+{% endcapture %}
+
+<style>
+  /* CSS PERFORMANCE: Skip rendering off-screen sliders */
+  .product-slider-container {
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 400px;
+  }
+  /* Animation for the swap */
+  img.reveal-on-radar {
+    opacity: 0;
+    transition: opacity 0.5s ease-in;
+  }
+  img.reveal-on-radar.loaded {
+    opacity: 1 !important;
+  }
+</style>
+
+<div class="product-slider-container mx-4 md:mx-0 my-6 md:my-12 border border-white/10 md:border-x-0 px-2 py-3 md:p-4 bg-white/20 rounded-md md:rounded-none" 
+     data-slider-id="{{ section.id }}" 
+     {% if section.settings.section_bg_image != blank %} 
+       data-section-bg-image 
+       style="--section-bg-image: url('{{ section.settings.section_bg_image | image_url: width: 2000 }}')" 
+     {% endif %}>
+  
+  <div class="container max-w-screen-xl mx-auto px-0">
+      <p class="text-start text-white text-2xl md:text-4xl font-bold md:mb-2 title-font pl-2 md:pl-0">
+        {% if section.settings.section_title != blank %}
+          {{ section.settings.section_title }}
+        {% else %}
+          {{ section.settings.collection.title }}
+        {% endif %}
+      </p>
+      {% if section.settings.section_sub_heading != blank %}
+        <p class="text-start text-white text-lg md:text-xl leading-normal font-normal normal-font mb-2 md:mb-3 pl-2 md:pl-0">{{ section.settings.section_sub_heading }}</p>
+      {% endif %}
+  </div>
+
+  <div class="product-slider-wrapper" {{ slider_attributes }}>
+    <div class="">
+      <div class="overflow-hidden js-product-slider">
+        <div class="swiper-wrapper">
+          
+          {% for product in section.settings.collection.products limit: 15 %}
+            
+            {% comment %} 
+               LOGIC:
+               1. If "is_priority_section" is CHECKED (First Slider):
+                  - Images 1-2: Load immediately (super_lazy: false).
+                  - Images 3+: Radar Mode (super_lazy: true).
+               2. If UNCHECKED (All other sliders):
+                  - All Images: Radar Mode (super_lazy: true).
+            {% endcomment %}
+            
+            {% assign use_radar = true %}
+            {% assign radar_class = 'reveal-1500' %}
+            
+            {% if section.settings.is_priority_section and forloop.index <= 2 %}
+               {% assign use_radar = false %} 
+            {% endif %}
+
+            {% if forloop.index > 2 %}
+               {% assign radar_class = 'reveal-1000' %}
+            {% endif %}
+
+            {% if section.settings.collection_for != blank %}
+              {% assign section_product_type = section.settings.collection_for | downcase %}
+              {% assign product_type = product.type | downcase %}
+              {% if product_type == section_product_type %}
+                <div class="swiper-slide">
+                  {% render 'product-card', product: product, wishlist: true, super_lazy: use_radar, radar_class: radar_class %}
+                </div>
+              {% endif %}
+            {% else %}
+              <div class="swiper-slide">
+                {% render 'product-card', product: product, wishlist: true, super_lazy: use_radar, radar_class: radar_class %}
+              </div>
+            {% endif %}
+            
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="flex mt-3 gap-4 flex-col-reverse container max-w-screen-xl mx-auto px-0">
+      <a href="{{ section.settings.collection.url }}" class="bg-white flex-1 text-center rounded-md uppercase font-bold text-black hover:bg-black hover:text-white border border-white px-4 py-2 normal-font">
+        {{ section.settings.button_text }}
+      </a>
+
+      <div class="product-slider-controls flex justify-center items-center gap-4">
+        {% if section.settings.enable_navigation %}
+          <button class="product-slider-prev p-2 bg-white/20 hidden md:flex justify-center items-center cursor-pointer disabled:cursor-not-allowed">
+            <i class="bi bi-chevron-left"></i>
+          </button>
+        {% endif %}
+        {% if section.settings.enable_pagination %}
+          <div class="product-slider-pagination flex items-center justify-center gap-2 max-w-fit"></div>
+        {% endif %}
+        {% if section.settings.enable_navigation %}
+          <button class="product-slider-next p-2 bg-white/20 hidden md:flex justify-center items-center cursor-pointer disabled:cursor-not-allowed">
+            <i class="bi bi-chevron-right"></i>
+          </button>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const section = document.querySelector('[data-slider-id="{{ section.id }}"]');
+    if (!section || !('IntersectionObserver' in window)) return;
+
+    // --- FUNCTION: LOAD IMAGES ---
+    // This wakes up the radar images
+    const loadImages = (selector, priority) => {
+      const targets = section.querySelectorAll(selector);
+      targets.forEach(img => {
+        if (img.dataset.src) {
+          if(priority) img.setAttribute('loading', priority);
+          img.src = img.dataset.src;
+          img.onload = () => img.classList.add('loaded'); // Trigger fade-in
+          img.removeAttribute('data-src');
+        }
+      });
+    };
+
+    // --- BRAIN 1: THE PANIC BUTTON (Emergency Override) ---
+    // If user scrolls within 200px (Very Close), load EVERYTHING immediately.
+    // Does NOT wait for window.onload. UX is #1 priority here.
+    const emergencyObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          // User is looking at the slider! Fire everything!
+          loadImages('img.reveal-1500', 'eager');
+          loadImages('img.reveal-1000', 'eager');
+          
+          // Kill observers, job done.
+          emergencyObserver.disconnect(); 
+          if(window.politeObserver_{{ section.id | replace: '-', '_' }}) {
+             window.politeObserver_{{ section.id | replace: '-', '_' }}.disconnect();
+          }
+        }
+      });
+    }, { rootMargin: '200px' }); // 200px = "It's almost on screen"
+    
+    emergencyObserver.observe(section);
+
+
+    // --- BRAIN 2: THE POLITE PRE-LOADER (Background Task) ---
+    // Scans 1500px ahead to pre-load images silently.
+    // ONLY turns on AFTER the page is fully loaded (LCP Shield).
+    
+    const startPolitePreloader = () => {
+       // Check if emergency observer already finished the job
+       if(section.querySelectorAll('img[data-src]').length === 0) return;
+
+       const obsName = 'politeObserver_{{ section.id | replace: '-', '_' }}';
+       window[obsName] = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              // User is 1500px away. Load the first 2 images gently.
+              loadImages('img.reveal-1500', 'lazy');
+              window[obsName].disconnect();
+            }
+          });
+       }, { rootMargin: '1500px' });
+       
+       window[obsName].observe(section);
+    };
+
+    // Activate Polite Preloader only when page is "Quiet"
+    if (document.readyState === 'complete') {
+       startPolitePreloader();
+    } else {
+       // Wait for Hero to finish loading
+       window.addEventListener('load', () => setTimeout(startPolitePreloader, 100));
+    }
+    
+  });
+</script>
+
+{% schema %}
+  {
+    "name": "Product Slider",
+    "tag": "section",
+    "class": "w-full", 
+    "settings": [
+      {
+        "type": "header",
+        "content": "Performance Tuning"
+      },
+      {
+        "type": "checkbox",
+        "id": "is_priority_section",
+        "label": "Is this the First Slider?",
+        "default": false,
+        "info": "Check this ONLY for the first slider on the page. It will load the first 2 images immediately (Priority 3)."
+      },
+      { "type": "text", "id": "section_title", "label": "Section Title" },
+      { "type": "text", "id": "section_sub_heading", "label": "Section Sub Heading" },
+      { "type": "image_picker", "id": "section_bg_image", "label": "Section Background Image" },
+      { "type": "text", "id": "collection_for", "label": "Collection for" },
+      { "type": "collection", "id": "collection", "label": "Choose Collection" }, 
+      { "type": "checkbox", "id": "enable_autoplay", "label": "Enable Autoplay", "default": true }, 
+      { "type": "range", "id": "autoplay_duration", "label": "Autoplay Speed (ms)", "min": 1000, "max": 5000, "step": 500, "default": 3000 }, 
+      { "type": "checkbox", "id": "enable_navigation", "label": "Enable Navigation Arrows", "default": true }, 
+      { "type": "checkbox", "id": "enable_pagination", "label": "Enable Pagination Dots", "default": true }, 
+      { "type": "checkbox", "id": "enable_loop", "label": "Enable Infinite Loop", "default": true },
+      { "type": "text", "id": "button_text", "label": "Button Text", "default": "View All" }
+    ],
+    "presets": [ { "name": "Product Slider", "category": "Collection" } ]
+  }
+{% endschema %}

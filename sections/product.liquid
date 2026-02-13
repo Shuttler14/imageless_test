@@ -1,0 +1,570 @@
+{{ 'product.css' | asset_url | stylesheet_tag }}
+
+{% comment %} --- CRITICAL CSS FIX: LOCKS LAYOUT BEFORE JS LOADS --- {% endcomment %}
+<style>
+  /* 1. Force Horizontal Layout immediately (stops vertical stacking) */
+  [data-for^="main-image-slider"] .swiper-wrapper,
+  [data-for^="thumb-image-slider"] .swiper-wrapper {
+    display: flex; 
+    width: 100%;
+    height: 100%;
+    align-items: stretch;
+  }
+  
+  /* 2. Force Slides to fill container */
+  [data-for^="main-image-slider"] .swiper-slide,
+  [data-for^="thumb-image-slider"] .swiper-slide {
+    flex-shrink: 0;
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+
+  /* 3. Reserve Height (The Skeleton) */
+  .skeleton-ratio {
+    aspect-ratio: 3 / 4; /* Standard Portrait Mode */
+    background-color: #111; /* Placeholder color while loading */
+    width: 100%;
+  }
+  
+  @media (max-width: 768px) {
+    .skeleton-ratio { aspect-ratio: 1 / 1; } /* Square on mobile (optional, adjust if needed) */
+  }
+</style>
+
+{% comment %} SMART FILTER: Exclude Reward Collections {% endcomment %}
+{% assign product_collection = product.collections | first %}
+{% for col in product.collections %}
+  {% assign col_title_down = col.title | downcase %}
+  {% unless col_title_down contains 'reward' or col_title_down contains 'eligible' %}
+      {% assign product_collection = col %}
+      {% break %}
+  {% endunless %}
+{% endfor %}
+
+<div class="mx-4 md:mx-6 flex flex-col md:flex-row gap-4 md:gap-6 lg:gap-8 py-6 md:py-8 lg:py-10" id="main-product">
+  <div class="flex-[2] flex flex-col gap-2 overflow-x-hidden md:h-full md:sticky md:top-20 -mx-4 md:mx-0">
+    {% if product.selected_or_first_available_variant.featured_image %}
+      {% assign selected_image_position = product.selected_or_first_available_variant.featured_image.position %}
+    {% endif %}
+
+    <input type="hidden" id="selected-image-position" value="{{ selected_image_position }}">
+    
+    {% comment %} ADDED CLASS: 'skeleton-ratio' to lock height {% endcomment %}
+    <div class="overflow-hidden relative skeleton-ratio" data-for="main-image-slider-{{ section.id | handleize }}">
+      <div class="swiper-wrapper">
+        {% for image in product.images %}
+          <figure class="swiper-slide">
+            {% comment %} SPEED FIX: Eager load 1st image, Lazy load the rest {% endcomment %}
+            {% assign loading_attr = 'lazy' %}
+            {% assign fetch_priority = 'auto' %}
+            {% if forloop.first %}
+              {% assign loading_attr = 'eager' %}
+              {% assign fetch_priority = 'high' %}
+            {% endif %}
+            
+            <img
+              src="{{ image | image_url: width: 800 }}"
+              width="800"
+              height="1000"
+              loading="{{ loading_attr }}"
+              fetchpriority="{{ fetch_priority }}"
+              class="w-full h-full object-cover block"
+              alt="{{ image.alt | escape }}"
+            >
+          </figure>
+        {% endfor %}
+      </div>
+      <div class="flex items-center justify-center w-full absolute z-[1] bottom-3">
+        <div id="nav-{{ section.id | handleize }}" class="max-w-fit px-2 bg-black/20"></div>
+      </div>
+      <button
+        id="next-{{ section.id | handleize }}"
+        class="hidden md:block absolute z-[1] top-1/2 right-3 p-2 bg-black/20 disabled:cursor-not-allowed"
+      >
+        <i class="bi bi-chevron-right"></i>
+      </button>
+      <button
+        id="prev-{{ section.id | handleize }}"
+        class="hidden md:block absolute z-[1] top-1/2 left-3 p-2 bg-black/20 disabled:cursor-not-allowed"
+      >
+        <i class="bi bi-chevron-left"></i>
+      </button>
+    </div>
+
+    <div class="overflow-hidden" data-for="thumb-image-slider-{{ section.id | handleize }}">
+      <div class="swiper-wrapper">
+        {% for image in product.images %}
+          <figure class="swiper-slide aspect-square">
+            {% comment %} SPEED FIX: Eager load thumbnails & Reduce size to 200px {% endcomment %}
+            <img
+              src="{{ image | image_url: width: 200 }}"
+              width="200"
+              height="200"
+              loading="eager"
+              class="w-full h-full object-cover block"
+              alt="{{ image.alt | escape }}"
+            >
+          </figure>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div class="flex-[3] normal-font">
+    <div class="flex flex-col gap-2 md:gap-3 ">
+      <div>
+        <div class="flex gap-1 items-center flex-wrap text-xs md:text-sm text-[#cdcdcd]">
+          <a href="/">Home</a>
+          <i class="bi bi-chevron-right"></i>
+          <a
+            href="{% if downcase_product_type == 't shirt' %}/pages/t-shirts {% else %}/{% endif %}"
+          >
+            {{- product.type -}}
+          </a>
+          <i class="bi bi-chevron-right"></i>
+          <a href="{{ product_collection.url }}">{{ product_collection.title | capitalize }}</a>
+        </div>
+        <p class="text-2xl md:text-4xl">{{ product.title }}</p>
+      </div>
+      <div class="flex gap-2 ">
+        <p class="text-xl md:text-2xl" data-for="product-price">
+          {{ product.selected_or_first_available_variant.price | money_without_trailing_zeros }}
+        </p>
+        {% if product.selected_or_first_available_variant.price
+            < product.selected_or_first_available_variant.compare_at_price
+        %}
+          <p class="text-xl md:text-2xl line-through text-[#B8B8B8]" data-for="product-compare-price">
+            {{ product.selected_or_first_available_variant.compare_at_price | money_without_trailing_zeros }}
+          </p>
+        {% endif %}
+      </div>
+      {% assign product_type = product.type | downcase %}
+      {% if product_type == 't shirt' %}
+        <p class="text-xs md:text-sm">The model in the picture is wearing an oversized T-shirt</p>
+      {% endif %}
+
+      {% assign show_size_chart = false %}
+      {% for block in section.blocks %}
+        {% if block.type == 'size_chart' and block.settings.sizeChartPage.content != blank %}
+          {% assign show_size_chart = true %}
+        {% elsif section.settings.default_Size_chart.content != blank %}
+          {% assign show_size_chart = true %}
+        {% endif %}
+      {% endfor %}
+
+      {% form 'product', product %}
+        <input
+          data-for="current-variant"
+          type="hidden"
+          name="id"
+          value="{{ product.selected_or_first_available_variant.id }}"
+          class=""
+        >
+        <div class="flex flex-col gap-3 md:gap-5" data-for="product-variants-container">
+          {% for product_option in product.options_with_values %}
+            <div class="flex flex-col gap-1 md:gap-2">
+              <div class="flex items-center gap-2 justify-between">
+                {% assign option_name = product_option.name | handleize %}
+                {% assign downcase_option_name = product_option.name | downcase %}
+                <p>{{ product_option.name }} :</p>
+                {% if downcase_option_name contains 'size' and show_size_chart %}
+                  <a class="underline cursor-pointer hover:no-underline transition-all" data-for="size-chart-btn">
+                    <p>Size Chart</p>
+                  </a>
+                {% endif %}
+              </div>
+              <ul class="flex gap-1 md:gap-2 flex-wrap">
+                {% for value in product_option.values %}
+                  <li class="flex items-center justify-center text-center">
+                    <label
+                      class="cursor-pointer transition-all px-[6px] py-[4px] border-2 border-white has-[:disabled]:opacity-50 has-[:disabled]:line-through has-[:disabled]:cursor-not-allowed has-[:checked]:outline-double outline-offset-1 outline-[#00AA98] has-[:checked]:border-transparent min-w-[40px] {% if value.swatch.color or value.swatch.image %} h-[40px] {% else %} has-[:checked]:bg-white has-[:checked]:text-black {% endif %}"
+                      for="{{ product_option.name | handleize }}-{{ value | handleize }}"
+                      title="{{ value }}"
+                      {% if value.swatch.color %}
+                        style="background-color: {{ value.swatch.color }};border-radius: 50%;"
+                      {% elsif value.swatch.image %}
+                        style="background: url({{ value.swatch.image | image_url: width: 50 }});border-radius: 50%;"
+                      {% endif %}
+                    >
+                      <input
+                        type="radio"
+                        {% if value.selected %}
+                          checked
+                        {% endif %}
+                        name="{{ product_option.name }}"
+                        id="{{ product_option.name | handleize }}-{{ value |  handleize }}"
+                        value="{{ value }}"
+                        class="hidden"
+                      >
+                      {% unless value.swatch.color or value.swatch.image %}
+                        {{- value -}}
+                      {% endunless %}
+                    </label>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endfor %}
+        </div>
+
+        {% if product.selected_or_first_available_variant.available %}
+          <div class="flex flex-col gap-1 md:gap-2 mt-3 md:mt-5">
+            <p>Quantity :</p>
+            <div class="flex border w-fit " data-for="quantity-selector">
+              <button class="qty-remove p-2 disabled:opacity-30" data-for="decreament-btn">
+                {% render 'icons', icon: 'remove' %}
+              </button>
+              <input
+                type="text"
+                readonly
+                name="quantity"
+                min="1"
+                value="1"
+                class="bg-black text-white max-w-9 px-2 text-center"
+              >
+              <button class="qty-add p-2 disabled:opacity-30" data-for="increament-btn">
+                {% render 'icons', icon: 'add' %}
+              </button>
+            </div>
+          </div>
+        {% endif %}
+
+        {% if product.tags contains 'customyear' %}
+          <div class="flex flex-col gap-1 md:gap-2 mt-3 md:mt-5">
+            <label for="custom-year">Fill the year you want to be printed:</label>
+            <input
+              type="text"
+              min="1900"
+              step="1"
+              inputmode="numeric"
+              maxlength="4"
+              pattern="[0-9]{4}"
+              max="2100"
+              id="custom-year"
+              class="bg-[#111] border-2 py-1 px-2 border-gray-700 md:min-w-1/2 md:max-w-[500px]"
+              placeholder="Enter year"
+              autofocus
+              required
+              name="properties[Year]"
+            >
+          </div>
+        {% endif %}
+        {% if product.tags contains 'customname' %}
+          <div class="flex flex-col gap-1 md:gap-2 mt-3 md:mt-5">
+            <label for="custom-name">Fill the name you want to be printed:</label>
+            <input
+              type="text"
+              id="custom-name"
+              class="bg-[#111] border-2 py-1 px-2 border-gray-700 md:min-w-1/2 md:max-w-[500px]"
+              placeholder="Enter name"
+              autofocus
+              required
+              name="properties[Name]"
+            >
+          </div>
+        {% endif %}
+        {% for block in section.blocks %}
+          {% if block.type == 'size_chart' %}
+            {% assign default_size_chart = section.settings.default_Size_chart.content %}
+            <div
+              class="fixed top-0 left-0 w-screen h-screen bg-black opacity-70 hidden z-[1]"
+              data-for="size-chart-overlay"
+            ></div>
+            <div
+              class="fixed top-1/2 left-1/2 w-fit max-w-[90vw] overflow-auto h-fit z-[2] transition-all"
+              data-for="size-chart"
+            >
+              {% if block.settings.sizeChartPage.content != blank %}
+                {{ block.settings.sizeChartPage.content }}
+              {% elsif default_size_chart != blank %}
+                {{ default_size_chart }}
+              {% endif %}
+            </div>
+          {% endif %}
+        {% endfor %}
+
+        <div class="flex mt-3 md:mt-5 gap-3 md:gap-5 flex-wrap">
+          <button
+            class="bg-white hover:bg-teal-600 cursor-pointer disabled:text-red-500 disabled:cursor-not-allowed p-2 text-black flex-1 "
+            type="submit"
+            data-for="add-to-cart"
+            {% unless product.selected_or_first_available_variant.available %}
+              disabled
+            {% endunless %}
+          >
+            {% if product.selected_or_first_available_variant.available %}
+              Add to Cart
+            {% else %}
+              Sold Out
+            {% endif %}
+          </button>
+          
+          <button
+            type="button"
+            class="border aspect-square w-11 cursor-pointer flex items-center justify-center transition-all hover:bg-white/10"
+            data-for="single-product-wishlist" 
+            data-product-handle="{{ product.handle }}"
+            title="Add to Wishlist"
+          >
+            <style>
+                /* Visual Toggle Logic for Single Product */
+                button[data-for="single-product-wishlist"].active .bi-heart { display: none; }
+                button[data-for="single-product-wishlist"].active .bi-heart-fill { display: block; }
+                button[data-for="single-product-wishlist"] .bi-heart-fill { display: none; }
+            </style>
+            <i class="bi bi-heart text-xl"></i>
+            <i class="bi bi-heart-fill text-xl text-[#39A596]"></i>
+          </button>
+
+        </div>
+
+        {% for block in section.blocks %}
+          {% if block.type == '@app' %}
+            {% render block %}
+          {% endif %}
+        {% endfor %}
+      {% endform %}
+      {% render 'offers' %}
+      {% render 'trust-badges' %}
+      {% render 'product-description', type: downcase_product_type %}
+    </div>
+  </div>
+</div>
+
+<script>
+
+  const selected_image_position = {{ selected_image_position }};
+  const initSlider = (position = selected_image_position) => {
+    // Only init if element exists
+    if(!document.querySelector('[data-for="thumb-image-slider-{{ section.id | handleize }}"]')) return;
+
+    const thumbSlider = new Swiper('[data-for="thumb-image-slider-{{ section.id | handleize }}"]', {
+      slidesPerView: 4,
+      spaceBetween: 20,
+      mousewheel: {
+        invert: false,
+        forceToAxis: true,
+      },
+      watchSlidesVisibility: true,
+      watchSlidesProgress: true,
+    });
+
+    const mainProductSlider = new Swiper('[data-for="main-image-slider-{{ section.id | handleize }}"]', {
+      slidesPerView: 1,
+      keyboard: {
+        enabled: true,
+        onlyInViewport: true,
+      },
+      pagination: {
+        el: '#nav-{{ section.id | handleize }}',
+        type: 'fraction',
+      },
+      mousewheel: {
+        invert: false,
+        forceToAxis: true,
+      },
+      navigation: {
+        nextEl: '#next-{{ section.id | handleize }}',
+        prevEl: '#prev-{{ section.id | handleize }}',
+      },
+      thumbs: {
+        swiper: thumbSlider,
+      },
+    });
+
+    if(position) mainProductSlider.slideTo(position - 1); 
+
+    mainProductSlider.on("slideChange", function () {
+      const activeIndex = mainProductSlider.activeIndex; 
+      thumbSlider.slideTo(activeIndex); 
+    });
+
+  };
+
+
+  const productUrl = "{{ product.url }}";
+  const sectionId = "{{ section.id }}";
+
+  // Fetch and replace product section via variant
+  const fetchProductSection = (variantId) => {
+    fetch(`${productUrl}?variant=${variantId}&section_id=${sectionId}`)
+      .then((response) => response.text())
+      .then((responseText) => {
+        const oldProductContainer = document.getElementById("main-product");
+        if (oldProductContainer) {
+          const newProductSection = new DOMParser().parseFromString(responseText, 'text/html');
+          const newProductContainer = newProductSection.getElementById("main-product");
+          const selectedImagePosition = newProductSection.getElementById("selected-image-position").value;
+          if (newProductContainer) {
+            oldProductContainer.replaceWith(newProductContainer);
+            addProductEvents(); // Re-attach all events including Wishlist
+            initSlider(selectedImagePosition);
+          }
+        }
+      })
+      .catch((e) => console.error(e));
+  };
+
+  // Add event listeners for product variants, quantity AND WISHLIST
+  const addProductEvents = () => {
+    const product = {{ product | json }};
+    const selected_image_position = {{ selected_image_position }};
+
+    const variantsContainer = document.querySelector(`[data-for="product-variants-container"]`);
+
+    // Event listener for variant change
+    if(variantsContainer){
+        variantsContainer.addEventListener("change", (e) => {
+        if (e.target.matches(`input[type="radio"]`)) {
+            const selectedVariant = Array.from(
+            variantsContainer.querySelectorAll(`input[type="radio"]:checked`)
+            ).map(input => input.value);
+
+            const matchingVariant = product.variants.find(variant =>
+            variant.options.every((option, i) => option === selectedVariant[i])
+            );
+
+            if (matchingVariant) {
+            console.log(matchingVariant)
+            fetchProductSection(matchingVariant.id);
+
+            const newUrl = `${window.location.pathname}?variant=${matchingVariant.id}`;
+            window.history.replaceState(null, null, newUrl);
+            }
+        }
+        });
+    }
+
+    // Quantity change logic
+    const quantitySelectors = document.querySelectorAll(`[data-for="quantity-selector"] button`);
+    quantitySelectors.forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        let quantityValue = btn.parentElement.querySelector("input");
+        let quantity = parseInt(quantityValue.value, 10); 
+        if (btn.classList.contains("qty-add")) {
+          quantity += 1;
+        } else if (btn.classList.contains("qty-remove") && quantity > 1) {
+          quantity -= 1;
+        }
+        quantityValue.value = quantity;
+      });
+    });
+
+    // size chart pop-up 
+    const sizeChartBtn = document.querySelector(`[data-for="size-chart-btn"]`);
+    const sizeChartOverlay = document.querySelector(`[data-for="size-chart-overlay"]`);
+    const sizeChart = document.querySelector(`[data-for="size-chart"]`);
+    const showChart = () => {
+      sizeChartOverlay?.classList.remove("hidden");
+      sizeChart?.classList.add("active");
+      document.body.classList.add("overflow-hidden");
+    }
+    const hideChart = () => {
+      sizeChartOverlay?.classList.add("hidden");
+      sizeChart?.classList.remove("active");
+      document.body.classList.remove("overflow-hidden");
+    }
+    sizeChartBtn?.addEventListener("click", showChart);
+    sizeChartOverlay?.addEventListener("click", hideChart);
+
+    // ==========================================
+    // START: Wishlist Logic for Product Page
+    // ==========================================
+    // UPDATED SELECTOR to match new button ID
+    const wishlistBtn = document.querySelector('[data-for="single-product-wishlist"]');
+    
+    // Check login status (injected via Liquid)
+    const isUserLoggedIn = {% if customer %}true{% else %}false{% endif %};
+
+    if(wishlistBtn) {
+        const handle = wishlistBtn.getAttribute('data-product-handle');
+        
+        // 1. Initial State Check (Paint green if already saved)
+        const savedItems = JSON.parse(localStorage.getItem('wishlist_items')) || [];
+        if(savedItems.includes(handle)) {
+            wishlistBtn.classList.add('active');
+        }
+
+        // 2. Click Handler
+        wishlistBtn.addEventListener('click', (e) => {
+            e.preventDefault(); 
+            e.stopPropagation(); // Ensure click doesn't bubble up
+            
+            // Auth Check
+            if(!isUserLoggedIn) {
+                // FIXED: Removed Alert, added direct redirect
+                window.location.href = "/account/login";
+                return;
+            }
+
+            // Toggle Logic
+            let list = JSON.parse(localStorage.getItem('wishlist_items')) || [];
+            if(list.includes(handle)) {
+                // Remove
+                list = list.filter(item => item !== handle);
+                wishlistBtn.classList.remove('active');
+            } else {
+                // Add
+                list.push(handle);
+                wishlistBtn.classList.add('active');
+            }
+            
+            // Save
+            localStorage.setItem('wishlist_items', JSON.stringify(list));
+        });
+    }
+    // ==========================================
+    // END: Wishlist Logic
+    // ==========================================
+  
+  };
+
+  // Attach events on DOMContentLoaded
+  document.addEventListener("DOMContentLoaded", () => {
+    addProductEvents()
+    initSlider()
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Product",
+  "tag": "section",
+  "class": "container max-w-screen-xl mx-auto",
+  "settings": [
+    {
+      "type": "page",
+      "id": "default_Size_chart",
+      "label": "Default Size Chart",
+      "info": "Select the default size chart to be displayed on product page."
+    }
+  ],
+  "enabled_on": {
+    "templates": ["product"]
+  },
+  "limit": 1,
+  "blocks": [
+    {
+      "type": "size_chart",
+      "name": "Size Chart",
+      "settings": [
+        {
+          "type": "page",
+          "id": "sizeChartPage",
+          "label": "Select Size Chart"
+        }
+      ]
+    },
+    {
+      "type": "@app"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product"
+    }
+  ]
+}
+{% endschema %}

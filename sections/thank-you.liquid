@@ -1,0 +1,210 @@
+{% comment %} <div class="" data-for="thank-you-card">
+  <h1 class="px-4 md:px-6 container max-w-screen-xl mx-auto text-center text-2xl font-bold md:text-4xl my-6 md:my-12 heading-font">{{ section.settings.section_title }}</h1>
+  <div class="my-6 md:my-12 px-4 md:px-6 container max-w-screen-xl mx-auto normal-font">
+    <div class="max-w-md mx-auto bg-gradient-to-br from-gray-800 to-black rounded-2xl p-6 border border-green-500 shadow-xl min-h-[70vh] flex flex-col justify-between">
+      
+      <!-- Mascot (40%) -->
+      <figure class="h-[40%] flex justify-center items-center">
+        <img id="mascot" src="" alt="Narrative Mascot" class="h-full object-contain" />
+      </figure>
+      
+      <!-- Hashtag -->
+      <div class="text-center mt-4">
+        <p id="hashtag" class="text-green-400 font-semibold text-lg tracking-wide">#loading</p>
+      </div>
+
+      <!-- Compliment -->
+      <div class="mt-2 text-white text-center text-sm space-y-1 font-light leading-relaxed">
+        <p id="line1">...</p>
+        <p id="line2">...</p>
+        <p id="line3">...</p>
+      </div>
+
+      <!-- Buttons -->
+      <div class="mt-6 flex flex-col gap-4">
+        <button class="w-full border border-green-400 text-green-400 py-2 rounded-full text-sm font-semibold hover:bg-green-400 hover:text-black transition">
+          Earn Money
+        </button>
+        <button class="w-full border border-green-400 text-green-400 py-2 rounded-full text-sm font-semibold hover:bg-green-400 hover:text-black transition" data-for="social-share-button">
+          Share Your Look
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+
+<script>
+document.querySelector('[data-for="social-share-button"]').addEventListener('click', async () => {
+  const card = document.querySelector('[data-for="thank-you-card"]');
+
+  // Hide buttons
+  const buttons = card.querySelectorAll('button');
+  buttons.forEach(btn => btn.style.display = 'none');
+
+  // Capture card as image
+  const canvas = await html2canvas(card);
+  const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+
+  // Show buttons again
+  buttons.forEach(btn => btn.style.display = '');
+
+  if (navigator.canShare && navigator.canShare({ files: [new File([blob], "card.png", { type: "image/png" })] })) {
+    const file = new File([blob], "card.png", { type: "image/png" });
+
+    try {
+      await navigator.share({
+        title: "Check this out!",
+        files: [file],
+        text: "Look at this awesome card!",
+      });
+    } catch (err) {
+      alert('Sharing failed:', err.message);
+    }
+  } else {
+    // fallback for unsupported devices
+    const url = canvas.toDataURL();
+    const link = document.createElement('a');
+    link.download = 'card.png';
+    link.href = url;
+    link.click();
+  }
+});
+</script> {% endcomment %}
+
+<div class="" data-for="thank-you-card">
+  <h1 class="px-4 md:px-6 container max-w-screen-xl mx-auto text-center text-2xl font-bold md:text-4xl my-6 md:my-12 heading-font">
+    {{ section.settings.section_title }}
+  </h1>
+  <div class="my-6 md:my-12 px-4 md:px-6 container max-w-screen-xl mx-auto normal-font">
+    <div class="max-w-md mx-auto rounded-2xl p-6 border border-green-500 shadow-xl min-h-[70vh] flex flex-col justify-between"
+         style="background-image: linear-gradient(to bottom right, #2d2d2d, #000000);">
+      
+      <!-- Mascot (40%) -->
+      <figure class="h-[40%] flex justify-center items-center">
+        <img id="mascot" src="" alt="Narrative Mascot" class="h-full object-contain" />
+      </figure>
+      
+      <!-- Hashtag -->
+      <div class="text-center mt-4">
+        <p id="hashtag" class="text-green-400 font-semibold text-lg tracking-wide">#loading</p>
+      </div>
+
+      <!-- Compliment -->
+      <div class="mt-2 text-white text-center text-sm space-y-1 font-light leading-relaxed">
+        <p id="line1">...</p>
+        <p id="line2">...</p>
+        <p id="line3">...</p>
+      </div>
+
+      <!-- Buttons -->
+      <div class="mt-6 flex flex-col gap-4">
+        <button class="w-full border border-green-400 text-green-400 py-2 rounded-full text-sm font-semibold hover:bg-green-400 hover:text-black transition">
+          Earn Money
+        </button>
+        <button class="w-full border border-green-400 text-green-400 py-2 rounded-full text-sm font-semibold hover:bg-green-400 hover:text-black transition" data-for="social-share-button">
+          Share Your Look
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<script>
+document.querySelector('[data-for="social-share-button"]').addEventListener('click', async () => {
+  const originalCard = document.querySelector('[data-for="thank-you-card"]');
+
+  // Clone the card
+  const clone = originalCard.cloneNode(true);
+
+  // Remove buttons from clone
+  const buttons = clone.querySelectorAll('button');
+  buttons.forEach(btn => btn.remove());
+
+  // Replace Tailwind classes with safe inline styles
+  const wrapper = clone.querySelector('.max-w-md');
+  if (wrapper) {
+    wrapper.removeAttribute('class');
+    wrapper.style.cssText = `
+      background: linear-gradient(to bottom right, #2d2d2d, #000000);
+      border: 1px solid #22c55e;
+      border-radius: 1rem;
+      padding: 1.5rem;
+      min-height: 70vh;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    `;
+  }
+
+  const hashtag = clone.querySelector('#hashtag');
+  if (hashtag) {
+    hashtag.removeAttribute('class');
+    hashtag.style.cssText = 'color: #22c55e; font-weight: 600; font-size: 1.125rem; text-align: center;';
+  }
+
+  const complimentLines = clone.querySelectorAll('#line1, #line2, #line3');
+  complimentLines.forEach(p => {
+    p.removeAttribute('class');
+    p.style.cssText = 'color: #ffffff; font-size: 0.875rem; text-align: center;';
+  });
+
+  // Put the clone off-screen so we can render it
+  clone.style.position = 'absolute';
+  clone.style.left = '-9999px';
+  document.body.appendChild(clone);
+
+  try {
+    const canvas = await html2canvas(clone, { backgroundColor: null });
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+
+    const file = new File([blob], "card.png", { type: "image/png" });
+
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({
+        title: "Check this out!",
+        files: [file],
+        text: "Look at this awesome card!",
+      });
+    } else {
+      // fallback: download image
+      const link = document.createElement('a');
+      link.download = 'card.png';
+      link.href = canvas.toDataURL();
+      link.click();
+    }
+  } catch (err) {
+    alert('Sharing failed: ' + err.message);
+  } finally {
+    // Cleanup
+    document.body.removeChild(clone);
+  }
+});
+</script>
+
+
+
+{% schema %}
+  {
+    "name": "Thank You",
+    "tag": "section",
+    "class": "my-6 md:my-12 px-4 md:px-6 container max-w-screen-xl mx-auto",
+    "limit": 1,
+    "settings": [
+        {
+            "type": "text",
+            "id": "section_title",
+            "label": "Section Title",
+            "default": "You are unique!"
+        }
+    ],
+    "presets": [
+      {
+        "name": "Thank You"
+      }
+    ]
+  }
+{% endschema %}

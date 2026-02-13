@@ -1,0 +1,341 @@
+{% comment %}
+  STREET POP 3D SLIDER - Radar Edition
+  - Optimization: 0 Bandwidth usage until user is 1000px away.
+  - Logic: Uses IntersectionObserver to swap placeholders for real images.
+  - Speed: Force 'eager' load once proximity is detected.
+{% endcomment %}
+
+{% capture slider_attributes %}
+  data-autoplay="{{ section.settings.enable_autoplay }}"
+  data-autoplay-duration="{{ section.settings.autoplay_duration }}"
+  data-loop="{{ section.settings.enable_loop }}"
+  data-slides-per-view-desktop="{{ section.settings.slides_desktop }}"
+  data-slides-per-view-mobile="{{ section.settings.slides_mobile }}"
+{% endcapture %}
+
+<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css"></noscript>
+
+<style>
+  {{ section.settings.font_family_heading | font_face }}
+  {{ section.settings.font_family_quirky | font_face }}
+
+  .section-street-pop-{{ section.id }} {
+    background: {{ section.settings.section_bg_color }};
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    overflow: hidden;
+  }
+
+  /* --- RADAR ANIMATION --- */
+  /* Images start invisible and fade in when the Radar activates them */
+  img.reveal-on-radar {
+    opacity: 0;
+    transition: opacity 0.5s ease-in;
+  }
+  img.reveal-on-radar.loaded {
+    opacity: 1 !important;
+  }
+
+  /* --- TYPOGRAPHY & CARDS --- */
+  .quirky-sticker {
+    display: inline-block;
+    background-color: {{ section.settings.accent_color }};
+    color: #ffffff;
+    padding: 6px 14px;
+    font-family: {{ section.settings.font_family_quirky.family }}, sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    transform: rotate(-2deg);
+    border: 2px solid #ffffff;
+    box-shadow: 4px 4px 0px rgba(0,0,0,0.5);
+    margin-bottom: 1.5rem;
+  }
+
+  .quirky-title {
+    font-family: {{ section.settings.font_family_heading.family }}, sans-serif;
+    font-weight: 900;
+    line-height: 1;
+    color: {{ section.settings.text_color }};
+    text-transform: uppercase;
+    text-shadow: 
+      3px 3px 0px {{ section.settings.accent_color }},
+      6px 6px 0px #ffffff;
+  }
+
+  .street-card {
+    position: relative;
+    display: block;
+    width: 100%;
+    border: 3px solid {{ section.settings.card_border_color }};
+    border-radius: {{ section.settings.card_border_radius }}px;
+    background: {{ section.settings.card_border_color }};
+    box-shadow: 12px 12px 0px {{ section.settings.accent_color }};
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform: translate(0, 0);
+    overflow: hidden; 
+  }
+
+  .street-slide:hover .street-card {
+    transform: translate(8px, 8px);
+    box-shadow: 4px 4px 0px {{ section.settings.accent_color }};
+  }
+
+  .street-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: {{ section.settings.card_border_radius | minus: 2 }}px;
+    display: block;
+    {% if section.settings.grayscale_hover %}
+      filter: grayscale(100%);
+      transition: filter 0.3s ease;
+    {% endif %}
+  }
+  
+  .street-slide:hover .street-image {
+    filter: grayscale(0%);
+  }
+
+  .street-link-overlay {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 50%;
+    height: 20%;
+    z-index: 20;
+    background: transparent; 
+    cursor: pointer;
+  }
+
+  .nav-btn-street {
+    background: #000;
+    border: 2px solid {{ section.settings.accent_color }};
+    color: {{ section.settings.accent_color }};
+    box-shadow: 4px 4px 0px {{ section.settings.accent_color }};
+    transition: all 0.2s ease;
+  }
+  .nav-btn-street:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0px {{ section.settings.accent_color }};
+    background: {{ section.settings.accent_color }};
+    color: #000;
+  }
+
+  .swiper-scrollbar {
+    background: rgba(255,255,255,0.1) !important;
+    height: 6px !important;
+    position: absolute !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    z-index: 10;
+  }
+  .swiper-scrollbar-drag {
+    background: {{ section.settings.accent_color }} !important;
+    border-radius: 0 !important;
+  }
+</style>
+
+<div class="section-street-pop-{{ section.id }}" data-radar-id="{{ section.id }}">
+  <div class="relative max-w-[1600px] mx-auto px-4 md:px-8">
+  
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 md:mb-12 gap-8">
+      
+      <div class="max-w-3xl text-left">
+        {% if section.settings.section_subtitle != blank %}
+          <div class="quirky-sticker">
+            {{ section.settings.section_subtitle }}
+          </div>
+        {% endif %}
+        
+        <h2 class="quirky-title text-4xl md:text-7xl">
+          {% if section.settings.section_title != blank %}
+            {{ section.settings.section_title }}
+          {% else %}
+            GENZ<br>ESSENTIALS
+          {% endif %}
+        </h2>
+      </div>
+
+      {% if section.settings.enable_navigation %}
+        <div class="hidden md:flex gap-4 pb-2">
+          <button class="product-slider-prev nav-btn-street w-14 h-14 flex items-center justify-center font-bold" aria-label="Previous">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          </button>
+          <button class="product-slider-next nav-btn-street w-14 h-14 flex items-center justify-center font-bold" aria-label="Next">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="product-slider-wrapper relative" {{ slider_attributes }}>
+      <div class="swiper overflow-visible js-product-slider !pb-24 !px-2"> 
+        <div class="swiper-wrapper">
+          {% for block in section.blocks %}
+            <div class="swiper-slide street-slide group cursor-pointer px-4 md:px-8 pt-4"> 
+              <div class="street-card aspect-[3/4]">
+                
+                {% if block.settings.image %}
+                  {% comment %} 
+                     RADAR IMPLEMENTATION:
+                     1. Source is a tiny transparent pixel.
+                     2. Real data is hidden in 'data-srcset' and 'data-src'.
+                     3. 'reveal-on-radar' class tells the JS script to wake this image up.
+                  {% endcomment %}
+                  <img 
+                    src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxIiBoZWlnaHQ9IjEiPjwvc3ZnPg=="
+                    data-srcset="{{ block.settings.image | image_url: width: 600 }} 600w, 
+                                 {{ block.settings.image | image_url: width: 900 }} 900w, 
+                                 {{ block.settings.image | image_url: width: 1200 }} 1200w"
+                    data-src="{{ block.settings.image | image_url: width: 1200 }}" 
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                    alt="{{ block.settings.image.alt | escape }}" 
+                    loading="lazy"
+                    width="{{ block.settings.image.width }}"
+                    height="{{ block.settings.image.height }}"
+                    class="street-image reveal-on-radar"
+                  >
+                {% else %}
+                  {{ 'image' | placeholder_svg_tag: 'w-full h-full object-cover opacity-50' }}
+                {% endif %}
+                <a href="{{ block.settings.image_link | default: '#' }}" class="street-link-overlay" aria-label="Go to product"></a>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+        
+        {% if section.settings.enable_pagination %}
+          <div class="swiper-scrollbar"></div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function(){
+    // 1. Initialize Swiper (Standard)
+    if (!window.Swiper) {
+      var script = document.createElement('script');
+      script.src = 'https://unpkg.com/swiper/swiper-bundle.min.js';
+      script.async = true;
+      script.onload = initStreetSlider;
+      document.head.appendChild(script);
+    } else {
+      document.addEventListener('DOMContentLoaded', initStreetSlider);
+    }
+
+    function initStreetSlider() {
+      const container = document.querySelector('.section-street-pop-{{ section.id }} .js-product-slider');
+      if (!container) return;
+
+      const wrapper = container.closest('.product-slider-wrapper');
+      const prevBtn = container.closest('.section-street-pop-{{ section.id }}').querySelector('.product-slider-prev');
+      const nextBtn = container.closest('.section-street-pop-{{ section.id }}').querySelector('.product-slider-next');
+
+      new Swiper(container, {
+        slidesPerView: parseFloat(wrapper.getAttribute('data-slides-per-view-mobile')),
+        spaceBetween: 0,
+        loop: wrapper.getAttribute('data-loop') === 'true',
+        autoplay: wrapper.getAttribute('data-autoplay') === 'true' ? { delay: parseInt(wrapper.getAttribute('data-autoplay-duration')), disableOnInteraction: false } : false,
+        navigation: { nextEl: nextBtn, prevEl: prevBtn },
+        scrollbar: { el: '.swiper-scrollbar', draggable: true, hide: false },
+        breakpoints: {
+          640: { slidesPerView: 2.2 },
+          1024: { slidesPerView: parseFloat(wrapper.getAttribute('data-slides-per-view-desktop')) }
+        }
+      });
+    }
+
+    // 2. RADAR SCRIPT (1000px Proximity Loader)
+    document.addEventListener('DOMContentLoaded', () => {
+      const section = document.querySelector('[data-radar-id="{{ section.id }}"]');
+      
+      if (section && 'IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              // User is within 1000px. Wake up ALL images in this slider.
+              const hiddenImages = section.querySelectorAll('img.reveal-on-radar');
+              hiddenImages.forEach(img => {
+                if (img.dataset.src) {
+                  // Swap real sources in
+                  img.src = img.dataset.src;
+                  if(img.dataset.srcset) img.srcset = img.dataset.srcset;
+                  
+                  // FORCE DOWNLOAD (Crucial for smooth horizontal scrolling)
+                  img.setAttribute('loading', 'eager'); 
+                  
+                  // Fade in when ready
+                  img.onload = () => img.classList.add('loaded');
+                  
+                  // Clean up
+                  img.removeAttribute('data-src');
+                  img.removeAttribute('data-srcset');
+                }
+              });
+              // Radar job done. Turn it off.
+              observer.unobserve(section);
+            }
+          });
+        }, { rootMargin: '1000px' }); // The "Tripwire" distance
+
+        observer.observe(section);
+      }
+    });
+
+  })();
+</script>
+
+{% schema %}
+  {
+    "name": "Street 3D Slider",
+    "tag": "section",
+    "class": "section",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Street Theme Colors"
+      },
+      { "type": "color", "id": "section_bg_color", "label": "Background Color", "default": "#111111" },
+      { "type": "color", "id": "text_color", "label": "Heading Main Color", "default": "#ffffff" },
+      { "type": "color", "id": "accent_color", "label": "3D Shadow & Sticker Color", "default": "#019973" },
+      { "type": "color", "id": "card_border_color", "label": "Card Border Color", "default": "#ffffff" },
+      { "type": "header", "content": "Quirky Typography" },
+      { "type": "text", "id": "section_title", "label": "Section Heading", "default": "NEW<br>ARRIVALS" },
+      { "type": "text", "id": "section_subtitle", "label": "Sticker Text", "default": "IN DELULU" },
+      { "type": "font_picker", "id": "font_family_heading", "label": "Heading Font", "default": "helvetica_n4" },
+      { "type": "font_picker", "id": "font_family_quirky", "label": "Sticker Font", "default": "helvetica_n4" },
+      { "type": "header", "content": "Card Design" },
+      { "type": "range", "id": "card_border_radius", "label": "Border Radius", "min": 0, "max": 20, "step": 2, "default": 0 },
+      { "type": "checkbox", "id": "grayscale_hover", "label": "Start Black & White?", "default": true },
+      { "type": "header", "content": "Layout (Enlarged)" },
+      { "type": "range", "id": "slides_desktop", "label": "Slides visible (Desktop)", "min": 1, "max": 4, "step": 0.1, "default": 2.0 },
+      { "type": "range", "id": "slides_mobile", "label": "Slides visible (Mobile)", "min": 1, "max": 2, "step": 0.1, "default": 1.1 },
+      { "type": "range", "id": "padding_top", "label": "Top Padding", "min": 0, "max": 160, "step": 10, "default": 40 },
+      { "type": "range", "id": "padding_bottom", "label": "Bottom Padding", "min": 0, "max": 160, "step": 10, "default": 40 },
+      { "type": "header", "content": "Controls" },
+      { "type": "checkbox", "id": "enable_autoplay", "label": "Enable Autoplay", "default": false },
+      { "type": "range", "id": "autoplay_duration", "label": "Autoplay Speed (ms)", "min": 2000, "max": 8000, "step": 500, "default": 4000 },
+      { "type": "checkbox", "id": "enable_navigation", "label": "Show Navigation Arrows", "default": true },
+      { "type": "checkbox", "id": "enable_pagination", "label": "Show Scrollbar", "default": true },
+      { "type": "checkbox", "id": "enable_loop", "label": "Enable Infinite Loop", "default": true }
+    ],
+    "blocks": [
+      {
+        "type": "image",
+        "name": "Image",
+        "settings": [
+          { "type": "image_picker", "id": "image", "label": "Image" },
+          { "type": "url", "id": "image_link", "label": "Link" }
+        ]
+      }
+    ],
+    "presets": [
+      { "name": "Street 3D Slider", "blocks": [{ "type": "image" }, { "type": "image" }, { "type": "image" }] }
+    ]
+  }
+{% endschema %}

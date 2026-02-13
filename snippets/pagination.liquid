@@ -1,0 +1,30 @@
+{%- if paginate.parts.size > 0 -%}
+
+    <ul class="flex items-center justify-center gap-2" role="list">
+        {%- if paginate.previous -%}
+        <li>
+            <a href="{{ paginate.previous.url }}" class="border w-[30px] h-[30px] flex items-center justify-center hover:bg-white hover:text-black transition-all"><i class="bi bi-chevron-left block"></i></a>
+        </li>
+        {%- endif -%}
+        {%- for part in paginate.parts -%}
+        <li>
+            {%- if part.is_link -%}
+            <a href="{{ part.url }}" class="border w-[30px] h-[30px] flex items-center justify-center hover:bg-white hover:text-black transition-all">{{ part.title }}</a>
+            {%- else -%}
+            {%- if part.title == paginate.current_page -%}
+            <span class="border w-[30px] h-[30px] flex items-center justify-center bg-white text-black">{{ part.title }}</span>
+            {%- else -%}
+            <span class="border w-[30px] h-[30px] flex items-center justify-center">{{ part.title }}</span>
+            {%- endif -%}
+            {%- endif -%}
+        </li>
+        {%- endfor -%}
+
+        {%- if paginate.next -%}
+        <li>
+            <a href="{{ paginate.next.url }}" class="border w-[30px] h-[30px] flex items-center justify-center hover:bg-white hover:text-black transition-all"><i class="bi bi-chevron-right"></i></a>
+        </li>
+        {%- endif -%}
+    </ul>
+
+{%- endif -%}

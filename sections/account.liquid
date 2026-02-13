@@ -1,0 +1,1395 @@
+<style>
+  /* Define the color once here */
+
+  :root {
+
+    --brand-teal: #39A596;
+
+    --brand-teal-rgb: 57, 165, 150;
+
+  }
+
+
+  /* These classes use !important to override any theme defaults */
+
+  .brand-text { color: var(--brand-teal) !important; }
+
+  .brand-bg { background-color: var(--brand-teal) !important; }
+
+  .brand-border { border-color: var(--brand-teal) !important; }
+
+
+  /* --- BUTTON FIX START --- */
+
+  .brand-btn {
+
+    background-color: var(--brand-teal) !important;
+
+    color: white !important;
+
+    border: 1px solid var(--brand-teal) !important;
+
+  }
+
+  .brand-btn:hover {
+
+    background-color: white !important;
+
+    color: var(--brand-teal) !important; /* Text turns Green on hover */
+
+  }
+
+  /* --- BUTTON FIX END --- */
+
+
+  /* Specific fix for the 'View Card' button */
+
+  .view-card-btn {
+
+    color: var(--brand-teal) !important;
+
+    font-weight: bold;
+
+    text-transform: uppercase;
+
+    font-size: 0.75rem;
+
+    letter-spacing: 0.05em;
+
+  }
+
+  .view-card-btn:hover {
+
+    color: white !important;
+
+  }
+
+
+  /* Specific fix for links */
+
+  .order-link {
+
+    color: var(--brand-teal) !important;
+
+    font-weight: bold;
+
+  }
+</style>
+
+<div class="flex flex-col gap-8">
+  <div class="flex justify-between items-end border-b border-gray-800 pb-6 mb-4">
+    <div>
+      <h1 class="heading-font text-3xl md:text-5xl font-bold text-white uppercase tracking-wider">My Narrative</h1>
+
+      <p class="text-gray-400 text-sm mt-2">Welcome back, {{ customer.first_name }}</p>
+    </div>
+
+    <a
+      class="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-white transition-colors border border-gray-700 px-4 py-2 rounded-full hover:border-white"
+
+      href="{{ routes.account_logout_url }}"
+    >
+      Logout
+    </a>
+  </div>
+
+  {% if customer.orders.size > 0 %}
+    {% assign latest_order = customer.orders.first %}
+
+    <div class="relative w-full bg-gradient-to-r from-[#0a0a0a] to-[#111] brand-border border rounded-xl overflow-hidden shadow-[0_0_30px_rgba(57,165,150,0.1)] group">
+      <div
+        class="absolute top-0 right-0 w-64 h-64 brand-bg opacity-5 blur-[100px] rounded-full pointer-events-none"
+      ></div>
+
+      <div class="relative z-2 p-6 md:p-10 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="text-center md:text-left">
+          <div
+            class="inline-block brand-text text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest mb-3 border brand-border"
+
+            style="background: rgba(57,165,150,0.1);"
+          >
+            Latest Order
+          </div>
+
+          <h2 class="heading-font text-2xl md:text-3xl font-bold text-white mb-1">ORDER {{ latest_order.name }}</h2>
+
+          <p class="text-gray-400 text-sm">
+            {{ latest_order.created_at | date: '%B %d, %Y' }} • {{ latest_order.financial_status_label }}
+          </p>
+
+          <div class="flex flex-wrap gap-3 mt-4 justify-center md:justify-start">
+            {% for item in latest_order.line_items limit: 3 %}
+              <div class="flex items-center gap-3 bg-black/40 border border-gray-800 p-2 rounded-md pr-4 max-w-[200px]">
+                {% if item.image %}
+                  <img
+                    src="{{ item.image | image_url: width: 60 }}"
+
+                    class="w-10 h-10 object-cover rounded shadow-sm border border-gray-700 flex-shrink-0"
+                  >
+                {% endif %}
+
+                <div class="text-left">
+                  <p class="text-white text-xs font-bold whitespace-normal leading-tight">{{ item.product.title }}</p>
+
+                  <p class="text-gray-500 text-[10px] mt-1">{{ item.variant.title }}</p>
+                </div>
+              </div>
+            {% endfor %}
+
+            {% if latest_order.line_items.size > 3 %}
+              <div class="flex items-center justify-center bg-black/40 border border-gray-800 w-10 h-10 rounded-md flex-shrink-0">
+                <span class="text-gray-500 text-xs">+{{ latest_order.line_items.size | minus: 3 }}</span>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <button
+          onclick="openVault('{{ latest_order.id }}')"
+
+          class="brand-btn heading-font font-normal text-base md:text-lg py-3 px-8 rounded-md hover:scale-105 transition-all duration-300 shadow-[0_0_20px_rgba(57,165,150,0.4)] uppercase tracking-wide flex items-center gap-2"
+        >
+          <span class="px-2"> Unlock Personality Card </span>
+        </button>
+      </div>
+    </div>
+  {% endif %}
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');
+
+
+    /* LOCAL VARIABLES FOR THIS SNIPPET */
+
+    .artifact-section-wrapper {
+
+      --brand-teal: #39A596;
+
+      --font-main: 'Montserrat', sans-serif;
+
+      font-family: var(--font-main);
+
+    }
+
+
+    /* CONTAINER STYLES */
+
+    .loyalty-card-mini {
+
+      background: #050505;
+
+      border: 1px solid var(--brand-teal);
+
+      box-shadow: 0 0 40px rgba(57, 165, 150, 0.15);
+
+      border-radius: 16px;
+
+      padding: 20px;
+
+      position: relative;
+
+      overflow: hidden;
+
+      max-width: 420px;
+
+      width: 100%;
+
+    }
+
+
+    /* --- NEW SAGA HISTORY STYLES --- */
+
+    .saga-row {
+
+      margin-bottom: 30px; /* Space between rows */
+
+      position: relative;
+
+    }
+
+    .saga-row.completed {
+
+      opacity: 0.85;
+
+    }
+
+
+
+    .saga-completed-badge {
+
+      position: absolute;
+
+      bottom: -14px;
+
+      right: 0;
+
+      background-color: var(--brand-teal);
+
+      color: #fff;
+
+      font-size: 9px;
+
+      font-weight: 800;
+
+      padding: 4px 10px;
+
+      border-radius: 12px;
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 4px;
+
+      box-shadow: 0 4px 12px rgba(0,0,0,0.9);
+
+      z-index: 20;
+
+      font-family: 'Montserrat', sans-serif;
+
+      text-transform: uppercase;
+
+      letter-spacing: 0.5px;
+
+      border: 1px solid #000;
+
+    }
+
+
+    /* SLOTS - REDUCED SIZE */
+
+    .artifact-slot-mini {
+
+      aspect-ratio: 1/1;
+
+      border-radius: 6px;
+
+      position: relative;
+
+      overflow: hidden;
+
+      transition: all 0.3s ease;
+
+      width: 100%;
+
+      cursor: pointer;
+
+    }
+
+
+    .artifact-slot-mini:hover {
+
+      transform: scale(1.05);
+
+    }
+
+
+    /* FILLED */
+
+    .artifact-slot-mini.filled {
+
+      border: 1px solid var(--brand-teal);
+
+      background: #000;
+
+      box-shadow: inset 0 0 10px rgba(57, 165, 150, 0.2);
+
+    }
+
+
+    .artifact-slot-mini.filled:hover {
+
+      border-color: var(--brand-teal);
+
+      box-shadow: 0 0 20px rgba(57, 165, 150, 0.4);
+
+    }
+
+
+    /* EMPTY (Blueprint Grid) */
+
+    .artifact-slot-mini.empty {
+
+      background-color: #0f0f0f;
+
+      border: 1px solid #222;
+
+      background-image:
+
+        linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+
+        linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+
+      background-size: 6px 6px;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      cursor: default;
+
+    }
+
+
+    .empty-number-mini {
+
+      font-size: 0.9rem;
+
+      font-weight: 700;
+
+      color: #444;
+
+    }
+
+
+    /* BADGE - SMALLER */
+
+    .check-badge-mini {
+
+      position: absolute; top: 2px; right: 2px;
+
+      width: 12px; height: 12px;
+
+      background: var(--brand-teal);
+
+      border-radius: 50%;
+
+      display: flex; align-items: center; justify-content: center;
+
+      z-index: 10;
+
+      box-shadow: 0 0 5px var(--brand-teal);
+
+    }
+
+
+    /* PROGRESS BAR */
+
+    .progress-track-mini {
+
+      background: #1a1a1a;
+
+      border-radius: 10px;
+
+      height: 5px;
+
+      overflow: hidden;
+
+      margin-top: 16px;
+
+    }
+
+    .progress-fill-mini {
+
+      height: 100%;
+
+      background: var(--brand-teal);
+
+      box-shadow: 0 0 10px var(--brand-teal);
+
+      border-radius: 10px;
+
+      transition: width 0.5s ease;
+
+    }
+
+
+    /* GRID - TIGHTER SPACING */
+
+    .artifact-grid-compact {
+
+      display: grid;
+
+      grid-template-columns: repeat(5, 1fr);
+
+      gap: 8px;
+
+      position: relative;
+
+      z-index: 10;
+
+    }
+
+
+    /* MODAL STYLES */
+
+    .artifact-modal {
+
+      display: none;
+
+      position: fixed;
+
+      top: 0;
+
+      left: 0;
+
+      width: 100%;
+
+      height: 100%;
+
+      background: rgba(0, 0, 0, 0.95);
+
+      z-index: 9999;
+
+      align-items: center;
+
+      justify-content: center;
+
+      padding: 20px;
+
+    }
+
+
+    .artifact-modal.active {
+
+      display: flex;
+
+    }
+
+
+    .modal-content {
+
+      background: linear-gradient(145deg, #1a1a1a 0%, #0a0a0a 50%, #1a1a1a 100%);
+
+      border: 2px solid var(--brand-teal);
+
+      border-radius: 16px;
+
+      padding: 30px;
+
+      max-width: 400px;
+
+      width: 100%;
+
+      position: relative;
+
+      box-shadow:
+
+        0 0 60px rgba(57, 165, 150, 0.4),
+
+        0 8px 32px rgba(0, 0, 0, 0.8),
+
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+
+        inset 0 -1px 0 rgba(0, 0, 0, 0.5);
+
+      animation: modalZoom 0.3s ease-out;
+
+    }
+
+
+    .modal-content::before {
+
+      content: '';
+
+      position: absolute;
+
+      top: -2px;
+
+      left: -2px;
+
+      right: -2px;
+
+      bottom: -2px;
+
+      background: linear-gradient(45deg, var(--brand-teal), #2d8578, var(--brand-teal), #2d8578);
+
+      border-radius: 16px;
+
+      z-index: -1;
+
+      opacity: 0.6;
+
+      filter: blur(8px);
+
+      animation: borderGlow 3s ease-in-out infinite;
+
+    }
+
+
+    @keyframes borderGlow {
+
+      0%, 100% {
+
+        opacity: 0.6;
+
+        filter: blur(8px);
+
+      }
+
+      50% {
+
+        opacity: 0.8;
+
+        filter: blur(12px);
+
+      }
+
+    }
+
+
+    @keyframes modalZoom {
+
+      from {
+
+        transform: scale(0.8);
+
+        opacity: 0;
+
+      }
+
+      to {
+
+        transform: scale(1);
+
+        opacity: 1;
+
+      }
+
+    }
+
+
+    .modal-close {
+
+      position: absolute;
+
+      top: 15px;
+
+      right: 15px;
+
+      background: none;
+
+      border: none;
+
+      color: #fff;
+
+      font-size: 28px;
+
+      cursor: pointer;
+
+      line-height: 1;
+
+      padding: 0;
+
+      width: 30px;
+
+      height: 30px;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      transition: color 0.2s;
+
+      z-index: 10;
+
+    }
+
+
+    .modal-close:hover {
+
+      color: var(--brand-teal);
+
+    }
+
+
+    .modal-title {
+
+      text-align: center;
+
+      color: #ffffff;
+
+      font-size: 20px;
+
+      font-weight: 700;
+
+      text-transform: uppercase;
+
+      letter-spacing: 1px;
+
+      margin-bottom: 5px;
+
+      margin-top: 5px;
+
+    }
+
+
+    .modal-subtitle {
+
+      text-align: center;
+
+      color: #888;
+
+      font-size: 12px;
+
+      font-weight: 500;
+
+      margin-bottom: 20px;
+
+    }
+
+
+    .modal-image-container {
+
+      width: 100%;
+
+      aspect-ratio: 1/1;
+
+      background: radial-gradient(circle at center, #1a1a1a 0%, #000 70%);
+
+      border: 2px solid #444;
+
+      border-radius: 12px;
+
+      overflow: hidden;
+
+      margin-bottom: 20px;
+
+      position: relative;
+
+      box-shadow:
+
+        0 4px 16px rgba(0, 0, 0, 0.5),
+
+        inset 0 0 30px rgba(57, 165, 150, 0.05);
+
+    }
+
+
+    .modal-image-container::after {
+
+      content: '';
+
+      position: absolute;
+
+      top: 0;
+
+      left: 0;
+
+      right: 0;
+
+      bottom: 0;
+
+      border-radius: 12px;
+
+      background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 50%, rgba(57, 165, 150, 0.05) 100%);
+
+      pointer-events: none;
+
+    }
+
+
+    .modal-image-container img {
+
+      width: 100%;
+
+      height: 100%;
+
+      object-fit: contain;
+
+      padding: 10px;
+
+      position: relative;
+
+      z-index: 1;
+
+    }
+
+
+    .modal-btn {
+
+      width: 100%;
+
+      background: transparent;
+
+      color: #ffffff;
+
+      border: 2px solid #ffffff;
+
+      padding: 14px 20px;
+
+      font-size: 14px;
+
+      font-weight: 700;
+
+      text-transform: uppercase;
+
+      border-radius: 8px;
+
+      cursor: pointer;
+
+      transition: all 0.3s ease;
+
+      font-family: var(--font-main);
+
+      letter-spacing: 0.5px;
+
+    }
+
+
+    .modal-btn:hover {
+
+      background: rgba(255, 255, 255, 0.1);
+
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+
+      transform: scale(1.02);
+
+    }
+  </style>
+
+  {% comment %} --- LOGIC: FETCH ALL DATA (HISTORY) --- {% endcomment %}
+
+  {% assign total_items = 0 %}
+
+  {% assign collected_images = '' %}
+
+  {% assign collected_titles = '' %}
+
+  {% assign collected_order_ids = '' %}
+
+  {% comment %} Added Pagination to ensure we get ALL past orders {% endcomment %}
+
+  {% paginate customer.orders by 250 %}
+    {% for order in customer.orders %}
+      {% unless order.cancelled %}
+        {% comment %} CHECK FOR SPECIAL CODE TEST649 {% endcomment %}
+
+        {% assign is_special_order = false %}
+
+        {% for discount in order.discount_applications %}
+          {% if discount.title == 'TEST649' %}
+            {% assign is_special_order = true %}
+          {% endif %}
+        {% endfor %}
+
+        {% for line_item in order.line_items %}
+          {% comment %} LOGIC: Paid item OR Special Code Order {% endcomment %}
+
+          {% if line_item.final_price > 0 or is_special_order %}
+            {% comment %} 1. COUNT ITEMS {% endcomment %}
+
+            {% assign total_items = total_items | plus: line_item.quantity %}
+
+            {% comment %} 2. FETCH MASCOT {% endcomment %}
+
+            {% assign mascot = line_item.product.metafields.custom.mascot_file %}
+
+            {% if mascot %}
+              {% assign img_url = mascot | image_url: width: 400 %}
+
+            {% else %}
+              {% assign img_url = line_item.image | image_url: width: 400 %}
+            {% endif %}
+
+            {% comment %} 3. GET COLLECTION NAME {% endcomment %}
+
+            {% if line_item.product.collections.size > 0 %}
+              {% assign collection_name = line_item.product.collections.first.title %}
+
+            {% else %}
+              {% assign collection_name = 'Exclusive Drop' %}
+            {% endif %}
+
+            {% assign collected_images = collected_images | append: img_url | append: '||' %}
+
+            {% assign collected_titles = collected_titles | append: collection_name | append: '||' %}
+
+            {% assign collected_order_ids = collected_order_ids | append: order.id | append: '||' %}
+          {% endif %}
+        {% endfor %}
+      {% endunless %}
+    {% endfor %}
+  {% endpaginate %}
+
+  {% assign current_progress = total_items | modulo: 5 %}
+
+  {% comment %} Use Calculated Total Items for Saga Count {% endcomment %}
+
+  {% assign sagas_completed = total_items | divided_by: 5 | floor %}
+
+  {% assign missing_count = 5 | minus: current_progress %}
+
+  {% assign reward_code = customer.metafields.loyalty.reward_code %}
+
+  {% assign collected_images_array = collected_images | split: '||' | reverse %}
+  {% assign collected_titles_array = collected_titles | split: '||' | reverse %}
+  {% assign collected_order_ids_array = collected_order_ids | split: '||' | reverse %}
+
+  <div class="artifact-section-wrapper mt-2 ">
+    <div class="loyalty-card-mini group">
+      <div
+        class="absolute -top-10 -right-10 w-40 h-40 bg-[#39A596] opacity-10 blur-[60px] rounded-full pointer-events-none"
+      ></div>
+
+      <div class="flex justify-between items-start mb-6 relative z-2">
+        <div>
+          <h2 class="text-lg font-bold text-white tracking-wide" style="font-family: 'Montserrat', sans-serif;">
+            Vibe Card Collections
+          </h2>
+
+          <p class="text-xs font-semibold mt-1" style="color: #39A596; font-family: 'Montserrat', sans-serif;">
+            Total Cards Earned: <span class="text-white">{{ total_items }}</span>
+          </p>
+        </div>
+      </div>
+
+      {% comment %}
+        ------------------------------------------------
+
+        PART A: COMPLETED HISTORY ROWS (SAGAS)
+
+        ------------------------------------------------
+      {% endcomment %}
+
+      {% if sagas_completed > 0 %}
+        {% for saga_index in (1..sagas_completed) %}
+          <div class="saga-row completed">
+            <div class="artifact-grid-compact">
+              {% for i in (1..5) %}
+                {% comment %} Calculate Array Index: (SagaNum - 1) * 5 + (SlotNum - 1) {% endcomment %}
+
+                {% assign offset = saga_index | minus: 1 | times: 5 %}
+
+                {% assign array_index = offset | plus: i | minus: 1 %}
+
+                {% assign hist_img = collected_images_array[array_index] %}
+
+                {% assign hist_title = collected_titles_array[array_index] %}
+
+                {% assign hist_oid = collected_order_ids_array[array_index] %}
+
+                <div
+                  class="artifact-slot-mini filled"
+
+                  onclick="openArtifactModal('{{ hist_img }}', '{{ hist_title }}', '{{ hist_oid }}')"
+                >
+                  {% if hist_img %}
+                    <img src="{{ hist_img }}" class="w-full h-full object-contain p-1 relative z-2">
+
+                  {% else %}
+                    <span style="font-size:20px;">✅</span>
+                  {% endif %}
+                </div>
+              {% endfor %}
+            </div>
+
+            <div class="saga-completed-badge">
+              SAGA COMPLETED
+
+              <svg
+                width="10"
+                height="10"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="white"
+                stroke-width="4"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      {% comment %}
+        ------------------------------------------------
+
+        PART B: ACTIVE MISSION OR REWARD TICKET
+
+        ------------------------------------------------
+      {% endcomment %}
+
+      {% if reward_code != blank %}
+        <div class="bg-gray-900 border border-[#39A596] rounded-lg p-4 flex flex-col items-center justify-center gap-2 relative z-2 text-center mt-4">
+          <div>
+            <h2 class="font-bold text-m uppercase mb-2" style="font-family: 'Montserrat', sans-serif; color: #39A596;">
+              MISSION ACCOMPLISHED
+            </h2>
+
+            <h3 class="text-[#39A596] font-bold text-sm uppercase mb-0" style="font-family: 'Montserrat', sans-serif;">
+              🥳Congratulations! You have unlocked your free product
+            </h3>
+
+            <p class="text-gray-400 text-[10px]" style="font-family: 'Montserrat', sans-serif;">
+              Use the below coupon code to buy any T-shirt for FREE
+            </p>
+          </div>
+
+          <div
+            class="bg-[#39A596] text-black font-bold text-lg px-4 py-2 rounded cursor-pointer select-all shadow-lg hover:scale-105 transition-transform w-full"
+
+            style="font-family: 'Montserrat', sans-serif;"
+          >
+            {{ reward_code }}
+          </div>
+        </div>
+
+      {% else %}
+        <div class="saga-row">
+          <p class="text-[10px] text-gray-500 mb-2 uppercase tracking-wider">Current Saga</p>
+
+          <div class="artifact-grid-compact">
+            {% for i in (0..4) %}
+              {% comment %} Calculate Index for Active Row: (Completed * 5) + i {% endcomment %}
+
+              {% assign start_index = sagas_completed | times: 5 %}
+
+              {% assign active_index = start_index | plus: i %}
+
+              {% assign current_img = collected_images_array[active_index] %}
+
+              {% assign current_title = collected_titles_array[active_index] %}
+
+              {% assign current_order_id = collected_order_ids_array[active_index] %}
+
+              <div
+                class="artifact-slot-mini {% if current_img %}filled{% else %}empty{% endif %}"
+
+                {% if current_img %}
+                  onclick="openArtifactModal('{{ current_img }}', '{{ current_title }}', '{{ current_order_id }}')"
+                {% endif %}
+              >
+                {% if current_img %}
+                  <img src="{{ current_img }}" class="w-full h-full object-contain p-1 relative z-2">
+
+                  <div class="check-badge-mini">
+                    <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="4">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  </div>
+
+                {% else %}
+                  <span class="empty-number-mini" style="font-family: 'Montserrat', sans-serif;">
+                    {{- i | plus: 1 -}}
+                  </span>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+
+          <div class="mt-3 relative z-2">
+            <div class="progress-track-mini">
+              {% assign percent = current_progress | times: 20 %}
+
+              <div class="progress-fill-mini" style="width: {{ percent }}%"></div>
+            </div>
+
+            <div class="flex justify-between items-center mt-2">
+              <span class="text-[10px] font-bold text-[#39A596]" style="font-family: 'Montserrat', sans-serif;">
+                {{- percent }}%</span
+              >
+            </div>
+
+            <div class="mt-2 text-center bg-[#39A596]/10 border border-[#39A596]/30 rounded-md py-2 px-3">
+              <span
+                class="text-[11px] text-[#39A596] font-bold tracking-wide uppercase"
+
+                style="font-family: 'Montserrat', sans-serif;"
+              >
+                Buy {{ missing_count }} More Product to Unlock Your Free Product
+              </span>
+              <p 
+                class="text-[9px] font-semibold mt-1 uppercase tracking-wider opacity-90" 
+                style="font-family: 'Montserrat', sans-serif; color: #39A596;"
+              >
+                Order any T-shirt for free upon completing the 5 cards collection
+              </p>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="artifact-modal" id="artifactModal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeArtifactModal()">×</button>
+
+      <h3 class="modal-title" id="modalTitle" style="font-family: 'Montserrat', sans-serif;">Collection Name</h3>
+
+      <div class="modal-image-container">
+        <img id="modalImage" src="" alt="Artifact">
+      </div>
+
+      <button class="modal-btn" id="modalButton" onclick="viewPersonalityCard()">View Personality Card</button>
+    </div>
+  </div>
+
+  <script>
+    let currentOrderId = '';
+
+    function openArtifactModal(imageUrl, title, orderId) {
+      document.getElementById('modalImage').src = imageUrl;
+
+      document.getElementById('modalTitle').textContent = title || 'Exclusive Drop';
+
+      currentOrderId = orderId;
+
+      document.getElementById('artifactModal').classList.add('active');
+
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeArtifactModal() {
+      document.getElementById('artifactModal').classList.remove('active');
+
+      document.body.style.overflow = 'auto';
+    }
+
+    function viewPersonalityCard() {
+      if (currentOrderId && typeof openVault === 'function') {
+        closeArtifactModal();
+
+        openVault(currentOrderId);
+      } else {
+        alert('Personality card feature is not available.');
+      }
+    }
+
+    // Close modal when clicking outside
+
+    document.getElementById('artifactModal').addEventListener('click', function (e) {
+      if (e.target === this) {
+        closeArtifactModal();
+      }
+    });
+  </script>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-12 mt-4">
+    <div class="lg:col-span-1 space-y-8">
+      <div class="bg-[#111] p-6 rounded-lg border border-gray-800">
+        <h3 class="heading-font text-lg text-white mb-4 uppercase tracking-widest border-b border-gray-800 pb-2">
+          Profile
+        </h3>
+
+        <div class="space-y-4 text-sm">
+          <div>
+            <p class="text-gray-500 text-xs uppercase">Full Name</p>
+
+            <p class="text-white font-medium">{{ customer.name }}</p>
+          </div>
+
+          <div>
+            <p class="text-gray-500 text-xs uppercase">Email</p>
+
+            <p class="text-white font-medium">{{ customer.email }}</p>
+          </div>
+
+          {% if customer.phone %}
+            <div>
+              <p class="text-gray-500 text-xs uppercase">Phone</p>
+
+              <p class="text-white font-medium">{{ customer.phone }}</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      {% if customer.default_address %}
+        <div class="bg-[#111] p-6 rounded-lg border border-gray-800">
+          <div class="flex justify-between items-center mb-4 border-b border-gray-800 pb-2">
+            <h3 class="heading-font text-lg text-white uppercase tracking-widest">Shipping</h3>
+
+            <a href="{{ routes.account_addresses_url }}" class="text-xs brand-text hover:underline">Manage</a>
+          </div>
+
+          <div class="text-gray-300 text-sm leading-relaxed opacity-80">
+            {{ customer.default_address | format_address }}
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="lg:col-span-2">
+      <h3 class="heading-font text-lg text-white mb-4 uppercase tracking-widest border-b border-gray-800 pb-2 mt-4">
+        Order History ({{ customer.orders.size }})
+      </h3>
+
+      {% if customer.orders.size > 0 %}
+        <div class="bg-[#111] rounded-lg border border-gray-800 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead class="bg-[#0a0a0a] border-b border-gray-800">
+                <tr>
+                  <th class="p-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Order</th>
+
+                  <th class="p-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Date</th>
+
+                  <th class="p-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
+
+                  <th class="p-4"></th>
+                </tr>
+              </thead>
+
+              <tbody class="divide-y divide-gray-800">
+                {% for order in customer.orders %}
+                  <tr class="hover:bg-gray-900/50 transition-colors group">
+                    <td class="p-4">
+                      <a href="{{ order.customer_url }}" class="order-link group-hover:underline">
+                        {{ order.order_number | prepend: '#' }}
+                      </a>
+                    </td>
+
+                    <td class="p-4 text-sm text-gray-400">
+                      {{ order.created_at | date: '%b %d, %Y' }}
+                    </td>
+
+                    <td class="p-4">
+                      <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-800 text-gray-300">
+                        {{ order.fulfillment_status_label }}
+                      </span>
+                    </td>
+
+                    <td class="p-4 text-sm text-white font-medium text-right">
+                      {{ order.total_price | money_without_trailing_zeros }}
+                    </td>
+
+                    <td class="p-4 text-right">
+                      <button
+                        onclick="openVault('{{ order.id }}')"
+
+                        class="view-card-btn transition-colors"
+                      >
+                        View Card
+                      </button>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      {% else %}
+        <div class="text-center py-12 bg-[#111] rounded-lg border border-gray-800">
+          <p class="text-gray-500">No orders found yet.</p>
+
+          <a href="/" class="brand-text hover:underline mt-2 inline-block">Start your narrative</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&display=swap');
+
+
+  #vault-overlay {
+
+    display: none;
+
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+
+    background: #000; z-index: 99999;
+
+    flex-direction: column; align-items: center; justify-content: center;
+
+    font-family: 'Rajdhani', sans-serif;
+
+    color: #39A596 !important; /* Force green text */
+
+    background-image: radial-gradient(circle at 50% 50%, #111 0%, #000 80%);
+
+  }
+
+  .close-vault {
+
+    position: absolute; top: 20px; right: 20px; color: #fff;
+
+    font-size: 40px; cursor: pointer; background: none; border: none; z-index: 100000;
+
+  }
+
+  .scanner-bar { width: 80%; max-width: 300px; height: 4px; background: #111; margin: 20px 0; position: relative; overflow: hidden; border: 1px solid #39A596; }
+
+  .scanner-light { width: 50%; height: 100%; background: #39A596; position: absolute; animation: scan 1.5s infinite alternate; box-shadow: 0 0 15px #39A596; }
+
+  @keyframes scan { from { left: 0; } to { left: 50%; } }
+
+
+  .glitch-text { animation: blink 0.2s infinite; color: #fff; letter-spacing: 2px;}
+
+  @keyframes blink { 0% {opacity: 1} 90% {opacity: 1} 95% {opacity: 0.5} 100% {opacity: 1} }
+
+
+  #final-card-img { width: 90%; max-width: 350px; border: 2px solid #39A596; border-radius: 10px; margin-bottom: 20px; animation: zoomIn 0.5s ease-out; box-shadow: 0 0 30px rgba(57,165,150,0.3); }
+
+  @keyframes zoomIn { from {transform: scale(0.8); opacity: 0;} to {transform: scale(1); opacity: 1;} }
+
+
+  .cyber-btn {
+
+    background: #000; color: #39A596; border: 1px solid #39A596;
+
+    padding: 12px 25px; font-size: 16px; font-weight: bold; text-transform: uppercase;
+
+    cursor: pointer; display: flex; align-items: center; gap: 10px; margin-top: 10px;
+
+    width: 100%; max-width: 300px; justify-content: center;
+
+  }
+
+  .cyber-btn:hover { background: #39A596; color: #000; box-shadow: 0 0 20px #39A596; }
+
+  .insta-btn { border-color: #E1306C; color: #E1306C; }
+
+  .insta-btn:hover { background: #E1306C; color: white; box-shadow: 0 0 20px #E1306C; }
+</style>
+
+<div id="vault-overlay">
+  <button class="close-vault" onclick="closeVault()">×</button>
+
+  <div id="loading-state" style="text-align: center;">
+    <h2 style="letter-spacing: 3px; color: white; margin-bottom: 10px;">NEURAL LINK ESTABLISHED</h2>
+
+    <div class="scanner-bar"><div class="scanner-light"></div></div>
+
+    <p id="status-text" class="glitch-text">ANALYZING PERSONALITY DATA...</p>
+  </div>
+
+  <div
+    id="result-state"
+
+    style="display: none; text-align: center; width: 100%; flex-direction: column; align-items: center;"
+  >
+    <h3 style="color: white; letter-spacing: 2px; margin-bottom: 20px;">IDENTITY CONFIRMED</h3>
+
+    <img id="final-card-img" src="" alt="Identity Card">
+
+    <button class="cyber-btn insta-btn" onclick="shareToInstagram()">SHARE TO STORY 📸</button>
+
+    <a id="download-link" href="#" download class="cyber-btn" style="background:transparent; color:#888; border:none;"
+      >⬇ Download Image</a
+    >
+  </div>
+</div>
+
+<script>
+  // --- CONFIGURATION ---
+
+  const API_URL = 'https://mynarrative-card-gen.vercel.app/api/index';
+
+  let activeOrderId = '';
+
+  let finalImageUrl = '';
+
+  function openVault(orderId) {
+    activeOrderId = orderId;
+
+    document.getElementById('vault-overlay').style.display = 'flex';
+
+    document.getElementById('loading-state').style.display = 'block';
+
+    document.getElementById('result-state').style.display = 'none';
+
+    document.body.style.overflow = 'hidden';
+
+    startPolling();
+  }
+
+  function closeVault() {
+    document.getElementById('vault-overlay').style.display = 'none';
+
+    document.body.style.overflow = 'auto';
+  }
+
+  function startPolling() {
+    const statusText = document.getElementById('status-text');
+
+    let attempts = 0;
+
+    const poller = setInterval(() => {
+      attempts++;
+
+      if (attempts % 2 === 0) statusText.innerText = 'ANALYZING VIBE...';
+      else statusText.innerText = 'GENERATING ASSET...';
+
+      fetch(`${API_URL}?order_id=${activeOrderId}`)
+        .then((res) => res.json())
+
+        .then((data) => {
+          if (data.status === 'ready' && data.url.includes('http')) {
+            clearInterval(poller);
+
+            finalImageUrl = data.url;
+
+            setTimeout(() => {
+              revealCard(finalImageUrl);
+            }, 1000);
+          }
+        })
+
+        .catch((err) => console.error(err));
+
+      if (attempts > 40) {
+        clearInterval(poller);
+
+        statusText.innerText = 'Processing... Check back in 1 minute.';
+      }
+    }, 3000);
+  }
+
+  function revealCard(url) {
+    document.getElementById('loading-state').style.display = 'none';
+
+    document.getElementById('result-state').style.display = 'flex';
+
+    document.getElementById('final-card-img').src = url;
+
+    document.getElementById('download-link').href = url;
+  }
+
+  async function shareToInstagram() {
+    if (!finalImageUrl) return;
+
+    if (navigator.share) {
+      try {
+        const response = await fetch(finalImageUrl);
+
+        const blob = await response.blob();
+
+        const file = new File([blob], 'identity_card.jpg', { type: 'image/jpeg' });
+
+        await navigator.share({
+          files: [file],
+
+          title: 'My Narrative Identity',
+
+          text: 'Verified 1%. #MyNarrative',
+        });
+      } catch (e) {
+        alert('Please save the image and upload manually.');
+      }
+    } else {
+      alert('Image saved! Open Instagram to post.');
+
+      document.getElementById('download-link').click();
+    }
+  }
+</script>
+
+{% schema %}
+{
+  "name": "Account",
+
+  "tag": "section",
+
+  "class": "my-6 md:my-12 px-4 md:px-6 container max-w-screen-xl mx-auto",
+
+  "limit": 1,
+
+  "presets": [
+    {
+      "name": "Account"
+    }
+  ]
+}
+{% endschema %}
