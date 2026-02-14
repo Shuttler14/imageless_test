@@ -1799,11 +1799,12 @@
 }
 
 .mn-slogan-text {
-  font-family: 'Playfair Display', serif;
-  /* Optional: Use your brand font */
-  font-size: 16px;
+  font-family: 'Montserrat', sans-serif;
+  /* Matches your theme */
+  font-size: 15px;
+  font-weight: 500;
   color: #fff;
-  font-style: italic;
+  font-style: normal;
   line-height: 1.4;
 }
 
@@ -1814,15 +1815,13 @@
   right: 15px;
   background: linear-gradient(135deg, #39A596, #247a6d);
   color: white;
-  font-size: 10px;
-  font-weight: 700;
+  font-size: 9px;
+  font-weight: 800;
   padding: 4px 10px;
   border-radius: 20px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
+  letter-spacing: 0.5px;
   z-index: 2;
-  animation: floatBadge 3s infinite ease-in-out;
 }
 
 @keyframes floatBadge {
@@ -1893,4 +1892,16 @@
   font-size: 13px;
   color: rgba(255, 255, 255, 0.7);
   margin-bottom: 6px;
+}
+
+/* Tips Text (Simplified Single Tip) */
+.mn-tips-text {
+  margin-top: 20px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  border-left: 2px solid #39A596;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.6;
 }

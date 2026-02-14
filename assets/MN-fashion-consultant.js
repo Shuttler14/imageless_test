@@ -648,7 +648,7 @@ const MNAIStylist = (() => {
 
     // 1. Dynamic Titles
     const title = isGiftMode ? "Choose Their Message" : "Your AI-Curated Direction";
-    const subtitle = isGiftMode ? "Select the slogan that captures the feeling." : `"${recommendations.direction}"`;
+    const subtitle = isGiftMode ? "We recommend the first one based on your profile." : `"${recommendations.direction}"`;
 
     let contentHtml = '';
 
@@ -665,7 +665,7 @@ const MNAIStylist = (() => {
             <button class="mn-slogan-card ${index === 0 ? 'recommended active' : ''}" 
                     onclick="MNAIStylist.selectSlogan(this, '${slogan.replace(/'/g, "\\'")}')">
               
-              ${index === 0 ? '<div class="mn-badge-recommended">✨ AI RECOMMENDED</div>' : ''}
+              ${index === 0 ? '<div class="mn-badge-recommended">✨ RECOMMENDED</div>' : ''}
               
               <div class="mn-slogan-content">
                 <span class="mn-slogan-text">"${slogan}"</span>
@@ -675,14 +675,7 @@ const MNAIStylist = (() => {
           `).join('')}
         </div>
         
-        ${recommendations.styling_tips ? `
-          <div class="mn-styling-tips">
-            <h4 class="mn-tips-heading">💡 Stylist Notes</h4>
-            <ul class="mn-tips-list">
-              ${recommendations.styling_tips.map(tip => `<li>${tip}</li>`).join('')}
-            </ul>
-          </div>
-        ` : ''}
+        ${recommendations.styling_tips ? `<p class="mn-tips-text">💡 <b>Stylist Tip:</b> ${recommendations.styling_tips[0]}</p>` : ''}
       `;
     }
     // 3. Self Mode: Visual Suggestions (Standard)
@@ -708,7 +701,7 @@ const MNAIStylist = (() => {
           <div class="mn-results-icon">${isGiftMode ? '🎁' : '✨'}</div>
           <div>
             <h3 class="mn-results-title">${title}</h3>
-            <p class="mn-results-subtitle" style="font-size: 13px; opacity: 0.8; margin-top: 4px;">${subtitle}</p>
+            <p class="mn-results-subtitle" style="font-size:12px; color:var(--mn-text-muted);">${subtitle}</p>
           </div>
         </div>
 
@@ -749,8 +742,8 @@ const MNAIStylist = (() => {
       `;
 
       setTimeout(() => {
-        // Redirect to your Design Page
-        window.location.href = window.MN_CONFIG?.studioUrl || "/pages/create-your-own-design";
+        // ✅ CORRECT URL REDIRECT
+        window.location.href = "/pages/create-your-design";
       }, 800);
     });
   };
