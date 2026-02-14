@@ -81,15 +81,17 @@ document.addEventListener('DOMContentLoaded', () => {
             }
           }, 200);
 
-          // 4. Auto-Skip to Step 3
-          setTimeout(() => {
+          // 4. Auto-Skip to Step 3 - Wait for function to be ready
+          const jumpToStep3 = () => {
             if (typeof goToStep === 'function') {
               console.log("🚀 Jumping to Step 3...");
               goToStep(3);
             } else {
-              console.warn("⚠️ goToStep function not found");
+              console.log("⏳ Waiting for goToStep function...");
+              setTimeout(jumpToStep3, 200);
             }
-          }, 100);
+          };
+          setTimeout(jumpToStep3, 300);
         } else {
           console.warn("⚠️ State object not found");
         }
