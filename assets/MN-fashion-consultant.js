@@ -640,55 +640,116 @@ const MNAIStylist = (() => {
   };
 
   // ═══════════════════════════════════════════════════════════
-  // RESULTS DISPLAY
+  // RESULTS DISPLAY (UPDATED FOR GIFT MODE)
   // ═══════════════════════════════════════════════════════════
 
   const renderResults = (recommendations) => {
-    const html = `
-      <div class="mn-results mn-fade-in">
-        
-        <div class="mn-results-header">
-          <div class="mn-results-icon">✨</div>
-          <h3 class="mn-results-title">Your AI-Curated Direction</h3>
-        </div>
+    const isGiftMode = state.currentContext?.mode === 'gift';
 
+    // 1. Dynamic Titles
+    const title = isGiftMode ? "Choose Their Message" : "Your AI-Curated Direction";
+    const subtitle = isGiftMode ? "Select the slogan that captures the feeling." : `"${recommendations.direction}"`;
+
+    let contentHtml = '';
+
+    // 2. Gift Mode: Slogan Cards
+    if (isGiftMode) {
+      // Default the selected slogan to the first one (Recommended)
+      if (recommendations.suggestions?.length > 0) {
+        state.selectedSlogan = recommendations.suggestions[0];
+      }
+
+      contentHtml = `
+        <div class="mn-slogan-grid">
+          ${recommendations.suggestions.map((slogan, index) => `
+            <button class="mn-slogan-card ${index === 0 ? 'recommended active' : ''}" 
+                    onclick="MNAIStylist.selectSlogan(this, '${slogan.replace(/'/g, "\\'")}')">
+              
+              ${index === 0 ? '<div class="mn-badge-recommended">✨ AI RECOMMENDED</div>' : ''}
+              
+              <div class="mn-slogan-content">
+                <span class="mn-slogan-text">"${slogan}"</span>
+              </div>
+              <div class="mn-checkbox"></div>
+            </button>
+          `).join('')}
+        </div>
+        
+        ${recommendations.styling_tips ? `
+          <div class="mn-styling-tips">
+            <h4 class="mn-tips-heading">💡 Stylist Notes</h4>
+            <ul class="mn-tips-list">
+              ${recommendations.styling_tips.map(tip => `<li>${tip}</li>`).join('')}
+            </ul>
+          </div>
+        ` : ''}
+      `;
+    }
+    // 3. Self Mode: Visual Suggestions (Standard)
+    else {
+      contentHtml = `
         <div class="mn-direction-card">
           <p class="mn-direction-text">"${recommendations.direction}"</p>
         </div>
-
         <div class="mn-divider"></div>
-
         <h4 class="mn-suggestions-heading">Tactical Suggestions</h4>
         <ul class="mn-suggestions-list">
           ${recommendations.suggestions.map(suggestion => `
             <li class="mn-suggestion-item">${suggestion}</li>
           `).join('')}
         </ul>
+      `;
+    }
+
+    // 4. Render Full UI
+    const html = `
+      <div class="mn-results mn-fade-in">
+        <div class="mn-results-header">
+          <div class="mn-results-icon">${isGiftMode ? '🎁' : '✨'}</div>
+          <div>
+            <h3 class="mn-results-title">${title}</h3>
+            <p class="mn-results-subtitle" style="font-size: 13px; opacity: 0.8; margin-top: 4px;">${subtitle}</p>
+          </div>
+        </div>
+
+        ${contentHtml}
 
         <div class="mn-action-bar">
           <button id="btn-new-consultation" class="mn-btn-secondary">
-            🔄 New Consultation
+            🔄 Start Over
           </button>
           <button id="btn-close-widget" class="mn-btn-primary">
-            🎨 Start Designing
+            ${isGiftMode ? '🎨 Design This Slogan' : '🎨 Start Designing'}
           </button>
         </div>
-
       </div>
     `;
 
     DOM.container.innerHTML = html;
 
+    // 5. Bind Buttons
     document.getElementById('btn-new-consultation').addEventListener('click', renderContextDashboard);
+
     document.getElementById('btn-close-widget').addEventListener('click', () => {
+      // SAVE SELECTION LOGIC
+      if (isGiftMode && state.selectedSlogan) {
+        // Save specifically for the design page to pick up
+        localStorage.setItem('mn_pending_design', JSON.stringify({
+          slogan: state.selectedSlogan,
+          context: state.currentContext,
+          timestamp: Date.now()
+        }));
+      }
+
       DOM.container.innerHTML = `
         <div class="mn-transition">
           <div class="mn-spinner"></div>
-          <p class="mn-transition-text">Transferring to Studio...</p>
+          <p class="mn-transition-text">Opening Design Studio...</p>
         </div>
       `;
 
       setTimeout(() => {
+        // Redirect to your Design Page
         window.location.href = window.MN_CONFIG?.studioUrl || "/pages/create-your-own-design";
       }, 800);
     });
@@ -711,6 +772,20 @@ const MNAIStylist = (() => {
   };
 
   // ═══════════════════════════════════════════════════════════
+  // HELPER: SELECT SLOGAN (Called via onclick)
+  // ═══════════════════════════════════════════════════════════
+  const selectSlogan = (btn, text) => {
+    // 1. Visually update cards
+    const allCards = DOM.container.querySelectorAll('.mn-slogan-card');
+    allCards.forEach(b => b.classList.remove('active'));
+
+    btn.classList.add('active');
+
+    // 2. Update State
+    state.selectedSlogan = text;
+  };
+
+  // ═══════════════════════════════════════════════════════════
   // PUBLIC API
   // ═══════════════════════════════════════════════════════════
 
@@ -718,7 +793,8 @@ const MNAIStylist = (() => {
     init,
     expandWidget,
     minimizeWidget,
-    clearIdentity
+    clearIdentity,
+    selectSlogan // <--- ADD THIS LINE
   };
 
 })();
