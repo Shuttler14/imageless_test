@@ -10,29 +10,15 @@ const MNAIStylist = (() => {
   // CONFIGURATION
   // ═══════════════════════════════════════════════════════════
 
-  // Use centralized config
-  const CONFIG = window.MNConfig || {
-    STORAGE: {
-      CORE_IDENTITY: 'mn_core_identity',
-      ACTIVE_CONTEXT: 'mn_active_design_prompt'
-    },
-    UI: {
-      ANIMATION_DURATION: 400
-    },
-    API: {
-      FASHION_CONSULTANT_API: 'https://YOUR_VERCEL_APP.vercel.app/api/fashion_consultant'
-    },
-    NETWORK: {
-      API_TIMEOUT: 30000,
-      RETRY_ATTEMPTS: 3
-    }
+  const CONFIG = {
+    STORAGE_KEY: 'mn_core_identity',
+    CONTEXT_KEY: 'mn_active_design_prompt',    // ← ADDED: key name for reuse
+    ANIMATION_DURATION: 400,
+    // ═══════════════════════════════════════════
+    // CHANGE 1: Replace with your REAL Vercel URL
+    // ═══════════════════════════════════════════
+    API_URL: 'https://mynarrative-ai.vercel.app/api/fashion_consultant'
   };
-  
-  // Legacy compatibility
-  const STORAGE_KEY = CONFIG.STORAGE?.CORE_IDENTITY || 'mn_core_identity';
-  const CONTEXT_KEY = CONFIG.STORAGE?.ACTIVE_CONTEXT || 'mn_active_design_prompt';
-  const ANIMATION_DURATION = CONFIG.UI?.ANIMATION_DURATION || 400;
-  const API_URL = CONFIG.API?.FASHION_CONSULTANT_API;
 
   // ═══════════════════════════════════════════════════════════
   // STATE MANAGEMENT
@@ -576,58 +562,12 @@ const MNAIStylist = (() => {
   // ═══════════════════════════════════════════════════════════
 
   const generateAIRecommendations = async () => {
-    // 1. Show Loading with enhanced UI
-    const loadingMessages = [
-      '🧠 Analyzing your unique style...',
-      '✨ Crafting personalized recommendations...',
-      '🎨 Weaving your narrative...',
-      '💫 Baking your uniqueness...'
-    ];
-    
-    const randomMessage = loadingMessages[Math.floor(Math.random() * loadingMessages.length)];
-    renderTransition(randomMessage, () => {});
-    
-    // Optional: Use new loading system if available
-    if (window.MNLoadingStates) {
-      const spinner = MNLoadingStates.spinner.show({
-        message: randomMessage,
-        container: DOM.container
-      });
-    }
-
-    // Helper: API call with retry logic
-    const fetchWithRetry = async (url, options, retries = CONFIG.NETWORK?.RETRY_ATTEMPTS || 3) => {
-      for (let i = 0; i < retries; i++) {
-        try {
-          const controller = new AbortController();
-          const timeout = setTimeout(() => controller.abort(), CONFIG.NETWORK?.API_TIMEOUT || 30000);
-          
-          const response = await fetch(url, {
-            ...options,
-            signal: controller.signal
-          });
-          
-          clearTimeout(timeout);
-          
-          if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-          }
-          
-          return await response.json();
-        } catch (error) {
-          CONFIG.log?.(`API attempt ${i + 1} failed:`, error.message);
-          
-          if (i === retries - 1) throw error;
-          
-          // Wait before retry (exponential backoff)
-          await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, i)));
-        }
-      }
-    };
+    // 1. Show Loading
+    renderTransition('🧠 Baking Your Uniqueness...', () => {});
 
     try {
-      // 2. Call your Vercel backend with retry logic
-      const recommendations = await fetchWithRetry(API_URL, {
+      // 2. Call your Vercel backend
+      const response = await fetch(CONFIG.API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -636,42 +576,45 @@ const MNAIStylist = (() => {
         })
       });
 
-      // 3. Check for backend error in response
+      if (!response.ok) throw new Error("Consultant Service Unavailable");
+
+      const recommendations = await response.json();
+
+      // ═══════════════════════════════════════════
+      // CHANGE 3: Check for backend error in response
+      // ═══════════════════════════════════════════
       if (recommendations.error) {
-        CONFIG.error?.('⚠️ AI returned fallback:', recommendations.error);
+        console.warn('⚠️ AI returned fallback:', recommendations.error);
         // Still show the fallback recommendations — they're usable
       }
 
-      // 4. Save recommendations and context for slogans page
-      localStorage.setItem(CONTEXT_KEY, JSON.stringify({
+      // ═══════════════════════════════════════════
+      // CHANGE 4: Save BOTH direction AND context 
+      //           so the slogans page can use them
+      // ═══════════════════════════════════════════
+      localStorage.setItem(CONFIG.CONTEXT_KEY, JSON.stringify({
         direction: recommendations.direction,
         suggestions: recommendations.suggestions,
-        context: state.currentContext,
-        identity: state.identity,
-        mode: state.currentContext.mode,
+        context: state.currentContext,   // ← ADDED: the full context object
+        identity: state.identity,        // ← ADDED: identity for slogans page
+        mode: state.currentContext.mode, // ← ADDED: quick mode access
         timestamp: Date.now()
       }));
 
-      // 5. Show Results
+      // 4. Show Results
       renderResults(recommendations);
 
     } catch (error) {
-      CONFIG.error?.("AI Error:", error);
+      console.error("AI Error:", error);
       
-      // Enhanced error UX with fallback option
+      // ═══════════════════════════════════════════
+      // CHANGE 5: Better error UX — don't just alert
+      // ═══════════════════════════════════════════
       DOM.container.innerHTML = `
         <div class="mn-transition">
           <p class="mn-transition-text" style="color: #ff6b6b;">⚠️ AI Connection Failed</p>
           <p style="color: #888; font-size: 12px; margin-top: 10px;">${error.message}</p>
-          <p style="color: #888; font-size: 11px; margin-top: 5px;">Check your internet connection or try again later.</p>
-          
-          ${CONFIG.FEATURES?.ENABLE_OFFLINE_MODE ? `
-            <button class="mn-btn-primary" id="btn-offline" style="margin-top: 20px;">
-              💡 Use Offline Recommendations
-            </button>
-          ` : ''}
-          
-          <button class="mn-btn-secondary" id="btn-retry" style="margin-top: 10px;">
+          <button class="mn-btn-secondary" id="btn-retry" style="margin-top: 20px;">
             🔄 Try Again
           </button>
           <button class="mn-btn-secondary" id="btn-back-err" style="margin-top: 10px;">
@@ -680,52 +623,9 @@ const MNAIStylist = (() => {
         </div>
       `;
       
-      document.getElementById('btn-retry')?.addEventListener('click', generateAIRecommendations);
-      document.getElementById('btn-back-err')?.addEventListener('click', renderContextDashboard);
-      
-      // Offline fallback mode
-      if (CONFIG.FEATURES?.ENABLE_OFFLINE_MODE) {
-        document.getElementById('btn-offline')?.addEventListener('click', () => {
-          const offlineRecommendations = generateOfflineFallback(state.identity, state.currentContext);
-          renderResults(offlineRecommendations);
-        });
-      }
+      document.getElementById('btn-retry').addEventListener('click', generateAIRecommendations);
+      document.getElementById('btn-back-err').addEventListener('click', renderContextDashboard);
     }
-  };
-  
-  // ═══════════════════════════════════════════════════════════
-  // OFFLINE FALLBACK GENERATOR
-  // ═══════════════════════════════════════════════════════════
-  
-  const generateOfflineFallback = (identity, context) => {
-    const { mode } = context;
-    
-    let direction = "We're working in offline mode. ";
-    let suggestions = [];
-    
-    if (mode === 'self') {
-      direction += `Based on your ${identity.coreExpression} style and ${identity.presence} presence, `;
-      direction += "consider pieces that reflect your authentic narrative.";
-      suggestions = [
-        "Explore versatile basics that align with your core expression",
-        "Look for quality over quantity - invest in timeless pieces",
-        "Mix textures and layers to add depth to simple outfits"
-      ];
-    } else if (mode === 'gift') {
-      direction += `For a ${context.occasion} gift for your ${context.recipient}, `;
-      direction += "consider items that show thoughtfulness and personal connection.";
-      suggestions = [
-        "Choose pieces that match their lifestyle and preferences",
-        "Consider personalized or unique items over generic gifts",
-        "Include a heartfelt note explaining your choice"
-      ];
-    }
-    
-    return {
-      direction,
-      suggestions,
-      offline: true
-    };
   };
 
   // ═══════════════════════════════════════════════════════════
@@ -808,6 +708,7 @@ const MNAIStylist = (() => {
     expandWidget,
     minimizeWidget,
     clearIdentity
+    selectSlogan
   };
 
 })();

@@ -143,5 +143,56 @@
       });
     });
   </script>
+  <script>
+  // 1. REGISTER SERVICE WORKER
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register("{{ 'sw.js' | asset_url }}").then(reg => {
+        
+        // 2. WAIT 15 SECONDS (Network is completely idle)
+        setTimeout(() => {
+          scanAndCacheAssets(reg);
+        }, 15000); // <--- CHANGED FROM 4000 TO 15000
+        
+      });
+    });
+  }
+
+  function scanAndCacheAssets(registration) {
+    // Wait for the controller to be ready (handled by clients.claim in sw.js)
+    if (!navigator.serviceWorker.controller) return;
+
+    const urlsToCache = new Set(); 
+
+    // --- A. GET HERO SLIDER IMAGES ---
+    document.querySelectorAll('.swiper-slide img, .hero-banner img').forEach(img => {
+      if(img.currentSrc) urlsToCache.add(img.currentSrc);
+    });
+
+    // --- B. GET FIRST 8 STORIES ---
+    const stories = document.querySelectorAll('.story-ring img, .story-trigger img'); 
+    for (let i = 0; i < 8 && i < stories.length; i++) {
+      if(stories[i].currentSrc) urlsToCache.add(stories[i].currentSrc);
+    }
+
+    // --- C. GET FIRST PRODUCT OF TOP 10 SLIDERS ---
+    const sliders = document.querySelectorAll('.product-slider, .collection-slider');
+    for (let i = 0; i < 10 && i < sliders.length; i++) {
+      const firstProductImg = sliders[i].querySelector('img'); 
+      if (firstProductImg && firstProductImg.currentSrc) {
+        urlsToCache.add(firstProductImg.currentSrc);
+      }
+    }
+
+    // --- D. SEND TO SERVICE WORKER ---
+    if (urlsToCache.size > 0) {
+      console.log(`[Narrative Cache] T+15s: Precaching ${urlsToCache.size} assets.`);
+      navigator.serviceWorker.controller.postMessage({
+        action: 'CACHE_SPECIFIC_URLS',
+        urls: Array.from(urlsToCache)
+      });
+    }
+  }
+</script>
 </body>
 </html>

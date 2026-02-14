@@ -1,17 +1,8 @@
-<script>
-    // If the user has already seen the animation in this session, 
-    // we inject a style to HIDE the overlay immediately before it renders.
-    if (sessionStorage.getItem('mn_preloader_seen')) {
-        document.write('<style>#mn-preloader-overlay { display: none !important; visibility: hidden !important; }</style>');
-    }
-</script>
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 
 <style>
-    /* Scoped Variables */
     :root { 
         --mn-brand-teal: #39A596; 
         --mn-bg-dark: #000000;
@@ -25,7 +16,10 @@
         height: 100vh;
         z-index: 2147483647; 
         background-color: var(--mn-bg-dark);
-        display: flex;
+        
+        /* FIX 1: Hide by default to prevent flash on reload */
+        display: none; 
+        
         align-items: center;
         justify-content: center;
         font-family: 'Montserrat', sans-serif;
@@ -62,7 +56,6 @@
         display: flex; align-items: center; justify-content: center;
     }
 
-    /* --- WAVES --- */
     .mn-wave {
         position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
     }
@@ -70,7 +63,6 @@
         width: 100%; height: 100%; border-radius: 50%; border: 1px solid;
     }
 
-    /* --- CORE SPHERE --- */
     .mn-core-glow {
         position: absolute; width: 128px; height: 128px;
         left: 50%; top: 50%; transform: translate(-50%, -50%);
@@ -106,7 +98,6 @@
         filter: blur(8px); animation: mnHighlightShift 4s ease-in-out infinite; border-radius: 50%;
     }
 
-    /* --- ORBITING PARTICLES --- */
     .mn-orbit-container {
         position: absolute; left: 50%; top: 50%; width: 100%; height: 100%;
     }
@@ -148,7 +139,6 @@
         transform: translate(-50%, -50%) scale(0);
     }
 
-    /* --- BRAND REVEAL SECTION --- */
     .mn-brand-reveal {
         position: absolute; top: 50%; left: 50%;
         transform: translate(-50%, -50%);
@@ -235,6 +225,14 @@
     @keyframes mnHeartSync { 0%, 100% { transform: scale(0.2); opacity: 0.5; } 50% { transform: scale(0.4); opacity: 1; } }
 </style>
 
+<script>
+    // Logic: Default is hidden (css: display:none). 
+    // If NO session item found, we force it to show.
+    if (!sessionStorage.getItem('mn_preloader_seen')) {
+        document.write('<style>#mn-preloader-overlay { display: flex !important; }</style>');
+    }
+</script>
+
 <div id="mn-preloader-overlay">
     <div class="mn-glass-layer-1"></div>
     <div class="mn-glass-layer-2"></div>
@@ -284,16 +282,15 @@
     document.addEventListener("DOMContentLoaded", function() {
         const overlay = document.getElementById('mn-preloader-overlay');
 
-        // Double check session in case HTML rendered before head script
+        // Safety check: if seen, ensure hidden (cleanup)
         if (sessionStorage.getItem('mn_preloader_seen')) {
             overlay.style.display = 'none';
             return;
         }
         
-        // Mark as seen so next time the HEAD script catches it
+        // Mark as seen immediately so next reload hides it
         sessionStorage.setItem('mn_preloader_seen', 'true');
         
-        // --- 1. SETUP VISUALS (WAVES, SPHERE, LINES) ---
         const createEl = (type, className, styles = {}, parent) => {
             const el = document.createElement(type);
             el.className = className;
@@ -302,7 +299,6 @@
             return el;
         };
 
-        // Waves Generation
         ['mn-outerWaves', 'mn-middleWaves', 'mn-innerWaves'].forEach((id, groupIdx) => {
             const container = document.getElementById(id);
             if (!container) return;
@@ -321,7 +317,6 @@
             }
         });
 
-        // Longitude Lines
         const longContainer = document.getElementById('mn-longitudeLines');
         if (longContainer) {
             for(let i=0; i<6; i++) {
@@ -334,7 +329,6 @@
             }
         }
 
-        // --- 2. PARTICLES SETUP ---
         const particleContainer = document.getElementById('mn-orbitingParticles');
         const orbitElements = [];
         const HERO_INDEX = 3; 
@@ -353,7 +347,6 @@
             }
         }
 
-        // --- 3. ANIMATION TIMELINE LOOP ---
         let rotationAngle = 0;
         let heroRotation = 0;
         let isHeroSequence = false;
@@ -380,7 +373,6 @@
         };
         startRotation();
 
-        // --- 4. THE 8-SECOND NARRATIVE ---
         updateUI("SEARCHING SIGNAL...", 0);
 
         setTimeout(() => {
@@ -410,7 +402,6 @@
             });
         }, 5500);
 
-        // Build Letters
         const brandTitleEl = document.getElementById('mn-brandTitle');
         if (brandTitleEl) {
             "MY NARRATIVE".split('').forEach(char => {
@@ -421,7 +412,6 @@
             });
         }
 
-        // FINAL REVEAL (7s)
         setTimeout(() => {
             ['mn-centralSystem', 'mn-outerWaves', 'mn-middleWaves', 'mn-innerWaves', 'mn-microCopy', 'mn-phaseIndicators'].forEach(id => {
                 const el = document.getElementById(id);
@@ -454,7 +444,6 @@
                     if(slogan) slogan.classList.add('visible');
                 }, 1200);
                 
-                // --- END: FADE OUT OVERLAY ---
                 setTimeout(() => {
                    overlay.style.opacity = 0;
                    overlay.style.visibility = 'hidden';
@@ -465,7 +454,6 @@
 
         }, 7000);
 
-        // Helper UI
         function updateUI(text, phaseNum) {
             const textEl = document.getElementById('mn-microCopy');
             if(!textEl) return;
@@ -479,7 +467,6 @@
             dots.forEach((d, i) => i <= phaseNum ? d.classList.add('active') : d.classList.remove('active'));
         }
 
-        // --- SAND DUST PARTICLE SYSTEM (FULL SCREEN SUSPENDED IRIS) ---
         (function() {
             const canvas = document.getElementById('mn-dustCanvas');
             if(!canvas) return;
@@ -492,7 +479,7 @@
                 canvas.height = window.innerHeight;
                 ctx.scale(1, 1); 
             }
-            window.addEventListener('resize', resize); // Ensure resizing works
+            window.addEventListener('resize', resize);
 
             const COLORS = [
                 { r:57,  g:165, b:150 }, { r:72,  g:185, b:168 }, { r:40,  g:140, b:128 },
@@ -503,33 +490,29 @@
             function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
             function spawnBurst() {
-                // Ensure canvas is full screen
                 resize();
-                
                 const cx = canvas.width / 2;
                 const cy = canvas.height / 2;
-                const innerRadius = 15; // Tight Iris
+                const innerRadius = 15; 
 
-                for (let i = 0; i < 150; i++) { // 20k Particles
+                const aspect = canvas.width / canvas.height;
+                let xScale = 1, yScale = 1;
+                if (aspect > 1) { xScale = aspect; } else { yScale = 1 / aspect; }
+
+                for (let i = 0; i < 20000; i++) { 
                     const angle = Math.random() * Math.PI * 2;
-                    
-                    // Suspended Motion: Slow Drift
-                    const speed = rand(0.5, 2.0) / 15; 
+                    const speed = rand(1.0, 8.0) / 15; 
                     
                     particles.push({
                         x: cx + Math.cos(angle) * innerRadius, 
                         y: cy + Math.sin(angle) * innerRadius, 
-                        
-                        vx: Math.cos(angle)*speed, 
-                        vy: Math.sin(angle)*speed,
+                        vx: Math.cos(angle) * speed * xScale, 
+                        vy: Math.sin(angle) * speed * yScale,
                         size: rand(0.4, 1.2), 
                         alpha: rand(0.4, 0.8), alphaMax: rand(0.4, 0.8),
                         life: 1, 
-                        
-                        // 2X Expansion Perimeter (Half decay = Double distance)
-                        decay: rand(0.01, 0.02) / 30, 
-                        
-                        drag: 0.995, 
+                        decay: rand(0.00015, 0.0004), 
+                        drag: 0.9995, 
                         color: pick(COLORS)
                     });
                 }
@@ -567,7 +550,6 @@
             };
         })();
 
-        // --- AMBIENT DUST ---
         (function() {
             const canvas = document.getElementById('mn-ambientDustCanvas');
             if(!canvas) return;
