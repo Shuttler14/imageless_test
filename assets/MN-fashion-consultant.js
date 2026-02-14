@@ -10,15 +10,28 @@ const MNAIStylist = (() => {
   // CONFIGURATION
   // ═══════════════════════════════════════════════════════════
 
-  const CONFIG = {
-    STORAGE_KEY: 'mn_core_identity',
-    CONTEXT_KEY: 'mn_active_design_prompt',    // ← ADDED: key name for reuse
-    ANIMATION_DURATION: 400,
-    // ═══════════════════════════════════════════
-    // CHANGE 1: Replace with your REAL Vercel URL
-    // ═══════════════════════════════════════════
-    API_URL: 'https://mynarrative-ai.vercel.app/api/fashion_consultant'
+  // Use centralized config
+  const CONFIG = window.MNConfig || {
+    STORAGE: {
+      CORE_IDENTITY: 'mn_core_identity',
+      ACTIVE_CONTEXT: 'mn_active_design_prompt'
+    },
+    UI: {
+      ANIMATION_DURATION: 400
+    },
+    API: {
+      // Replace with your Vercel deployment URL
+      FASHION_CONSULTANT_API: window.MN_CONFIG?.apiUrl || 'https://fashion-consultant-shuttler14.vercel.app/api/fashion_consultant'
+    },
+    NETWORK: {
+      API_TIMEOUT: 30000,
+      RETRY_ATTEMPTS: 3
+    }
   };
+  
+  const STORAGE_KEY = CONFIG.STORAGE?.CORE_IDENTITY || 'mn_core_identity';
+  const CONTEXT_KEY = CONFIG.STORAGE?.ACTIVE_CONTEXT || 'mn_active_design_prompt';
+  const API_URL = CONFIG.API?.FASHION_CONSULTANT_API || 'https://fashion-consultant-shuttler14.vercel.app/api/fashion_consultant';
 
   // ═══════════════════════════════════════════════════════════
   // STATE MANAGEMENT
@@ -195,21 +208,21 @@ const MNAIStylist = (() => {
 
   const loadIdentityFromStorage = () => {
     try {
-      const stored = localStorage.getItem(CONFIG.STORAGE_KEY);
+      const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         state.identity = JSON.parse(stored);
         console.log('✅ Identity loaded:', state.identity);
       }
     } catch (error) {
       console.error('❌ Error loading identity:', error);
-      localStorage.removeItem(CONFIG.STORAGE_KEY);
+      localStorage.removeItem(STORAGE_KEY);
     }
   };
 
   const saveIdentityToStorage = () => {
     try {
       state.identity = { ...state.tempCalibration };
-      localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(state.identity));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.identity));
       console.log('💾 Identity saved:', state.identity);
     } catch (error) {
       console.error('❌ Error saving identity:', error);
@@ -217,7 +230,7 @@ const MNAIStylist = (() => {
   };
 
   const clearIdentity = () => {
-    localStorage.removeItem(CONFIG.STORAGE_KEY);
+    localStorage.removeItem(STORAGE_KEY);
     state.identity = null;
     state.tempCalibration = {};
     console.log('🗑️ Identity cleared');
@@ -567,7 +580,7 @@ const MNAIStylist = (() => {
 
     try {
       // 2. Call your Vercel backend
-      const response = await fetch(CONFIG.API_URL, {
+      const response = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -589,15 +602,13 @@ const MNAIStylist = (() => {
       }
 
       // ═══════════════════════════════════════════
-      // CHANGE 4: Save BOTH direction AND context 
-      //           so the slogans page can use them
-      // ═══════════════════════════════════════════
-      localStorage.setItem(CONFIG.CONTEXT_KEY, JSON.stringify({
+      // Save BOTH direction AND context so the slogans page can use them
+      localStorage.setItem(CONTEXT_KEY, JSON.stringify({
         direction: recommendations.direction,
         suggestions: recommendations.suggestions,
-        context: state.currentContext,   // ← ADDED: the full context object
-        identity: state.identity,        // ← ADDED: identity for slogans page
-        mode: state.currentContext.mode, // ← ADDED: quick mode access
+        context: state.currentContext,
+        identity: state.identity,
+        mode: state.currentContext.mode,
         timestamp: Date.now()
       }));
 
@@ -708,7 +719,6 @@ const MNAIStylist = (() => {
     expandWidget,
     minimizeWidget,
     clearIdentity
-    selectSlogan
   };
 
 })();

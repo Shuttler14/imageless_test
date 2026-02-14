@@ -18,8 +18,10 @@
   --mn-teal: #39A596;
   --mn-teal-glow: #4fffd9;
   --mn-teal-dark: #2a7a6f;
-  --mn-glass-bg: rgba(10, 10, 10, 0.85);
+  --mn-glass-bg: rgba(0, 0, 0, 0.85);
+  --mn-glass-bg-light: rgba(0, 0, 0, 0.65);
   --mn-glass-border: rgba(57, 165, 150, 0.3);
+  --mn-glass-border-bright: rgba(57, 165, 150, 0.6);
   --mn-text-main: #f4f4f4;
   --mn-text-muted: rgba(244, 244, 244, 0.7);
   --mn-text-dim: rgba(244, 244, 244, 0.5);
@@ -30,6 +32,9 @@
   --mn-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.25);
   --mn-shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.35);
   --mn-shadow-glow: 0 0 20px rgba(57, 165, 150, 0.4);
+  --mn-shadow-luxury: 0 20px 60px rgba(0, 0, 0, 0.6), 
+                      0 8px 24px rgba(57, 165, 150, 0.15),
+                      inset 0 1px 1px rgba(255, 255, 255, 0.1);
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -57,11 +62,9 @@
   padding: 18px 20px;
   cursor: pointer;
   transition: var(--mn-transition);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow:
-    0 10px 40px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(57, 165, 150, 0.1) inset;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  box-shadow: var(--mn-shadow-luxury);
   overflow: hidden;
 }
 
@@ -86,12 +89,14 @@
 }
 
 .mn-widget-minimized:hover {
-  border-color: var(--mn-teal);
+  border-color: var(--mn-glass-border-bright);
   box-shadow:
-    0 12px 45px rgba(57, 165, 150, 0.3),
-    0 0 20px rgba(57, 165, 150, 0.2),
-    0 0 40px rgba(79, 255, 217, 0.15);
-  transform: translateY(-4px) scale(1.02);
+    0 25px 60px rgba(0, 0, 0, 0.7),
+    0 15px 45px rgba(57, 165, 150, 0.4),
+    0 0 30px rgba(79, 255, 217, 0.3),
+    0 0 60px rgba(79, 255, 217, 0.15),
+    inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  transform: translateY(-6px) scale(1.03);
 }
 
 .mn-widget-minimized:active {
@@ -957,13 +962,15 @@
 .mn-option-card {
   position: relative;
   padding: 24px 20px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--mn-glass-bg-light);
+  border: 1px solid var(--mn-glass-border);
   border-radius: 16px;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   text-align: center;
   overflow: hidden;
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
 }
 
 .mn-option-card::before {
@@ -988,12 +995,14 @@
 }
 
 .mn-option-card:hover {
-  border-color: var(--mn-teal);
-  background: rgba(57, 165, 150, 0.08);
-  transform: translateY(-5px) scale(1.02);
+  border-color: var(--mn-glass-border-bright);
+  background: rgba(57, 165, 150, 0.12);
+  transform: translateY(-8px) scale(1.03);
   box-shadow:
-    0 10px 30px rgba(57, 165, 150, 0.3),
-    0 0 0 1px rgba(57, 165, 150, 0.2) inset;
+    0 20px 50px rgba(0, 0, 0, 0.6),
+    0 10px 30px rgba(57, 165, 150, 0.4),
+    0 0 30px rgba(79, 255, 217, 0.2),
+    inset 0 1px 1px rgba(255, 255, 255, 0.1);
 }
 
 .mn-option-card:hover::before {
@@ -1133,13 +1142,15 @@
 .mn-mode-card {
   position: relative;
   padding: 40px 30px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  background: var(--mn-glass-bg-light);
+  border: 2px solid var(--mn-glass-border);
   border-radius: 20px;
   cursor: pointer;
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   text-align: center;
   overflow: hidden;
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
 }
 
 .mn-mode-card::before {
@@ -1164,11 +1175,13 @@
 }
 
 .mn-mode-card:hover {
-  border-color: var(--mn-teal);
-  transform: translateY(-8px) scale(1.02);
+  border-color: var(--mn-glass-border-bright);
+  transform: translateY(-12px) scale(1.03);
   box-shadow:
-    0 15px 40px rgba(57, 165, 150, 0.4),
-    0 0 0 1px rgba(57, 165, 150, 0.3) inset;
+    0 30px 70px rgba(0, 0, 0, 0.7),
+    0 15px 40px rgba(57, 165, 150, 0.5),
+    0 0 40px rgba(79, 255, 217, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.15);
 }
 
 .mn-mode-card:hover::before {
@@ -1405,16 +1418,17 @@
   position: relative;
   padding: 16px 32px;
   background: linear-gradient(135deg, var(--mn-teal), var(--mn-teal-dark));
-  border: none;
+  border: 1px solid var(--mn-teal);
   border-radius: 12px;
   color: #061a17;
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow:
-    0 0 20px rgba(57, 165, 150, 0.3),
-    0 4px 12px rgba(0, 0, 0, 0.2);
+    0 0 30px rgba(57, 165, 150, 0.4),
+    0 8px 20px rgba(0, 0, 0, 0.3),
+    inset 0 1px 1px rgba(255, 255, 255, 0.2);
   overflow: hidden;
 }
 
@@ -1442,10 +1456,13 @@
 
 .mn-btn-primary:hover {
   background: linear-gradient(135deg, var(--mn-teal-glow), var(--mn-teal));
+  border-color: var(--mn-teal-glow);
   box-shadow:
-    0 0 40px rgba(79, 255, 217, 0.6),
-    0 6px 20px rgba(0, 0, 0, 0.3);
-  transform: translateY(-3px) scale(1.02);
+    0 0 50px rgba(79, 255, 217, 0.7),
+    0 10px 30px rgba(0, 0, 0, 0.4),
+    0 0 80px rgba(79, 255, 217, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.3);
+  transform: translateY(-4px) scale(1.03);
 }
 
 .mn-btn-primary:hover::before {
