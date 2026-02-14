@@ -744,7 +744,21 @@ const MNAIStylist = (() => {
       setTimeout(() => {
         // Redirect to AI Studio page which handles both flows
         const studioUrl = window.MN_CONFIG?.studioUrl || "/pages/ai-studio";
-        window.location.href = studioUrl;
+        
+        // Check if page exists before redirecting
+        fetch(studioUrl, { method: 'HEAD' })
+          .then(response => {
+            if (response.ok) {
+              window.location.href = studioUrl;
+            } else {
+              console.error('❌ AI Studio page not found. Please create /pages/ai-studio in Shopify admin.');
+              alert('Setup Required: Please create the AI Studio page in Shopify admin. See SHOPIFY_PAGE_SETUP.md for instructions.');
+            }
+          })
+          .catch(() => {
+            // Fallback: redirect anyway (might work if CORS blocked the check)
+            window.location.href = studioUrl;
+          });
       }, 800);
     });
   };
