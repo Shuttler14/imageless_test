@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Gift Mode - Complete Reference Implementation</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a2e;
+            color: #fff;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #22c55e;
+        }
+
+        h1 {
+            color: #22c55e;
+        }
+
+        h2 {
+            color: #4ade80;
+            margin-top: 20px;
+        }
+
+        code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+
+        pre {
+            background: #0d1117;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .highlight {
+            background: #22c55e;
+            color: #000;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🎁 Gift Mode - Complete Reference Implementation</h1>
+    <p>This file contains all the code needed for the enhanced Gift Mode with psychological UX.</p>
+
+    <!-- PART 1: RECEIVER SCRIPT -->
+    <div class="section">
+        <h2>Part 1: Receiver Script (page.ai-studio.liquid)</h2>
+        <p><span class="highlight">✅ ALREADY IMPLEMENTED</span></p>
+        <p>Located in: <code>templates/page.ai-studio.liquid</code></p>
+        <pre><code>&lt;!-- 🎁 GIFT MODE RECEIVER SCRIPT (Enhanced with Psychological UX) --&gt;
+&lt;script&gt;
+document.addEventListener('DOMContentLoaded', () =&gt; {
+  const pendingDesign = localStorage.getItem('mn_pending_design');
+  
+  if (pendingDesign) {
+    try {
+      const data = JSON.parse(pendingDesign);
+      
+      if (data.slogan && (Date.now() - data.timestamp) &lt; 3600000) {
+        console.log("🎁 Gift Mode Activated");
+
+        if (typeof state !== 'undefined') {
+          state.isGiftMode = true;
+          state.giftContext = data.context;
+          state.selectedQuote = data.slogan;
+          state.topic = `Gift for ${data.context.recipient}`;
+          
+          // Psychological header change
+          setTimeout(() =&gt; {
+            const titleEl = document.querySelector('#step-3 .cinematic-title');
+            const subEl = document.querySelector('#step-3 .cinematic-subtitle');
+            
+            if (titleEl) titleEl.innerText = "HOW SHOULD THE DESIGN LOOK?";
+            if (subEl) subEl.innerText = "We have the message. Now let's give it a visual soul.";
+          }, 150);
+
+          // Auto-skip to Step 3
+          setTimeout(() =&gt; {
+            if (typeof goToStep === 'function') goToStep(3);
+          }, 100);
+        }
+      }
+      
+      localStorage.removeItem('mn_pending_design');
+      
+    } catch (e) {
+      console.error("Error loading gift context:", e);
+    }
+  }
+});
+&lt;/script&gt;</code></pre>
+    </div>
+
+    <!-- PART 2: MAIN LOGIC -->
+    <div class="section">
+        <h2>Part 2: Main Logic Updates</h2>
+        <p><span class="highlight">⚠️ TO BE ADDED TO PAGE CONTENT</span></p>
+
+        <h3>Update 1: checkAIReady()</h3>
+        <p>Gift Mode only needs Color + Placement (not Vibe)</p>
+        <pre><code>function checkAIReady() {
+    if (state.isGiftMode) {
+        // Gift Mode: Only need Color & Placement
+        if (state.aiColor && state.aiPlacement) {
+            aiGenerateBtn.classList.add('ready');
+        } else {
+            aiGenerateBtn.classList.remove('ready');
+        }
+    } else {
+        // Standard Mode: Need all 3
+        if (state.aiColor && state.aiPlacement && state.aiVibe) {
+            aiGenerateBtn.classList.add('ready');
+        } else {
+            aiGenerateBtn.classList.remove('ready');
+        }
+    }
+}</code></pre>
+
+        <h3>Update 2: aiChoice Event Listener</h3>
+        <p>Hide Vibe question for Gift Mode</p>
+        <pre><code>aiChoice.addEventListener('click', () => { 
+    aiOverlay.classList.add('active'); 
+    preferencesDrawer.classList.remove('expanded'); 
+    
+    // Hide Vibe question for Gift Mode
+    const allQuestions = document.querySelectorAll('.ai-question');
+    if (state.isGiftMode && allQuestions.length >= 3) {
+        allQuestions[2].style.display = 'none';
+        console.log("🎁 Hiding Vibe question for Gift Mode");
+    } else if (allQuestions.length >= 3) {
+        allQuestions[2].style.display = 'block';
+    }
+});</code></pre>
+
+        <h3>Update 3: aiGenerateBtn Event Listener</h3>
+        <p>Use gift context for style generation</p>
+        <pre><code>aiGenerateBtn.addEventListener('click', () => {
+  if(!aiGenerateBtn.classList.contains('ready')) return;
+  aiOverlay.classList.remove('active');
+  
+  state.color = state.aiColor;
+  if(state.aiPlacement === 'front') { 
+    state.side1.placement = 'chest'; 
+  } else { 
+    state.side1.placement = 'back-full'; 
+  }
+
+  // NEW LOGIC: PREPARE STYLE STRING
+  if (state.isGiftMode && state.giftContext) {
+      // 🎁 GIFT MODE
+      const ctx = state.giftContext;
+      state.selectedStyle = `Gift Design for ${ctx.recipient} on ${ctx.occasion}. Context: ${ctx.unspoken || 'None'}. Style: Emotionally resonant and visually premium.`;
+      state.toneKey = "emotionally real";
+      console.log("🎁 Gift Mode Style:", state.selectedStyle);
+  } else {
+      // 👤 SELF MODE
+      switch(state.aiVibe) {
+          case 'calm': 
+            state.selectedStyle = "Minimalist Type"; 
+            state.toneKey = "stoic"; 
+            break;
+          case 'bold': 
+            state.selectedStyle = "Cyberpunk Neon"; 
+            state.toneKey = "unapologetic"; 
+            break;
+          case 'disciplined': 
+            state.selectedStyle = "Minimalist Type"; 
+            state.toneKey = "hustle"; 
+            break;
+          case 'free': 
+            state.selectedStyle = "Vintage 90s"; 
+            state.toneKey = "retro"; 
+            break;
+          case 'dark': 
+            state.selectedStyle = "Cyberpunk Neon"; 
+            state.toneKey = "darkhumour"; 
+            break;
+          case 'light': 
+            state.selectedStyle = "Y2K Chrome"; 
+            state.toneKey = "healing"; 
+            break;
+          default: 
+            state.selectedStyle = "Minimalist Type"; 
+            state.toneKey = "stoic";
+      }
+      console.log("👤 Self Mode Style:", state.selectedStyle);
+  }
+  
+  autoGenerate(); 
+});</code></pre>
+    </div>
+
+    <!-- TESTING -->
+    <div class="section">
+        <h2>Testing the Implementation</h2>
+
+        <h3>Test Gift Mode Flow:</h3>
+        <ol>
+            <li>Widget: Select "Gift for Someone" mode</li>
+            <li>Enter recipient, occasion, message</li>
+            <li>Get AI recommendations</li>
+            <li>Select a slogan</li>
+            <li>Click "Design This Slogan"</li>
+            <li><strong>Expected:</strong>
+                <ul>
+                    <li>Redirects to design page</li>
+                    <li>Headers change to "HOW SHOULD THE DESIGN LOOK?"</li>
+                    <li>Auto-skips to Step 3</li>
+                    <li>Vibe question is hidden</li>
+                    <li>Can generate with just Color + Placement</li>
+                </ul>
+            </li>
+        </ol>
+
+        <h3>Console Logs to Check:</h3>
+        <pre><code>🎁 Gift Mode Activated
+✅ Gift Mode State Set: {slogan: "...", topic: "...", context: {...}}
+✅ Header updated: Step 3 title
+✅ Header updated: Step 3 subtitle
+🚀 Jumping to Step 3...
+🎁 Hiding Vibe question for Gift Mode
+🎁 Gift Mode Style: Gift Design for...</code></pre>
+    </div>
+
+    <!-- KEY FEATURES -->
+    <div class="section">
+        <h2>Key Psychological UX Features</h2>
+        <ul>
+            <li><strong>Instant Context:</strong> User sees personalized headers immediately</li>
+            <li><strong>Reduced Friction:</strong> Only 2 questions instead of 3</li>
+            <li><strong>Relevant Questions:</strong> Vibe question removed (not relevant for gifts)</li>
+            <li><strong>Rich AI Context:</strong> Uses recipient/occasion/message for generation</li>
+            <li><strong>Seamless Flow:</strong> Widget → Design page with zero manual navigation</li>
+        </ul>
+    </div>
+
+</body>
+
+</html>
