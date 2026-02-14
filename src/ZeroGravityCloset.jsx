@@ -187,7 +187,7 @@ const ZeroGravityCloset = ({ identity, context, onClose }) => {
 
         // Get config from global or use defaults
         const config = window.MNConfig || {
-            API: { FASHION_CONSULTANT_API: 'https://YOUR_VERCEL_APP.vercel.app/api/fashion_consultant' },
+            API: { FASHION_CONSULTANT_API: 'https://mynarrative-ai.vercel.app/api/fashion_consultant' },
             NETWORK: { API_TIMEOUT: 30000 },
             FEATURES: { ENABLE_OFFLINE_MODE: true }
         };

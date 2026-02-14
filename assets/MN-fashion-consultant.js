@@ -21,17 +21,17 @@ const MNAIStylist = (() => {
     },
     API: {
       // Replace with your Vercel deployment URL
-      FASHION_CONSULTANT_API: window.MN_CONFIG?.apiUrl || 'https://fashion-consultant-shuttler14.vercel.app/api/fashion_consultant'
+      FASHION_CONSULTANT_API: window.MN_CONFIG?.apiUrl || 'https://mynarrative-ai.vercel.app/api/fashion_consultant'
     },
     NETWORK: {
       API_TIMEOUT: 30000,
       RETRY_ATTEMPTS: 3
     }
   };
-  
+
   const STORAGE_KEY = CONFIG.STORAGE?.CORE_IDENTITY || 'mn_core_identity';
   const CONTEXT_KEY = CONFIG.STORAGE?.ACTIVE_CONTEXT || 'mn_active_design_prompt';
-  const API_URL = CONFIG.API?.FASHION_CONSULTANT_API || 'https://fashion-consultant-shuttler14.vercel.app/api/fashion_consultant';
+  const API_URL = CONFIG.API?.FASHION_CONSULTANT_API || 'https://mynarrative-ai.vercel.app/api/fashion_consultant';
 
   // ═══════════════════════════════════════════════════════════
   // STATE MANAGEMENT
@@ -576,7 +576,7 @@ const MNAIStylist = (() => {
 
   const generateAIRecommendations = async () => {
     // 1. Show Loading
-    renderTransition('🧠 Baking Your Uniqueness...', () => {});
+    renderTransition('🧠 Baking Your Uniqueness...', () => { });
 
     try {
       // 2. Call your Vercel backend
@@ -617,7 +617,7 @@ const MNAIStylist = (() => {
 
     } catch (error) {
       console.error("AI Error:", error);
-      
+
       // ═══════════════════════════════════════════
       // CHANGE 5: Better error UX — don't just alert
       // ═══════════════════════════════════════════
@@ -633,7 +633,7 @@ const MNAIStylist = (() => {
           </button>
         </div>
       `;
-      
+
       document.getElementById('btn-retry').addEventListener('click', generateAIRecommendations);
       document.getElementById('btn-back-err').addEventListener('click', renderContextDashboard);
     }
