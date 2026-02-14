@@ -742,8 +742,9 @@ const MNAIStylist = (() => {
       `;
 
       setTimeout(() => {
-        // ✅ CORRECT URL REDIRECT
-        window.location.href = "/pages/create-your-design";
+        // Redirect to AI Studio page which handles both flows
+        const studioUrl = window.MN_CONFIG?.studioUrl || "/pages/ai-studio";
+        window.location.href = studioUrl;
       }, 800);
     });
   };
