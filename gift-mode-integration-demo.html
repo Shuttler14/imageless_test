@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gift Mode Integration - Complete Demo</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1e3a8a 0%, #1a1a2e 100%);
+      color: #fff;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+    
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+      font-size: 32px;
+      background: linear-gradient(135deg, #4ade80, #22c55e);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .subtitle {
+      text-align: center;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 40px;
+    }
+    
+    .demo-section {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 30px;
+      margin-bottom: 30px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .demo-section h2 {
+      margin-bottom: 20px;
+      color: #4ade80;
+      font-size: 20px;
+    }
+    
+    .status-box {
+      background: rgba(0,0,0,0.3);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 15px 0;
+      border-left: 4px solid #4ade80;
+    }
+    
+    .status-box.info { border-left-color: #3b82f6; }
+    .status-box.success { border-left-color: #22c55e; }
+    .status-box.warning { border-left-color: #fbbf24; }
+    
+    .code-block {
+      background: #1a1a2e;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 15px 0;
+      overflow-x: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    
+    .btn {
+      background: linear-gradient(135deg, #4ade80, #22c55e);
+      color: #000;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 5px;
+      transition: transform 0.2s;
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+    
+    .btn-secondary {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    
+    .step-indicator {
+      display: inline-block;
+      background: #4ade80;
+      color: #000;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎁 Gift Mode Integration Demo</h1>
+    <p class="subtitle">Complete implementation with receiver script</p>
+
+    <!-- Step 1: Widget Sends Data -->
+    <div class="demo-section">
+      <h2><span class="step-indicator">STEP 1</span>Widget Sends Data</h2>
+      <p style="margin-bottom: 15px;">When user clicks "Design This Slogan" in Gift Mode:</p>
+      
+      <div class="code-block">const isGiftMode = state.currentContext?.mode === 'gift';
+
+if (isGiftMode && state.selectedSlogan) {
+  localStorage.setItem('mn_pending_design', JSON.stringify({
+    slogan: state.selectedSlogan,
+    context: state.currentContext,
+    timestamp: Date.now()
+  }));
+}
+
+window.location.href = "/pages/create-your-design";</div>
+
+      <div class="status-box success">
+        <strong>✅ Status:</strong> Implemented in <code>assets/MN-fashion-consultant.js</code> (Lines 728-746)
+      </div>
+
+      <button class="btn" onclick="simulateWidgetSave()">🧪 Simulate Widget Save</button>
+      <button class="btn btn-secondary" onclick="checkStorage()">🔍 Check LocalStorage</button>
+    </div>
+
+    <!-- Step 2: Design Page Receives Data -->
+    <div class="demo-section">
+      <h2><span class="step-indicator">STEP 2</span>Design Page Receives Data</h2>
+      <p style="margin-bottom: 15px;">Design page detects and processes the data:</p>
+      
+      <div class="code-block">document.addEventListener('DOMContentLoaded', () => {
+  const pendingDesign = localStorage.getItem('mn_pending_design');
+  
+  if (pendingDesign) {
+    const data = JSON.parse(pendingDesign);
+    
+    if (data.slogan && Date.now() - data.timestamp < 3600000) {
+      // Set state
+      state.selectedQuote = data.slogan;
+      state.topic = "Gift Mode";
+      
+      // Jump to Step 3
+      setTimeout(() => {
+        if (typeof goToStep === 'function') {
+          goToStep(3);
+        }
+      }, 100);
+    }
+    
+    localStorage.removeItem('mn_pending_design');
+  }
+});</div>
+
+      <div class="status-box success">
+        <strong>✅ Status:</strong> Added to <code>templates/page.ai-studio.liquid</code>
+      </div>
+
+      <button class="btn" onclick="testReceiver()">🧪 Test Receiver Logic</button>
+    </div>
+
+    <!-- Step 3: Integration Flow -->
+    <div class="demo-section">
+      <h2><span class="step-indicator">STEP 3</span>Complete Flow</h2>
+      <div style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 20px; margin: 15px 0;">
+        <div style="margin-bottom: 15px;">
+          <strong>1. User Action:</strong> Select slogan in Gift Mode → Click "Design This Slogan"
+        </div>
+        <div style="margin-bottom: 15px;">
+          <strong>2. Widget:</strong> Save data to localStorage → Redirect to design page
+        </div>
+        <div style="margin-bottom: 15px;">
+          <strong>3. Design Page:</strong> Detect data → Set slogan → Jump to Step 3
+        </div>
+        <div>
+          <strong>4. User Sees:</strong> Style selection screen with pre-filled slogan ✨
+        </div>
+      </div>
+    </div>
+
+    <!-- Test Console -->
+    <div class="demo-section">
+      <h2>📊 Test Console</h2>
+      <div id="console" class="code-block" style="min-height: 150px; max-height: 300px; overflow-y: auto;">
+        <div style="color: #4ade80;">Ready for testing...</div>
+      </div>
+      <button class="btn btn-secondary" onclick="clearConsole()">🗑️ Clear Console</button>
+    </div>
+  </div>
+
+  <script>
+    // Utility Functions
+    function log(message, type = 'info') {
+      const console = document.getElementById('console');
+      const timestamp = new Date().toLocaleTimeString();
+      const colors = {
+        info: '#3b82f6',
+        success: '#22c55e',
+        warning: '#fbbf24',
+        error: '#ef4444'
+      };
+      
+      const entry = document.createElement('div');
+      entry.style.color = colors[type];
+      entry.style.marginBottom = '8px';
+      entry.innerHTML = `<strong>[${timestamp}]</strong> ${message}`;
+      console.appendChild(entry);
+      console.scrollTop = console.scrollHeight;
+    }
+
+    function clearConsole() {
+      document.getElementById('console').innerHTML = '<div style="color: #4ade80;">Console cleared.</div>';
+    }
+
+    // Test Functions
+    function simulateWidgetSave() {
+      const mockData = {
+        slogan: "LEGEND IN THE MAKING",
+        context: {
+          mode: 'gift',
+          recipient: '👨 Brother',
+          occasion: '🎂 Birthday',
+          unspoken: 'You inspire me every day'
+        },
+        timestamp: Date.now()
+      };
+
+      localStorage.setItem('mn_pending_design', JSON.stringify(mockData));
+      log('✅ Widget save simulated successfully!', 'success');
+      log(`📦 Slogan: "${mockData.slogan}"`, 'info');
+      log(`🎁 For: ${mockData.context.recipient} - ${mockData.context.occasion}`, 'info');
+    }
+
+    function checkStorage() {
+      const data = localStorage.getItem('mn_pending_design');
+      
+      if (data) {
+        const parsed = JSON.parse(data);
+        log('✅ Data found in localStorage:', 'success');
+        log(`📝 Slogan: "${parsed.slogan}"`, 'info');
+        log(`⏰ Timestamp: ${new Date(parsed.timestamp).toLocaleString()}`, 'info');
+        
+        const age = Date.now() - parsed.timestamp;
+        const isValid = age < 3600000;
+        log(`⏳ Age: ${Math.round(age / 1000)}s ${isValid ? '(Valid)' : '(Expired)'}`, isValid ? 'success' : 'warning');
+      } else {
+        log('❌ No data found in localStorage', 'warning');
+        log('💡 Click "Simulate Widget Save" first', 'info');
+      }
+    }
+
+    function testReceiver() {
+      const data = localStorage.getItem('mn_pending_design');
+      
+      if (!data) {
+        log('❌ No data to receive. Simulate widget save first!', 'error');
+        return;
+      }
+
+      try {
+        const parsed = JSON.parse(data);
+        const isRecent = (Date.now() - parsed.timestamp) < 3600000;
+
+        if (parsed.slogan && isRecent) {
+          log('🎁 Gift Mode Detected!', 'success');
+          log(`📝 Slogan: "${parsed.slogan}"`, 'info');
+          
+          // Simulate state update
+          const mockState = {
+            selectedQuote: parsed.slogan,
+            topic: parsed.context?.recipient ? `Gift for ${parsed.context.recipient}` : "Gift Mode"
+          };
+          
+          log(`✅ State would be set to:`, 'success');
+          log(`   - selectedQuote: "${mockState.selectedQuote}"`, 'info');
+          log(`   - topic: "${mockState.topic}"`, 'info');
+          
+          // Simulate goToStep
+          log(`🚀 Would call: goToStep(3)`, 'success');
+          
+          // Clear data
+          localStorage.removeItem('mn_pending_design');
+          log(`🗑️ Data cleared from localStorage`, 'info');
+          
+        } else if (!isRecent) {
+          log('⏰ Data expired (older than 1 hour)', 'warning');
+        }
+      } catch (e) {
+        log(`❌ Error: ${e.message}`, 'error');
+      }
+    }
+
+    // Auto-load on page load
+    window.addEventListener('load', () => {
+      log('✅ Demo page loaded', 'success');
+      log('💡 Use the buttons above to test the integration', 'info');
+      checkStorage();
+    });
+  </script>
+</body>
+</html>

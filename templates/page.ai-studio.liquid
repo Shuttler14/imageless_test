@@ -2,3 +2,73 @@
   <h1 style="text-align: center;">{{ page.title }}</h1>
   {{ page.content }}
 </div>
+
+<!-- 🎁 GIFT MODE RECEIVER SCRIPT (Enhanced with Psychological UX) -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const pendingDesign = localStorage.getItem('mn_pending_design');
+  
+  if (pendingDesign) {
+    try {
+      const data = JSON.parse(pendingDesign);
+      
+      // Check if data is valid and recent (< 1 hour)
+      if (data.slogan && (Date.now() - data.timestamp) < 3600000) {
+        
+        console.log("🎁 Gift Mode Activated");
+
+        // 1. Inject Data into State
+        if (typeof state !== 'undefined') {
+          state.isGiftMode = true; // flag for other functions
+          state.giftContext = data.context; // save the full context (recipient, occasion, etc)
+          state.selectedQuote = data.slogan;
+          state.topic = `Gift for ${data.context.recipient}`;
+          
+          console.log("✅ Gift Mode State Set:", {
+            slogan: state.selectedQuote,
+            topic: state.topic,
+            context: state.giftContext
+          });
+          
+          // 2. PSYCHOLOGICAL HEADER CHANGE
+          // We target the elements in Step 3
+          setTimeout(() => {
+            const titleEl = document.querySelector('#step-3 .cinematic-title');
+            const subEl = document.querySelector('#step-3 .cinematic-subtitle');
+            
+            if (titleEl) {
+              titleEl.innerText = "HOW SHOULD THE DESIGN LOOK?";
+              console.log("✅ Header updated: Step 3 title");
+            }
+            if (subEl) {
+              subEl.innerText = "We have the message. Now let's give it a visual soul.";
+              console.log("✅ Header updated: Step 3 subtitle");
+            }
+          }, 150);
+
+          // 3. Auto-Skip to Step 3
+          setTimeout(() => {
+            if (typeof goToStep === 'function') {
+              console.log("🚀 Jumping to Step 3...");
+              goToStep(3);
+            } else {
+              console.warn("⚠️ goToStep function not found");
+            }
+          }, 100);
+        } else {
+          console.warn("⚠️ State object not found");
+        }
+      }
+      
+      // Clear data so it doesn't persist forever
+      localStorage.removeItem('mn_pending_design');
+      console.log("🗑️ Cleared localStorage");
+      
+    } catch (e) {
+      console.error("❌ Error loading gift context:", e);
+    }
+  } else {
+    console.log("ℹ️ No gift mode data. Normal page load.");
+  }
+});
+</script>
