@@ -613,7 +613,11 @@ const MNAIStylist = (() => {
       }));
 
       // 4. Show Results
-      renderResults(recommendations);
+      if (state.currentContext.mode === 'gift') {
+        renderGiftResults(recommendations);
+      } else {
+        renderResults(recommendations);
+      }
 
     } catch (error) {
       console.error("AI Error:", error);
@@ -637,6 +641,81 @@ const MNAIStylist = (() => {
       document.getElementById('btn-retry').addEventListener('click', generateAIRecommendations);
       document.getElementById('btn-back-err').addEventListener('click', renderContextDashboard);
     }
+  };
+
+  // ═══════════════════════════════════════════════════════════
+  // GIFT MODE RESULTS (Slogans)
+  // ═══════════════════════════════════════════════════════════
+
+  const renderGiftResults = (recommendations) => {
+    const slogans = recommendations.suggestions || [];
+
+    // Ensure we have slogans
+    if (slogans.length === 0) {
+      renderTransition('⚠️ No slogans generated. Please try again.', () => {
+        renderContextDashboard();
+      });
+      return;
+    }
+
+    const html = `
+      <div class="mn-results mn-fade-in">
+        
+        <div class="mn-results-header">
+          <div class="mn-results-icon">🎁</div>
+          <h3 class="mn-results-title">AI-Curated Slogans</h3>
+          <p class="mn-results-subtitle">Select the one that speaks to you</p>
+        </div>
+
+        <div class="mn-slogans-list">
+          ${slogans.map((slogan, index) => `
+            <button class="mn-slogan-card ${index === 0 ? 'recommended' : ''}" data-slogan="${slogan}" style="animation-delay: ${index * 0.1}s">
+              ${index === 0 ? '<div class="mn-recommended-badge">✨ AI Recommended</div>' : ''}
+              <p class="mn-slogan-text">"${slogan}"</p>
+              <div class="mn-select-indicator">Select →</div>
+            </button>
+          `).join('')}
+        </div>
+
+        <div class="mn-action-bar">
+          <button id="btn-back-gift" class="mn-btn-secondary">
+            ← Back
+          </button>
+        </div>
+
+      </div>
+    `;
+
+    DOM.container.innerHTML = html;
+
+    // Add click handlers for slogans
+    DOM.container.querySelectorAll('.mn-slogan-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const selectedSlogan = card.dataset.slogan;
+        handleSloganSelection(selectedSlogan);
+      });
+    });
+
+    document.getElementById('btn-back-gift').addEventListener('click', renderContextDashboard);
+  };
+
+  const handleSloganSelection = (slogan) => {
+    // 1. Update the stored context with the selected slogan
+    try {
+      const storedData = JSON.parse(localStorage.getItem(CONTEXT_KEY) || '{}');
+      storedData.selectedSlogan = slogan;
+      // Also update the 'direction' to match the slogan if needed, or keep provided direction
+      // For now just appending it
+      localStorage.setItem(CONTEXT_KEY, JSON.stringify(storedData));
+    } catch (e) {
+      console.error('Error saving slogan selection:', e);
+    }
+
+    // 2. Show transition
+    renderTransition('✨ Excellent Choice! Redirecting to Studio...', () => {
+      // 3. Redirect to Design Page
+      window.location.href = window.MN_CONFIG?.studioUrl || "/pages/create-your-own-design";
+    });
   };
 
   // ═══════════════════════════════════════════════════════════
