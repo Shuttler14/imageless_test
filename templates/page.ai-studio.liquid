@@ -30,22 +30,58 @@ document.addEventListener('DOMContentLoaded', () => {
           });
           
           // 2. PSYCHOLOGICAL HEADER CHANGE
-          // We target the elements in Step 3
           setTimeout(() => {
             const titleEl = document.querySelector('#step-3 .cinematic-title');
             const subEl = document.querySelector('#step-3 .cinematic-subtitle');
             
             if (titleEl) {
-              titleEl.innerText = "HOW SHOULD THE DESIGN LOOK?";
+              titleEl.innerText = "How Should The Design Look?";
               console.log("✅ Header updated: Step 3 title");
             }
             if (subEl) {
-              subEl.innerText = "We have the message. Now let's give it a visual soul.";
+              subEl.innerText = `Perfect! We have your message for ${data.context.recipient}. Now let's bring it to life.`;
               console.log("✅ Header updated: Step 3 subtitle");
             }
           }, 150);
 
-          // 3. Auto-Skip to Step 3
+          // 3. MODIFY AI OVERLAY FOR GIFT MODE - Remove Vibe Question
+          setTimeout(() => {
+            if (state.isGiftMode) {
+              const vibeQuestion = document.querySelector('.ai-question:last-child');
+              if (vibeQuestion && vibeQuestion.innerHTML.includes('feels most like you')) {
+                vibeQuestion.style.display = 'none';
+                console.log("✅ Removed vibe question for gift mode");
+                
+                // Auto-set vibe based on occasion
+                const occasionMap = {
+                  'Birthday': 'bold',
+                  'Anniversary': 'calm',
+                  'New Job': 'disciplined',
+                  'Breakup Support': 'healing',
+                  'First Date': 'light',
+                  'Motivation Gift': 'disciplined',
+                  'Inside Joke': 'free',
+                  'Everyday Wear': 'calm'
+                };
+                state.aiVibe = occasionMap[data.context.occasion] || 'calm';
+                console.log(`✅ Auto-set vibe to: ${state.aiVibe} (based on ${data.context.occasion})`);
+              }
+              
+              // Update AI generate button check to not require vibe in gift mode
+              const originalCheckAIReady = window.checkAIReady;
+              window.checkAIReady = function() {
+                if (state.isGiftMode) {
+                  if(state.aiColor && state.aiPlacement) {
+                    document.getElementById('ai-generate-btn').classList.add('ready');
+                  }
+                } else {
+                  if (originalCheckAIReady) originalCheckAIReady();
+                }
+              };
+            }
+          }, 200);
+
+          // 4. Auto-Skip to Step 3
           setTimeout(() => {
             if (typeof goToStep === 'function') {
               console.log("🚀 Jumping to Step 3...");
