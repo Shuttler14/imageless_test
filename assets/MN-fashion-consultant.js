@@ -41,7 +41,9 @@ const MNAIStylist = (() => {
     isExpanded: false,
     identity: null,
     tempCalibration: {},
-    currentContext: null
+    dataCollection: {},
+    currentContext: null,
+    selectedSlogan: null
   };
 
   // ═══════════════════════════════════════════════════════════
@@ -101,6 +103,188 @@ const MNAIStylist = (() => {
       ]
     }
   ];
+
+  // ═══════════════════════════════════════════════════════════
+  // ARCHETYPE MAP (Post-Calibration Identity Derivation)
+  // ═══════════════════════════════════════════════════════════
+
+  const ARCHETYPE_MAP = {
+    'Calm & Minimal|Confident but Reserved|Quiet Rebellion': {
+      name: 'The Quiet Rebel',
+      tagline: "You don't dress loud. You dress precise.",
+      palette: ['#1a1a1a', '#f5f0e8', '#8b7355']
+    },
+    'Bold & Expressive|Creative Risk-Taker|Main Character Energy': {
+      name: 'The Visual Poet',
+      tagline: "Every outfit is a verse. Every color is a word.",
+      palette: ['#ff4444', '#222222', '#ffd700']
+    },
+    'Deep & Symbolic|Thoughtful Introvert|Seeing Beyond the Mask': {
+      name: 'The Silent Philosopher',
+      tagline: "Your clothes think before they speak.",
+      palette: ['#2c3e50', '#ecf0f1', '#8e44ad']
+    },
+    'Disciplined & Structured|Focused Builder|Stoic Focus': {
+      name: 'The Architect',
+      tagline: "Every line has a reason. Every seam is deliberate.",
+      palette: ['#2d2d2d', '#ffffff', '#4a90d9']
+    },
+    'Free & Experimental|Explorer Mindset|Digital Nomad': {
+      name: 'The Drifter',
+      tagline: "No fixed address. No fixed uniform.",
+      palette: ['#e67e22', '#1abc9c', '#ecf0f1']
+    },
+    'Dark & Mysterious|Stoic & Composed|Night Owl': {
+      name: 'The Shadow',
+      tagline: "You let the mystery do the talking.",
+      palette: ['#0d0d0d', '#2c2c2c', '#8b0000']
+    },
+    'Clean & Premium|Logic-Driven|Organized Chaos': {
+      name: 'The Curator',
+      tagline: "Your wardrobe is an edit, not a collection.",
+      palette: ['#f8f8f8', '#333333', '#c0a062']
+    },
+    'Emotional & Reflective|Emotion-Driven|Healing Era': {
+      name: 'The Alchemist',
+      tagline: "Turning feelings into fabric.",
+      palette: ['#6c5ce7', '#ffeaa7', '#dfe6e9']
+    },
+    'Playful but Intentional|Balanced & Adaptive|Academic Burnout': {
+      name: 'The Paradox',
+      tagline: "Serious about not being too serious.",
+      palette: ['#00b894', '#fdcb6e', '#2d3436']
+    },
+    'Understated Confidence|Quiet Observer|Emotionless': {
+      name: 'The Minimalist Stoic',
+      tagline: "Less noise. More signal.",
+      palette: ['#dcdcdc', '#1a1a1a', '#708090']
+    }
+  };
+
+  const deriveArchetype = (calibration) => {
+    const key = `${calibration.coreExpression}|${calibration.presence}|${calibration.signal}`;
+    if (ARCHETYPE_MAP[key]) return ARCHETYPE_MAP[key];
+    // Fuzzy match: find closest by matching at least the coreExpression
+    const expr = calibration.coreExpression;
+    for (const [mapKey, archetype] of Object.entries(ARCHETYPE_MAP)) {
+      if (mapKey.startsWith(expr)) return archetype;
+    }
+    // Default fallback
+    return {
+      name: 'The Original',
+      tagline: "Your style writes its own rules.",
+      palette: ['#1a1a1a', '#f5f0e8', '#4a90d9']
+    };
+  };
+
+  // ═══════════════════════════════════════════════════════════
+  // DATA: SILHOUETTE OPTIONS (Phase 2A — Body Data)
+  // ═══════════════════════════════════════════════════════════
+
+  const SILHOUETTE_OPTIONS = {
+    heights: { min: 150, max: 195, unit: 'cm', default: 170 },
+    builds: [
+      { id: 'lean', label: 'Lean', icon: '│', description: 'Slim frame, narrow shoulders' },
+      { id: 'athletic', label: 'Athletic', icon: '▽', description: 'Defined, proportional' },
+      { id: 'broad', label: 'Broad', icon: '█', description: 'Wide shoulders, sturdy' },
+      { id: 'slim', label: 'Slim', icon: '╎', description: 'Thin, elongated' },
+      { id: 'regular', label: 'Regular', icon: '▌', description: 'Average, balanced' },
+      { id: 'heavy', label: 'Heavy', icon: '▊', description: 'Full, solid build' }
+    ]
+  };
+
+  // ═══════════════════════════════════════════════════════════
+  // DATA: TONE OPTIONS (Phase 2B — Skin & Undertone)
+  // ═══════════════════════════════════════════════════════════
+
+  const TONE_OPTIONS = {
+    skinTones: [
+      { id: 'fair', label: 'Fair', color: '#FDEBD3', textColor: '#333' },
+      { id: 'wheatish', label: 'Wheatish', color: '#E8C99B', textColor: '#333' },
+      { id: 'medium', label: 'Medium', color: '#C6956A', textColor: '#fff' },
+      { id: 'dusky', label: 'Dusky', color: '#8D6346', textColor: '#fff' },
+      { id: 'deep', label: 'Deep', color: '#5C3A21', textColor: '#fff' }
+    ],
+    undertones: [
+      { id: 'warm', label: '🥇 Gold looks best', value: 'warm' },
+      { id: 'cool', label: '🥈 Silver looks best', value: 'cool' },
+      { id: 'neutral', label: '✨ Both work equally', value: 'neutral' }
+    ]
+  };
+
+  // ═══════════════════════════════════════════════════════════
+  // DATA: LIFESTYLE OPTIONS (Phase 2C — Region, Climate, Budget)
+  // ═══════════════════════════════════════════════════════════
+
+  const LIFESTYLE_OPTIONS = {
+    regions: [
+      { id: 'north', label: 'North', emoji: '🏔️', context: 'Lucknowi, Patiala, layered styles' },
+      { id: 'south', label: 'South', emoji: '🌴', context: 'Silk traditions, lighter fabrics' },
+      { id: 'west', label: 'West', emoji: '🏜️', context: 'Bandhani, mirror work, vibrant' },
+      { id: 'east', label: 'East', emoji: '🌊', context: 'Tant, Baluchari, elegant draping' },
+      { id: 'metro', label: 'Metro / Global', emoji: '🌆', context: 'Contemporary fusion, no regional lock' }
+    ],
+    climates: [
+      { id: 'hot_dry', label: '☀️ Hot & Dry', fabrics: 'cotton, linen, khadi' },
+      { id: 'humid', label: '🌧️ Humid', fabrics: 'breathable cotton, rayon' },
+      { id: 'cold', label: '❄️ Cold', fabrics: 'wool, layering pieces' },
+      { id: 'moderate', label: '🌤️ Moderate', fabrics: 'versatile blend' },
+      { id: 'mixed', label: '🌀 Travels a lot', fabrics: 'packable, versatile' }
+    ],
+    budgets: [
+      { id: 'budget', label: 'Under ₹1,500', range: [0, 1500] },
+      { id: 'mid', label: '₹1,500 — ₹4,000', range: [1500, 4000] },
+      { id: 'premium', label: '₹4,000 — ₹10,000', range: [4000, 10000] },
+      { id: 'luxury', label: '₹10,000+', range: [10000, 999999] }
+    ]
+  };
+
+  // ═══════════════════════════════════════════════════════════
+  // DATA: GHOST MODE CLOSET ITEMS (Phase 3)
+  // ═══════════════════════════════════════════════════════════
+
+  const GHOST_MODE_ITEMS = {
+    tops: [
+      'Black T-Shirt', 'White T-Shirt', 'Navy T-Shirt',
+      'White Formal Shirt', 'Blue Oxford Shirt', 'Black Shirt',
+      'Grey Hoodie', 'Denim Jacket', 'Navy Blazer',
+      'Leather Jacket', 'Bomber Jacket', 'Kurta (White)',
+      'Kurta (Black)', 'Printed Shirt', 'Polo T-Shirt',
+      'Linen Shirt', 'Flannel Shirt', 'Nehru Jacket'
+    ],
+    bottoms: [
+      'Blue Jeans', 'Black Jeans', 'Khaki Chinos',
+      'Navy Chinos', 'Formal Trousers (Black)', 'Formal Trousers (Grey)',
+      'Joggers', 'Cargo Pants', 'Shorts (Khaki)',
+      'Churidar', 'Patiala', 'Dhoti Pants'
+    ],
+    footwear: [
+      'White Sneakers', 'Black Sneakers', 'Brown Formal Shoes',
+      'Black Formal Shoes', 'Kolhapuri Chappals', 'Loafers',
+      'Chelsea Boots', 'Slides', 'Running Shoes', 'Mojaris'
+    ],
+    accessories: [
+      'Analog Watch', 'Digital Watch', 'Sunglasses',
+      'Silver Chain', 'Gold Chain', 'Bracelet',
+      'Stole/Scarf', 'Cap', 'Belt (Brown)', 'Belt (Black)',
+      'Backpack', 'Tote Bag', 'Messenger Bag'
+    ]
+  };
+
+  // ═══════════════════════════════════════════════════════════
+  // HELPER: Has Body Data? (Determines returning-user shortcut)
+  // ═══════════════════════════════════════════════════════════
+
+  const hasBodyData = () => {
+    return state.identity &&
+      state.identity.height &&
+      state.identity.build &&
+      state.identity.skinTone &&
+      state.identity.undertone &&
+      state.identity.region &&
+      state.identity.climate &&
+      state.identity.budget;
+  };
 
   // ═══════════════════════════════════════════════════════════
   // DATA: CONTEXT OPTIONS (Phase 2)
@@ -211,6 +395,12 @@ const MNAIStylist = (() => {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         state.identity = JSON.parse(stored);
+        // Migration: derive archetype if missing (old schema)
+        if (state.identity.coreExpression && !state.identity.archetype) {
+          state.identity.archetype = deriveArchetype(state.identity);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state.identity));
+          console.log('🔄 Migrated identity with archetype:', state.identity.archetype);
+        }
         console.log('✅ Identity loaded:', state.identity);
       }
     } catch (error) {
@@ -233,6 +423,7 @@ const MNAIStylist = (() => {
     localStorage.removeItem(STORAGE_KEY);
     state.identity = null;
     state.tempCalibration = {};
+    state.dataCollection = {};
     console.log('🗑️ Identity cleared');
   };
 
@@ -285,9 +476,7 @@ const MNAIStylist = (() => {
       saveIdentityToStorage();
       setTimeout(() => {
         updateProgressBar(0);
-        renderTransition('✨ Identity Calibrated Successfully', () => {
-          renderContextDashboard();
-        });
+        renderArchetypeCard();
       }, 500);
       return;
     }
@@ -472,8 +661,764 @@ const MNAIStylist = (() => {
         loudness: selectedLoudness
       };
 
-      generateAIRecommendations();
+      // Branch: first time → body data collection, returning → direct AI
+      if (hasBodyData()) {
+        generateAIRecommendations();
+      } else {
+        state.dataCollection = state.dataCollection || {};
+        renderSilhouetteStep();
+      }
     });
+  };
+
+  // ═══════════════════════════════════════════════════════════
+  // ARCHETYPE CARD (Vibe Lock — Post-Calibration)
+  // ═══════════════════════════════════════════════════════════
+
+  const renderArchetypeCard = () => {
+    const archetype = deriveArchetype(state.identity);
+    state.identity.archetype = archetype;
+    // Re-save with archetype
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state.identity));
+
+    const html = `
+      <div class="mn-archetype-card mn-fade-in">
+        <div class="mn-archetype-header">
+          <span class="mn-archetype-label">YOUR STYLE ARCHETYPE</span>
+        </div>
+        <div class="mn-archetype-name">◆ ${archetype.name.toUpperCase()} ◆</div>
+        <div class="mn-archetype-traits">
+          <span>${state.identity.coreExpression}</span> ×
+          <span>${state.identity.presence}</span> ×
+          <span>${state.identity.signal}</span>
+        </div>
+        <p class="mn-archetype-tagline">"${archetype.tagline}"</p>
+        <div class="mn-archetype-palette">
+          ${archetype.palette.map(c => `
+            <div class="mn-palette-swatch" style="background:${c}"></div>
+          `).join('')}
+        </div>
+        <div class="mn-action-bar">
+          <button id="btn-lock-identity" class="mn-btn-primary">
+            🔒 Lock This Identity
+          </button>
+        </div>
+      </div>
+    `;
+
+    DOM.container.innerHTML = html;
+
+    document.getElementById('btn-lock-identity').addEventListener('click', () => {
+      renderTransition('✨ Identity Locked', () => {
+        renderContextDashboard();
+      });
+    });
+  };
+
+  // ═══════════════════════════════════════════════════════════
+  // PHASE 2A: SILHOUETTE STEP (Height + Build)
+  // ═══════════════════════════════════════════════════════════
+
+  const renderSilhouetteStep = () => {
+    state.dataCollection = state.dataCollection || {};
+
+    const html = `
+      <div class="mn-silhouette-step mn-fade-in">
+        <button class="mn-back-btn" id="btn-back">← Back</button>
+        
+        <div class="mn-step-header">
+          <h3 class="mn-context-heading">Your Silhouette</h3>
+          <p class="mn-context-subtitle">
+            "Clothes are architecture. Let's get your blueprint right."
+          </p>
+        </div>
+
+        <div class="mn-height-selector">
+          <label class="mn-input-label">How tall are you?</label>
+          <div class="mn-height-visual">
+            <div class="mn-silhouette-figure" id="silhouette-figure"></div>
+            <input type="range" 
+                   id="height-slider" 
+                   min="150" max="195" value="170" 
+                   class="mn-range-slider" />
+            <div class="mn-height-display" id="height-display">170 cm / 5'7"</div>
+          </div>
+        </div>
+
+        <div class="mn-build-selector">
+          <label class="mn-input-label">What's your build?</label>
+          <div class="mn-build-grid">
+            ${SILHOUETTE_OPTIONS.builds.map(build => `
+              <button class="mn-build-card" data-build="${build.id}">
+                <div class="mn-build-icon">${build.icon}</div>
+                <div class="mn-build-label">${build.label}</div>
+              </button>
+            `).join('')}
+          </div>
+        </div>
+
+        <p class="mn-trust-note">
+          🔒 This helps us recommend cuts and proportions. Never shared.
+        </p>
+
+        <div class="mn-action-bar">
+          <button id="btn-next-tone" class="mn-btn-primary">Continue →</button>
+        </div>
+      </div>
+    `;
+
+    DOM.container.innerHTML = html;
+
+    // Height slider interaction
+    const slider = document.getElementById('height-slider');
+    const display = document.getElementById('height-display');
+
+    slider.addEventListener('input', () => {
+      const cm = parseInt(slider.value);
+      const feet = Math.floor(cm / 30.48);
+      const inches = Math.round((cm / 2.54) % 12);
+      display.textContent = `${cm} cm / ${feet}'${inches}"`;
+      state.dataCollection.height = cm;
+      // Animate silhouette figure height
+      const figure = document.getElementById('silhouette-figure');
+      const scale = 0.7 + ((cm - 150) / 45) * 0.6;
+      figure.style.transform = `scaleY(${scale})`;
+    });
+
+    // Build selection
+    DOM.container.querySelectorAll('.mn-build-card').forEach(card => {
+      card.addEventListener('click', () => {
+        DOM.container.querySelectorAll('.mn-build-card')
+          .forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        state.dataCollection.build = card.dataset.build;
+      });
+    });
+
+    document.getElementById('btn-back').addEventListener('click', renderSelfContext);
+    document.getElementById('btn-next-tone').addEventListener('click', () => {
+      if (!state.dataCollection.build) {
+        alert('Please select your build type');
+        return;
+      }
+      state.dataCollection.height = state.dataCollection.height || 170;
+      renderToneStep();
+    });
+  };
+
+  // ═══════════════════════════════════════════════════════════
+  // PHASE 2B: TONE STEP (Skin Tone + Undertone)
+  // ═══════════════════════════════════════════════════════════
+
+  const renderToneStep = () => {
+    const html = `
+      <div class="mn-tone-step mn-fade-in">
+        <button class="mn-back-btn" id="btn-back">← Back</button>
+        
+        <div class="mn-step-header">
+          <h3 class="mn-context-heading">Your Palette</h3>
+          <p class="mn-context-subtitle">
+            "Every skin tells a story. Let's find the colors made for yours."
+          </p>
+        </div>
+
+        <div class="mn-tone-section">
+          <label class="mn-input-label">Which feels closest to you?</label>
+          <div class="mn-tone-swatches">
+            ${TONE_OPTIONS.skinTones.map(tone => `
+              <button class="mn-tone-swatch" 
+                      data-tone="${tone.id}"
+                      style="background:${tone.color}; color:${tone.textColor}">
+                <span class="mn-tone-label">${tone.label}</span>
+              </button>
+            `).join('')}
+          </div>
+        </div>
+
+        <div class="mn-undertone-section">
+          <label class="mn-input-label">Quick test — what jewelry makes you glow?</label>
+          <div class="mn-undertone-options">
+            ${TONE_OPTIONS.undertones.map(ut => `
+              <button class="mn-undertone-btn" data-undertone="${ut.value}">
+                ${ut.label}
+              </button>
+            `).join('')}
+          </div>
+        </div>
+
+        <p class="mn-trust-note">
+          🎨 This determines which color palettes will complement you naturally
+        </p>
+
+        <div class="mn-action-bar">
+          <button id="btn-next-lifestyle" class="mn-btn-primary">Continue →</button>
+        </div>
+      </div>
+    `;
+
+    DOM.container.innerHTML = html;
+
+    // Tone selection
+    DOM.container.querySelectorAll('.mn-tone-swatch').forEach(swatch => {
+      swatch.addEventListener('click', () => {
+        DOM.container.querySelectorAll('.mn-tone-swatch')
+          .forEach(s => s.classList.remove('active'));
+        swatch.classList.add('active');
+        state.dataCollection.skinTone = swatch.dataset.tone;
+      });
+    });
+
+    // Undertone selection
+    DOM.container.querySelectorAll('.mn-undertone-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        DOM.container.querySelectorAll('.mn-undertone-btn')
+          .forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.dataCollection.undertone = btn.dataset.undertone;
+      });
+    });
+
+    document.getElementById('btn-back').addEventListener('click', renderSilhouetteStep);
+    document.getElementById('btn-next-lifestyle').addEventListener('click', () => {
+      if (!state.dataCollection.skinTone || !state.dataCollection.undertone) {
+        alert('Please complete both selections');
+        return;
+      }
+      renderLifestyleStep();
+    });
+  };
+
+  // ═══════════════════════════════════════════════════════════
+  // PHASE 2C: LIFESTYLE STEP (Region + Climate + Budget)
+  // ═══════════════════════════════════════════════════════════
+
+  const renderLifestyleStep = () => {
+    const html = `
+      <div class="mn-lifestyle-step mn-fade-in">
+        <button class="mn-back-btn" id="btn-back">← Back</button>
+        
+        <div class="mn-step-header">
+          <h3 class="mn-context-heading">Your World</h3>
+          <p class="mn-context-subtitle">
+            "Fashion lives in context. Let's understand yours."
+          </p>
+        </div>
+
+        <div class="mn-lifestyle-section">
+          <label class="mn-input-label">Your style roots?</label>
+          <div class="mn-region-grid">
+            ${LIFESTYLE_OPTIONS.regions.map(r => `
+              <button class="mn-region-chip" data-region="${r.id}" 
+                      title="${r.context}">
+                ${r.emoji} ${r.label}
+              </button>
+            `).join('')}
+          </div>
+        </div>
+
+        <div class="mn-lifestyle-section">
+          <label class="mn-input-label">Your weather most days?</label>
+          <div class="mn-climate-grid">
+            ${LIFESTYLE_OPTIONS.climates.map(c => `
+              <button class="mn-climate-chip" data-climate="${c.id}">
+                ${c.label}
+              </button>
+            `).join('')}
+          </div>
+        </div>
+
+        <div class="mn-lifestyle-section">
+          <label class="mn-input-label">
+            Your comfort range for a single statement piece?
+          </label>
+          <div class="mn-budget-grid">
+            ${LIFESTYLE_OPTIONS.budgets.map(b => `
+              <button class="mn-budget-chip" data-budget="${b.id}">
+                ${b.label}
+              </button>
+            `).join('')}
+          </div>
+        </div>
+
+        <div class="mn-action-bar">
+          <button id="btn-next-closet" class="mn-btn-primary">
+            Almost there... →
+          </button>
+        </div>
+      </div>
+    `;
+
+    DOM.container.innerHTML = html;
+
+    // Single-select handlers for each group
+    const setupSingleSelect = (selector, stateKey, dataAttr) => {
+      DOM.container.querySelectorAll(selector).forEach(chip => {
+        chip.addEventListener('click', () => {
+          DOM.container.querySelectorAll(selector)
+            .forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          state.dataCollection[stateKey] = chip.dataset[dataAttr];
+        });
+      });
+    };
+
+    setupSingleSelect('.mn-region-chip', 'region', 'region');
+    setupSingleSelect('.mn-climate-chip', 'climate', 'climate');
+    setupSingleSelect('.mn-budget-chip', 'budget', 'budget');
+
+    document.getElementById('btn-back').addEventListener('click', renderToneStep);
+    document.getElementById('btn-next-closet').addEventListener('click', () => {
+      const { region, climate, budget } = state.dataCollection;
+      if (!region || !climate || !budget) {
+        alert('Please complete all three selections');
+        return;
+      }
+      renderClosetStep();
+    });
+  };
+
+  // ═══════════════════════════════════════════════════════════
+  // PHASE 3: CLOSET STEP (Ghost Mode + Photo Upload)
+  // ═══════════════════════════════════════════════════════════
+
+  const renderClosetStep = () => {
+    state.dataCollection.closet = state.dataCollection.closet || [];
+
+    const html = `
+      <div class="mn-closet-step mn-fade-in">
+        <button class="mn-back-btn" id="btn-back">← Back</button>
+        
+        <div class="mn-step-header">
+          <h3 class="mn-context-heading">Your Closet</h3>
+          <p class="mn-context-subtitle">
+            "Show us what you already own. We'll build from there."
+          </p>
+        </div>
+
+        <!-- Photo Upload Section -->
+        <div class="mn-closet-upload">
+          <label for="closet-photos" class="mn-upload-area" id="upload-area">
+            <div class="mn-upload-icon">📸</div>
+            <div class="mn-upload-title">Snap Your Wardrobe</div>
+            <div class="mn-upload-subtitle">
+              Take photos — we auto-detect items
+            </div>
+            <input type="file" 
+                   id="closet-photos" 
+                   multiple 
+                   accept="image/*" 
+                   style="display:none" />
+          </label>
+          <div id="upload-preview" class="mn-upload-preview"></div>
+        </div>
+
+        <div class="mn-divider-text">
+          <span>or use Ghost Mode</span>
+        </div>
+
+        <!-- Ghost Mode: Quick Picks -->
+        <div class="mn-ghost-mode">
+          <div class="mn-ghost-category" data-category="tops">
+            <h4 class="mn-ghost-label">👕 Tops</h4>
+            <div class="mn-ghost-chips">
+              ${GHOST_MODE_ITEMS.tops.slice(0, 8).map(item => `
+                <button class="mn-ghost-chip" data-item="${item}">
+                  ${item}
+                </button>
+              `).join('')}
+              <button class="mn-ghost-more" data-category="tops">
+                +${GHOST_MODE_ITEMS.tops.length - 8} more
+              </button>
+            </div>
+          </div>
+
+          <div class="mn-ghost-category" data-category="bottoms">
+            <h4 class="mn-ghost-label">👖 Bottoms</h4>
+            <div class="mn-ghost-chips">
+              ${GHOST_MODE_ITEMS.bottoms.slice(0, 6).map(item => `
+                <button class="mn-ghost-chip" data-item="${item}">
+                  ${item}
+                </button>
+              `).join('')}
+              <button class="mn-ghost-more" data-category="bottoms">
+                +${GHOST_MODE_ITEMS.bottoms.length - 6} more
+              </button>
+            </div>
+          </div>
+
+          <div class="mn-ghost-category" data-category="footwear">
+            <h4 class="mn-ghost-label">👟 Footwear</h4>
+            <div class="mn-ghost-chips">
+              ${GHOST_MODE_ITEMS.footwear.slice(0, 6).map(item => `
+                <button class="mn-ghost-chip" data-item="${item}">
+                  ${item}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+
+          <div class="mn-ghost-category" data-category="accessories">
+            <h4 class="mn-ghost-label">💎 Accessories</h4>
+            <div class="mn-ghost-chips">
+              ${GHOST_MODE_ITEMS.accessories.slice(0, 6).map(item => `
+                <button class="mn-ghost-chip" data-item="${item}">
+                  ${item}
+                </button>
+              `).join('')}
+              <button class="mn-ghost-more" data-category="accessories">
+                +${GHOST_MODE_ITEMS.accessories.length - 6} more
+              </button>
+            </div>
+          </div>
+
+          <!-- Custom Input -->
+          <div class="mn-custom-item-input">
+            <input type="text" 
+                   id="custom-item" 
+                   class="mn-text-input" 
+                   placeholder="Or type: Maroon Kurta, Grey Joggers..." />
+            <button id="btn-add-custom" class="mn-btn-icon">+ Add</button>
+          </div>
+        </div>
+
+        <!-- Selected Items Display -->
+        <div class="mn-selected-closet" id="selected-closet">
+          <h4 class="mn-ghost-label">
+            Your Items 
+            (<span id="closet-count">0</span>)
+          </h4>
+          <div class="mn-selected-items" id="selected-items"></div>
+        </div>
+
+        <div class="mn-action-bar">
+          <button id="btn-skip-closet" class="mn-btn-secondary">
+            Skip for now
+          </button>
+          <button id="btn-generate-final" class="mn-btn-primary" disabled>
+            ✨ Generate My Look
+          </button>
+        </div>
+      </div>
+    `;
+
+    DOM.container.innerHTML = html;
+
+    // Photo upload handler
+    document.getElementById('closet-photos').addEventListener('change', handlePhotoUpload);
+
+    // Ghost mode chip selection (toggle)
+    DOM.container.querySelectorAll('.mn-ghost-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const item = chip.dataset.item;
+        chip.classList.toggle('active');
+
+        if (chip.classList.contains('active')) {
+          state.dataCollection.closet.push(item);
+        } else {
+          state.dataCollection.closet = state.dataCollection.closet
+            .filter(i => i !== item);
+        }
+        updateClosetDisplay();
+      });
+    });
+
+    // Custom item input
+    document.getElementById('btn-add-custom').addEventListener('click', () => {
+      const input = document.getElementById('custom-item');
+      const value = input.value.trim();
+      if (value) {
+        const items = value.split(',').map(i => i.trim()).filter(Boolean);
+        state.dataCollection.closet.push(...items);
+        input.value = '';
+        updateClosetDisplay();
+      }
+    });
+
+    // Enter key support
+    document.getElementById('custom-item').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        document.getElementById('btn-add-custom').click();
+      }
+    });
+
+    // "More" buttons
+    DOM.container.querySelectorAll('.mn-ghost-more').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const category = btn.dataset.category;
+        const allItems = GHOST_MODE_ITEMS[category];
+        const container = btn.parentElement;
+        const sliceStart = category === 'tops' ? 8 : 6;
+
+        btn.remove();
+        allItems.slice(sliceStart).forEach(item => {
+          const chip = document.createElement('button');
+          chip.className = 'mn-ghost-chip mn-fade-in';
+          chip.dataset.item = item;
+          chip.textContent = item;
+          chip.addEventListener('click', () => {
+            chip.classList.toggle('active');
+            if (chip.classList.contains('active')) {
+              state.dataCollection.closet.push(item);
+            } else {
+              state.dataCollection.closet =
+                state.dataCollection.closet.filter(i => i !== item);
+            }
+            updateClosetDisplay();
+          });
+          container.appendChild(chip);
+        });
+      });
+    });
+
+    document.getElementById('btn-back').addEventListener('click', renderLifestyleStep);
+    document.getElementById('btn-skip-closet').addEventListener('click', () => {
+      saveAllDataAndGenerate();
+    });
+    document.getElementById('btn-generate-final').addEventListener('click', () => {
+      saveAllDataAndGenerate();
+    });
+  };
+
+  const updateClosetDisplay = () => {
+    const items = state.dataCollection.closet;
+    const container = document.getElementById('selected-items');
+    const count = document.getElementById('closet-count');
+    const generateBtn = document.getElementById('btn-generate-final');
+
+    count.textContent = items.length;
+    generateBtn.disabled = items.length < 1;
+
+    container.innerHTML = items.map(item => `
+      <div class="mn-closet-item">
+        <span>${item}</span>
+        <button class="mn-remove-item" data-remove="${item}">✕</button>
+      </div>
+    `).join('');
+
+    // Remove item handlers
+    container.querySelectorAll('.mn-remove-item').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = btn.dataset.remove;
+        state.dataCollection.closet =
+          state.dataCollection.closet.filter(i => i !== item);
+        const chip = DOM.container
+          .querySelector(`.mn-ghost-chip[data-item="${item}"]`);
+        if (chip) chip.classList.remove('active');
+        updateClosetDisplay();
+      });
+    });
+  };
+
+  // Photo upload handler (basic — will need ML backend)
+  const handlePhotoUpload = (event) => {
+    const files = event.target.files;
+    const preview = document.getElementById('upload-preview');
+
+    Array.from(files).forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = document.createElement('div');
+        img.className = 'mn-upload-thumb mn-fade-in';
+        img.innerHTML = `
+          <img src="${e.target.result}" alt="Closet item" />
+          <div class="mn-upload-detecting">
+            <div class="mn-mini-spinner"></div>
+            Detecting...
+          </div>
+        `;
+        preview.appendChild(img);
+
+        // Simulate AI detection (real version calls Vision API)
+        setTimeout(() => {
+          const detected = simulateClothingDetection(file.name);
+          img.querySelector('.mn-upload-detecting').innerHTML =
+            `✅ ${detected}`;
+          state.dataCollection.closet.push(detected);
+          updateClosetDisplay();
+        }, 1500);
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const simulateClothingDetection = (filename) => {
+    const detections = [
+      'Blue Denim Shirt', 'Black T-Shirt', 'White Sneakers',
+      'Grey Hoodie', 'Navy Chinos', 'Brown Belt'
+    ];
+    return detections[Math.floor(Math.random() * detections.length)];
+  };
+
+  // ═══════════════════════════════════════════════════════════
+  // PHASE 4: SAVE ALL DATA & GENERATE
+  // ═══════════════════════════════════════════════════════════
+
+  const saveAllDataAndGenerate = () => {
+    // Merge calibration identity + body data into full profile
+    const fullProfile = {
+      ...state.identity,
+      ...state.dataCollection,
+      lastUpdated: Date.now()
+    };
+
+    // Save complete profile
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(fullProfile));
+    state.identity = fullProfile;
+
+    console.log('💾 Full profile saved:', fullProfile);
+
+    // Now generate with ALL data
+    generateAIRecommendations();
+  };
+
+  // ═══════════════════════════════════════════════════════════
+  // PHASE 5: AVATAR RESULTS SCREEN
+  // ═══════════════════════════════════════════════════════════
+
+  const renderAvatarResults = (recommendations) => {
+    const profile = state.identity;
+    const closetItems = profile.closet || [];
+
+    // Determine which recommended items user owns vs needs to buy
+    const outfitItems = recommendations.outfit_pieces || [];
+    const categorized = outfitItems.map(item => ({
+      ...item,
+      owned: closetItems.some(owned =>
+        owned.toLowerCase().includes(item.type?.toLowerCase() || '') ||
+        item.name.toLowerCase().includes(owned.toLowerCase())
+      )
+    }));
+
+    const missingItems = categorized.filter(item => !item.owned);
+    const ownedItems = categorized.filter(item => item.owned);
+    const archetypeName = profile.archetype?.name || profile.coreExpression;
+
+    const html = `
+      <div class="mn-avatar-results mn-fade-in">
+        <button class="mn-back-btn" id="btn-back">← Back</button>
+        
+        <div class="mn-results-header">
+          <h3 class="mn-results-title">
+            ✨ Your Look: "${state.currentContext.contexts?.[0] || 'Custom'}"
+          </h3>
+          <p class="mn-results-meta">
+            ${state.currentContext.loudness} • ${archetypeName} Archetype
+          </p>
+        </div>
+
+        <!-- Avatar Visual -->
+        <div class="mn-avatar-container">
+          <div class="mn-avatar-figure" 
+               data-height="${profile.height}" 
+               data-build="${profile.build}"
+               data-skin="${profile.skinTone}">
+            <div class="mn-avatar-body"></div>
+          </div>
+          
+          <!-- Item Cards -->
+          <div class="mn-outfit-items">
+            ${categorized.map(item => `
+              <div class="mn-outfit-item ${item.owned ? 'owned' : 'missing'}">
+                <div class="mn-item-preview" 
+                     style="background:${item.color || '#333'}"></div>
+                <div class="mn-item-name">${item.name}</div>
+                <div class="mn-item-status">
+                  ${item.owned ? '✅ Owned' : '🔴 Shop'}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- AI Direction -->
+        <div class="mn-direction-card">
+          <p class="mn-direction-text">"${recommendations.direction}"</p>
+        </div>
+
+        <!-- Color Science Note -->
+        ${recommendations.color_science ? `
+          <div class="mn-color-science">
+            <h4>🎨 Why These Colors Work On You</h4>
+            <p>${recommendations.color_science}</p>
+          </div>
+        ` : ''}
+
+        <!-- Styling Tips -->
+        ${recommendations.styling_tips?.length ? `
+          <div class="mn-tips-section">
+            <h4>💡 Styling Tips</h4>
+            <ul class="mn-tips-list">
+              ${recommendations.styling_tips.map(tip => `
+                <li>${tip}</li>
+              `).join('')}
+            </ul>
+          </div>
+        ` : ''}
+
+        <!-- Missing Items → Shopping -->
+        ${missingItems.length > 0 ? `
+          <div class="mn-shopping-section">
+            <h4>🛒 Complete This Look</h4>
+            <p class="mn-shopping-subtitle">
+              Items you don't have yet 
+              (within your ${LIFESTYLE_OPTIONS.budgets
+          .find(b => b.id === profile.budget)?.label || 'selected'} range)
+            </p>
+            ${missingItems.map(item => `
+              <div class="mn-shopping-card">
+                <div class="mn-shopping-item-info">
+                  <span class="mn-shopping-item-name">
+                    🔴 ${item.name}
+                  </span>
+                  <span class="mn-shopping-item-reason">
+                    ${item.why || 'Completes the look'}
+                  </span>
+                </div>
+                <div class="mn-shopping-links">
+                  ${(item.shop_links || []).map(link => `
+                    <a href="${link.url}" 
+                       target="_blank" 
+                       class="mn-shop-link">
+                      🛒 ${link.platform} ${link.price || ''}
+                    </a>
+                  `).join('')}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        ` : `
+          <div class="mn-complete-badge">
+            ✅ You own everything needed for this look!
+          </div>
+        `}
+
+        <!-- Action Bar -->
+        <div class="mn-action-bar mn-action-bar-grid">
+          <button id="btn-regenerate" class="mn-btn-secondary">
+            🔄 Different Look
+          </button>
+          <button id="btn-save-look" class="mn-btn-primary">
+            💾 Save This Look
+          </button>
+        </div>
+      </div>
+    `;
+
+    DOM.container.innerHTML = html;
+
+    document.getElementById('btn-back')
+      .addEventListener('click', renderContextDashboard);
+    document.getElementById('btn-regenerate')
+      .addEventListener('click', generateAIRecommendations);
+    document.getElementById('btn-save-look')
+      .addEventListener('click', () => {
+        localStorage.setItem('mn_saved_looks', JSON.stringify({
+          recommendations,
+          context: state.currentContext,
+          timestamp: Date.now()
+        }));
+        alert('✅ Look saved!');
+      });
   };
 
   // ═══════════════════════════════════════════════════════════
@@ -612,8 +1557,18 @@ const MNAIStylist = (() => {
         timestamp: Date.now()
       }));
 
-      // 4. Show Results
-      renderResults(recommendations);
+      // 4. Route to appropriate results screen
+      const isGiftMode = state.currentContext?.mode === 'gift';
+      if (isGiftMode) {
+        renderResults(recommendations);
+      } else {
+        // Self mode: use enhanced avatar results if outfit_pieces exist
+        if (recommendations.outfit_pieces) {
+          renderAvatarResults(recommendations);
+        } else {
+          renderResults(recommendations);
+        }
+      }
 
     } catch (error) {
       console.error("AI Error:", error);
