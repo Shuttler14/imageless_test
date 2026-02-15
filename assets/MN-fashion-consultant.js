@@ -53,53 +53,56 @@ const MNAIStylist = (() => {
   const CALIBRATION_FLOW = [
     {
       id: 'coreExpression',
-      question: 'How would you describe your core style expression?',
+      question: 'Your Core Expression',
+      subtitle: 'How do you naturally show up?',
       label: 'Q1: Core Expression',
       options: [
-        'Calm & Minimal',
-        'Bold & Expressive',
-        'Deep & Symbolic',
-        'Disciplined & Structured',
-        'Free & Experimental',
-        'Dark & Mysterious',
-        'Clean & Premium',
-        'Emotional & Reflective',
-        'Playful but Intentional',
-        'Understated Confidence'
+        { value: 'Calm & Minimal', label: 'Calm & Minimal', description: 'Quiet confidence, no excess' },
+        { value: 'Bold & Expressive', label: 'Bold & Expressive', description: 'Unapologetically visible' },
+        { value: 'Deep & Symbolic', label: 'Deep & Symbolic', description: 'Every choice has meaning' },
+        { value: 'Playful & Light', label: 'Playful & Light', description: 'Fashion is fun, not serious' },
+        { value: 'Minimalist', label: 'Minimalist', description: 'Function over decoration' },
+        { value: 'Traditional & Rooted', label: 'Traditional & Rooted', description: 'Connected to heritage' },
+        { value: 'Experimental', label: 'Experimental', description: 'Breaking the mold' },
+        { value: 'Elegant & Refined', label: 'Elegant & Refined', description: 'Timeless sophistication' },
+        { value: 'Casual & Approachable', label: 'Casual & Approachable', description: 'Comfort meets style' },
+        { value: 'Edgy & Alternative', label: 'Edgy & Alternative', description: 'Against the grain' }
       ]
     },
     {
       id: 'presence',
-      question: 'How do you show up in the world?',
+      question: 'Your Presence',
+      subtitle: 'How do you want to be perceived?',
       label: 'Q2: Presence',
       options: [
-        'Quiet Observer',
-        'Thoughtful Introvert',
-        'Confident but Reserved',
-        'Creative Risk-Taker',
-        'Focused Builder',
-        'Explorer Mindset',
-        'Stoic & Composed',
-        'Emotion-Driven',
-        'Logic-Driven',
-        'Balanced & Adaptive'
+        { value: 'Confident but Reserved', label: 'Confident but Reserved', description: 'Strong, not loud' },
+        { value: 'Creative Risk-Taker', label: 'Creative Risk-Taker', description: 'Willing to stand out' },
+        { value: 'Thoughtful Introvert', label: 'Thoughtful Introvert', description: 'Depth over flash' },
+        { value: 'Life of the Party', label: 'Life of the Party', description: 'Energy and warmth' },
+        { value: 'Low-Key', label: 'Low-Key', description: 'Prefer to blend in' },
+        { value: 'Cultural Pride', label: 'Cultural Pride', description: 'Honor your roots' },
+        { value: 'Boundary-Pusher', label: 'Boundary-Pusher', description: 'Challenge norms' },
+        { value: 'Graceful Authority', label: 'Graceful Authority', description: 'Command respect naturally' },
+        { value: 'Friendly & Warm', label: 'Friendly & Warm', description: 'Easy to approach' },
+        { value: 'Mysterious & Intriguing', label: 'Mysterious & Intriguing', description: 'Leave them curious' }
       ]
     },
     {
       id: 'signal',
-      question: 'What is your current signal?',
+      question: 'Your Signal',
+      subtitle: 'What message do your clothes send?',
       label: 'Q3: Signal',
       options: [
-        'Quiet Rebellion',
-        'Academic Burnout',
-        'Main Character Energy',
-        'Healing Era',
-        'Organized Chaos',
-        'Stoic Focus',
-        'Digital Nomad',
-        'Night Owl',
-        'Emotionless',
-        'Seeing Beyond the Mask'
+        { value: 'Quiet Rebellion', label: 'Quiet Rebellion', description: 'Subtle defiance' },
+        { value: 'Main Character Energy', label: 'Main Character Energy', description: 'Own the room' },
+        { value: 'Seeing Beyond the Mask', label: 'Seeing Beyond the Mask', description: 'Layers and meaning' },
+        { value: 'Joy & Lightness', label: 'Joy & Lightness', description: 'Spread positive vibes' },
+        { value: 'Understated Confidence', label: 'Understated Confidence', description: 'No need to prove' },
+        { value: 'Timeless Elegance', label: 'Timeless Elegance', description: 'Classic never fades' },
+        { value: 'Fashion Forward', label: 'Fashion Forward', description: 'Ahead of the curve' },
+        { value: 'Refined Luxury', label: 'Refined Luxury', description: 'Quality speaks' },
+        { value: 'Relatable Authenticity', label: 'Relatable Authenticity', description: 'Real and genuine' },
+        { value: 'Dark Romance', label: 'Dark Romance', description: 'Beauty in darkness' }
       ]
     }
   ];
@@ -112,52 +115,38 @@ const MNAIStylist = (() => {
     'Calm & Minimal|Confident but Reserved|Quiet Rebellion': {
       name: 'The Quiet Rebel',
       tagline: "You don't dress loud. You dress precise.",
+      icon: '🎯',
       palette: ['#1a1a1a', '#f5f0e8', '#8b7355']
     },
     'Bold & Expressive|Creative Risk-Taker|Main Character Energy': {
       name: 'The Visual Poet',
       tagline: "Every outfit is a verse. Every color is a word.",
+      icon: '🎨',
       palette: ['#ff4444', '#222222', '#ffd700']
     },
     'Deep & Symbolic|Thoughtful Introvert|Seeing Beyond the Mask': {
       name: 'The Silent Philosopher',
       tagline: "Your clothes think before they speak.",
+      icon: '📚',
       palette: ['#2c3e50', '#ecf0f1', '#8e44ad']
     },
-    'Disciplined & Structured|Focused Builder|Stoic Focus': {
-      name: 'The Architect',
-      tagline: "Every line has a reason. Every seam is deliberate.",
-      palette: ['#2d2d2d', '#ffffff', '#4a90d9']
+    'Minimalist|Low-Key|Understated Confidence': {
+      name: 'The Essential',
+      tagline: "Less noise. More meaning.",
+      icon: '⚡',
+      palette: ['#000000', '#ffffff', '#666666']
     },
-    'Free & Experimental|Explorer Mindset|Digital Nomad': {
-      name: 'The Drifter',
-      tagline: "No fixed address. No fixed uniform.",
-      palette: ['#e67e22', '#1abc9c', '#ecf0f1']
+    'Traditional & Rooted|Cultural Pride|Timeless Elegance': {
+      name: 'The Heritage Keeper',
+      tagline: "Modern by choice. Rooted by nature.",
+      icon: '🕉️',
+      palette: ['#8B4513', '#FFD700', '#800020']
     },
-    'Dark & Mysterious|Stoic & Composed|Night Owl': {
-      name: 'The Shadow',
-      tagline: "You let the mystery do the talking.",
-      palette: ['#0d0d0d', '#2c2c2c', '#8b0000']
-    },
-    'Clean & Premium|Logic-Driven|Organized Chaos': {
-      name: 'The Curator',
-      tagline: "Your wardrobe is an edit, not a collection.",
-      palette: ['#f8f8f8', '#333333', '#c0a062']
-    },
-    'Emotional & Reflective|Emotion-Driven|Healing Era': {
-      name: 'The Alchemist',
-      tagline: "Turning feelings into fabric.",
-      palette: ['#6c5ce7', '#ffeaa7', '#dfe6e9']
-    },
-    'Playful but Intentional|Balanced & Adaptive|Academic Burnout': {
-      name: 'The Paradox',
-      tagline: "Serious about not being too serious.",
-      palette: ['#00b894', '#fdcb6e', '#2d3436']
-    },
-    'Understated Confidence|Quiet Observer|Emotionless': {
-      name: 'The Minimalist Stoic',
-      tagline: "Less noise. More signal.",
-      palette: ['#dcdcdc', '#1a1a1a', '#708090']
+    'Experimental|Boundary-Pusher|Fashion Forward': {
+      name: 'The Avant-Garde',
+      tagline: "Trends follow you, not the other way around.",
+      icon: '🚀',
+      palette: ['#FF00FF', '#00FFFF', '#000000']
     }
   };
 
@@ -173,6 +162,7 @@ const MNAIStylist = (() => {
     return {
       name: 'The Original',
       tagline: "Your style writes its own rules.",
+      icon: '✨',
       palette: ['#1a1a1a', '#f5f0e8', '#4a90d9']
     };
   };
@@ -292,16 +282,16 @@ const MNAIStylist = (() => {
 
   const CONTEXT_DATA = {
     selfContexts: [
-      '📅 First Day at Work',
-      '💝 First Date',
-      '💪 Gym /Discipline Mode',
-      '🌱 Healing Phase',
-      '🌙 Late-Night Drives',
-      '👕 Daily Minimal Wear',
-      '👔 Public-Facing Outfit',
-      '✈️ Travel /Wander Mode',
-      '🏠 Quiet Personal Wear',
-      '⚡ Statement Moment'
+      { value: 'First Day at Work', emoji: '💼', description: 'Make the right first impression' },
+      { value: 'Date Night', emoji: '💕', description: 'Romance and confidence' },
+      { value: 'Wedding Guest', emoji: '💍', description: 'Celebrate in style' },
+      { value: 'Festival/Pooja', emoji: '🪔', description: 'Traditional elegance' },
+      { value: 'College/Campus', emoji: '🎓', description: 'Casual yet sharp' },
+      { value: 'House Party', emoji: '🎉', description: 'Fun and approachable' },
+      { value: 'Formal Meeting', emoji: '🤝', description: 'Command respect' },
+      { value: 'Weekend Brunch', emoji: '☕', description: 'Relaxed sophistication' },
+      { value: 'Travel/Airport', emoji: '✈️', description: 'Comfortable style' },
+      { value: 'Gym/Active', emoji: '💪', description: 'Functional fashion' }
     ],
     recipients: [
       '👥 Friend',
@@ -441,7 +431,7 @@ const MNAIStylist = (() => {
     }, 10);
 
     if (!state.identity) {
-      renderCalibrationFlow(0);
+      renderWelcomeScreen();
     } else {
       renderContextDashboard();
     }
@@ -459,6 +449,43 @@ const MNAIStylist = (() => {
       updateProgressBar(0);
       DOM.expanded.style.animation = '';
     }, 300);
+  };
+
+  // ═══════════════════════════════════════════════════════════
+  // WELCOME SCREEN (First-Time Users)
+  // ═══════════════════════════════════════════════════════════
+
+  const renderWelcomeScreen = () => {
+    updateProgressBar(0);
+    
+    const html = `
+      <div class="mn-welcome-screen mn-fade-in">
+        <div class="mn-welcome-header">
+          <h1 class="mn-welcome-title">Welcome to MY NARRATIVE</h1>
+          <p class="mn-welcome-subtitle">
+            Your AI Fashion Consultant that understands your unique style identity.
+            <br>Let's discover who you are, so we can design what you wear.
+          </p>
+        </div>
+        
+        <div class="mn-welcome-content">
+          <div class="mn-welcome-icon">✨</div>
+          <p class="mn-welcome-description">
+            This journey takes 3 minutes.<br>
+            But what you discover will change how you dress forever.
+          </p>
+          <button id="btn-start-journey" class="mn-btn-primary">
+            Begin Your Style Journey →
+          </button>
+        </div>
+      </div>
+    `;
+    
+    DOM.container.innerHTML = html;
+    
+    document.getElementById('btn-start-journey').addEventListener('click', () => {
+      renderCalibrationFlow(0);
+    });
   };
 
   // ═══════════════════════════════════════════════════════════
@@ -483,17 +510,23 @@ const MNAIStylist = (() => {
 
     const html = `
       <div class="mn-calibration-step mn-fade-in">
-        <div class="mn-step-indicator">
+        ${stepIndex > 0 ? '<button class="mn-back-btn" id="btn-back-cal">← Back</button>' : ''}
+        
+        <div class="mn-progress-text">
           <span class="mn-step-label">${step.label}</span>
           <span class="mn-step-progress">Step ${stepIndex + 1} of ${CALIBRATION_FLOW.length}</span>
         </div>
         
-        <h2 class="mn-step-question">${step.question}</h2>
+        <div class="mn-step-header">
+          <h2 class="mn-context-heading">${step.question}</h2>
+          <p class="mn-context-subtitle">"${step.subtitle}"</p>
+        </div>
         
-        <div class="mn-options-grid">
+        <div class="mn-chip-grid">
           ${step.options.map((option, idx) => `
-            <button class="mn-option-card" data-value="${option}" style="animation-delay: ${idx * 0.05}s">
-              <span class="mn-option-text">${option}</span>
+            <button class="mn-chip" data-value="${option.value}" style="animation-delay: ${idx * 0.05}s">
+              <span class="mn-chip-label">${option.label}</span>
+              <span class="mn-chip-description">${option.description}</span>
             </button>
           `).join('')}
         </div>
@@ -502,15 +535,15 @@ const MNAIStylist = (() => {
 
     DOM.container.innerHTML = html;
 
-    DOM.container.querySelectorAll('.mn-option-card').forEach(btn => {
+    DOM.container.querySelectorAll('.mn-chip').forEach(btn => {
       btn.addEventListener('click', () => {
         if (btn.classList.contains('selected')) return;
 
         state.tempCalibration[step.id] = btn.dataset.value;
 
-        btn.classList.add('selected');
+        btn.classList.add('active');
 
-        DOM.container.querySelectorAll('.mn-option-card').forEach(b => {
+        DOM.container.querySelectorAll('.mn-chip').forEach(b => {
           if (b !== btn) {
             b.style.opacity = '0.3';
             b.style.pointerEvents = 'none';
@@ -529,6 +562,13 @@ const MNAIStylist = (() => {
         }, 400);
       });
     });
+    
+    // Back button handler
+    if (stepIndex > 0) {
+      document.getElementById('btn-back-cal')?.addEventListener('click', () => {
+        renderCalibrationFlow(stepIndex - 1);
+      });
+    }
   };
 
   // ═══════════════════════════════════════════════════════════
@@ -597,29 +637,44 @@ const MNAIStylist = (() => {
         
         <button class="mn-back-btn" id="btn-back">← Back</button>
 
-        <h3 class="mn-context-heading">What's the context?</h3>
-        <p class="mn-context-subtitle">Select one or more that resonate</p>
+        <div class="mn-step-header">
+          <h3 class="mn-context-heading">What's the occasion?</h3>
+          <p class="mn-context-subtitle">"Context shapes everything"</p>
+        </div>
 
-        <div class="mn-context-chips" id="context-chips">
+        <div class="mn-chip-grid" id="context-chips">
           ${CONTEXT_DATA.selfContexts.map(ctx => `
-            <button class="mn-context-chip" data-value="${ctx}">
-              ${ctx}
+            <button class="mn-chip" data-value="${ctx.value}">
+              <span class="mn-chip-label">${ctx.emoji} ${ctx.value}</span>
+              <span class="mn-chip-description">${ctx.description}</span>
             </button>
           `).join('')}
         </div>
 
-        <div class="mn-divider"></div>
-
-        <h3 class="mn-context-heading">How loud should it be?</h3>
-        <div class="mn-loudness-selector">
-          <button class="mn-loudness-btn active" data-value="Subtle">🤫 Subtle</button>
-          <button class="mn-loudness-btn" data-value="Balanced">⚖️ Balanced</button>
-          <button class="mn-loudness-btn" data-value="Statement">⚡ Statement</button>
+        <div id="loudness-section" class="mn-loudness-section" style="display: none;">
+          <div class="mn-step-header" style="margin-top: 40px;">
+            <h3 class="mn-context-heading" style="font-size: 24px;">How loud do you want to be?</h3>
+          </div>
+          
+          <div class="mn-chip-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+            <button class="mn-chip" data-loudness="Subtle">
+              <span class="mn-chip-label">Subtle</span>
+              <span class="mn-chip-description">Whisper, don't shout</span>
+            </button>
+            <button class="mn-chip" data-loudness="Balanced">
+              <span class="mn-chip-label">Balanced</span>
+              <span class="mn-chip-description">Present but not loud</span>
+            </button>
+            <button class="mn-chip" data-loudness="Statement">
+              <span class="mn-chip-label">Statement</span>
+              <span class="mn-chip-description">Bold and memorable</span>
+            </button>
+          </div>
         </div>
 
         <div class="mn-action-bar">
-          <button id="btn-generate-self" class="mn-btn-primary">
-            ✨ Get AI Recommendations
+          <button id="btn-generate-self" class="mn-btn-primary" disabled>
+            Continue to Your Details →
           </button>
         </div>
 
@@ -629,29 +684,42 @@ const MNAIStylist = (() => {
     DOM.container.innerHTML = html;
 
     let selectedContext = null;
-    let selectedLoudness = 'Subtle';  // ← Matches the default 'active' button
+    let selectedLoudness = null;
 
-    DOM.container.querySelectorAll('.mn-context-chip').forEach(chip => {
+    DOM.container.querySelectorAll('.mn-chip[data-value]').forEach(chip => {
       chip.addEventListener('click', () => {
-        DOM.container.querySelectorAll('.mn-context-chip').forEach(c => c.classList.remove('active'));
+        DOM.container.querySelectorAll('.mn-chip[data-value]').forEach(c => c.classList.remove('active'));
         chip.classList.add('active');
         selectedContext = chip.dataset.value;
+        
+        // Show loudness section
+        document.getElementById('loudness-section').style.display = 'block';
+        
+        // Enable button if loudness is also selected
+        if (selectedLoudness) {
+          document.getElementById('btn-generate-self').disabled = false;
+        }
       });
     });
 
-    DOM.container.querySelectorAll('.mn-loudness-btn').forEach(btn => {
+    DOM.container.querySelectorAll('.mn-chip[data-loudness]').forEach(btn => {
       btn.addEventListener('click', () => {
-        DOM.container.querySelectorAll('.mn-loudness-btn').forEach(b => b.classList.remove('active'));
+        DOM.container.querySelectorAll('.mn-chip[data-loudness]').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        selectedLoudness = btn.dataset.value;
+        selectedLoudness = btn.dataset.loudness;
+        
+        // Enable button if context is also selected
+        if (selectedContext) {
+          document.getElementById('btn-generate-self').disabled = false;
+        }
       });
     });
 
     document.getElementById('btn-back').addEventListener('click', renderContextDashboard);
 
     document.getElementById('btn-generate-self').addEventListener('click', () => {
-      if (!selectedContext) {
-        alert('⚠️ Please select a context');
+      if (!selectedContext || !selectedLoudness) {
+        alert('⚠️ Please select both context and loudness level');
         return;
       }
 
@@ -682,22 +750,32 @@ const MNAIStylist = (() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state.identity));
 
     const html = `
-      <div class="mn-archetype-card mn-fade-in">
-        <div class="mn-archetype-header">
-          <span class="mn-archetype-label">YOUR STYLE ARCHETYPE</span>
+      <div class="mn-archetype-reveal mn-fade-in">
+        <div class="mn-step-header">
+          <h2 class="mn-context-heading">Your Style Archetype</h2>
         </div>
-        <div class="mn-archetype-name">◆ ${archetype.name.toUpperCase()} ◆</div>
-        <div class="mn-archetype-traits">
-          <span>${state.identity.coreExpression}</span> ×
-          <span>${state.identity.presence}</span> ×
-          <span>${state.identity.signal}</span>
+        
+        <div class="mn-archetype-card mn-scale-in">
+          <div class="mn-archetype-icon">${archetype.icon}</div>
+          <h3 class="mn-archetype-name">${archetype.name}</h3>
+          
+          <div class="mn-archetype-combo">
+            ${state.identity.coreExpression} ×<br>
+            ${state.identity.presence} ×<br>
+            ${state.identity.signal}
+          </div>
+          
+          <div class="mn-archetype-tagline">
+            "${archetype.tagline}"
+          </div>
+          
+          <div class="mn-archetype-palette">
+            ${archetype.palette.map(color => 
+              `<div class="mn-palette-swatch" style="background-color: ${color};"></div>`
+            ).join('')}
+          </div>
         </div>
-        <p class="mn-archetype-tagline">"${archetype.tagline}"</p>
-        <div class="mn-archetype-palette">
-          ${archetype.palette.map(c => `
-            <div class="mn-palette-swatch" style="background:${c}"></div>
-          `).join('')}
-        </div>
+        
         <div class="mn-action-bar">
           <button id="btn-lock-identity" class="mn-btn-primary">
             🔒 Lock This Identity

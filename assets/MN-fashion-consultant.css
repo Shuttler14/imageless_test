@@ -2723,3 +2723,305 @@
   grid-template-columns: 1fr 1fr;
   gap: 10px;
 }
+
+/* ═══════════════════════════════════════════════════════════
+   WELCOME SCREEN STYLES
+   ═══════════════════════════════════════════════════════════ */
+
+.mn-welcome-screen {
+  text-align: center;
+  padding: 60px 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.mn-welcome-header {
+  margin-bottom: 60px;
+}
+
+.mn-welcome-title {
+  font-size: 42px;
+  font-weight: 800;
+  margin-bottom: 15px;
+  background: linear-gradient(135deg, var(--mn-text-main), var(--mn-teal-glow));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.mn-welcome-subtitle {
+  font-size: 16px;
+  color: var(--mn-text-muted);
+  line-height: 1.6;
+  margin-bottom: 30px;
+}
+
+.mn-welcome-content {
+  margin: 60px 0;
+}
+
+.mn-welcome-icon {
+  font-size: 80px;
+  margin-bottom: 30px;
+  animation: float 3s ease-in-out infinite;
+}
+
+.mn-welcome-description {
+  font-size: 18px;
+  color: var(--mn-text-muted);
+  margin-bottom: 40px;
+  line-height: 1.8;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CHIP SELECTION STYLES (Calibration & Context)
+   ═══════════════════════════════════════════════════════════ */
+
+.mn-chip-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin: 30px 0;
+}
+
+.mn-chip {
+  padding: 20px 24px;
+  background: rgba(57, 165, 150, 0.1);
+  border: 2px solid var(--mn-glass-border);
+  border-radius: 16px;
+  color: var(--mn-text-main);
+  font-family: var(--mn-font-main);
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  animation: fadeIn 0.6s ease-out;
+}
+
+.mn-chip:hover {
+  border-color: var(--mn-teal);
+  background: rgba(57, 165, 150, 0.2);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(57, 165, 150, 0.3);
+}
+
+.mn-chip.active {
+  border-color: var(--mn-teal-glow);
+  background: var(--mn-teal);
+  box-shadow: 0 0 20px rgba(79, 255, 217, 0.4);
+}
+
+.mn-chip-label {
+  display: block;
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.mn-chip-description {
+  display: block;
+  font-size: 12px;
+  color: var(--mn-text-muted);
+  font-weight: 400;
+}
+
+.mn-chip.active .mn-chip-description {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PROGRESS TEXT (for calibration steps)
+   ═══════════════════════════════════════════════════════════ */
+
+.mn-progress-text {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  font-size: 13px;
+  color: var(--mn-text-muted);
+}
+
+.mn-step-label {
+  font-weight: 600;
+  color: var(--mn-teal);
+}
+
+.mn-step-progress {
+  font-weight: 500;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ARCHETYPE REVEAL STYLES
+   ═══════════════════════════════════════════════════════════ */
+
+.mn-archetype-reveal {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.mn-archetype-card {
+  background: linear-gradient(135deg, rgba(57, 165, 150, 0.15), rgba(0, 0, 0, 0.3));
+  border: 2px solid var(--mn-teal);
+  border-radius: 24px;
+  padding: 50px 40px;
+  text-align: center;
+  margin: 40px auto;
+  max-width: 500px;
+  box-shadow: 0 10px 40px rgba(57, 165, 150, 0.3);
+}
+
+.mn-archetype-icon {
+  font-size: 60px;
+  margin-bottom: 20px;
+  animation: float 3s ease-in-out infinite;
+}
+
+.mn-archetype-name {
+  font-size: 36px;
+  font-weight: 800;
+  font-family: 'Playfair Display', serif;
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, var(--mn-teal-glow), var(--mn-text-main));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.mn-archetype-combo {
+  font-size: 14px;
+  color: var(--mn-text-muted);
+  margin-bottom: 20px;
+  line-height: 1.8;
+}
+
+.mn-archetype-palette {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.mn-palette-swatch {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 2px solid var(--mn-glass-border);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SCALE-IN ANIMATION
+   ═══════════════════════════════════════════════════════════ */
+
+.mn-scale-in {
+  animation: scaleIn 0.5s ease-out;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FLOAT ANIMATION
+   ═══════════════════════════════════════════════════════════ */
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   LOUDNESS SECTION
+   ═══════════════════════════════════════════════════════════ */
+
+.mn-loudness-section {
+  margin-top: 40px;
+  animation: fadeIn 0.6s ease-out;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   STEP HEADER (Calibration & Context)
+   ═══════════════════════════════════════════════════════════ */
+
+.mn-step-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.mn-context-heading {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--mn-text-main);
+}
+
+.mn-context-subtitle {
+  font-size: 16px;
+  font-style: italic;
+  color: var(--mn-text-muted);
+  font-family: 'Playfair Display', serif;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   BACK BUTTON
+   ═══════════════════════════════════════════════════════════ */
+
+.mn-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--mn-teal);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 30px;
+  transition: all 0.3s ease;
+  background: none;
+  border: none;
+  font-family: var(--mn-font-main);
+  padding: 0;
+}
+
+.mn-back-btn:hover {
+  color: var(--mn-teal-glow);
+  transform: translateX(-5px);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE ADJUSTMENTS
+   ═══════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  .mn-welcome-title {
+    font-size: 32px;
+  }
+  
+  .mn-context-heading {
+    font-size: 24px;
+  }
+  
+  .mn-chip-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .mn-archetype-card {
+    padding: 30px 20px;
+  }
+  
+  .mn-archetype-name {
+    font-size: 28px;
+  }
+}
