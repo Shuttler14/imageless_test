@@ -457,7 +457,7 @@ const MNAIStylist = (() => {
 
   const renderWelcomeScreen = () => {
     updateProgressBar(0);
-    
+
     const html = `
       <div class="mn-welcome-screen mn-fade-in">
         <div class="mn-welcome-header">
@@ -480,9 +480,9 @@ const MNAIStylist = (() => {
         </div>
       </div>
     `;
-    
+
     DOM.container.innerHTML = html;
-    
+
     document.getElementById('btn-start-journey').addEventListener('click', () => {
       renderCalibrationFlow(0);
     });
@@ -562,7 +562,7 @@ const MNAIStylist = (() => {
         }, 400);
       });
     });
-    
+
     // Back button handler
     if (stepIndex > 0) {
       document.getElementById('btn-back-cal')?.addEventListener('click', () => {
@@ -691,10 +691,10 @@ const MNAIStylist = (() => {
         DOM.container.querySelectorAll('.mn-chip[data-value]').forEach(c => c.classList.remove('active'));
         chip.classList.add('active');
         selectedContext = chip.dataset.value;
-        
+
         // Show loudness section
         document.getElementById('loudness-section').style.display = 'block';
-        
+
         // Enable button if loudness is also selected
         if (selectedLoudness) {
           document.getElementById('btn-generate-self').disabled = false;
@@ -707,7 +707,7 @@ const MNAIStylist = (() => {
         DOM.container.querySelectorAll('.mn-chip[data-loudness]').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         selectedLoudness = btn.dataset.loudness;
-        
+
         // Enable button if context is also selected
         if (selectedContext) {
           document.getElementById('btn-generate-self').disabled = false;
@@ -770,9 +770,9 @@ const MNAIStylist = (() => {
           </div>
           
           <div class="mn-archetype-palette">
-            ${archetype.palette.map(color => 
-              `<div class="mn-palette-swatch" style="background-color: ${color};"></div>`
-            ).join('')}
+            ${archetype.palette.map(color =>
+      `<div class="mn-palette-swatch" style="background-color: ${color};"></div>`
+    ).join('')}
           </div>
         </div>
         
@@ -1385,27 +1385,26 @@ const MNAIStylist = (() => {
         </div>
 
         <!-- Avatar Visual -->
-        <div class="mn-avatar-container">
-          <div class="mn-avatar-figure" 
-               data-height="${profile.height}" 
-               data-build="${profile.build}"
-               data-skin="${profile.skinTone}">
-            <div class="mn-avatar-body"></div>
+        <div class="mn-avatar-container" style="position: relative; margin-bottom: 24px;">
+          <div id="mn-3d-canvas" style="width: 100%; height: 450px; background: radial-gradient(circle, #2a2a2a, #000); border-radius: 12px; overflow: hidden;">
+            <div style="display:flex;align-items:center;justify-content:center;height:100%;color:#555;">
+              <p>Loading 3D preview...</p>
+            </div>
           </div>
-          
-          <!-- Item Cards -->
-          <div class="mn-outfit-items">
-            ${categorized.map(item => `
-              <div class="mn-outfit-item ${item.owned ? 'owned' : 'missing'}">
-                <div class="mn-item-preview" 
-                     style="background:${item.color || '#333'}"></div>
-                <div class="mn-item-name">${item.name}</div>
-                <div class="mn-item-status">
-                  ${item.owned ? '✅ Owned' : '🔴 Shop'}
-                </div>
+        </div>
+
+        <!-- Item Cards -->
+        <div class="mn-outfit-items">
+          ${categorized.map(item => `
+            <div class="mn-outfit-item ${item.owned ? 'owned' : 'missing'}">
+              <div class="mn-item-preview" 
+                   style="background:${item.color || '#333'}"></div>
+              <div class="mn-item-name">${item.name}</div>
+              <div class="mn-item-status">
+                ${item.owned ? '✅ Owned' : '🔴 Shop'}
               </div>
-            `).join('')}
-          </div>
+            </div>
+          `).join('')}
         </div>
 
         <!-- AI Direction -->
@@ -1483,6 +1482,57 @@ const MNAIStylist = (() => {
     `;
 
     DOM.container.innerHTML = html;
+
+    // 🚀 INITIALIZE 3D VISUALIZER
+    setTimeout(() => {
+      const canvas = document.getElementById('mn-3d-canvas');
+      if (window.MNVisualizer) {
+        try {
+          // 1. Init Scene
+          window.MNVisualizer.init('mn-3d-canvas', {
+            height: profile.height || 170,
+            build: profile.build || 'regular',
+            skinTone: profile.skinTone || 'wheatish'
+          });
+
+          // 2. Apply Colors from Recommendations
+          categorized.forEach(item => {
+            const name = item.name.toLowerCase();
+            const color = item.color || detectColorFromName(name);
+
+            if (item.slot === 'top' || name.includes('shirt') || name.includes('hoodie') || name.includes('jacket') || name.includes('sweater') || name.includes('kurta') || name.includes('tshirt') || name.includes('t-shirt')) {
+              window.MNVisualizer.updateOutfit('top', color);
+            }
+            if (item.slot === 'bottom' || name.includes('pant') || name.includes('chino') || name.includes('jeans') || name.includes('trouser') || name.includes('jogger') || name.includes('short')) {
+              window.MNVisualizer.updateOutfit('bottom', color);
+            }
+            if (item.slot === 'footwear' || name.includes('shoe') || name.includes('sneaker') || name.includes('boot') || name.includes('loafer') || name.includes('sandal')) {
+              window.MNVisualizer.updateOutfit('shoes', color);
+            }
+          });
+
+          console.log('✅ 3D Visualizer initialized successfully');
+        } catch (error) {
+          console.error('❌ 3D Visualizer failed:', error);
+          if (canvas) {
+            canvas.innerHTML = `
+              <div style="display:flex;align-items:center;justify-content:center;height:100%;color:#888;flex-direction:column;gap:8px;">
+                <p style="font-size:14px;">⚠️ 3D preview unavailable</p>
+                <p style="font-size:11px;opacity:0.6;">Outfit details shown below</p>
+              </div>`;
+          }
+        }
+      } else {
+        console.warn('⚠️ MNVisualizer not loaded — showing fallback');
+        if (canvas) {
+          canvas.innerHTML = `
+            <div style="display:flex;align-items:center;justify-content:center;height:100%;color:#888;flex-direction:column;gap:8px;">
+              <p style="font-size:14px;">⚠️ 3D preview loading failed</p>
+              <p style="font-size:11px;opacity:0.6;">Outfit details shown below</p>
+            </div>`;
+        }
+      }
+    }, 300);
 
     document.getElementById('btn-back')
       .addEventListener('click', renderContextDashboard);
@@ -1812,6 +1862,53 @@ const MNAIStylist = (() => {
 
     // 2. Update State
     state.selectedSlogan = text;
+  };
+
+  // ═══════════════════════════════════════════════════════════
+  // HELPER: DETECT COLOR FROM PRODUCT NAME
+  // ═══════════════════════════════════════════════════════════
+  const detectColorFromName = (name) => {
+    const nameLower = name.toLowerCase();
+
+    // Navy & Blue variants
+    if (nameLower.includes('navy')) return '#000080';
+    if (nameLower.includes('royal blue')) return '#4169e1';
+    if (nameLower.includes('sky blue')) return '#87ceeb';
+    if (nameLower.includes('blue')) return '#0066cc';
+
+    // Black & White
+    if (nameLower.includes('black')) return '#1a1a1a';
+    if (nameLower.includes('white') || nameLower.includes('cream')) return '#f5f5f5';
+
+    // Earth tones
+    if (nameLower.includes('khaki') || nameLower.includes('beige') || nameLower.includes('tan')) return '#c3b091';
+    if (nameLower.includes('brown') || nameLower.includes('chocolate')) return '#8b4513';
+    if (nameLower.includes('olive')) return '#6b8e23';
+
+    // Grays
+    if (nameLower.includes('charcoal')) return '#36454f';
+    if (nameLower.includes('grey') || nameLower.includes('gray')) return '#808080';
+    if (nameLower.includes('silver')) return '#c0c0c0';
+
+    // Warm colors
+    if (nameLower.includes('red') || nameLower.includes('crimson')) return '#dc143c';
+    if (nameLower.includes('maroon') || nameLower.includes('burgundy')) return '#800000';
+    if (nameLower.includes('orange')) return '#ff8c00';
+    if (nameLower.includes('yellow') || nameLower.includes('mustard')) return '#ffd700';
+
+    // Cool colors
+    if (nameLower.includes('green') || nameLower.includes('forest')) return '#228b22';
+    if (nameLower.includes('teal') || nameLower.includes('turquoise')) return '#008080';
+    if (nameLower.includes('purple') || nameLower.includes('violet')) return '#800080';
+    if (nameLower.includes('pink') || nameLower.includes('rose')) return '#ff69b4';
+
+    // Pastels
+    if (nameLower.includes('pastel')) return '#f0e8e8';
+    if (nameLower.includes('mint')) return '#98ff98';
+    if (nameLower.includes('lavender')) return '#e6e6fa';
+
+    // Default - neutral dark gray
+    return '#333333';
   };
 
   // ═══════════════════════════════════════════════════════════

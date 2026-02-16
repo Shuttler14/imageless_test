@@ -85,6 +85,9 @@
 
   <script src="{{ "application.js" | asset_url }}" defer ></script>
   
+  {% comment %} 3D Avatar Visualizer - Load as ES Module {% endcomment %}
+  <script type="module" src="{{ 'MN-3d-visualizer.js' | asset_url }}"></script>
+  
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" media="print" onload="this.media='all'">
   
   {% comment %} Analytics - Defer content square to not block LCP {% endcomment %}
