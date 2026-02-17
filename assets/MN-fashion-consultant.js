@@ -1073,7 +1073,6 @@ const MNAIStylist = (() => {
           </p>
         </div>
 
-        <!-- Photo Upload Section -->
         <div class="mn-closet-upload">
           <label for="closet-photos" class="mn-upload-area" id="upload-area">
             <div class="mn-upload-icon">📸</div>
@@ -1094,7 +1093,6 @@ const MNAIStylist = (() => {
           <span>or use Ghost Mode</span>
         </div>
 
-        <!-- Ghost Mode: Quick Picks -->
         <div class="mn-ghost-mode">
           <div class="mn-ghost-category" data-category="tops">
             <h4 class="mn-ghost-label">👕 Tops</h4>
@@ -1149,7 +1147,6 @@ const MNAIStylist = (() => {
             </div>
           </div>
 
-          <!-- Custom Input -->
           <div class="mn-custom-item-input">
             <input type="text" 
                    id="custom-item" 
@@ -1159,7 +1156,6 @@ const MNAIStylist = (() => {
           </div>
         </div>
 
-        <!-- Selected Items Display -->
         <div class="mn-selected-closet" id="selected-closet">
           <h4 class="mn-ghost-label">
             Your Items 
@@ -1371,6 +1367,15 @@ const MNAIStylist = (() => {
     const ownedItems = categorized.filter(item => item.owned);
     const archetypeName = profile.archetype?.name || profile.coreExpression;
 
+    // ═══════════════════════════════════════════════════════════
+    // VISUALIZATION LOGIC: 3D or FLUX
+    // ═══════════════════════════════════════════════════════════
+    
+    // Construct Prompt for FLUX (Fallback/Enhancement)
+    const missingDesc = missingItems.map(i => i.name).join(", ");
+    const gender = state.identity.gender || 'person'; 
+    const fluxPrompt = `A photorealistic shot of an Indian ${gender} (${profile.build} build, ${profile.skinTone} skin) wearing ${missingDesc}. Cinematic lighting, high fashion street style.`;
+
     const html = `
       <div class="mn-avatar-results mn-fade-in">
         <button class="mn-back-btn" id="btn-back">← Back</button>
@@ -1384,16 +1389,23 @@ const MNAIStylist = (() => {
           </p>
         </div>
 
-        <!-- Avatar Visual -->
-        <div class="mn-avatar-container" style="position: relative; margin-bottom: 24px;">
-          <div id="mn-3d-canvas" style="width: 100%; height: 450px; background: radial-gradient(circle, #2a2a2a, #000); border-radius: 12px; overflow: hidden;">
-            <div style="display:flex;align-items:center;justify-content:center;height:100%;color:#555;">
-              <p>Loading 3D preview...</p>
-            </div>
+        <div class="mn-avatar-container" style="position: relative; min-height: 400px; background: radial-gradient(circle, #2a2a2a, #000); border-radius: 12px; overflow: hidden; margin-bottom: 24px;">
+          
+          <div id="mn-3d-canvas" style="width: 100%; height: 450px; position:absolute; top:0; left:0; z-index:1;"></div>
+          
+          <div id="mn-flux-canvas" style="width: 100%; height: 450px; position:absolute; top:0; left:0; z-index:2; display:flex; align-items:center; justify-content:center; flex-direction:column; pointer-events:none;">
+             <div style="pointer-events:auto; text-align:center; background:rgba(0,0,0,0.4); padding:20px; border-radius:16px; backdrop-filter:blur(4px);">
+                <p style="color:#fff; font-size:12px; margin-bottom:12px;">Want to see this exact vibe?</p>
+                <button class="mn-btn-primary" 
+                  onclick="window.generateFluxLook('${fluxPrompt.replace(/'/g, "\\'")}', 'mn-flux-canvas')"
+                  style="padding:8px 16px; font-size:11px;">
+                  ✨ VISUALIZE STYLE
+                </button>
+             </div>
           </div>
+
         </div>
 
-        <!-- Item Cards -->
         <div class="mn-outfit-items">
           ${categorized.map(item => `
             <div class="mn-outfit-item ${item.owned ? 'owned' : 'missing'}">
@@ -1407,12 +1419,10 @@ const MNAIStylist = (() => {
           `).join('')}
         </div>
 
-        <!-- AI Direction -->
         <div class="mn-direction-card">
           <p class="mn-direction-text">"${recommendations.direction}"</p>
         </div>
 
-        <!-- Color Science Note -->
         ${recommendations.color_science ? `
           <div class="mn-color-science">
             <h4>🎨 Why These Colors Work On You</h4>
@@ -1420,7 +1430,6 @@ const MNAIStylist = (() => {
           </div>
         ` : ''}
 
-        <!-- Styling Tips -->
         ${recommendations.styling_tips?.length ? `
           <div class="mn-tips-section">
             <h4>💡 Styling Tips</h4>
@@ -1432,7 +1441,6 @@ const MNAIStylist = (() => {
           </div>
         ` : ''}
 
-        <!-- Missing Items → Shopping -->
         ${missingItems.length > 0 ? `
           <div class="mn-shopping-section">
             <h4>🛒 Complete This Look</h4>
@@ -1469,7 +1477,6 @@ const MNAIStylist = (() => {
           </div>
         `}
 
-        <!-- Action Bar -->
         <div class="mn-action-bar mn-action-bar-grid">
           <button id="btn-regenerate" class="mn-btn-secondary">
             🔄 Different Look
@@ -1483,7 +1490,7 @@ const MNAIStylist = (() => {
 
     DOM.container.innerHTML = html;
 
-    // 🚀 INITIALIZE 3D VISUALIZER
+    // 🚀 INITIALIZE 3D VISUALIZER (Background Layer)
     setTimeout(() => {
       const canvas = document.getElementById('mn-3d-canvas');
       if (window.MNVisualizer) {
@@ -1514,22 +1521,6 @@ const MNAIStylist = (() => {
           console.log('✅ 3D Visualizer initialized successfully');
         } catch (error) {
           console.error('❌ 3D Visualizer failed:', error);
-          if (canvas) {
-            canvas.innerHTML = `
-              <div style="display:flex;align-items:center;justify-content:center;height:100%;color:#888;flex-direction:column;gap:8px;">
-                <p style="font-size:14px;">⚠️ 3D preview unavailable</p>
-                <p style="font-size:11px;opacity:0.6;">Outfit details shown below</p>
-              </div>`;
-          }
-        }
-      } else {
-        console.warn('⚠️ MNVisualizer not loaded — showing fallback');
-        if (canvas) {
-          canvas.innerHTML = `
-            <div style="display:flex;align-items:center;justify-content:center;height:100%;color:#888;flex-direction:column;gap:8px;">
-              <p style="font-size:14px;">⚠️ 3D preview loading failed</p>
-              <p style="font-size:11px;opacity:0.6;">Outfit details shown below</p>
-            </div>`;
         }
       }
     }, 300);
@@ -1676,6 +1667,7 @@ const MNAIStylist = (() => {
 
       // ═══════════════════════════════════════════
       // Save BOTH direction AND context so the slogans page can use them
+      // ═══════════════════════════════════════════
       localStorage.setItem(CONTEXT_KEY, JSON.stringify({
         direction: recommendations.direction,
         suggestions: recommendations.suggestions,
@@ -1920,10 +1912,64 @@ const MNAIStylist = (() => {
     expandWidget,
     minimizeWidget,
     clearIdentity,
-    selectSlogan // <--- ADD THIS LINE
+    selectSlogan
   };
 
+
 })();
+
+// ═══════════════════════════════════════════════════════════
+// NEW HELPER - GENERATE FLUX LOOK
+// Added manually for Virtual Try-On Integration
+// ═══════════════════════════════════════════════════════════
+window.generateFluxLook = async (prompt, containerId) => {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  // 1. Show Loading State
+  container.style.pointerEvents = 'none'; // Disable multiple clicks
+  container.innerHTML = `
+    <div style="background:rgba(0,0,0,0.8); padding:20px; border-radius:12px; text-align:center;">
+      <div class="mn-spinner"></div>
+      <p style="color:#fff; font-size:12px; margin-top:10px;">AI is styling this look...</p>
+    </div>
+  `;
+
+  try {
+    // 2. Call Your New API
+    const res = await fetch("https://mynarrative-ai.vercel.app/api/virtual_try_on", {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        mode: 'flux',
+        prompt: prompt
+      })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      // 3. Render Result - Replacing the entire container content with the image
+      // Note: We traverse up to the main avatar container if possible, or just replace inner content
+      const displayContainer = container.parentElement.id === 'mn-avatar-container' ? container.parentElement : container;
+      
+      displayContainer.innerHTML = `
+        <img src="${data.image}" style="width:100%; height:100%; object-fit:cover; border-radius:12px; animation: mnFadeIn 1s;">
+        <div style="position:absolute; bottom:10px; right:10px; background:rgba(0,0,0,0.6); color:#fff; font-size:10px; padding:4px 8px; border-radius:4px;">✨ AI Generated Vibe</div>
+      `;
+    } else {
+      throw new Error(data.error || "Generation failed");
+    }
+  } catch (e) {
+    console.error("Flux Error:", e);
+    container.innerHTML = `
+      <div style="text-align:center; padding:20px; color:#ff6b6b; background:rgba(0,0,0,0.8); border-radius:12px;">
+        <p>Could not generate look.</p>
+        <button class="mn-btn-secondary" onclick="window.generateFluxLook('${prompt.replace(/'/g, "\\'")}', '${containerId}')" style="margin-top:10px; font-size:11px;">Try Again</button>
+      </div>
+    `;
+  }
+};
 
 // ═══════════════════════════════════════════════════════════
 // AUTO-INITIALIZE ON DOM READY
