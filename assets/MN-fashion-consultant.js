@@ -10,7 +10,6 @@ const MNAIStylist = (() => {
   // CONFIGURATION
   // ═══════════════════════════════════════════════════════════
 
-  // Use centralized config
   const CONFIG = window.MNConfig || {
     STORAGE: {
       CORE_IDENTITY: 'mn_core_identity',
@@ -20,7 +19,6 @@ const MNAIStylist = (() => {
       ANIMATION_DURATION: 400
     },
     API: {
-      // Replace with your Vercel deployment URL
       FASHION_CONSULTANT_API: window.MN_CONFIG?.apiUrl || 'https://mynarrative-ai.vercel.app/api/fashion_consultant'
     },
     NETWORK: {
@@ -47,7 +45,7 @@ const MNAIStylist = (() => {
   };
 
   // ═══════════════════════════════════════════════════════════
-  // DATA: CALIBRATION QUESTIONS (Phase 1)
+  // DATA: CALIBRATION QUESTIONS
   // ═══════════════════════════════════════════════════════════
 
   const CALIBRATION_FLOW = [
@@ -108,7 +106,7 @@ const MNAIStylist = (() => {
   ];
 
   // ═══════════════════════════════════════════════════════════
-  // ARCHETYPE MAP (Post-Calibration Identity Derivation)
+  // ARCHETYPE MAP
   // ═══════════════════════════════════════════════════════════
 
   const ARCHETYPE_MAP = {
@@ -153,12 +151,10 @@ const MNAIStylist = (() => {
   const deriveArchetype = (calibration) => {
     const key = `${calibration.coreExpression}|${calibration.presence}|${calibration.signal}`;
     if (ARCHETYPE_MAP[key]) return ARCHETYPE_MAP[key];
-    // Fuzzy match: find closest by matching at least the coreExpression
     const expr = calibration.coreExpression;
     for (const [mapKey, archetype] of Object.entries(ARCHETYPE_MAP)) {
       if (mapKey.startsWith(expr)) return archetype;
     }
-    // Default fallback
     return {
       name: 'The Original',
       tagline: "Your style writes its own rules.",
@@ -168,7 +164,7 @@ const MNAIStylist = (() => {
   };
 
   // ═══════════════════════════════════════════════════════════
-  // DATA: SILHOUETTE OPTIONS (Phase 2A — Body Data)
+  // DATA: SILHOUETTE & LIFESTYLE
   // ═══════════════════════════════════════════════════════════
 
   const SILHOUETTE_OPTIONS = {
@@ -182,10 +178,6 @@ const MNAIStylist = (() => {
       { id: 'heavy', label: 'Heavy', icon: '▊', description: 'Full, solid build' }
     ]
   };
-
-  // ═══════════════════════════════════════════════════════════
-  // DATA: TONE OPTIONS (Phase 2B — Skin & Undertone)
-  // ═══════════════════════════════════════════════════════════
 
   const TONE_OPTIONS = {
     skinTones: [
@@ -201,10 +193,6 @@ const MNAIStylist = (() => {
       { id: 'neutral', label: '✨ Both work equally', value: 'neutral' }
     ]
   };
-
-  // ═══════════════════════════════════════════════════════════
-  // DATA: LIFESTYLE OPTIONS (Phase 2C — Region, Climate, Budget)
-  // ═══════════════════════════════════════════════════════════
 
   const LIFESTYLE_OPTIONS = {
     regions: [
@@ -228,10 +216,6 @@ const MNAIStylist = (() => {
       { id: 'luxury', label: '₹10,000+', range: [10000, 999999] }
     ]
   };
-
-  // ═══════════════════════════════════════════════════════════
-  // DATA: GHOST MODE CLOSET ITEMS (Phase 3)
-  // ═══════════════════════════════════════════════════════════
 
   const GHOST_MODE_ITEMS = {
     tops: [
@@ -261,10 +245,6 @@ const MNAIStylist = (() => {
     ]
   };
 
-  // ═══════════════════════════════════════════════════════════
-  // HELPER: Has Body Data? (Determines returning-user shortcut)
-  // ═══════════════════════════════════════════════════════════
-
   const hasBodyData = () => {
     return state.identity &&
       state.identity.height &&
@@ -275,10 +255,6 @@ const MNAIStylist = (() => {
       state.identity.climate &&
       state.identity.budget;
   };
-
-  // ═══════════════════════════════════════════════════════════
-  // DATA: CONTEXT OPTIONS (Phase 2)
-  // ═══════════════════════════════════════════════════════════
 
   const CONTEXT_DATA = {
     selfContexts: [
@@ -312,10 +288,6 @@ const MNAIStylist = (() => {
     ]
   };
 
-  // ═══════════════════════════════════════════════════════════
-  // DOM REFERENCES
-  // ═══════════════════════════════════════════════════════════
-
   const DOM = {};
 
   // ═══════════════════════════════════════════════════════════
@@ -326,9 +298,7 @@ const MNAIStylist = (() => {
     cacheDOM();
     bindEvents();
     loadIdentityFromStorage();
-
     console.log('🎨 MY NARRATIVE AI Stylist Initialized');
-    console.log('💾 Identity Found:', state.identity ? 'Yes (Returning User)' : 'No (New User)');
   };
 
   const cacheDOM = () => {
@@ -338,39 +308,25 @@ const MNAIStylist = (() => {
     DOM.minimizeBtn = document.getElementById('mn-minimize-btn');
     DOM.container = document.getElementById('mn-content-container');
     DOM.progressBar = document.getElementById('mn-progress-bar');
-    DOM.progressFill = null;
   };
 
   const bindEvents = () => {
     DOM.minimized.addEventListener('click', expandWidget);
     DOM.minimizeBtn.addEventListener('click', minimizeWidget);
-
     DOM.expanded.addEventListener('click', (e) => {
-      if (e.target === DOM.expanded) {
-        minimizeWidget();
-      }
+      if (e.target === DOM.expanded) minimizeWidget();
     });
-
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && state.isExpanded) {
-        minimizeWidget();
-      }
+      if (e.key === 'Escape' && state.isExpanded) minimizeWidget();
     });
   };
 
-  // ═══════════════════════════════════════════════════════════
-  // PROGRESS BAR UTILITY
-  // ═══════════════════════════════════════════════════════════
-
   const updateProgressBar = (percentage) => {
     if (!DOM.progressBar) return;
-
     if (percentage > 0) {
       DOM.progressBar.classList.add('active');
       const progressFill = DOM.progressBar.querySelector('.mn-progress-fill');
-      if (progressFill) {
-        progressFill.style.width = `${percentage}%`;
-      }
+      if (progressFill) progressFill.style.width = `${percentage}%`;
     } else {
       DOM.progressBar.classList.remove('active');
     }
@@ -385,13 +341,10 @@ const MNAIStylist = (() => {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         state.identity = JSON.parse(stored);
-        // Migration: derive archetype if missing (old schema)
         if (state.identity.coreExpression && !state.identity.archetype) {
           state.identity.archetype = deriveArchetype(state.identity);
           localStorage.setItem(STORAGE_KEY, JSON.stringify(state.identity));
-          console.log('🔄 Migrated identity with archetype:', state.identity.archetype);
         }
-        console.log('✅ Identity loaded:', state.identity);
       }
     } catch (error) {
       console.error('❌ Error loading identity:', error);
@@ -403,7 +356,6 @@ const MNAIStylist = (() => {
     try {
       state.identity = { ...state.tempCalibration };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state.identity));
-      console.log('💾 Identity saved:', state.identity);
     } catch (error) {
       console.error('❌ Error saving identity:', error);
     }
@@ -414,7 +366,6 @@ const MNAIStylist = (() => {
     state.identity = null;
     state.tempCalibration = {};
     state.dataCollection = {};
-    console.log('🗑️ Identity cleared');
   };
 
   // ═══════════════════════════════════════════════════════════
@@ -425,23 +376,14 @@ const MNAIStylist = (() => {
     state.isExpanded = true;
     DOM.widget.classList.add('is-expanded');
     DOM.expanded.setAttribute('aria-hidden', 'false');
-
-    setTimeout(() => {
-      DOM.expanded.style.animation = 'fadeIn 0.4s ease-out';
-    }, 10);
-
-    if (!state.identity) {
-      renderWelcomeScreen();
-    } else {
-      renderContextDashboard();
-    }
+    setTimeout(() => { DOM.expanded.style.animation = 'fadeIn 0.4s ease-out'; }, 10);
+    if (!state.identity) renderWelcomeScreen();
+    else renderContextDashboard();
   };
 
   const minimizeWidget = () => {
     state.isExpanded = false;
-
     DOM.expanded.style.animation = 'fadeOut 0.3s ease-out';
-
     setTimeout(() => {
       DOM.widget.classList.remove('is-expanded');
       DOM.expanded.setAttribute('aria-hidden', 'true');
@@ -452,49 +394,34 @@ const MNAIStylist = (() => {
   };
 
   // ═══════════════════════════════════════════════════════════
-  // WELCOME SCREEN (First-Time Users)
+  // WELCOME SCREEN
   // ═══════════════════════════════════════════════════════════
 
   const renderWelcomeScreen = () => {
     updateProgressBar(0);
-
     const html = `
       <div class="mn-welcome-screen mn-fade-in">
         <div class="mn-welcome-header">
           <h1 class="mn-welcome-title">Welcome to MY NARRATIVE</h1>
-          <p class="mn-welcome-subtitle">
-            Your AI Fashion Consultant that understands your unique style identity.
-            <br>Let's discover who you are, so we can design what you wear.
-          </p>
+          <p class="mn-welcome-subtitle">Your AI Fashion Consultant that understands your unique style identity.<br>Let's discover who you are, so we can design what you wear.</p>
         </div>
-        
         <div class="mn-welcome-content">
           <div class="mn-welcome-icon">✨</div>
-          <p class="mn-welcome-description">
-            This journey takes 3 minutes.<br>
-            But what you discover will change how you dress forever.
-          </p>
-          <button id="btn-start-journey" class="mn-btn-primary">
-            Begin Your Style Journey →
-          </button>
+          <p class="mn-welcome-description">This journey takes 3 minutes.<br>But what you discover will change how you dress forever.</p>
+          <button id="btn-start-journey" class="mn-btn-primary">Begin Your Style Journey →</button>
         </div>
       </div>
     `;
-
     DOM.container.innerHTML = html;
-
-    document.getElementById('btn-start-journey').addEventListener('click', () => {
-      renderCalibrationFlow(0);
-    });
+    document.getElementById('btn-start-journey').addEventListener('click', () => renderCalibrationFlow(0));
   };
 
   // ═══════════════════════════════════════════════════════════
-  // PHASE 1: IDENTITY CALIBRATION (First-Time Users)
+  // CALIBRATION FLOW
   // ═══════════════════════════════════════════════════════════
 
   const renderCalibrationFlow = (stepIndex) => {
     const step = CALIBRATION_FLOW[stepIndex];
-
     const progress = ((stepIndex + 1) / CALIBRATION_FLOW.length) * 100;
     updateProgressBar(progress);
 
@@ -511,17 +438,14 @@ const MNAIStylist = (() => {
     const html = `
       <div class="mn-calibration-step mn-fade-in">
         ${stepIndex > 0 ? '<button class="mn-back-btn" id="btn-back-cal">← Back</button>' : ''}
-        
         <div class="mn-progress-text">
           <span class="mn-step-label">${step.label}</span>
           <span class="mn-step-progress">Step ${stepIndex + 1} of ${CALIBRATION_FLOW.length}</span>
         </div>
-        
         <div class="mn-step-header">
           <h2 class="mn-context-heading">${step.question}</h2>
           <p class="mn-context-subtitle">"${step.subtitle}"</p>
         </div>
-        
         <div class="mn-chip-grid">
           ${step.options.map((option, idx) => `
             <button class="mn-chip" data-value="${option.value}" style="animation-delay: ${idx * 0.05}s">
@@ -538,22 +462,12 @@ const MNAIStylist = (() => {
     DOM.container.querySelectorAll('.mn-chip').forEach(btn => {
       btn.addEventListener('click', () => {
         if (btn.classList.contains('selected')) return;
-
         state.tempCalibration[step.id] = btn.dataset.value;
-
         btn.classList.add('active');
-
-        DOM.container.querySelectorAll('.mn-chip').forEach(b => {
-          if (b !== btn) {
-            b.style.opacity = '0.3';
-            b.style.pointerEvents = 'none';
-          }
-        });
-
+        DOM.container.querySelectorAll('.mn-chip').forEach(b => { if (b !== btn) { b.style.opacity = '0.3'; b.style.pointerEvents = 'none'; } });
         setTimeout(() => {
           DOM.container.style.opacity = '0';
           DOM.container.style.transform = 'translateY(-20px)';
-
           setTimeout(() => {
             DOM.container.style.opacity = '1';
             DOM.container.style.transform = 'translateY(0)';
@@ -563,57 +477,43 @@ const MNAIStylist = (() => {
       });
     });
 
-    // Back button handler
-    if (stepIndex > 0) {
-      document.getElementById('btn-back-cal')?.addEventListener('click', () => {
-        renderCalibrationFlow(stepIndex - 1);
-      });
-    }
+    if (stepIndex > 0) document.getElementById('btn-back-cal')?.addEventListener('click', () => renderCalibrationFlow(stepIndex - 1));
   };
 
   // ═══════════════════════════════════════════════════════════
-  // PHASE 2: CONTEXT DASHBOARD (Returning Users)
+  // CONTEXT DASHBOARD
   // ═══════════════════════════════════════════════════════════
 
   const renderContextDashboard = () => {
     updateProgressBar(0);
-
     const html = `
       <div class="mn-dashboard mn-fade-in">
-        
         <div class="mn-identity-bar">
           <div class="mn-identity-info">
             <span class="mn-identity-dot"></span>
             <span class="mn-identity-label">Identity Profile:</span>
             <span class="mn-identity-value">${state.identity.coreExpression}</span>
           </div>
-          <button id="mn-recalibrate-btn" class="mn-text-link">
-            🔄 Recalibrate
-          </button>
+          <button id="mn-recalibrate-btn" class="mn-text-link">🔄 Recalibrate</button>
         </div>
-
         <h2 class="mn-dashboard-title">Welcome back.</h2>
         <p class="mn-dashboard-subtitle">Who are you designing for today?</p>
-
         <div class="mn-mode-grid">
           <button id="btn-mode-self" class="mn-mode-card" style="animation-delay: 0.1s">
             <div class="mn-mode-icon">👤</div>
             <div class="mn-mode-title">Designing for Myself</div>
             <div class="mn-mode-description">Get personalized outfit recommendations</div>
           </button>
-          
           <button id="btn-mode-gift" class="mn-mode-card" style="animation-delay: 0.2s">
             <div class="mn-mode-icon">🎁</div>
             <div class="mn-mode-title">Gift for Someone</div>
             <div class="mn-mode-description">Find the perfect style for them</div>
           </button>
         </div>
-
       </div>
     `;
 
     DOM.container.innerHTML = html;
-
     DOM.container.style.opacity = '1';
     DOM.container.style.transform = 'translateY(0)';
 
@@ -628,20 +528,17 @@ const MNAIStylist = (() => {
   };
 
   // ═══════════════════════════════════════════════════════════
-  // PATH A: DESIGNING FOR MYSELF
+  // SELF CONTEXT
   // ═══════════════════════════════════════════════════════════
 
   const renderSelfContext = () => {
     const html = `
       <div class="mn-context-flow mn-fade-in">
-        
         <button class="mn-back-btn" id="btn-back">← Back</button>
-
         <div class="mn-step-header">
           <h3 class="mn-context-heading">What's the occasion?</h3>
           <p class="mn-context-subtitle">"Context shapes everything"</p>
         </div>
-
         <div class="mn-chip-grid" id="context-chips">
           ${CONTEXT_DATA.selfContexts.map(ctx => `
             <button class="mn-chip" data-value="${ctx.value}">
@@ -650,39 +547,29 @@ const MNAIStylist = (() => {
             </button>
           `).join('')}
         </div>
-
         <div id="loudness-section" class="mn-loudness-section" style="display: none;">
           <div class="mn-step-header" style="margin-top: 40px;">
             <h3 class="mn-context-heading" style="font-size: 24px;">How loud do you want to be?</h3>
           </div>
-          
           <div class="mn-chip-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
             <button class="mn-chip" data-loudness="Subtle">
-              <span class="mn-chip-label">Subtle</span>
-              <span class="mn-chip-description">Whisper, don't shout</span>
+              <span class="mn-chip-label">Subtle</span><span class="mn-chip-description">Whisper, don't shout</span>
             </button>
             <button class="mn-chip" data-loudness="Balanced">
-              <span class="mn-chip-label">Balanced</span>
-              <span class="mn-chip-description">Present but not loud</span>
+              <span class="mn-chip-label">Balanced</span><span class="mn-chip-description">Present but not loud</span>
             </button>
             <button class="mn-chip" data-loudness="Statement">
-              <span class="mn-chip-label">Statement</span>
-              <span class="mn-chip-description">Bold and memorable</span>
+              <span class="mn-chip-label">Statement</span><span class="mn-chip-description">Bold and memorable</span>
             </button>
           </div>
         </div>
-
         <div class="mn-action-bar">
-          <button id="btn-generate-self" class="mn-btn-primary" disabled>
-            Continue to Your Details →
-          </button>
+          <button id="btn-generate-self" class="mn-btn-primary" disabled>Continue to Your Details →</button>
         </div>
-
       </div>
     `;
 
     DOM.container.innerHTML = html;
-
     let selectedContext = null;
     let selectedLoudness = null;
 
@@ -691,14 +578,8 @@ const MNAIStylist = (() => {
         DOM.container.querySelectorAll('.mn-chip[data-value]').forEach(c => c.classList.remove('active'));
         chip.classList.add('active');
         selectedContext = chip.dataset.value;
-
-        // Show loudness section
         document.getElementById('loudness-section').style.display = 'block';
-
-        // Enable button if loudness is also selected
-        if (selectedLoudness) {
-          document.getElementById('btn-generate-self').disabled = false;
-        }
+        if (selectedLoudness) document.getElementById('btn-generate-self').disabled = false;
       });
     });
 
@@ -707,122 +588,73 @@ const MNAIStylist = (() => {
         DOM.container.querySelectorAll('.mn-chip[data-loudness]').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         selectedLoudness = btn.dataset.loudness;
-
-        // Enable button if context is also selected
-        if (selectedContext) {
-          document.getElementById('btn-generate-self').disabled = false;
-        }
+        if (selectedContext) document.getElementById('btn-generate-self').disabled = false;
       });
     });
 
     document.getElementById('btn-back').addEventListener('click', renderContextDashboard);
-
     document.getElementById('btn-generate-self').addEventListener('click', () => {
-      if (!selectedContext || !selectedLoudness) {
-        alert('⚠️ Please select both context and loudness level');
-        return;
-      }
-
-      state.currentContext = {
-        mode: 'self',
-        contexts: [selectedContext],
-        loudness: selectedLoudness
-      };
-
-      // Branch: first time → body data collection, returning → direct AI
-      if (hasBodyData()) {
-        generateAIRecommendations();
-      } else {
-        state.dataCollection = state.dataCollection || {};
-        renderSilhouetteStep();
-      }
+      if (!selectedContext || !selectedLoudness) return alert('⚠️ Please select both context and loudness level');
+      state.currentContext = { mode: 'self', contexts: [selectedContext], loudness: selectedLoudness };
+      if (hasBodyData()) generateAIRecommendations();
+      else { state.dataCollection = state.dataCollection || {}; renderSilhouetteStep(); }
     });
   };
 
   // ═══════════════════════════════════════════════════════════
-  // ARCHETYPE CARD (Vibe Lock — Post-Calibration)
+  // ARCHETYPE CARD
   // ═══════════════════════════════════════════════════════════
 
   const renderArchetypeCard = () => {
     const archetype = deriveArchetype(state.identity);
     state.identity.archetype = archetype;
-    // Re-save with archetype
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state.identity));
 
     const html = `
       <div class="mn-archetype-reveal mn-fade-in">
-        <div class="mn-step-header">
-          <h2 class="mn-context-heading">Your Style Archetype</h2>
-        </div>
-        
+        <div class="mn-step-header"><h2 class="mn-context-heading">Your Style Archetype</h2></div>
         <div class="mn-archetype-card mn-scale-in">
           <div class="mn-archetype-icon">${archetype.icon}</div>
           <h3 class="mn-archetype-name">${archetype.name}</h3>
-          
           <div class="mn-archetype-combo">
-            ${state.identity.coreExpression} ×<br>
-            ${state.identity.presence} ×<br>
-            ${state.identity.signal}
+            ${state.identity.coreExpression} ×<br>${state.identity.presence} ×<br>${state.identity.signal}
           </div>
-          
-          <div class="mn-archetype-tagline">
-            "${archetype.tagline}"
-          </div>
-          
+          <div class="mn-archetype-tagline">"${archetype.tagline}"</div>
           <div class="mn-archetype-palette">
-            ${archetype.palette.map(color =>
-      `<div class="mn-palette-swatch" style="background-color: ${color};"></div>`
-    ).join('')}
+            ${archetype.palette.map(color => `<div class="mn-palette-swatch" style="background-color: ${color};"></div>`).join('')}
           </div>
         </div>
-        
-        <div class="mn-action-bar">
-          <button id="btn-lock-identity" class="mn-btn-primary">
-            🔒 Lock This Identity
-          </button>
-        </div>
+        <div class="mn-action-bar"><button id="btn-lock-identity" class="mn-btn-primary">🔒 Lock This Identity</button></div>
       </div>
     `;
 
     DOM.container.innerHTML = html;
-
     document.getElementById('btn-lock-identity').addEventListener('click', () => {
-      renderTransition('✨ Identity Locked', () => {
-        renderContextDashboard();
-      });
+      renderTransition('✨ Identity Locked', () => renderContextDashboard());
     });
   };
 
   // ═══════════════════════════════════════════════════════════
-  // PHASE 2A: SILHOUETTE STEP (Height + Build)
+  // SILHOUETTE STEP
   // ═══════════════════════════════════════════════════════════
 
   const renderSilhouetteStep = () => {
     state.dataCollection = state.dataCollection || {};
-
     const html = `
       <div class="mn-silhouette-step mn-fade-in">
         <button class="mn-back-btn" id="btn-back">← Back</button>
-        
         <div class="mn-step-header">
           <h3 class="mn-context-heading">Your Silhouette</h3>
-          <p class="mn-context-subtitle">
-            "Clothes are architecture. Let's get your blueprint right."
-          </p>
+          <p class="mn-context-subtitle">"Clothes are architecture. Let's get your blueprint right."</p>
         </div>
-
         <div class="mn-height-selector">
           <label class="mn-input-label">How tall are you?</label>
           <div class="mn-height-visual">
             <div class="mn-silhouette-figure" id="silhouette-figure"></div>
-            <input type="range" 
-                   id="height-slider" 
-                   min="150" max="195" value="170" 
-                   class="mn-range-slider" />
+            <input type="range" id="height-slider" min="150" max="195" value="170" class="mn-range-slider" />
             <div class="mn-height-display" id="height-display">170 cm / 5'7"</div>
           </div>
         </div>
-
         <div class="mn-build-selector">
           <label class="mn-input-label">What's your build?</label>
           <div class="mn-build-grid">
@@ -834,40 +666,29 @@ const MNAIStylist = (() => {
             `).join('')}
           </div>
         </div>
-
-        <p class="mn-trust-note">
-          🔒 This helps us recommend cuts and proportions. Never shared.
-        </p>
-
-        <div class="mn-action-bar">
-          <button id="btn-next-tone" class="mn-btn-primary">Continue →</button>
-        </div>
+        <p class="mn-trust-note">🔒 This helps us recommend cuts and proportions. Never shared.</p>
+        <div class="mn-action-bar"><button id="btn-next-tone" class="mn-btn-primary">Continue →</button></div>
       </div>
     `;
 
     DOM.container.innerHTML = html;
 
-    // Height slider interaction
     const slider = document.getElementById('height-slider');
     const display = document.getElementById('height-display');
-
     slider.addEventListener('input', () => {
       const cm = parseInt(slider.value);
       const feet = Math.floor(cm / 30.48);
       const inches = Math.round((cm / 2.54) % 12);
       display.textContent = `${cm} cm / ${feet}'${inches}"`;
       state.dataCollection.height = cm;
-      // Animate silhouette figure height
       const figure = document.getElementById('silhouette-figure');
       const scale = 0.7 + ((cm - 150) / 45) * 0.6;
       figure.style.transform = `scaleY(${scale})`;
     });
 
-    // Build selection
     DOM.container.querySelectorAll('.mn-build-card').forEach(card => {
       card.addEventListener('click', () => {
-        DOM.container.querySelectorAll('.mn-build-card')
-          .forEach(c => c.classList.remove('active'));
+        DOM.container.querySelectorAll('.mn-build-card').forEach(c => c.classList.remove('active'));
         card.classList.add('active');
         state.dataCollection.build = card.dataset.build;
       });
@@ -875,82 +696,59 @@ const MNAIStylist = (() => {
 
     document.getElementById('btn-back').addEventListener('click', renderSelfContext);
     document.getElementById('btn-next-tone').addEventListener('click', () => {
-      if (!state.dataCollection.build) {
-        alert('Please select your build type');
-        return;
-      }
+      if (!state.dataCollection.build) return alert('Please select your build type');
       state.dataCollection.height = state.dataCollection.height || 170;
       renderToneStep();
     });
   };
 
   // ═══════════════════════════════════════════════════════════
-  // PHASE 2B: TONE STEP (Skin Tone + Undertone)
+  // TONE STEP
   // ═══════════════════════════════════════════════════════════
 
   const renderToneStep = () => {
     const html = `
       <div class="mn-tone-step mn-fade-in">
         <button class="mn-back-btn" id="btn-back">← Back</button>
-        
         <div class="mn-step-header">
           <h3 class="mn-context-heading">Your Palette</h3>
-          <p class="mn-context-subtitle">
-            "Every skin tells a story. Let's find the colors made for yours."
-          </p>
+          <p class="mn-context-subtitle">"Every skin tells a story. Let's find the colors made for yours."</p>
         </div>
-
         <div class="mn-tone-section">
           <label class="mn-input-label">Which feels closest to you?</label>
           <div class="mn-tone-swatches">
             ${TONE_OPTIONS.skinTones.map(tone => `
-              <button class="mn-tone-swatch" 
-                      data-tone="${tone.id}"
-                      style="background:${tone.color}; color:${tone.textColor}">
+              <button class="mn-tone-swatch" data-tone="${tone.id}" style="background:${tone.color}; color:${tone.textColor}">
                 <span class="mn-tone-label">${tone.label}</span>
               </button>
             `).join('')}
           </div>
         </div>
-
         <div class="mn-undertone-section">
           <label class="mn-input-label">Quick test — what jewelry makes you glow?</label>
           <div class="mn-undertone-options">
             ${TONE_OPTIONS.undertones.map(ut => `
-              <button class="mn-undertone-btn" data-undertone="${ut.value}">
-                ${ut.label}
-              </button>
+              <button class="mn-undertone-btn" data-undertone="${ut.value}">${ut.label}</button>
             `).join('')}
           </div>
         </div>
-
-        <p class="mn-trust-note">
-          🎨 This determines which color palettes will complement you naturally
-        </p>
-
-        <div class="mn-action-bar">
-          <button id="btn-next-lifestyle" class="mn-btn-primary">Continue →</button>
-        </div>
+        <div class="mn-action-bar"><button id="btn-next-lifestyle" class="mn-btn-primary">Continue →</button></div>
       </div>
     `;
 
     DOM.container.innerHTML = html;
 
-    // Tone selection
     DOM.container.querySelectorAll('.mn-tone-swatch').forEach(swatch => {
       swatch.addEventListener('click', () => {
-        DOM.container.querySelectorAll('.mn-tone-swatch')
-          .forEach(s => s.classList.remove('active'));
+        DOM.container.querySelectorAll('.mn-tone-swatch').forEach(s => s.classList.remove('active'));
         swatch.classList.add('active');
         state.dataCollection.skinTone = swatch.dataset.tone;
       });
     });
 
-    // Undertone selection
     DOM.container.querySelectorAll('.mn-undertone-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        DOM.container.querySelectorAll('.mn-undertone-btn')
-          .forEach(b => b.classList.remove('active'));
+        DOM.container.querySelectorAll('.mn-undertone-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         state.dataCollection.undertone = btn.dataset.undertone;
       });
@@ -958,82 +756,42 @@ const MNAIStylist = (() => {
 
     document.getElementById('btn-back').addEventListener('click', renderSilhouetteStep);
     document.getElementById('btn-next-lifestyle').addEventListener('click', () => {
-      if (!state.dataCollection.skinTone || !state.dataCollection.undertone) {
-        alert('Please complete both selections');
-        return;
-      }
+      if (!state.dataCollection.skinTone || !state.dataCollection.undertone) return alert('Please complete both selections');
       renderLifestyleStep();
     });
   };
 
   // ═══════════════════════════════════════════════════════════
-  // PHASE 2C: LIFESTYLE STEP (Region + Climate + Budget)
+  // LIFESTYLE STEP
   // ═══════════════════════════════════════════════════════════
 
   const renderLifestyleStep = () => {
     const html = `
       <div class="mn-lifestyle-step mn-fade-in">
         <button class="mn-back-btn" id="btn-back">← Back</button>
-        
         <div class="mn-step-header">
           <h3 class="mn-context-heading">Your World</h3>
-          <p class="mn-context-subtitle">
-            "Fashion lives in context. Let's understand yours."
-          </p>
+          <p class="mn-context-subtitle">"Fashion lives in context. Let's understand yours."</p>
         </div>
-
-        <div class="mn-lifestyle-section">
-          <label class="mn-input-label">Your style roots?</label>
-          <div class="mn-region-grid">
-            ${LIFESTYLE_OPTIONS.regions.map(r => `
-              <button class="mn-region-chip" data-region="${r.id}" 
-                      title="${r.context}">
-                ${r.emoji} ${r.label}
-              </button>
-            `).join('')}
-          </div>
+        <div class="mn-lifestyle-section"><label class="mn-input-label">Your style roots?</label>
+          <div class="mn-region-grid">${LIFESTYLE_OPTIONS.regions.map(r => `<button class="mn-region-chip" data-region="${r.id}" title="${r.context}">${r.emoji} ${r.label}</button>`).join('')}</div>
         </div>
-
-        <div class="mn-lifestyle-section">
-          <label class="mn-input-label">Your weather most days?</label>
-          <div class="mn-climate-grid">
-            ${LIFESTYLE_OPTIONS.climates.map(c => `
-              <button class="mn-climate-chip" data-climate="${c.id}">
-                ${c.label}
-              </button>
-            `).join('')}
-          </div>
+        <div class="mn-lifestyle-section"><label class="mn-input-label">Your weather most days?</label>
+          <div class="mn-climate-grid">${LIFESTYLE_OPTIONS.climates.map(c => `<button class="mn-climate-chip" data-climate="${c.id}">${c.label}</button>`).join('')}</div>
         </div>
-
-        <div class="mn-lifestyle-section">
-          <label class="mn-input-label">
-            Your comfort range for a single statement piece?
-          </label>
-          <div class="mn-budget-grid">
-            ${LIFESTYLE_OPTIONS.budgets.map(b => `
-              <button class="mn-budget-chip" data-budget="${b.id}">
-                ${b.label}
-              </button>
-            `).join('')}
-          </div>
+        <div class="mn-lifestyle-section"><label class="mn-input-label">Your comfort range for a single statement piece?</label>
+          <div class="mn-budget-grid">${LIFESTYLE_OPTIONS.budgets.map(b => `<button class="mn-budget-chip" data-budget="${b.id}">${b.label}</button>`).join('')}</div>
         </div>
-
-        <div class="mn-action-bar">
-          <button id="btn-next-closet" class="mn-btn-primary">
-            Almost there... →
-          </button>
-        </div>
+        <div class="mn-action-bar"><button id="btn-next-closet" class="mn-btn-primary">Almost there... →</button></div>
       </div>
     `;
 
     DOM.container.innerHTML = html;
 
-    // Single-select handlers for each group
     const setupSingleSelect = (selector, stateKey, dataAttr) => {
       DOM.container.querySelectorAll(selector).forEach(chip => {
         chip.addEventListener('click', () => {
-          DOM.container.querySelectorAll(selector)
-            .forEach(c => c.classList.remove('active'));
+          DOM.container.querySelectorAll(selector).forEach(c => c.classList.remove('active'));
           chip.classList.add('active');
           state.dataCollection[stateKey] = chip.dataset[dataAttr];
         });
@@ -1047,156 +805,74 @@ const MNAIStylist = (() => {
     document.getElementById('btn-back').addEventListener('click', renderToneStep);
     document.getElementById('btn-next-closet').addEventListener('click', () => {
       const { region, climate, budget } = state.dataCollection;
-      if (!region || !climate || !budget) {
-        alert('Please complete all three selections');
-        return;
-      }
+      if (!region || !climate || !budget) return alert('Please complete all three selections');
       renderClosetStep();
     });
   };
 
   // ═══════════════════════════════════════════════════════════
-  // PHASE 3: CLOSET STEP (Ghost Mode + Photo Upload)
+  // CLOSET STEP
   // ═══════════════════════════════════════════════════════════
 
   const renderClosetStep = () => {
     state.dataCollection.closet = state.dataCollection.closet || [];
-
     const html = `
       <div class="mn-closet-step mn-fade-in">
         <button class="mn-back-btn" id="btn-back">← Back</button>
-        
         <div class="mn-step-header">
           <h3 class="mn-context-heading">Your Closet</h3>
-          <p class="mn-context-subtitle">
-            "Show us what you already own. We'll build from there."
-          </p>
+          <p class="mn-context-subtitle">"Show us what you already own. We'll build from there."</p>
         </div>
-
         <div class="mn-closet-upload">
           <label for="closet-photos" class="mn-upload-area" id="upload-area">
             <div class="mn-upload-icon">📸</div>
             <div class="mn-upload-title">Snap Your Wardrobe</div>
-            <div class="mn-upload-subtitle">
-              Take photos — we auto-detect items
-            </div>
-            <input type="file" 
-                   id="closet-photos" 
-                   multiple 
-                   accept="image/*" 
-                   style="display:none" />
+            <div class="mn-upload-subtitle">Take photos — we auto-detect items</div>
+            <input type="file" id="closet-photos" multiple accept="image/*" style="display:none" />
           </label>
           <div id="upload-preview" class="mn-upload-preview"></div>
         </div>
-
-        <div class="mn-divider-text">
-          <span>or use Ghost Mode</span>
-        </div>
-
+        <div class="mn-divider-text"><span>or use Ghost Mode</span></div>
         <div class="mn-ghost-mode">
-          <div class="mn-ghost-category" data-category="tops">
-            <h4 class="mn-ghost-label">👕 Tops</h4>
-            <div class="mn-ghost-chips">
-              ${GHOST_MODE_ITEMS.tops.slice(0, 8).map(item => `
-                <button class="mn-ghost-chip" data-item="${item}">
-                  ${item}
-                </button>
-              `).join('')}
-              <button class="mn-ghost-more" data-category="tops">
-                +${GHOST_MODE_ITEMS.tops.length - 8} more
-              </button>
+          ${['tops', 'bottoms', 'footwear', 'accessories'].map(cat => `
+            <div class="mn-ghost-category" data-category="${cat}">
+              <h4 class="mn-ghost-label">${cat === 'tops' ? '👕 Tops' : cat === 'bottoms' ? '👖 Bottoms' : cat === 'footwear' ? '👟 Footwear' : '💎 Accessories'}</h4>
+              <div class="mn-ghost-chips">
+                ${GHOST_MODE_ITEMS[cat].slice(0, cat === 'tops' ? 8 : 6).map(item => `<button class="mn-ghost-chip" data-item="${item}">${item}</button>`).join('')}
+                ${cat === 'tops' || cat === 'bottoms' || cat === 'accessories' ? `<button class="mn-ghost-more" data-category="${cat}">+${GHOST_MODE_ITEMS[cat].length - (cat === 'tops' ? 8 : 6)} more</button>` : ''}
+              </div>
             </div>
-          </div>
-
-          <div class="mn-ghost-category" data-category="bottoms">
-            <h4 class="mn-ghost-label">👖 Bottoms</h4>
-            <div class="mn-ghost-chips">
-              ${GHOST_MODE_ITEMS.bottoms.slice(0, 6).map(item => `
-                <button class="mn-ghost-chip" data-item="${item}">
-                  ${item}
-                </button>
-              `).join('')}
-              <button class="mn-ghost-more" data-category="bottoms">
-                +${GHOST_MODE_ITEMS.bottoms.length - 6} more
-              </button>
-            </div>
-          </div>
-
-          <div class="mn-ghost-category" data-category="footwear">
-            <h4 class="mn-ghost-label">👟 Footwear</h4>
-            <div class="mn-ghost-chips">
-              ${GHOST_MODE_ITEMS.footwear.slice(0, 6).map(item => `
-                <button class="mn-ghost-chip" data-item="${item}">
-                  ${item}
-                </button>
-              `).join('')}
-            </div>
-          </div>
-
-          <div class="mn-ghost-category" data-category="accessories">
-            <h4 class="mn-ghost-label">💎 Accessories</h4>
-            <div class="mn-ghost-chips">
-              ${GHOST_MODE_ITEMS.accessories.slice(0, 6).map(item => `
-                <button class="mn-ghost-chip" data-item="${item}">
-                  ${item}
-                </button>
-              `).join('')}
-              <button class="mn-ghost-more" data-category="accessories">
-                +${GHOST_MODE_ITEMS.accessories.length - 6} more
-              </button>
-            </div>
-          </div>
-
+          `).join('')}
           <div class="mn-custom-item-input">
-            <input type="text" 
-                   id="custom-item" 
-                   class="mn-text-input" 
-                   placeholder="Or type: Maroon Kurta, Grey Joggers..." />
+            <input type="text" id="custom-item" class="mn-text-input" placeholder="Or type: Maroon Kurta, Grey Joggers..." />
             <button id="btn-add-custom" class="mn-btn-icon">+ Add</button>
           </div>
         </div>
-
         <div class="mn-selected-closet" id="selected-closet">
-          <h4 class="mn-ghost-label">
-            Your Items 
-            (<span id="closet-count">0</span>)
-          </h4>
+          <h4 class="mn-ghost-label">Your Items (<span id="closet-count">0</span>)</h4>
           <div class="mn-selected-items" id="selected-items"></div>
         </div>
-
         <div class="mn-action-bar">
-          <button id="btn-skip-closet" class="mn-btn-secondary">
-            Skip for now
-          </button>
-          <button id="btn-generate-final" class="mn-btn-primary" disabled>
-            ✨ Generate My Look
-          </button>
+          <button id="btn-skip-closet" class="mn-btn-secondary">Skip for now</button>
+          <button id="btn-generate-final" class="mn-btn-primary" disabled>✨ Generate My Look</button>
         </div>
       </div>
     `;
 
     DOM.container.innerHTML = html;
 
-    // Photo upload handler
     document.getElementById('closet-photos').addEventListener('change', handlePhotoUpload);
 
-    // Ghost mode chip selection (toggle)
     DOM.container.querySelectorAll('.mn-ghost-chip').forEach(chip => {
       chip.addEventListener('click', () => {
         const item = chip.dataset.item;
         chip.classList.toggle('active');
-
-        if (chip.classList.contains('active')) {
-          state.dataCollection.closet.push(item);
-        } else {
-          state.dataCollection.closet = state.dataCollection.closet
-            .filter(i => i !== item);
-        }
+        if (chip.classList.contains('active')) state.dataCollection.closet.push(item);
+        else state.dataCollection.closet = state.dataCollection.closet.filter(i => i !== item);
         updateClosetDisplay();
       });
     });
 
-    // Custom item input
     document.getElementById('btn-add-custom').addEventListener('click', () => {
       const input = document.getElementById('custom-item');
       const value = input.value.trim();
@@ -1208,21 +884,16 @@ const MNAIStylist = (() => {
       }
     });
 
-    // Enter key support
     document.getElementById('custom-item').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        document.getElementById('btn-add-custom').click();
-      }
+      if (e.key === 'Enter') document.getElementById('btn-add-custom').click();
     });
 
-    // "More" buttons
     DOM.container.querySelectorAll('.mn-ghost-more').forEach(btn => {
       btn.addEventListener('click', () => {
         const category = btn.dataset.category;
         const allItems = GHOST_MODE_ITEMS[category];
         const container = btn.parentElement;
         const sliceStart = category === 'tops' ? 8 : 6;
-
         btn.remove();
         allItems.slice(sliceStart).forEach(item => {
           const chip = document.createElement('button');
@@ -1231,12 +902,8 @@ const MNAIStylist = (() => {
           chip.textContent = item;
           chip.addEventListener('click', () => {
             chip.classList.toggle('active');
-            if (chip.classList.contains('active')) {
-              state.dataCollection.closet.push(item);
-            } else {
-              state.dataCollection.closet =
-                state.dataCollection.closet.filter(i => i !== item);
-            }
+            if (chip.classList.contains('active')) state.dataCollection.closet.push(item);
+            else state.dataCollection.closet = state.dataCollection.closet.filter(i => i !== item);
             updateClosetDisplay();
           });
           container.appendChild(chip);
@@ -1245,68 +912,45 @@ const MNAIStylist = (() => {
     });
 
     document.getElementById('btn-back').addEventListener('click', renderLifestyleStep);
-    document.getElementById('btn-skip-closet').addEventListener('click', () => {
-      saveAllDataAndGenerate();
-    });
-    document.getElementById('btn-generate-final').addEventListener('click', () => {
-      saveAllDataAndGenerate();
-    });
+    document.getElementById('btn-skip-closet').addEventListener('click', () => saveAllDataAndGenerate());
+    document.getElementById('btn-generate-final').addEventListener('click', () => saveAllDataAndGenerate());
   };
 
   const updateClosetDisplay = () => {
     const items = state.dataCollection.closet;
     const container = document.getElementById('selected-items');
-    const count = document.getElementById('closet-count');
-    const generateBtn = document.getElementById('btn-generate-final');
-
-    count.textContent = items.length;
-    generateBtn.disabled = items.length < 1;
-
+    document.getElementById('closet-count').textContent = items.length;
+    document.getElementById('btn-generate-final').disabled = items.length < 1;
     container.innerHTML = items.map(item => `
       <div class="mn-closet-item">
         <span>${item}</span>
         <button class="mn-remove-item" data-remove="${item}">✕</button>
       </div>
     `).join('');
-
-    // Remove item handlers
     container.querySelectorAll('.mn-remove-item').forEach(btn => {
       btn.addEventListener('click', () => {
         const item = btn.dataset.remove;
-        state.dataCollection.closet =
-          state.dataCollection.closet.filter(i => i !== item);
-        const chip = DOM.container
-          .querySelector(`.mn-ghost-chip[data-item="${item}"]`);
+        state.dataCollection.closet = state.dataCollection.closet.filter(i => i !== item);
+        const chip = DOM.container.querySelector(`.mn-ghost-chip[data-item="${item}"]`);
         if (chip) chip.classList.remove('active');
         updateClosetDisplay();
       });
     });
   };
 
-  // Photo upload handler (basic — will need ML backend)
   const handlePhotoUpload = (event) => {
     const files = event.target.files;
     const preview = document.getElementById('upload-preview');
-
     Array.from(files).forEach(file => {
       const reader = new FileReader();
       reader.onload = (e) => {
         const img = document.createElement('div');
         img.className = 'mn-upload-thumb mn-fade-in';
-        img.innerHTML = `
-          <img src="${e.target.result}" alt="Closet item" />
-          <div class="mn-upload-detecting">
-            <div class="mn-mini-spinner"></div>
-            Detecting...
-          </div>
-        `;
+        img.innerHTML = `<img src="${e.target.result}" alt="Closet item" /><div class="mn-upload-detecting"><div class="mn-mini-spinner"></div>Detecting...</div>`;
         preview.appendChild(img);
-
-        // Simulate AI detection (real version calls Vision API)
         setTimeout(() => {
           const detected = simulateClothingDetection(file.name);
-          img.querySelector('.mn-upload-detecting').innerHTML =
-            `✅ ${detected}`;
+          img.querySelector('.mn-upload-detecting').innerHTML = `✅ ${detected}`;
           state.dataCollection.closet.push(detected);
           updateClosetDisplay();
         }, 1500);
@@ -1316,62 +960,35 @@ const MNAIStylist = (() => {
   };
 
   const simulateClothingDetection = (filename) => {
-    const detections = [
-      'Blue Denim Shirt', 'Black T-Shirt', 'White Sneakers',
-      'Grey Hoodie', 'Navy Chinos', 'Brown Belt'
-    ];
+    const detections = ['Blue Denim Shirt', 'Black T-Shirt', 'White Sneakers', 'Grey Hoodie', 'Navy Chinos', 'Brown Belt'];
     return detections[Math.floor(Math.random() * detections.length)];
   };
 
-  // ═══════════════════════════════════════════════════════════
-  // PHASE 4: SAVE ALL DATA & GENERATE
-  // ═══════════════════════════════════════════════════════════
-
   const saveAllDataAndGenerate = () => {
-    // Merge calibration identity + body data into full profile
-    const fullProfile = {
-      ...state.identity,
-      ...state.dataCollection,
-      lastUpdated: Date.now()
-    };
-
-    // Save complete profile
+    const fullProfile = { ...state.identity, ...state.dataCollection, lastUpdated: Date.now() };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(fullProfile));
     state.identity = fullProfile;
-
     console.log('💾 Full profile saved:', fullProfile);
-
-    // Now generate with ALL data
     generateAIRecommendations();
   };
 
   // ═══════════════════════════════════════════════════════════
-  // PHASE 5: AVATAR RESULTS SCREEN
+  // PHASE 5: AVATAR RESULTS SCREEN (WITH FLUX INTEGRATION)
   // ═══════════════════════════════════════════════════════════
 
   const renderAvatarResults = (recommendations) => {
     const profile = state.identity;
     const closetItems = profile.closet || [];
-
-    // Determine which recommended items user owns vs needs to buy
     const outfitItems = recommendations.outfit_pieces || [];
     const categorized = outfitItems.map(item => ({
       ...item,
-      owned: closetItems.some(owned =>
-        owned.toLowerCase().includes(item.type?.toLowerCase() || '') ||
-        item.name.toLowerCase().includes(owned.toLowerCase())
-      )
+      owned: closetItems.some(owned => owned.toLowerCase().includes(item.type?.toLowerCase() || '') || item.name.toLowerCase().includes(owned.toLowerCase()))
     }));
 
     const missingItems = categorized.filter(item => !item.owned);
-    const ownedItems = categorized.filter(item => item.owned);
     const archetypeName = profile.archetype?.name || profile.coreExpression;
 
-    // ═══════════════════════════════════════════════════════════
-    // VISUALIZATION LOGIC: 3D or FLUX
-    // ═══════════════════════════════════════════════════════════
-    
-    // Construct Prompt for FLUX (Fallback/Enhancement)
+    // --- GAP 2 FIX: CONSTRUCT PROMPT FOR FLUX ---
     const missingDesc = missingItems.map(i => i.name).join(", ");
     const gender = state.identity.gender || 'person'; 
     const fluxPrompt = `A photorealistic shot of an Indian ${gender} (${profile.build} build, ${profile.skinTone} skin) wearing ${missingDesc}. Cinematic lighting, high fashion street style.`;
@@ -1379,14 +996,9 @@ const MNAIStylist = (() => {
     const html = `
       <div class="mn-avatar-results mn-fade-in">
         <button class="mn-back-btn" id="btn-back">← Back</button>
-        
         <div class="mn-results-header">
-          <h3 class="mn-results-title">
-            ✨ Your Look: "${state.currentContext.contexts?.[0] || 'Custom'}"
-          </h3>
-          <p class="mn-results-meta">
-            ${state.currentContext.loudness} • ${archetypeName} Archetype
-          </p>
+          <h3 class="mn-results-title">✨ Your Look: "${state.currentContext.contexts?.[0] || 'Custom'}"</h3>
+          <p class="mn-results-meta">${state.currentContext.loudness} • ${archetypeName} Archetype</p>
         </div>
 
         <div class="mn-avatar-container" style="position: relative; min-height: 400px; background: radial-gradient(circle, #2a2a2a, #000); border-radius: 12px; overflow: hidden; margin-bottom: 24px;">
@@ -1409,81 +1021,35 @@ const MNAIStylist = (() => {
         <div class="mn-outfit-items">
           ${categorized.map(item => `
             <div class="mn-outfit-item ${item.owned ? 'owned' : 'missing'}">
-              <div class="mn-item-preview" 
-                   style="background:${item.color || '#333'}"></div>
+              <div class="mn-item-preview" style="background:${item.color || '#333'}"></div>
               <div class="mn-item-name">${item.name}</div>
-              <div class="mn-item-status">
-                ${item.owned ? '✅ Owned' : '🔴 Shop'}
-              </div>
+              <div class="mn-item-status">${item.owned ? '✅ Owned' : '🔴 Shop'}</div>
             </div>
           `).join('')}
         </div>
 
-        <div class="mn-direction-card">
-          <p class="mn-direction-text">"${recommendations.direction}"</p>
-        </div>
-
-        ${recommendations.color_science ? `
-          <div class="mn-color-science">
-            <h4>🎨 Why These Colors Work On You</h4>
-            <p>${recommendations.color_science}</p>
-          </div>
-        ` : ''}
-
-        ${recommendations.styling_tips?.length ? `
-          <div class="mn-tips-section">
-            <h4>💡 Styling Tips</h4>
-            <ul class="mn-tips-list">
-              ${recommendations.styling_tips.map(tip => `
-                <li>${tip}</li>
-              `).join('')}
-            </ul>
-          </div>
-        ` : ''}
-
+        <div class="mn-direction-card"><p class="mn-direction-text">"${recommendations.direction}"</p></div>
+        ${recommendations.color_science ? `<div class="mn-color-science"><h4>🎨 Why These Colors Work On You</h4><p>${recommendations.color_science}</p></div>` : ''}
+        ${recommendations.styling_tips?.length ? `<div class="mn-tips-section"><h4>💡 Styling Tips</h4><ul class="mn-tips-list">${recommendations.styling_tips.map(tip => `<li>${tip}</li>`).join('')}</ul></div>` : ''}
+        
         ${missingItems.length > 0 ? `
           <div class="mn-shopping-section">
             <h4>🛒 Complete This Look</h4>
-            <p class="mn-shopping-subtitle">
-              Items you don't have yet 
-              (within your ${LIFESTYLE_OPTIONS.budgets
-          .find(b => b.id === profile.budget)?.label || 'selected'} range)
-            </p>
+            <p class="mn-shopping-subtitle">Items you don't have yet (within your ${LIFESTYLE_OPTIONS.budgets.find(b => b.id === profile.budget)?.label || 'selected'} range)</p>
             ${missingItems.map(item => `
               <div class="mn-shopping-card">
-                <div class="mn-shopping-item-info">
-                  <span class="mn-shopping-item-name">
-                    🔴 ${item.name}
-                  </span>
-                  <span class="mn-shopping-item-reason">
-                    ${item.why || 'Completes the look'}
-                  </span>
-                </div>
+                <div class="mn-shopping-item-info"><span class="mn-shopping-item-name">🔴 ${item.name}</span><span class="mn-shopping-item-reason">${item.why || 'Completes the look'}</span></div>
                 <div class="mn-shopping-links">
-                  ${(item.shop_links || []).map(link => `
-                    <a href="${link.url}" 
-                       target="_blank" 
-                       class="mn-shop-link">
-                      🛒 ${link.platform} ${link.price || ''}
-                    </a>
-                  `).join('')}
+                  ${(item.shop_links || []).map(link => `<a href="${link.url}" target="_blank" class="mn-shop-link">🛒 ${link.platform} ${link.price || ''}</a>`).join('')}
                 </div>
               </div>
             `).join('')}
           </div>
-        ` : `
-          <div class="mn-complete-badge">
-            ✅ You own everything needed for this look!
-          </div>
-        `}
+        ` : `<div class="mn-complete-badge">✅ You own everything needed for this look!</div>`}
 
         <div class="mn-action-bar mn-action-bar-grid">
-          <button id="btn-regenerate" class="mn-btn-secondary">
-            🔄 Different Look
-          </button>
-          <button id="btn-save-look" class="mn-btn-primary">
-            💾 Save This Look
-          </button>
+          <button id="btn-regenerate" class="mn-btn-secondary">🔄 Different Look</button>
+          <button id="btn-save-look" class="mn-btn-primary">💾 Save This Look</button>
         </div>
       </div>
     `;
@@ -1495,102 +1061,51 @@ const MNAIStylist = (() => {
       const canvas = document.getElementById('mn-3d-canvas');
       if (window.MNVisualizer) {
         try {
-          // 1. Init Scene
           window.MNVisualizer.init('mn-3d-canvas', {
             height: profile.height || 170,
             build: profile.build || 'regular',
             skinTone: profile.skinTone || 'wheatish'
           });
-
-          // 2. Apply Colors from Recommendations
           categorized.forEach(item => {
             const name = item.name.toLowerCase();
             const color = item.color || detectColorFromName(name);
-
-            if (item.slot === 'top' || name.includes('shirt') || name.includes('hoodie') || name.includes('jacket') || name.includes('sweater') || name.includes('kurta') || name.includes('tshirt') || name.includes('t-shirt')) {
-              window.MNVisualizer.updateOutfit('top', color);
-            }
-            if (item.slot === 'bottom' || name.includes('pant') || name.includes('chino') || name.includes('jeans') || name.includes('trouser') || name.includes('jogger') || name.includes('short')) {
-              window.MNVisualizer.updateOutfit('bottom', color);
-            }
-            if (item.slot === 'footwear' || name.includes('shoe') || name.includes('sneaker') || name.includes('boot') || name.includes('loafer') || name.includes('sandal')) {
-              window.MNVisualizer.updateOutfit('shoes', color);
-            }
+            if (item.slot === 'top' || name.includes('shirt') || name.includes('hoodie')) window.MNVisualizer.updateOutfit('top', color);
+            if (item.slot === 'bottom' || name.includes('pant') || name.includes('jeans')) window.MNVisualizer.updateOutfit('bottom', color);
+            if (item.slot === 'footwear' || name.includes('shoe') || name.includes('sneaker')) window.MNVisualizer.updateOutfit('shoes', color);
           });
-
-          console.log('✅ 3D Visualizer initialized successfully');
-        } catch (error) {
-          console.error('❌ 3D Visualizer failed:', error);
-        }
+        } catch (error) { console.error('❌ 3D Visualizer failed:', error); }
       }
     }, 300);
 
-    document.getElementById('btn-back')
-      .addEventListener('click', renderContextDashboard);
-    document.getElementById('btn-regenerate')
-      .addEventListener('click', generateAIRecommendations);
-    document.getElementById('btn-save-look')
-      .addEventListener('click', () => {
-        localStorage.setItem('mn_saved_looks', JSON.stringify({
-          recommendations,
-          context: state.currentContext,
-          timestamp: Date.now()
-        }));
-        alert('✅ Look saved!');
-      });
+    document.getElementById('btn-back').addEventListener('click', renderContextDashboard);
+    document.getElementById('btn-regenerate').addEventListener('click', generateAIRecommendations);
+    document.getElementById('btn-save-look').addEventListener('click', () => {
+      localStorage.setItem('mn_saved_looks', JSON.stringify({ recommendations, context: state.currentContext, timestamp: Date.now() }));
+      alert('✅ Look saved!');
+    });
   };
-
-  // ═══════════════════════════════════════════════════════════
-  // PATH B: DESIGNING FOR GIFT
-  // ═══════════════════════════════════════════════════════════
 
   const renderGiftContext = () => {
     const html = `
       <div class="mn-context-flow mn-fade-in">
-        
         <button class="mn-back-btn" id="btn-back">← Back</button>
-
         <h3 class="mn-context-heading">Who is this gift for?</h3>
         <div class="mn-context-chips" id="recipient-chips">
-          ${CONTEXT_DATA.recipients.map(rec => `
-            <button class="mn-context-chip mn-recipient-chip" data-value="${rec}">
-              ${rec}
-            </button>
-          `).join('')}
+          ${CONTEXT_DATA.recipients.map(rec => `<button class="mn-context-chip mn-recipient-chip" data-value="${rec}">${rec}</button>`).join('')}
         </div>
-
         <div class="mn-divider"></div>
-
         <h3 class="mn-context-heading">What's the occasion?</h3>
         <div class="mn-context-chips" id="occasion-chips">
-          ${CONTEXT_DATA.occasions.map(occ => `
-            <button class="mn-context-chip mn-occasion-chip" data-value="${occ}">
-              ${occ}
-            </button>
-          `).join('')}
+          ${CONTEXT_DATA.occasions.map(occ => `<button class="mn-context-chip mn-occasion-chip" data-value="${occ}">${occ}</button>`).join('')}
         </div>
-
         <div class="mn-divider"></div>
-
         <h3 class="mn-context-heading">Unspoken Message (Optional)</h3>
-        <input 
-          type="text" 
-          id="unspoken-message" 
-          class="mn-text-input" 
-          placeholder="What should this design say to them?"
-        />
-
-        <div class="mn-action-bar">
-          <button id="btn-generate-gift" class="mn-btn-primary">
-            ✨ Get AI Recommendations
-          </button>
-        </div>
-
+        <input type="text" id="unspoken-message" class="mn-text-input" placeholder="What should this design say to them?" />
+        <div class="mn-action-bar"><button id="btn-generate-gift" class="mn-btn-primary">✨ Get AI Recommendations</button></div>
       </div>
     `;
 
     DOM.container.innerHTML = html;
-
     let selectedRecipient = null;
     let selectedOccasion = null;
 
@@ -1611,323 +1126,134 @@ const MNAIStylist = (() => {
     });
 
     document.getElementById('btn-back').addEventListener('click', renderContextDashboard);
-
     document.getElementById('btn-generate-gift').addEventListener('click', () => {
-      if (!selectedRecipient || !selectedOccasion) {
-        alert('⚠️ Please select both recipient and occasion');
-        return;
-      }
-
-      const unspokenMessage = document.getElementById('unspoken-message').value;
-
-      state.currentContext = {
-        mode: 'gift',
-        recipient: selectedRecipient,
-        occasion: selectedOccasion,
-        unspoken: unspokenMessage
-      };
-
+      if (!selectedRecipient || !selectedOccasion) return alert('⚠️ Please select both recipient and occasion');
+      state.currentContext = { mode: 'gift', recipient: selectedRecipient, occasion: selectedOccasion, unspoken: document.getElementById('unspoken-message').value };
       generateAIRecommendations();
     });
   };
 
-  // ═══════════════════════════════════════════════════════════
-  // AI INTEGRATION
-  // ═══════════════════════════════════════════════════════════
-  // CHANGE 2: Cleaned up — single function, real URL, 
-  //           saves context for slogans page
-  // ═══════════════════════════════════════════════════════════
-
   const generateAIRecommendations = async () => {
-    // 1. Show Loading
     renderTransition('🧠 Baking Your Uniqueness...', () => { });
-
     try {
-      // 2. Call your Vercel backend
       const response = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          identity: state.identity,
-          currentContext: state.currentContext
-        })
+        body: JSON.stringify({ identity: state.identity, currentContext: state.currentContext })
       });
-
       if (!response.ok) throw new Error("Consultant Service Unavailable");
-
       const recommendations = await response.json();
-
-      // ═══════════════════════════════════════════
-      // CHANGE 3: Check for backend error in response
-      // ═══════════════════════════════════════════
-      if (recommendations.error) {
-        console.warn('⚠️ AI returned fallback:', recommendations.error);
-        // Still show the fallback recommendations — they're usable
-      }
-
-      // ═══════════════════════════════════════════
-      // Save BOTH direction AND context so the slogans page can use them
-      // ═══════════════════════════════════════════
-      localStorage.setItem(CONTEXT_KEY, JSON.stringify({
-        direction: recommendations.direction,
-        suggestions: recommendations.suggestions,
-        context: state.currentContext,
-        identity: state.identity,
-        mode: state.currentContext.mode,
-        timestamp: Date.now()
-      }));
-
-      // 4. Route to appropriate results screen
+      if (recommendations.error) console.warn('⚠️ AI returned fallback:', recommendations.error);
+      localStorage.setItem(CONTEXT_KEY, JSON.stringify({ direction: recommendations.direction, suggestions: recommendations.suggestions, context: state.currentContext, identity: state.identity, mode: state.currentContext.mode, timestamp: Date.now() }));
       const isGiftMode = state.currentContext?.mode === 'gift';
-      if (isGiftMode) {
-        renderResults(recommendations);
-      } else {
-        // Self mode: use enhanced avatar results if outfit_pieces exist
-        if (recommendations.outfit_pieces) {
-          renderAvatarResults(recommendations);
-        } else {
-          renderResults(recommendations);
-        }
+      if (isGiftMode) renderResults(recommendations);
+      else {
+        if (recommendations.outfit_pieces) renderAvatarResults(recommendations);
+        else renderResults(recommendations);
       }
-
     } catch (error) {
       console.error("AI Error:", error);
-
-      // ═══════════════════════════════════════════
-      // CHANGE 5: Better error UX — don't just alert
-      // ═══════════════════════════════════════════
       DOM.container.innerHTML = `
         <div class="mn-transition">
           <p class="mn-transition-text" style="color: #ff6b6b;">⚠️ AI Connection Failed</p>
           <p style="color: #888; font-size: 12px; margin-top: 10px;">${error.message}</p>
-          <button class="mn-btn-secondary" id="btn-retry" style="margin-top: 20px;">
-            🔄 Try Again
-          </button>
-          <button class="mn-btn-secondary" id="btn-back-err" style="margin-top: 10px;">
-            ← Go Back
-          </button>
+          <button class="mn-btn-secondary" id="btn-retry" style="margin-top: 20px;">🔄 Try Again</button>
+          <button class="mn-btn-secondary" id="btn-back-err" style="margin-top: 10px;">← Go Back</button>
         </div>
       `;
-
       document.getElementById('btn-retry').addEventListener('click', generateAIRecommendations);
       document.getElementById('btn-back-err').addEventListener('click', renderContextDashboard);
     }
   };
 
-  // ═══════════════════════════════════════════════════════════
-  // RESULTS DISPLAY (UPDATED FOR GIFT MODE)
-  // ═══════════════════════════════════════════════════════════
-
   const renderResults = (recommendations) => {
     const isGiftMode = state.currentContext?.mode === 'gift';
-
-    // 1. Dynamic Titles
     const title = isGiftMode ? "Choose Their Message" : "Your AI-Curated Direction";
     const subtitle = isGiftMode ? "We recommend the first one based on your profile." : `"${recommendations.direction}"`;
-
     let contentHtml = '';
 
-    // 2. Gift Mode: Slogan Cards
     if (isGiftMode) {
-      // Default the selected slogan to the first one (Recommended)
-      if (recommendations.suggestions?.length > 0) {
-        state.selectedSlogan = recommendations.suggestions[0];
-      }
-
+      if (recommendations.suggestions?.length > 0) state.selectedSlogan = recommendations.suggestions[0];
       contentHtml = `
         <div class="mn-slogan-grid">
           ${recommendations.suggestions.map((slogan, index) => `
-            <button class="mn-slogan-card ${index === 0 ? 'recommended active' : ''}" 
-                    onclick="MNAIStylist.selectSlogan(this, '${slogan.replace(/'/g, "\\'")}')">
-              
+            <button class="mn-slogan-card ${index === 0 ? 'recommended active' : ''}" onclick="MNAIStylist.selectSlogan(this, '${slogan.replace(/'/g, "\\'")}')">
               ${index === 0 ? '<div class="mn-badge-recommended">✨ RECOMMENDED</div>' : ''}
-              
-              <div class="mn-slogan-content">
-                <span class="mn-slogan-text">"${slogan}"</span>
-              </div>
+              <div class="mn-slogan-content"><span class="mn-slogan-text">"${slogan}"</span></div>
               <div class="mn-checkbox"></div>
             </button>
           `).join('')}
         </div>
-        
         ${recommendations.styling_tips ? `<p class="mn-tips-text">💡 <b>Stylist Tip:</b> ${recommendations.styling_tips[0]}</p>` : ''}
       `;
-    }
-    // 3. Self Mode: Visual Suggestions (Standard)
-    else {
+    } else {
       contentHtml = `
-        <div class="mn-direction-card">
-          <p class="mn-direction-text">"${recommendations.direction}"</p>
-        </div>
+        <div class="mn-direction-card"><p class="mn-direction-text">"${recommendations.direction}"</p></div>
         <div class="mn-divider"></div>
         <h4 class="mn-suggestions-heading">Tactical Suggestions</h4>
-        <ul class="mn-suggestions-list">
-          ${recommendations.suggestions.map(suggestion => `
-            <li class="mn-suggestion-item">${suggestion}</li>
-          `).join('')}
-        </ul>
+        <ul class="mn-suggestions-list">${recommendations.suggestions.map(suggestion => `<li class="mn-suggestion-item">${suggestion}</li>`).join('')}</ul>
       `;
     }
 
-    // 4. Render Full UI
     const html = `
       <div class="mn-results mn-fade-in">
-        <div class="mn-results-header">
-          <div class="mn-results-icon">${isGiftMode ? '🎁' : '✨'}</div>
-          <div>
-            <h3 class="mn-results-title">${title}</h3>
-            <p class="mn-results-subtitle" style="font-size:12px; color:var(--mn-text-muted);">${subtitle}</p>
-          </div>
-        </div>
-
+        <div class="mn-results-header"><div class="mn-results-icon">${isGiftMode ? '🎁' : '✨'}</div><div><h3 class="mn-results-title">${title}</h3><p class="mn-results-subtitle" style="font-size:12px; color:var(--mn-text-muted);">${subtitle}</p></div></div>
         ${contentHtml}
-
         <div class="mn-action-bar">
-          <button id="btn-new-consultation" class="mn-btn-secondary">
-            🔄 Start Over
-          </button>
-          <button id="btn-close-widget" class="mn-btn-primary">
-            ${isGiftMode ? '🎨 Design This Slogan' : '🎨 Start Designing'}
-          </button>
+          <button id="btn-new-consultation" class="mn-btn-secondary">🔄 Start Over</button>
+          <button id="btn-close-widget" class="mn-btn-primary">${isGiftMode ? '🎨 Design This Slogan' : '🎨 Start Designing'}</button>
         </div>
       </div>
     `;
 
     DOM.container.innerHTML = html;
-
-    // 5. Bind Buttons
     document.getElementById('btn-new-consultation').addEventListener('click', renderContextDashboard);
-
     document.getElementById('btn-close-widget').addEventListener('click', () => {
-      // SAVE SELECTION LOGIC
-      if (isGiftMode && state.selectedSlogan) {
-        // Save specifically for the design page to pick up
-        localStorage.setItem('mn_pending_design', JSON.stringify({
-          slogan: state.selectedSlogan,
-          context: state.currentContext,
-          timestamp: Date.now()
-        }));
-      }
-
-      DOM.container.innerHTML = `
-        <div class="mn-transition">
-          <div class="mn-spinner"></div>
-          <p class="mn-transition-text">Opening Design Studio...</p>
-        </div>
-      `;
-
+      if (isGiftMode && state.selectedSlogan) localStorage.setItem('mn_pending_design', JSON.stringify({ slogan: state.selectedSlogan, context: state.currentContext, timestamp: Date.now() }));
+      DOM.container.innerHTML = `<div class="mn-transition"><div class="mn-spinner"></div><p class="mn-transition-text">Opening Design Studio...</p></div>`;
       setTimeout(() => {
-        // Redirect to AI Studio page which handles both flows
         const studioUrl = window.MN_CONFIG?.studioUrl || "/pages/ai-studio";
-        console.log('✅ Redirecting to AI Studio:', studioUrl);
-        console.log('📦 Saved context:', JSON.parse(localStorage.getItem('mn_pending_design')));
         window.location.href = studioUrl;
       }, 800);
     });
   };
 
-  // ═══════════════════════════════════════════════════════════
-  // UTILITY: TRANSITION SCREEN
-  // ═══════════════════════════════════════════════════════════
-
   const renderTransition = (message, callback) => {
-    const html = `
-      <div class="mn-transition">
-        <div class="mn-spinner"></div>
-        <p class="mn-transition-text">${message}</p>
-      </div>
-    `;
-
+    const html = `<div class="mn-transition"><div class="mn-spinner"></div><p class="mn-transition-text">${message}</p></div>`;
     DOM.container.innerHTML = html;
     setTimeout(callback, 1800);
   };
 
-  // ═══════════════════════════════════════════════════════════
-  // HELPER: SELECT SLOGAN (Called via onclick)
-  // ═══════════════════════════════════════════════════════════
   const selectSlogan = (btn, text) => {
-    // 1. Visually update cards
     const allCards = DOM.container.querySelectorAll('.mn-slogan-card');
     allCards.forEach(b => b.classList.remove('active'));
-
     btn.classList.add('active');
-
-    // 2. Update State
     state.selectedSlogan = text;
   };
 
-  // ═══════════════════════════════════════════════════════════
-  // HELPER: DETECT COLOR FROM PRODUCT NAME
-  // ═══════════════════════════════════════════════════════════
   const detectColorFromName = (name) => {
     const nameLower = name.toLowerCase();
-
-    // Navy & Blue variants
-    if (nameLower.includes('navy')) return '#000080';
-    if (nameLower.includes('royal blue')) return '#4169e1';
-    if (nameLower.includes('sky blue')) return '#87ceeb';
-    if (nameLower.includes('blue')) return '#0066cc';
-
-    // Black & White
+    if (nameLower.includes('navy') || nameLower.includes('blue')) return '#000080';
     if (nameLower.includes('black')) return '#1a1a1a';
     if (nameLower.includes('white') || nameLower.includes('cream')) return '#f5f5f5';
-
-    // Earth tones
-    if (nameLower.includes('khaki') || nameLower.includes('beige') || nameLower.includes('tan')) return '#c3b091';
-    if (nameLower.includes('brown') || nameLower.includes('chocolate')) return '#8b4513';
-    if (nameLower.includes('olive')) return '#6b8e23';
-
-    // Grays
-    if (nameLower.includes('charcoal')) return '#36454f';
+    if (nameLower.includes('khaki') || nameLower.includes('beige')) return '#c3b091';
+    if (nameLower.includes('brown')) return '#8b4513';
     if (nameLower.includes('grey') || nameLower.includes('gray')) return '#808080';
-    if (nameLower.includes('silver')) return '#c0c0c0';
-
-    // Warm colors
-    if (nameLower.includes('red') || nameLower.includes('crimson')) return '#dc143c';
-    if (nameLower.includes('maroon') || nameLower.includes('burgundy')) return '#800000';
-    if (nameLower.includes('orange')) return '#ff8c00';
-    if (nameLower.includes('yellow') || nameLower.includes('mustard')) return '#ffd700';
-
-    // Cool colors
-    if (nameLower.includes('green') || nameLower.includes('forest')) return '#228b22';
-    if (nameLower.includes('teal') || nameLower.includes('turquoise')) return '#008080';
-    if (nameLower.includes('purple') || nameLower.includes('violet')) return '#800080';
-    if (nameLower.includes('pink') || nameLower.includes('rose')) return '#ff69b4';
-
-    // Pastels
-    if (nameLower.includes('pastel')) return '#f0e8e8';
-    if (nameLower.includes('mint')) return '#98ff98';
-    if (nameLower.includes('lavender')) return '#e6e6fa';
-
-    // Default - neutral dark gray
     return '#333333';
   };
 
-  // ═══════════════════════════════════════════════════════════
-  // PUBLIC API
-  // ═══════════════════════════════════════════════════════════
-
-  return {
-    init,
-    expandWidget,
-    minimizeWidget,
-    clearIdentity,
-    selectSlogan
-  };
-
+  return { init, expandWidget, minimizeWidget, clearIdentity, selectSlogan };
 
 })();
 
 // ═══════════════════════════════════════════════════════════
-// NEW HELPER - GENERATE FLUX LOOK
-// Added manually for Virtual Try-On Integration
+// GAP 1 FIX: NEW HELPER - GENERATE FLUX LOOK
 // ═══════════════════════════════════════════════════════════
 window.generateFluxLook = async (prompt, containerId) => {
   const container = document.getElementById(containerId);
   if (!container) return;
 
-  // 1. Show Loading State
-  container.style.pointerEvents = 'none'; // Disable multiple clicks
+  container.style.pointerEvents = 'none'; // Disable click
   container.innerHTML = `
     <div style="background:rgba(0,0,0,0.8); padding:20px; border-radius:12px; text-align:center;">
       <div class="mn-spinner"></div>
@@ -1936,23 +1262,17 @@ window.generateFluxLook = async (prompt, containerId) => {
   `;
 
   try {
-    // 2. Call Your New API
     const res = await fetch("https://mynarrative-ai.vercel.app/api/virtual_try_on", {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        mode: 'flux',
-        prompt: prompt
-      })
+      body: JSON.stringify({ mode: 'flux', prompt: prompt })
     });
 
     const data = await res.json();
 
     if (data.success) {
-      // 3. Render Result - Replacing the entire container content with the image
-      // Note: We traverse up to the main avatar container if possible, or just replace inner content
+      // Replace container content with the generated image
       const displayContainer = container.parentElement.id === 'mn-avatar-container' ? container.parentElement : container;
-      
       displayContainer.innerHTML = `
         <img src="${data.image}" style="width:100%; height:100%; object-fit:cover; border-radius:12px; animation: mnFadeIn 1s;">
         <div style="position:absolute; bottom:10px; right:10px; background:rgba(0,0,0,0.6); color:#fff; font-size:10px; padding:4px 8px; border-radius:4px;">✨ AI Generated Vibe</div>
@@ -1970,10 +1290,6 @@ window.generateFluxLook = async (prompt, containerId) => {
     `;
   }
 };
-
-// ═══════════════════════════════════════════════════════════
-// AUTO-INITIALIZE ON DOM READY
-// ═══════════════════════════════════════════════════════════
 
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', MNAIStylist.init);
