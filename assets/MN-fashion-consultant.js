@@ -1001,18 +1001,17 @@ const MNAIStylist = (() => {
           <p class="mn-results-meta">${state.currentContext.loudness} • ${archetypeName} Archetype</p>
         </div>
 
-        <div class="mn-avatar-container" style="position: relative; min-height: 400px; background: radial-gradient(circle, #2a2a2a, #000); border-radius: 12px; overflow: hidden; margin-bottom: 24px;">
+        <div class="mn-avatar-container" id="mn-avatar-container" style="position: relative; min-height: 450px; background: radial-gradient(circle, #2a2a2a, #000); border-radius: 12px; overflow: hidden; margin-bottom: 24px;">
           
-          <div id="mn-3d-canvas" style="width: 100%; height: 450px; position:absolute; top:0; left:0; z-index:1;"></div>
-          
-          <div id="mn-flux-canvas" style="width: 100%; height: 450px; position:absolute; top:0; left:0; z-index:2; display:flex; align-items:center; justify-content:center; flex-direction:column; pointer-events:none;">
-             <div style="pointer-events:auto; text-align:center; background:rgba(0,0,0,0.4); padding:20px; border-radius:16px; backdrop-filter:blur(4px);">
-                <p style="color:#fff; font-size:12px; margin-bottom:12px;">Want to see this exact vibe?</p>
+          <div id="mn-flux-canvas" style="width: 100%; height: 450px; display:flex; align-items:center; justify-content:center; flex-direction:column;">
+             <div style="text-align:center; background:rgba(0,0,0,0.4); padding:20px; border-radius:16px; backdrop-filter:blur(4px);">
+                <p style="color:#fff; font-size:14px; margin-bottom:12px;">✨ Want to see this exact vibe on you?</p>
                 <button class="mn-btn-primary" 
                   onclick="window.generateFluxLook('${fluxPrompt.replace(/'/g, "\\'")}', 'mn-flux-canvas')"
-                  style="padding:8px 16px; font-size:11px;">
-                  ✨ VISUALIZE STYLE
+                  style="padding:10px 20px; font-size:12px;">
+                  🎨 VISUALIZE STYLE
                 </button>
+                <p style="color:#999; font-size:10px; margin-top:8px;">AI-powered photorealistic preview</p>
              </div>
           </div>
 
@@ -1056,27 +1055,7 @@ const MNAIStylist = (() => {
 
     DOM.container.innerHTML = html;
 
-    // 🚀 INITIALIZE 3D VISUALIZER (Background Layer)
-    setTimeout(() => {
-      const canvas = document.getElementById('mn-3d-canvas');
-      if (window.MNVisualizer) {
-        try {
-          window.MNVisualizer.init('mn-3d-canvas', {
-            height: profile.height || 170,
-            build: profile.build || 'regular',
-            skinTone: profile.skinTone || 'wheatish'
-          });
-          categorized.forEach(item => {
-            const name = item.name.toLowerCase();
-            const color = item.color || detectColorFromName(name);
-            if (item.slot === 'top' || name.includes('shirt') || name.includes('hoodie')) window.MNVisualizer.updateOutfit('top', color);
-            if (item.slot === 'bottom' || name.includes('pant') || name.includes('jeans')) window.MNVisualizer.updateOutfit('bottom', color);
-            if (item.slot === 'footwear' || name.includes('shoe') || name.includes('sneaker')) window.MNVisualizer.updateOutfit('shoes', color);
-          });
-        } catch (error) { console.error('❌ 3D Visualizer failed:', error); }
-      }
-    }, 300);
-
+    // Event handlers
     document.getElementById('btn-back').addEventListener('click', renderContextDashboard);
     document.getElementById('btn-regenerate').addEventListener('click', generateAIRecommendations);
     document.getElementById('btn-save-look').addEventListener('click', () => {
@@ -1253,11 +1232,12 @@ window.generateFluxLook = async (prompt, containerId) => {
   const container = document.getElementById(containerId);
   if (!container) return;
 
-  container.style.pointerEvents = 'none'; // Disable click
+  // Show loading state
   container.innerHTML = `
-    <div style="background:rgba(0,0,0,0.8); padding:20px; border-radius:12px; text-align:center;">
-      <div class="mn-spinner"></div>
-      <p style="color:#fff; font-size:12px; margin-top:10px;">AI is styling this look...</p>
+    <div style="background:rgba(0,0,0,0.8); padding:30px; border-radius:12px; text-align:center;">
+      <div class="mn-spinner" style="margin:0 auto 16px;"></div>
+      <p style="color:#fff; font-size:14px; margin-bottom:8px;">🎨 AI is styling this look...</p>
+      <p style="color:#999; font-size:11px;">This may take 20-30 seconds</p>
     </div>
   `;
 
@@ -1270,24 +1250,49 @@ window.generateFluxLook = async (prompt, containerId) => {
 
     const data = await res.json();
 
-    if (data.success) {
-      // Replace container content with the generated image
-      const displayContainer = container.parentElement.id === 'mn-avatar-container' ? container.parentElement : container;
-      displayContainer.innerHTML = `
-        <img src="${data.image}" style="width:100%; height:100%; object-fit:cover; border-radius:12px; animation: mnFadeIn 1s;">
-        <div style="position:absolute; bottom:10px; right:10px; background:rgba(0,0,0,0.6); color:#fff; font-size:10px; padding:4px 8px; border-radius:4px;">✨ AI Generated Vibe</div>
-      `;
+    if (data.success && data.image) {
+      // Replace entire avatar container with the generated image
+      const avatarContainer = document.getElementById('mn-avatar-container');
+      if (avatarContainer) {
+        avatarContainer.innerHTML = `
+          <img src="${data.image}" 
+               style="width:100%; height:100%; object-fit:cover; border-radius:12px; animation: mnFadeIn 1s;" 
+               alt="AI Generated Look">
+          <div style="position:absolute; bottom:16px; right:16px; background:rgba(0,0,0,0.7); color:#fff; font-size:11px; padding:8px 12px; border-radius:8px; backdrop-filter:blur(4px);">
+            ✨ AI Generated Preview
+          </div>
+          <button onclick="window.regenerateFluxLook('${prompt.replace(/'/g, "\\'")}', '${containerId}')" 
+                  style="position:absolute; top:16px; right:16px; background:rgba(255,255,255,0.2); color:#fff; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-size:11px; backdrop-filter:blur(4px);">
+            🔄 Regenerate
+          </button>
+        `;
+      }
     } else {
       throw new Error(data.error || "Generation failed");
     }
   } catch (e) {
-    console.error("Flux Error:", e);
+    console.error("❌ FLUX Error:", e);
     container.innerHTML = `
-      <div style="text-align:center; padding:20px; color:#ff6b6b; background:rgba(0,0,0,0.8); border-radius:12px;">
-        <p>Could not generate look.</p>
-        <button class="mn-btn-secondary" onclick="window.generateFluxLook('${prompt.replace(/'/g, "\\'")}', '${containerId}')" style="margin-top:10px; font-size:11px;">Try Again</button>
+      <div style="text-align:center; padding:30px; background:rgba(0,0,0,0.8); border-radius:12px;">
+        <p style="color:#ff6b6b; font-size:14px; margin-bottom:12px;">⚠️ Could not generate look</p>
+        <p style="color:#999; font-size:11px; margin-bottom:16px;">${e.message || 'Please try again'}</p>
+        <button class="mn-btn-secondary" 
+                onclick="window.generateFluxLook('${prompt.replace(/'/g, "\\'")}', '${containerId}')" 
+                style="padding:8px 16px; font-size:12px;">
+          🔄 Try Again
+        </button>
       </div>
     `;
+  }
+};
+
+// Helper function to regenerate
+window.regenerateFluxLook = (prompt, containerId) => {
+  const container = document.getElementById(containerId);
+  const avatarContainer = document.getElementById('mn-avatar-container');
+  if (avatarContainer) {
+    avatarContainer.innerHTML = `<div id="${containerId}" style="width: 100%; height: 450px; display:flex; align-items:center; justify-content:center;"></div>`;
+    window.generateFluxLook(prompt, containerId);
   }
 };
 
