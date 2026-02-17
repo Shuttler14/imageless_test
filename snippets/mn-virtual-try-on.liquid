@@ -1,6 +1,6 @@
 {% comment %}
-  MY NARRATIVE - VIRTUAL TRY ON WIDGET (FIXED)
-  Now supports multiple instances on one page using Unique IDs.
+  MY NARRATIVE - VIRTUAL TRY ON WIDGET (FIXED FOR PRODUCTION)
+  Handles multiple instances on the same page via unique IDs.
 {% endcomment %}
 
 {% assign unique_id = 'vton-' | append: product.id | append: '-' | append: section.id %}
@@ -113,7 +113,7 @@
     background: #39A596;
     width: 0%;
     transition: width 0.3s;
-    animation: loading 15s linear forwards;
+    animation: loading 25s linear forwards; /* Increased for VTON */
   }
   @keyframes loading { to { width: 95%; } }
 </style>
@@ -145,7 +145,7 @@
     <div id="step-loading-{{ unique_id }}" style="display:none; padding:40px 0;">
       <div style="font-size:14px; color:#fff; font-weight:700; letter-spacing:1px;">WEAVING REALITY...</div>
       <div class="mn-loader-bar" style="display:block;"><div class="mn-loader-fill"></div></div>
-      <p style="font-size:11px; color:#666; margin-top:10px;">Powered by My Narrative AI</p>
+      <p style="font-size:11px; color:#666; margin-top:10px;">This takes about 15-25 seconds.</p>
     </div>
 
     <div id="step-result-{{ unique_id }}" style="display:none;">
@@ -157,7 +157,7 @@
 </div>
 
 <script>
-  // Ensure we only define the object once
+  // SINGLETON PATTERN: Ensure MNTryOn is only defined once
   if (!window.MNTryOn) {
     window.MNTryOn = {
       api: "https://mynarrative-ai.vercel.app/api/virtual_try_on",
@@ -169,6 +169,7 @@
         document.getElementById(`step-upload-${id}`).style.display = 'block';
         document.getElementById(`step-result-${id}`).style.display = 'none';
         document.getElementById(`step-loading-${id}`).style.display = 'none';
+        document.getElementById(`input-${id}`).value = ''; // Clear input
       },
 
       process: async (input, id) => {
@@ -179,7 +180,7 @@
         document.getElementById(`step-upload-${id}`).style.display = 'none';
         document.getElementById(`step-loading-${id}`).style.display = 'block';
 
-        // Helper: Resize Image (Crucial for Vercel/Replicate limits)
+        // HELPER: Resize Image (Crucial for Vercel/Replicate limits)
         const resizeImage = (file) => {
           return new Promise((resolve) => {
             const reader = new FileReader();
@@ -187,13 +188,13 @@
               const img = new Image();
               img.onload = () => {
                 const canvas = document.createElement('canvas');
-                const MAX_WIDTH = 1024;
+                const MAX_WIDTH = 1024; // Limit width to 1024px
                 const scale = MAX_WIDTH / img.width;
                 canvas.width = MAX_WIDTH;
                 canvas.height = img.height * scale;
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                resolve(canvas.toDataURL('image/jpeg', 0.8));
+                resolve(canvas.toDataURL('image/jpeg', 0.8)); // Compress to 80% JPEG
               };
               img.src = e.target.result;
             };
@@ -204,11 +205,11 @@
         try {
           const compressedBase64 = await resizeImage(file);
           
-          // Get Product Image from Liquid context (passed via data attrib if needed, 
-          // but here we grab the main image from the page for simplicity or pass it)
-          // BETTER: Pass it dynamically. For now, using the product image rendered below.
-          const productImgUrl = "{{ product.featured_image | image_url: width: 800 }}";
+          // Get current product image URL dynamically
+          const productImgUrl = "{{ product.featured_image | image_url: width: 1024 }}";
           
+          console.log("🚀 Sending VTON Request...");
+
           const response = await fetch(MNTryOn.api, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -216,12 +217,14 @@
               mode: 'vton',
               user_image: compressedBase64,
               garment_image: productImgUrl,
-              category: "{% if product.type contains 'Pant' %}lower_body{% else %}upper_body{% endif %}",
+              // Simple logic to detect category
+              category: "{% if product.type contains 'Pant' or product.tags contains 'bottom' %}lower_body{% else %}upper_body{% endif %}",
               description: "{{ product.title }}"
             })
           });
 
           const data = await response.json();
+          console.log("✅ API Response:", data);
 
           if (data.success) {
             const img = document.getElementById(`img-result-${id}`);
@@ -234,8 +237,8 @@
             MNTryOn.reset(id);
           }
         } catch (err) {
-          console.error(err);
-          alert("Connection Failed.");
+          console.error("Network Error:", err);
+          alert("Connection Failed. Please try again.");
           MNTryOn.reset(id);
         }
       }
