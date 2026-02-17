@@ -223,6 +223,16 @@
             })
           });
 
+          console.log("📡 Response Status:", response.status, response.statusText);
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error("❌ Server Error:", errorText);
+            alert(`Server Error (${response.status}): ${errorText.substring(0, 200)}`);
+            MNTryOn.reset(id);
+            return;
+          }
+
           const data = await response.json();
           console.log("✅ API Response:", data);
 
@@ -233,12 +243,13 @@
             document.getElementById(`step-loading-${id}`).style.display = 'none';
             document.getElementById(`step-result-${id}`).style.display = 'block';
           } else {
+            console.error("❌ API Error:", data.error);
             alert("AI Error: " + (data.error || "Unknown error"));
             MNTryOn.reset(id);
           }
         } catch (err) {
-          console.error("Network Error:", err);
-          alert("Connection Failed. Please try again.");
+          console.error("❌ Network Error:", err);
+          alert("Connection Failed: " + err.message);
           MNTryOn.reset(id);
         }
       }
