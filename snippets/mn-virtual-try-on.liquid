@@ -132,6 +132,14 @@
     </p>
 
     <div id="step-upload-{{ unique_id }}">
+      <!-- Digital Twin Option (if available) -->
+      <div id="twin-option-{{ unique_id }}" style="display:none; margin-bottom:15px;">
+        <button type="button" class="mn-vton-trigger" onclick="MNTryOn.useTwin('{{ unique_id }}')" style="background: linear-gradient(135deg, #39A596, #2d7a6e); color: #fff; margin-top: 0;">
+          🤖 Use My Digital Twin (1-Click)
+        </button>
+        <p style="font-size:10px; color:#666; margin-top:8px;">Or upload a different photo below</p>
+      </div>
+      
       <div class="mn-upload-area" onclick="document.getElementById('input-{{ unique_id }}').click()">
         <div style="font-size:32px; margin-bottom:10px;">📸</div>
         <div style="font-weight:700; color:#fff; font-size:14px;">Upload Your Photo</div>
@@ -161,8 +169,37 @@
   if (!window.MNTryOn) {
     window.MNTryOn = {
       api: "https://mynarrative-ai.vercel.app/api/virtual_try_on",
+      savedTwinUrl: null, // Cache Digital Twin URL
 
-      open: (id) => document.getElementById(`modal-${id}`).classList.add('active'),
+      open: async (id) => {
+        document.getElementById(`modal-${id}`).classList.add('active');
+        
+        // Check for Digital Twin on modal open
+        {% if customer %}
+        if (!MNTryOn.savedTwinUrl) {
+          try {
+            const res = await fetch('https://mynarrative-ai.vercel.app/api/profile_manager', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                action: 'get_twin',
+                user_id: '{{ customer.id }}'
+              })
+            });
+            const data = await res.json();
+            if (data.success && data.url) {
+              MNTryOn.savedTwinUrl = data.url;
+              document.getElementById(`twin-option-${id}`).style.display = 'block';
+            }
+          } catch (e) {
+            console.log('No Digital Twin found');
+          }
+        } else {
+          document.getElementById(`twin-option-${id}`).style.display = 'block';
+        }
+        {% endif %}
+      },
+      
       close: (id) => document.getElementById(`modal-${id}`).classList.remove('active'),
       
       reset: (id) => {
@@ -170,6 +207,46 @@
         document.getElementById(`step-result-${id}`).style.display = 'none';
         document.getElementById(`step-loading-${id}`).style.display = 'none';
         document.getElementById(`input-${id}`).value = ''; // Clear input
+      },
+
+      useTwin: async (id) => {
+        if (!MNTryOn.savedTwinUrl) return;
+        
+        // Use Digital Twin directly without upload
+        document.getElementById(`step-upload-${id}`).style.display = 'none';
+        document.getElementById(`step-loading-${id}`).style.display = 'block';
+
+        const productImgUrl = "{{ product.featured_image | image_url: width: 1024 }}";
+        
+        try {
+          const response = await fetch(MNTryOn.api, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              mode: 'vton',
+              user_image: MNTryOn.savedTwinUrl, // Use saved Digital Twin URL
+              garment_image: productImgUrl,
+              category: "{% if product.type contains 'Pant' or product.tags contains 'bottom' %}lower_body{% else %}upper_body{% endif %}",
+              description: "{{ product.title }}"
+            })
+          });
+
+          const data = await response.json();
+          
+          if (data.success) {
+            const img = document.getElementById(`img-result-${id}`);
+            img.src = data.image;
+            img.style.display = 'block';
+            document.getElementById(`step-loading-${id}`).style.display = 'none';
+            document.getElementById(`step-result-${id}`).style.display = 'block';
+          } else {
+            alert("AI Error: " + (data.error || "Unknown error"));
+            MNTryOn.reset(id);
+          }
+        } catch (err) {
+          alert("Connection Failed: " + err.message);
+          MNTryOn.reset(id);
+        }
       },
 
       process: async (input, id) => {

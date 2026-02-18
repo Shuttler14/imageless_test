@@ -1062,6 +1062,41 @@
     });
   </script>
 
+  <!-- Digital Twin Section -->
+  <div class="mb-8 bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-6 border border-gray-700">
+    <div class="flex flex-col md:flex-row items-center gap-6">
+      <div class="flex-1">
+        <h2 class="text-2xl font-bold text-white mb-2">
+          <span style="font-size: 24px;">🤖</span> Your Digital Twin
+        </h2>
+        <p class="text-gray-400 text-sm mb-4">
+          Upload a full-body photo once. Try on any product in 1 click—no re-uploading!
+        </p>
+        <button type="button" class="bg-gradient-to-r from-teal-500 to-blue-500 text-black font-bold px-6 py-3 rounded-lg hover:opacity-90 transition-all" onclick="document.getElementById('twin-upload').click()">
+          📸 Update Digital Twin
+        </button>
+        <input type="file" id="twin-upload" hidden accept="image/*" onchange="uploadTwin(this)">
+      </div>
+      <div class="flex-shrink-0">
+        <div id="mn-twin-container" class="relative w-48 h-64 bg-gray-800 rounded-xl overflow-hidden border-2 border-gray-700">
+          <img src="" id="mn-twin-img" class="w-full h-full object-cover" style="display: none;" alt="Your Digital Twin">
+          <div id="mn-twin-placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-gray-500">
+            <svg class="w-16 h-16 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+            </svg>
+            <span class="text-sm">No photo yet</span>
+          </div>
+          <div id="mn-twin-loading" class="absolute inset-0 bg-black bg-opacity-75 flex items-center justify-center" style="display: none;">
+            <div class="text-center">
+              <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500 mx-auto mb-2"></div>
+              <span class="text-white text-sm">Uploading...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-12 mt-4">
     <div class="lg:col-span-1 space-y-8">
       <div class="bg-[#111] p-6 rounded-lg border border-gray-800">
@@ -1374,6 +1409,87 @@
       document.getElementById('download-link').click();
     }
   }
+</script>
+
+<script>
+// Digital Twin Upload Functionality
+async function uploadTwin(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  // Show loading state
+  document.getElementById('mn-twin-loading').style.display = 'flex';
+  document.getElementById('mn-twin-placeholder').style.display = 'none';
+
+  try {
+    // Convert to Base64
+    const base64 = await toBase64(file);
+    
+    // Send to Vercel Backend
+    const res = await fetch('https://mynarrative-ai.vercel.app/api/profile_manager', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'save_twin',
+        user_id: '{{ customer.id }}',
+        image: base64
+      })
+    });
+    
+    const data = await res.json();
+    
+    if (data.success) {
+      // Update the UI immediately
+      const imgEl = document.getElementById('mn-twin-img');
+      imgEl.src = data.url;
+      imgEl.style.display = 'block';
+      document.getElementById('mn-twin-loading').style.display = 'none';
+      alert('✅ Digital Twin Updated! Now you can try on products in 1 click.');
+    } else {
+      throw new Error(data.error || 'Upload failed');
+    }
+  } catch (error) {
+    console.error('Upload error:', error);
+    alert('❌ Upload failed: ' + error.message);
+    document.getElementById('mn-twin-loading').style.display = 'none';
+    document.getElementById('mn-twin-placeholder').style.display = 'flex';
+  }
+}
+
+// Helper: Convert file to Base64
+function toBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+  });
+}
+
+// Load existing Digital Twin on page load
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const res = await fetch('https://mynarrative-ai.vercel.app/api/profile_manager', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'get_twin',
+        user_id: '{{ customer.id }}'
+      })
+    });
+    
+    const data = await res.json();
+    
+    if (data.success && data.url) {
+      const imgEl = document.getElementById('mn-twin-img');
+      imgEl.src = data.url;
+      imgEl.style.display = 'block';
+      document.getElementById('mn-twin-placeholder').style.display = 'none';
+    }
+  } catch (error) {
+    console.error('Failed to load Digital Twin:', error);
+  }
+});
 </script>
 
 {% schema %}

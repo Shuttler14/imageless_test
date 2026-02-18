@@ -1,0 +1,10 @@
+{
+  "sections": {
+    "main": {
+      "type": "my-closet"
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

@@ -1,459 +1,191 @@
-Based on a complete analysis of your uploaded codebase (`fashionconsultant_theme` and `mynarrative-ai` backend), I have mapped your architecture.
+This is a significant architectural expansion. To do this right—and to make it **high-retention**—we need to move beyond simple browser storage. We are building a "User Data Layer."
 
-### **Current Architecture Mind Map**
+To make this successful and "sticky," we rely on the **Sunk Cost Fallacy**: *Once a user spends 10 minutes uploading their wardrobe and profile, they will never leave your platform for a competitor, because they don't want to do that work again.*
 
-* **Frontend (Theme):** Shopify 2.0 theme using Glassmorphism UI (`MN-fashion-consultant.css`).
-* **Core Widget:** `MN-fashion-consultant.liquid` injects the app.
-* **Brain:** `MN-fashion-consultant.js` manages state (Identity, Context, Closet).
-* **Design Studio:** `page.ai-studio.liquid` handles the custom merch creation flow.
-
-
-* **Backend (Vercel):** Python Serverless Functions.
-* `api/fashion_consultant.py`: Generates text recommendations using OpenAI.
-* `api/generate_design.py`: Creates graphic designs for the merch.
-
-
+Here is the **Exact Placement Strategy** and the **Step-by-Step Build Instructions** for your AI Agent.
 
 ---
 
-### **The Implementation Plan: "Real-Life Try-On"**
+### **Part 1: Strategic Placement (UX/UI)**
 
-We are adding a dual-engine visual system:
+**1. The "Digital Twin" (Master Photo)**
 
-1. **Product Page (The Mirror):** Uses **IDM-VTON** to dress the user in *your* exact product.
-2. **Consultant Widget (The Stylist):** Uses **FLUX** to visualize recommended looks (that you might not stock) on a model resembling the user.
+* **Placement:** **The "My Narrative" Hub (Account Page)**.
+* **The Hook:** Do not ask for this during sign-up (too much friction). Ask for it **after** they try the Virtual Try-On feature once.
+* *Popup Message:* "Tired of uploading every time? Save your Digital Twin to try on anything in 1 click."
 
-Here is the step-by-step production-grade guide.
+
+* **Visuals:** A dedicated card in the Account Dashboard showing their active "Model Photo" with a "Retake" button.
+
+**2. The "Digital Closet" (Wardrobe)**
+
+* **Placement:** A new Main Menu item called **"My Closet"**.
+* **The Hook:** "Upload your existing clothes. Our AI will tell you how to style them with our new drops."
+* **Visuals:** An Instagram-style grid of their clothes (background removed).
 
 ---
 
-### **STEP 1: Upgrade the Backend (Vercel)**
+### **Part 2: The Tech Requirement (Prerequisite)**
 
-We need a single, unified API endpoint that routes requests to the correct AI model (IDM-VTON or FLUX) via Replicate.
+Your Vercel backend needs a place to store these images permanently. Vercel files are temporary.
+**You must set up Supabase (Free Tier is sufficient).**
 
-**Action:** Create a new file `api/virtual_try_on.py` in your `mynarrative-ai` folder.
+1. **Database:** To store user profiles and closet items.
+2. **Storage:** To host the actual images.
 
-**File:** `mynarrative-ai/api/virtual_try_on.py`
+**Instruction to User:**
+
+> *Go to Supabase.com, create a project. Get the `SUPABASE_URL` and `SUPABASE_KEY` and add them to your Vercel Environment Variables.*
+
+---
+
+### **Part 3: Build Instructions for your AI Agent**
+
+Feed these exact steps to your developer/agent.
+
+#### **Step 1: Create the Backend Storage Logic (Python)**
+
+**File:** `mynarrative-ai/api/profile_manager.py`
+**Task:** Create an API that handles image uploading, background removal, and saving to Supabase.
 
 ```python
 from http.server import BaseHTTPRequestHandler
 import json
 import os
-import replicate
+import requests
+from supabase import create_client, Client
+
+# Initialize Supabase
+url: str = os.environ.get("SUPABASE_URL")
+key: str = os.environ.get("SUPABASE_KEY")
+supabase: Client = create_client(url, key)
 
 class handler(BaseHTTPRequestHandler):
     def do_POST(self):
-        self.send_response(200)
-        self.send_header('Content-type', 'application/json')
-        self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'POST')
-        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
-        self.end_headers()
+        # Standard CORS and Auth checks here...
+        
+        body = json.loads(self.rfile.read(int(self.headers['Content-Length'])))
+        action = body.get('action') # 'save_twin' or 'add_item'
+        user_id = body.get('user_id') # Shopify Customer ID
+        image_data = body.get('image') # Base64 string
 
-        try:
-            # 1. Auth Check
-            token = os.environ.get("REPLICATE_API_TOKEN")
-            if not token:
-                raise ValueError("Server Config Error: Missing Replicate Token")
+        if action == 'save_twin':
+            # 1. Upload raw image to Supabase Storage bucket 'digital-twins'
+            file_path = f"{user_id}/master_photo.png"
+            supabase.storage.from_("digital-twins").upload(file_path, image_data, {"upsert": "true"})
             
-            client = replicate.Client(api_token=token)
+            # 2. Get Public URL
+            public_url = supabase.storage.from_("digital-twins").get_public_url(file_path)
             
-            # 2. Parse Request
-            content_length = int(self.headers['Content-Length'])
-            body = json.loads(self.rfile.read(content_length))
-            mode = body.get('mode', 'flux') # Default to Flux if not specified
+            # 3. Update User Profile DB
+            supabase.table("profiles").upsert({"id": user_id, "twin_photo_url": public_url}).execute()
+            
+            response = {"success": True, "url": public_url}
 
-            output_url = ""
+        elif action == 'add_item':
+            # 1. Call Background Removal AI (e.g., Rembg or separate API)
+            # (Simplified for brevity - assume image is processed here)
+            
+            # 2. Call Vision AI (GPT-4o) to Tag the item
+            # Prompt: "Identify this clothing item. Return JSON: {color, category, style}."
+            
+            # 3. Upload to Supabase Storage 'closet'
+            file_name = f"{user_id}/{uuid.uuid4()}.png"
+            supabase.storage.from_("closet").upload(file_name, image_data)
+            
+            # 4. Save Metadata to DB
+            item_data = {
+                "user_id": user_id,
+                "image_url": supabase.storage.from_("closet").get_public_url(file_name),
+                "category": "detected_category", # from AI
+                "color": "detected_color"       # from AI
+            }
+            supabase.table("closet_items").insert(item_data).execute()
+            
+            response = {"success": True, "item": item_data}
 
-            # ---------------------------------------------------------
-            # MODE A: VIRTUAL TRY-ON (Product Page - IDM-VTON)
-            # Cost: ~$0.02 - $0.05
-            # ---------------------------------------------------------
-            if mode == 'vton':
-                human_img = body.get('user_image')     # Base64 or URL
-                garm_img = body.get('garment_image')   # URL from Shopify CDN
-                category = body.get('category', 'upper_body') 
-                
-                # Using IDM-VTON model
-                output = client.run(
-                    "cuuupid/idm-vton:c871bb9b046607e580c22118d58d01d4ce893999830f6e61e6d262172740922e",
-                    input={
-                        "human_img": human_img,
-                        "garm_img": garm_img,
-                        "garment_des": body.get('description', "clothing item"),
-                        "category": category,
-                        "crop": False,
-                        "seed": 42,
-                        "steps": 30
-                    }
-                )
-                output_url = output # IDM-VTON returns a string URL
-
-            # ---------------------------------------------------------
-            # MODE B: FANTASY VISUALIZATION (Consultant - FLUX)
-            # Cost: ~$0.003
-            # ---------------------------------------------------------
-            elif mode == 'flux':
-                # Constructing the prompt from inputs
-                prompt = body.get('prompt')
-                # Fallback construction if raw prompt isn't sent
-                if not prompt:
-                    gender = body.get('gender', 'man')
-                    skin = body.get('skin', 'medium')
-                    outfit = body.get('outfit', 'stylish streetwear')
-                    context = body.get('context', 'studio lighting')
-                    prompt = f"A photorealistic full-body shot of an Indian {gender} with {skin} skin tone, wearing {outfit}. Background is {context}. Cinematic lighting, 4k, texture rich, fashion photography."
-
-                output = client.run(
-                    "black-forest-labs/flux-schnell",
-                    input={
-                        "prompt": prompt,
-                        "aspect_ratio": "3:4",
-                        "num_inference_steps": 4 # Speed optimized
-                    }
-                )
-                output_url = output[0] # Flux returns a list
-
-            # 3. Response
-            self.wfile.write(json.dumps({"success": True, "image": output_url}).encode('utf-8'))
-
-        except Exception as e:
-            # Production Logging would go here
-            self.wfile.write(json.dumps({"success": False, "error": str(e)}).encode('utf-8'))
-
-    def do_OPTIONS(self):
-        self.send_response(200)
-        self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'POST')
-        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
-        self.end_headers()
+        self.wfile.write(json.dumps(response).encode('utf-8'))
 
 ```
 
-**Task for You:** Add `replicate==0.25.1` to your `mynarrative-ai/requirements.txt`.
+#### **Step 2: Create the Frontend "Digital Twin" Card**
 
----
-
-### **STEP 2: The "Try-On" Widget (Frontend)**
-
-We need a reusable UI component that appears on Product pages.
-
-**Action:** Create `snippets/mn-virtual-try-on.liquid`.
-
-**File:** `fashionconsultant_theme/snippets/mn-virtual-try-on.liquid`
+**File:** `sections/account-dashboard.liquid` (or wherever your main account page is).
+**Task:** Add a UI for uploading the master photo.
 
 ```liquid
-{% comment %}
-  MY NARRATIVE - VIRTUAL TRY ON WIDGET
-  Uses Glassmorphism UI to match brand identity.
-{% endcomment %}
-
-<style>
-  /* Floating Trigger Button */
-  .mn-vton-trigger {
-    width: 100%;
-    margin-top: 15px;
-    padding: 16px;
-    background: linear-gradient(135deg, rgba(57, 165, 150, 0.2), rgba(0, 0, 0, 0.4));
-    border: 1px solid #39A596;
-    border-radius: 8px;
-    color: #fff;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 700;
-    font-size: 14px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(57, 165, 150, 0.15);
-  }
+<div class="mn-profile-card">
+  <h3>Your Digital Twin</h3>
+  <p>Upload a full-body photo once. Use it everywhere.</p>
   
-  .mn-vton-trigger:hover {
-    background: #39A596;
-    color: #000;
-    box-shadow: 0 0 25px rgba(57, 165, 150, 0.6);
-  }
-
-  /* Modal Overlay */
-  .mn-vton-modal {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.92);
-    backdrop-filter: blur(10px);
-    z-index: 99999;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-  
-  .mn-vton-modal.active {
-    display: flex;
-    opacity: 1;
-  }
-
-  /* Modal Content */
-  .mn-vton-card {
-    background: rgba(20, 20, 20, 0.95);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 20px;
-    padding: 30px;
-    width: 90%;
-    max-width: 450px;
-    position: relative;
-    box-shadow: 0 0 50px rgba(57, 165, 150, 0.1);
-    text-align: center;
-  }
-
-  .mn-vton-close {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background: none;
-    border: none;
-    color: #fff;
-    font-size: 24px;
-    cursor: pointer;
-  }
-
-  /* Steps UI */
-  .mn-upload-area {
-    border: 2px dashed #39A596;
-    border-radius: 12px;
-    padding: 40px 20px;
-    margin: 20px 0;
-    cursor: pointer;
-    background: rgba(57, 165, 150, 0.05);
-    transition: 0.3s;
-  }
-  
-  .mn-upload-area:hover {
-    background: rgba(57, 165, 150, 0.15);
-  }
-
-  .mn-vton-image-preview {
-    width: 100%;
-    border-radius: 12px;
-    display: none;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-  }
-
-  /* Loading Animation */
-  .mn-loader-bar {
-    width: 100%;
-    height: 4px;
-    background: #333;
-    border-radius: 2px;
-    overflow: hidden;
-    margin-top: 15px;
-    display: none;
-  }
-  .mn-loader-fill {
-    height: 100%;
-    background: #39A596;
-    width: 0%;
-    transition: width 0.3s;
-    animation: loading 15s linear forwards; /* Approximate generation time */
-  }
-  @keyframes loading { to { width: 95%; } }
-
-</style>
-
-<button class="mn-vton-trigger" onclick="MNTryOn.open()">
-  <span style="font-size: 18px;">✨</span> TRY ON THIS LOOK
-</button>
-
-<div id="mn-vton-modal" class="mn-vton-modal">
-  <div class="mn-vton-card">
-    <button class="mn-vton-close" onclick="MNTryOn.close()">×</button>
-    
-    <h3 style="font-family:'Montserrat'; color:#fff; margin-bottom:5px;">Virtual Fitting Room</h3>
-    <p style="font-size:12px; color:#aaa; margin-bottom:20px;">
-      See exactly how the <span style="color:#39A596;">{{ product.title }}</span> looks on you.
-    </p>
-
-    <div id="mn-vton-step-upload">
-      <div class="mn-upload-area" onclick="document.getElementById('mn-user-upload').click()">
-        <div style="font-size:32px; margin-bottom:10px;">📸</div>
-        <div style="font-weight:700; color:#fff; font-size:14px;">Upload Your Photo</div>
-        <div style="font-size:11px; color:#888; margin-top:5px;">Best results: Good lighting, standing pose</div>
-      </div>
-      <input type="file" id="mn-user-upload" accept="image/*" style="display:none" onchange="MNTryOn.process(this)">
-    </div>
-
-    <div id="mn-vton-step-loading" style="display:none; padding:40px 0;">
-      <div style="font-size:14px; color:#fff; font-weight:700; letter-spacing:1px;">WEAVING REALITY...</div>
-      <div class="mn-loader-bar"><div class="mn-loader-fill"></div></div>
-      <p style="font-size:11px; color:#666; margin-top:10px;">Powered by My Narrative AI Engine</p>
-    </div>
-
-    <div id="mn-vton-step-result" style="display:none;">
-      <img id="mn-vton-final-image" class="mn-vton-image-preview">
-      <button class="mn-vton-trigger" onclick="MNTryOn.reset()" style="margin-top:20px;">🔄 Try Another Photo</button>
-    </div>
-
+  <div class="mn-twin-preview" id="mn-twin-container">
+    <img src="{{ customer.metafields.my_narrative.twin_photo | default: 'placeholder.jpg' }}" id="mn-twin-img">
   </div>
+
+  <button class="btn-primary" onclick="document.getElementById('twin-upload').click()">
+    📸 Update Digital Twin
+  </button>
+  <input type="file" id="twin-upload" hidden accept="image/*" onchange="uploadTwin(this)">
 </div>
 
 <script>
-  window.MNTryOn = {
-    // Determine category based on product type or tags
-    category: "{% if product.type contains 'Pant' or product.type contains 'Trouser' %}lower_body{% else %}upper_body{% endif %}",
-    productImage: "{{ product.featured_image | image_url: width: 800 }}",
-    api: "https://mynarrative-ai.vercel.app/api/virtual_try_on",
-
-    open: () => document.getElementById('mn-vton-modal').classList.add('active'),
-    close: () => document.getElementById('mn-vton-modal').classList.remove('active'),
-    
-    reset: () => {
-      document.getElementById('mn-vton-step-upload').style.display = 'block';
-      document.getElementById('mn-vton-step-result').style.display = 'none';
-      document.getElementById('mn-vton-step-loading').style.display = 'none';
-    },
-
-    process: async (input) => {
-      if (!input.files || !input.files[0]) return;
-      const file = input.files[0];
-
-      // UI Switch
-      document.getElementById('mn-vton-step-upload').style.display = 'none';
-      document.getElementById('mn-vton-step-loading').style.display = 'block';
-
-      // Read File
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        const base64Img = e.target.result;
-        
-        try {
-          // CALL API
-          const response = await fetch(MNTryOn.api, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              mode: 'vton',
-              user_image: base64Img,
-              garment_image: MNTryOn.productImage,
-              category: MNTryOn.category,
-              description: "{{ product.title }}"
-            })
-          });
-
-          const data = await response.json();
-
-          if (data.success) {
-            document.getElementById('mn-vton-final-image').src = data.image;
-            document.getElementById('mn-vton-final-image').style.display = 'block';
-            document.getElementById('mn-vton-step-loading').style.display = 'none';
-            document.getElementById('mn-vton-step-result').style.display = 'block';
-          } else {
-            alert("AI Error: " + (data.error || "Unknown error"));
-            MNTryOn.reset();
-          }
-        } catch (err) {
-          console.error(err);
-          alert("Connection Failed. Check your internet.");
-          MNTryOn.reset();
-        }
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+async function uploadTwin(input) {
+  const file = input.files[0];
+  // 1. Convert to Base64
+  const base64 = await toBase64(file);
+  
+  // 2. Send to your Vercel Backend
+  const res = await fetch('https://mynarrative-ai.vercel.app/api/profile_manager', {
+    method: 'POST',
+    body: JSON.stringify({
+      action: 'save_twin',
+      user_id: '{{ customer.id }}',
+      image: base64
+    })
+  });
+  
+  const data = await res.json();
+  if(data.success) {
+    // Update the UI immediately
+    document.getElementById('mn-twin-img').src = data.url;
+    alert("Digital Twin Updated!");
+  }
+}
 </script>
 
 ```
 
----
+#### **Step 3: Connect it to the "Try-On" Button**
 
-### **STEP 3: Integrate "Try-On" into Product Pages**
-
-You need to place the button where users make decisions.
-
-**Action:** Open `sections/product.liquid` (or `snippets/product-form.liquid` depending on your theme structure).
-**Action:** Find the `Add to Cart` button (usually `<button type="submit" name="add"...`).
-**Action:** Paste this line **immediately below** the Add to Cart button:
-
-```liquid
-{% render 'mn-virtual-try-on' %}
-
-```
-
----
-
-### **STEP 4: Upgrade the AI Consultant (Flux Visualization)**
-
-Now we update the `MN-fashion-consultant.js` file to use **FLUX** when recommending outfits that are *not* just a single product, but a full look.
-
-**Action:** Update `assets/MN-fashion-consultant.js`.
-
-**1. Add the Helper Function (At the bottom, before `return`):**
+**File:** `snippets/mn-virtual-try-on.liquid`
+**Task:** Modify the "Try On" logic to check if a Digital Twin exists.
 
 ```javascript
-  // ═══════════════════════════════════════════════════════════
-  // API: GENERATE FANTASY LOOK (FLUX)
-  // ═══════════════════════════════════════════════════════════
-  const generateFluxLook = async (context, profile) => {
-    try {
-      const prompt = `A cinematic, photorealistic full-body shot of an Indian person (${profile.build} build, ${profile.skinTone} skin), wearing ${context}. Detailed fabric texture, 8k resolution, street fashion photography.`;
-      
-      const res = await fetch("https://mynarrative-ai.vercel.app/api/virtual_try_on", {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          mode: 'flux',
-          prompt: prompt
-        })
-      });
-      
-      const data = await res.json();
-      return data.success ? data.image : null;
-    } catch (e) {
-      console.error("Flux Error:", e);
-      return null;
-    }
-  };
+// Inside MNTryOn.process function
 
-```
+// CHECK: Does user have a saved Digital Twin?
+const savedTwin = "{{ customer.metafields.my_narrative.twin_photo }}"; // Or fetch from DB
 
-**2. Update `renderAvatarResults` (Where results are shown):**
-Find where you render the results. If `missingItems` (items not in your store) are detected, trigger the Flux generation to create a "Complete Look" image.
+let userImage;
 
-```javascript
-    // ... inside renderAvatarResults ...
-    
-    // Check if we have items to visualize
-    if (recommendations.outfitItems && recommendations.outfitItems.length > 0) {
-       const outfitDesc = recommendations.outfitItems.map(i => i.name).join(", ");
-       
-       // Show a "Generating Look..." placeholder in the 3D canvas area
-       const canvas = document.getElementById('mn-3d-canvas');
-       if (canvas) {
-         canvas.innerHTML = `<div class="mn-spinner"></div><p style="text-align:center; color:#888; font-size:12px; margin-top:10px;">AI is sketching this look...</p>`;
-         
-         // Call FLUX
-         generateFluxLook(outfitDesc, APP_STATE.identity).then(imgUrl => {
-            if (imgUrl) {
-               canvas.innerHTML = `<img src="${imgUrl}" style="width:100%; height:100%; object-fit:cover; border-radius:12px; animation: mnFadeIn 1s;">`;
-            }
-         });
-       }
-    }
+if (savedTwin && confirm("Use your saved Digital Twin photo?")) {
+   // Use the saved URL directly! No upload needed.
+   userImage = savedTwin; 
+} else {
+   // Proceed with file upload flow
+   userImage = await resizeImage(fileInput);
+}
+
+// Proceed to call Vercel API...
 
 ```
 
 ---
 
-### **Summary of Execution for AI Agent**
+### **Why this works:**
 
-**Command:**
-"Agent, perform the following tasks to enable Production-Grade Virtual Try-On:"
+1. **Retention:** Once I have my "Twin" saved, trying on a new hoodie takes **1 second** (click button -> wait for result). On your competitor's site, I have to find a photo, upload it, and wait. **You win on speed.**
+2. **The "Real" Factor:** Because you ask for a "Full Body" photo *once* in a dedicated settings page, users are more likely to take a *good* photo (standing straight, good lighting) than they are when quickly browsing a product page. Better input = Better AI Output.
 
-1. **Backend:** Create `mynarrative-ai/api/virtual_try_on.py` using the Python code provided in Step 1. Update `requirements.txt` to include `replicate`.
-2. **Frontend Component:** Create `fashionconsultant_theme/snippets/mn-virtual-try-on.liquid` using the code in Step 2.
-3. **Frontend Injection:** Insert `{% render 'mn-virtual-try-on' %}` into `sections/product.liquid` right after the Add to Cart button.
-4. **Consultant Logic:** Update `assets/MN-fashion-consultant.js` to include the `generateFluxLook` function and call it within `renderAvatarResults` to replace the 3D canvas with a Flux-generated image.
-5. **Environment:** Ensure the `REPLICATE_API_TOKEN` is added to the Vercel environment variables.
-
-This implementation is robust, uses separate logic for "Exact Product" vs "Style Vibe," and uses the most economical AI models available today.
+**Command for your Agent:**
+"Start by setting up the Supabase infrastructure and the `profile_manager.py` endpoint. Once that is live, build the UI in the Account page to upload the Digital Twin."
