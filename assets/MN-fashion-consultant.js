@@ -647,6 +647,20 @@ const MNAIStylist = (() => {
           <h3 class="mn-context-heading">Your Silhouette</h3>
           <p class="mn-context-subtitle">"Clothes are architecture. Let's get your blueprint right."</p>
         </div>
+        <div class="mn-face-upload-section" style="margin-bottom: 30px;">
+          <label class="mn-input-label">See yourself in the outfit (Optional)</label>
+          <div class="mn-face-uploader" id="face-uploader">
+             <div class="mn-face-preview" id="face-preview">
+               <span class="mn-face-icon">📸</span>
+             </div>
+             <div class="mn-face-text">
+               <span class="mn-face-title">Upload Selfie</span>
+               <span class="mn-face-subtitle">For AI Face Swap</span>
+             </div>
+             <input type="file" id="face-input" accept="image/*" style="display:none" />
+             <button id="btn-clear-face" class="mn-btn-icon" style="display:none; margin-left:auto;">✕</button>
+          </div>
+        </div>
         <div class="mn-gender-selector" style="margin-bottom: 30px;">
           <label class="mn-input-label">I identify as:</label>
           <div class="mn-build-grid" style="grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));">
@@ -702,6 +716,49 @@ const MNAIStylist = (() => {
       const scale = 0.7 + ((cm - 150) / 45) * 0.6;
       figure.style.transform = `scaleY(${scale})`;
     });
+
+    // FACE UPLOAD LOGIC
+    const faceInput = document.getElementById('face-input');
+    const faceUploader = document.getElementById('face-uploader');
+    const facePreview = document.getElementById('face-preview');
+    const btnClearFace = document.getElementById('btn-clear-face');
+
+    // Load existing face if avail
+    if (state.dataCollection.faceImage) {
+      facePreview.innerHTML = `<img src="${state.dataCollection.faceImage}" class="mn-face-img" />`;
+      faceUploader.classList.add('has-file');
+      btnClearFace.style.display = 'block';
+    }
+
+    faceUploader.addEventListener('click', (e) => {
+      if (e.target !== btnClearFace) faceInput.click();
+    });
+
+    faceInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const base64 = ev.target.result;
+          state.dataCollection.faceImage = base64;
+          facePreview.innerHTML = `<img src="${base64}" class="mn-face-img" />`;
+          faceUploader.classList.add('has-file');
+          btnClearFace.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    btnClearFace.addEventListener('click', (e) => {
+      e.stopPropagation();
+      state.dataCollection.faceImage = null;
+      faceInput.value = '';
+      facePreview.innerHTML = '<span class="mn-face-icon">📸</span>';
+      faceUploader.classList.remove('has-file');
+      btnClearFace.style.display = 'none';
+    });
+
+
 
     DOM.container.querySelectorAll('[data-gender]').forEach(card => {
       card.addEventListener('click', () => {
@@ -1016,7 +1073,8 @@ const MNAIStylist = (() => {
 
     // --- GAP 2 FIX: CONSTRUCT PROMPT FOR FLUX ---
     const missingDesc = missingItems.map(i => i.name).join(", ");
-    const gender = state.identity.gender || 'person'; 
+    const gender = state.identity.gender || 'person';
+    const faceImage = state.identity.faceImage || state.dataCollection?.faceImage || null;
     const fluxPrompt = `A photorealistic shot of an Indian ${gender} (${profile.build} build, ${profile.skinTone} skin) wearing ${missingDesc}. Cinematic lighting, high fashion street style.`;
 
     const html = `
@@ -1033,9 +1091,9 @@ const MNAIStylist = (() => {
              <div style="text-align:center; background:rgba(0,0,0,0.4); padding:20px; border-radius:16px; backdrop-filter:blur(4px);">
                 <p style="color:#fff; font-size:14px; margin-bottom:12px;">✨ Want to see this exact vibe on you?</p>
                 <button class="mn-btn-primary" 
-                  onclick="window.generateFluxLook('${fluxPrompt.replace(/'/g, "\\'")}', 'mn-flux-canvas')"
+                  onclick="window.generateFluxLook('${fluxPrompt.replace(/'/g, "\\'")}', 'mn-flux-canvas', ${faceImage ? `'${faceImage}'` : 'null'})"
                   style="padding:10px 20px; font-size:12px;">
-                  🎨 VISUALIZE STYLE
+                  🎨 VISUALIZE STYLE ${faceImage ? '(With Your Face)' : ''}
                 </button>
                 <p style="color:#999; font-size:10px; margin-top:8px;">AI-powered photorealistic preview</p>
              </div>
@@ -1254,7 +1312,10 @@ const MNAIStylist = (() => {
 // ═══════════════════════════════════════════════════════════
 // GAP 1 FIX: NEW HELPER - GENERATE FLUX LOOK
 // ═══════════════════════════════════════════════════════════
-window.generateFluxLook = async (prompt, containerId) => {
+// ═══════════════════════════════════════════════════════════
+// GAP 1 FIX: NEW HELPER - GENERATE FLUX LOOK
+// ═══════════════════════════════════════════════════════════
+window.generateFluxLook = async (prompt, containerId, userImage = null) => {
   const container = document.getElementById(containerId);
   if (!container) return;
 
@@ -1271,7 +1332,7 @@ window.generateFluxLook = async (prompt, containerId) => {
     const res = await fetch("https://mynarrative-ai.vercel.app/api/virtual_try_on", {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ mode: 'flux', prompt: prompt })
+      body: JSON.stringify({ mode: 'flux', prompt: prompt, user_image: userImage })
     });
 
     const data = await res.json();
@@ -1287,7 +1348,7 @@ window.generateFluxLook = async (prompt, containerId) => {
           <div style="position:absolute; bottom:16px; right:16px; background:rgba(0,0,0,0.7); color:#fff; font-size:11px; padding:8px 12px; border-radius:8px; backdrop-filter:blur(4px);">
             ✨ AI Generated Preview
           </div>
-          <button onclick="window.regenerateFluxLook('${prompt.replace(/'/g, "\\'")}', '${containerId}')" 
+          <button onclick="window.regenerateFluxLook('${prompt.replace(/'/g, "\\'")}', '${containerId}', ${userImage ? `'${userImage}'` : 'null'})" 
                   style="position:absolute; top:16px; right:16px; background:rgba(255,255,255,0.2); color:#fff; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-size:11px; backdrop-filter:blur(4px);">
             🔄 Regenerate
           </button>
@@ -1303,7 +1364,7 @@ window.generateFluxLook = async (prompt, containerId) => {
         <p style="color:#ff6b6b; font-size:14px; margin-bottom:12px;">⚠️ Could not generate look</p>
         <p style="color:#999; font-size:11px; margin-bottom:16px;">${e.message || 'Please try again'}</p>
         <button class="mn-btn-secondary" 
-                onclick="window.generateFluxLook('${prompt.replace(/'/g, "\\'")}', '${containerId}')" 
+                onclick="window.generateFluxLook('${prompt.replace(/'/g, "\\'")}', '${containerId}', ${userImage ? `'${userImage}'` : 'null'})" 
                 style="padding:8px 16px; font-size:12px;">
           🔄 Try Again
         </button>
@@ -1313,12 +1374,12 @@ window.generateFluxLook = async (prompt, containerId) => {
 };
 
 // Helper function to regenerate
-window.regenerateFluxLook = (prompt, containerId) => {
+window.regenerateFluxLook = (prompt, containerId, userImage = null) => {
   const container = document.getElementById(containerId);
   const avatarContainer = document.getElementById('mn-avatar-container');
   if (avatarContainer) {
     avatarContainer.innerHTML = `<div id="${containerId}" style="width: 100%; height: 450px; display:flex; align-items:center; justify-content:center;"></div>`;
-    window.generateFluxLook(prompt, containerId);
+    window.generateFluxLook(prompt, containerId, userImage);
   }
 };
 
