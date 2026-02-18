@@ -1,0 +1,469 @@
+<!-- 
+  SECTION: My Digital Closet (Premium UI)
+  - Dark Mode / Glassmorphism
+  - Montserrat Font
+  - Integrated Image Upload & Auto-Classification
+-->
+
+<div class="mn-closet-page">
+  <div class="mn-closet-container">
+    
+    <!-- Header -->
+    <div class="mn-closet-header">
+      <h1>MY DIGITAL CLOSET</h1>
+      <p>"Your wardrobe, reimagined in the cloud."</p>
+    </div>
+
+    <!-- Stats & Actions -->
+    <div class="mn-closet-actions">
+      <div class="mn-closet-upload-card" onclick="document.getElementById('closet-upload-input').click()">
+        <div class="mn-upload-icon-wrapper">
+          <span class="mn-upload-icon">+</span>
+        </div>
+        <div class="mn-upload-text">
+          <h3>Add New Item</h3>
+          <p>AI Auto-Tagging Enabled</p>
+        </div>
+        <input type="file" id="closet-upload-input" accept="image/*" hidden onchange="MNCloset.uploadItem(this)">
+      </div>
+    </div>
+
+    <!-- Filter Tabs (Optional Enhancement) -->
+    <div class="mn-closet-tabs">
+      <button class="mn-tab active" onclick="MNCloset.filter('all', this)">All</button>
+      <button class="mn-tab" onclick="MNCloset.filter('Tops', this)">Tops</button>
+      <button class="mn-tab" onclick="MNCloset.filter('Bottoms', this)">Bottoms</button>
+      <button class="mn-tab" onclick="MNCloset.filter('Footwear', this)">Footwear</button>
+    </div>
+
+    <!-- Grid -->
+    <div id="mn-closet-grid" class="mn-closet-grid">
+      <!-- Items injected via JS -->
+      <div class="mn-loading-state">
+        <div class="mn-spinner"></div>
+        <p>Loading your collection...</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+  :root {
+    --mn-bg: #000000;
+    --mn-card-bg: #111111;
+    --mn-accent: #39A596; /* Brand Green */
+    --mn-text-main: #ffffff;
+    --mn-text-muted: #888888;
+    --mn-glass: rgba(255, 255, 255, 0.05);
+    --mn-glass-border: rgba(255, 255, 255, 0.1);
+  }
+
+  .mn-closet-page {
+    background-color: var(--mn-bg);
+    min-height: 100vh;
+    font-family: 'Montserrat', sans-serif;
+    color: var(--mn-text-main);
+    padding: 60px 20px;
+  }
+
+  .mn-closet-container {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .mn-closet-header {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+
+  .mn-closet-header h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin: 0 0 10px 0;
+    text-transform: uppercase;
+    background: linear-gradient(45deg, #fff, #888);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .mn-closet-header p {
+    color: var(--mn-text-muted);
+    font-size: 1.1rem;
+    font-weight: 300;
+  }
+
+  /* Upload Card */
+  .mn-closet-actions {
+    margin-bottom: 40px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .mn-closet-upload-card {
+    background: var(--mn-glass);
+    border: 1px solid var(--mn-glass-border);
+    border-radius: 16px;
+    padding: 20px 40px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+  }
+
+  .mn-closet-upload-card:hover {
+    background: rgba(255,255,255,0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    border-color: var(--mn-accent);
+  }
+
+  .mn-upload-icon-wrapper {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--mn-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 600;
+    color: #000;
+  }
+
+  .mn-upload-text h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+
+  .mn-upload-text p {
+    margin: 4px 0 0 0;
+    color: var(--mn-text-muted);
+    font-size: 0.85rem;
+  }
+
+  /* Tabs */
+  .mn-closet-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 40px;
+  }
+
+  .mn-tab {
+    background: transparent;
+    border: 1px solid var(--mn-glass-border);
+    color: var(--mn-text-muted);
+    padding: 10px 24px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.9rem;
+    transition: all 0.3s;
+  }
+
+  .mn-tab.active, .mn-tab:hover {
+    background: var(--mn-text-main);
+    color: #000;
+    border-color: var(--mn-text-main);
+  }
+
+  /* Grid */
+  .mn-closet-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+  }
+
+  /* Item Card */
+  .mn-item-card {
+    background: var(--mn-card-bg);
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    transition: transform 0.3s ease;
+    border: 1px solid transparent;
+  }
+
+  .mn-item-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--mn-glass-border);
+  }
+
+  .mn-item-image-wrapper {
+    position: relative;
+    aspect-ratio: 3/4;
+    overflow: hidden;
+  }
+
+  .mn-item-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+
+  .mn-item-card:hover .mn-item-image {
+    transform: scale(1.05);
+  }
+
+  .mn-item-overlay {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+  }
+
+  .mn-delete-btn {
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .mn-item-card:hover .mn-delete-btn {
+    opacity: 1;
+  }
+
+  .mn-item-info {
+    padding: 20px;
+  }
+
+  .mn-item-category {
+    color: var(--mn-accent);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .mn-item-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+  }
+
+  .mn-tag {
+    background: rgba(255,255,255,0.08);
+    color: #ccc;
+    font-size: 0.7rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+  }
+
+  /* Loading & Empty States */
+  .mn-loading-state, .mn-empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px;
+    color: var(--mn-text-muted);
+  }
+
+  .mn-spinner {
+    border: 3px solid rgba(255,255,255,0.1);
+    border-top: 3px solid var(--mn-accent);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+  }
+
+  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+</style>
+
+<script>
+class DigitalClosetManager {
+  constructor() {
+    this.api = "https://mynarrative-ai.vercel.app/api/profile_manager";
+    this.userId = "{{ customer.id }}";
+    this.items = [];
+    this.grid = document.getElementById('mn-closet-grid');
+
+    if (this.userId) {
+      this.init();
+    } else {
+      window.location.href = '/account/login';
+    }
+  }
+
+  async init() {
+    await this.loadItems();
+  }
+
+  async loadItems() {
+    try {
+      this.renderLoading();
+      const res = await fetch(`${this.api}?action=get_closet&user_id=${this.userId}`);
+      const data = await res.json();
+      
+      if (data.success) {
+        this.items = data.items || [];
+        this.renderGrid(this.items);
+      } else {
+        throw new Error(data.error || 'Failed to fetch');
+      }
+    } catch (e) {
+      console.error(e);
+      this.grid.innerHTML = `<div class="mn-empty-state"><p>Could not load closet. Please try refreshing.</p></div>`;
+    }
+  }
+
+  renderLoading() {
+    this.grid.innerHTML = `
+      <div class="mn-loading-state">
+        <div class="mn-spinner"></div>
+        <p>Syncing with your digital wardrobe...</p>
+      </div>
+    `;
+  }
+
+  renderGrid(items) {
+    if (items.length === 0) {
+      this.grid.innerHTML = `
+        <div class="mn-empty-state">
+          <div style="font-size: 48px; margin-bottom: 20px; opacity: 0.5;">🧥</div>
+          <h3>Your closet is empty</h3>
+          <p>Upload your first item to see AI magic happen.</p>
+        </div>
+      `;
+      return;
+    }
+
+    this.grid.innerHTML = items.map(item => `
+      <div class="mn-item-card mn-fade-in">
+        <div class="mn-item-image-wrapper">
+          <img src="${item.image_url}" class="mn-item-image" alt="${item.category}" loading="lazy" />
+          <div class="mn-item-overlay">
+            <button class="mn-delete-btn" onclick="MNCloset.deleteItem('${item.id}')" title="Remove Item">×</button>
+          </div>
+        </div>
+        <div class="mn-item-info">
+          <div class="mn-item-category">${item.category || 'General'}</div>
+          <div class="mn-item-color" style="display:flex; align-items:center; gap:6px; font-size: 0.8rem; color: #aaa; margin-bottom:8px;">
+             ${item.color !== 'unknown' ? `<div style="width:12px; height:12px; border-radius:50%; background:${item.color}; border:1px solid #333;"></div> ${item.color}` : ''}
+          </div>
+          <div class="mn-item-tags">
+            ${(item.tags || []).map(tag => `<span class="mn-tag">#${tag}</span>`).join('')}
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  filter(category, btn) {
+    // Update active tab
+    document.querySelectorAll('.mn-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    if (category === 'all') {
+      this.renderGrid(this.items);
+    } else {
+      const filtered = this.items.filter(item => 
+        (item.category || '').toLowerCase().includes(category.toLowerCase())
+      );
+      this.renderGrid(filtered);
+    }
+  }
+
+  async uploadItem(input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    // Optimistic UI update (optional) or just loading
+    this.renderLoading(); // Show loading state immediately
+    
+    // Read file
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const payload = {
+          action: 'add_item',
+          user_id: this.userId,
+          image: e.target.result
+        };
+
+        const res = await fetch(this.api, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        
+        if (data.success) {
+           await this.loadItems(); // Reload to show new item with AI tags
+           input.value = ''; 
+        } else {
+           alert('Upload Error: ' + data.error);
+           this.renderGrid(this.items); // Revert
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Failed to upload item');
+        this.renderGrid(this.items);
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+
+  async deleteItem(id) {
+    if(!confirm('Are you sure you want to remove this item?')) return;
+
+    // Optimistic removal
+    const oldItems = [...this.items];
+    this.items = this.items.filter(i => i.id !== id);
+    this.renderGrid(this.items);
+
+    try {
+      const res = await fetch(this.api, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'delete_item',
+          user_id: this.userId,
+          item_id: id
+        })
+      });
+      const data = await res.json();
+      if(!data.success) throw new Error(data.error);
+    } catch(e) {
+      alert('Could not delete item');
+      this.items = oldItems;
+      this.renderGrid(this.items);
+    }
+  }
+}
+
+// Initialize
+window.MNCloset = new DigitalClosetManager();
+</script>
+
+{% schema %}
+{
+  "name": "My Digital Closet",
+  "settings": [],
+  "presets": [
+    {
+      "name": "My Digital Closet"
+    }
+  ]
+}
+{% endschema %}
