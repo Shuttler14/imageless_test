@@ -647,6 +647,23 @@ const MNAIStylist = (() => {
           <h3 class="mn-context-heading">Your Silhouette</h3>
           <p class="mn-context-subtitle">"Clothes are architecture. Let's get your blueprint right."</p>
         </div>
+        <div class="mn-gender-selector" style="margin-bottom: 30px;">
+          <label class="mn-input-label">I identify as:</label>
+          <div class="mn-build-grid" style="grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));">
+            <button class="mn-build-card" data-gender="man">
+              <div class="mn-build-icon">👨</div>
+              <div class="mn-build-label">Man</div>
+            </button>
+            <button class="mn-build-card" data-gender="woman">
+              <div class="mn-build-icon">👩</div>
+              <div class="mn-build-label">Woman</div>
+            </button>
+            <button class="mn-build-card" data-gender="person">
+              <div class="mn-build-icon">⚧</div>
+              <div class="mn-build-label">Non-binary</div>
+            </button>
+          </div>
+        </div>
         <div class="mn-height-selector">
           <label class="mn-input-label">How tall are you?</label>
           <div class="mn-height-visual">
@@ -686,9 +703,17 @@ const MNAIStylist = (() => {
       figure.style.transform = `scaleY(${scale})`;
     });
 
-    DOM.container.querySelectorAll('.mn-build-card').forEach(card => {
+    DOM.container.querySelectorAll('[data-gender]').forEach(card => {
       card.addEventListener('click', () => {
-        DOM.container.querySelectorAll('.mn-build-card').forEach(c => c.classList.remove('active'));
+        DOM.container.querySelectorAll('[data-gender]').forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        state.dataCollection.gender = card.dataset.gender;
+      });
+    });
+
+    DOM.container.querySelectorAll('[data-build]').forEach(card => {
+      card.addEventListener('click', () => {
+        DOM.container.querySelectorAll('[data-build]').forEach(c => c.classList.remove('active'));
         card.classList.add('active');
         state.dataCollection.build = card.dataset.build;
       });
@@ -696,6 +721,7 @@ const MNAIStylist = (() => {
 
     document.getElementById('btn-back').addEventListener('click', renderSelfContext);
     document.getElementById('btn-next-tone').addEventListener('click', () => {
+      if (!state.dataCollection.gender) return alert('Please select your gender identity');
       if (!state.dataCollection.build) return alert('Please select your build type');
       state.dataCollection.height = state.dataCollection.height || 170;
       renderToneStep();
