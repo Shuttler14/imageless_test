@@ -118,7 +118,7 @@
   @keyframes loading { to { width: 95%; } }
 </style>
 
-<button class="mn-vton-trigger" onclick="MNTryOn.open('{{ unique_id }}')">
+<button type="button" class="mn-vton-trigger" onclick="MNTryOn.open('{{ unique_id }}')">
   <span style="font-size: 18px;">✨</span> TRY ON YOURSELF
 </button>
 
@@ -150,7 +150,7 @@
 
     <div id="step-result-{{ unique_id }}" style="display:none;">
       <img id="img-result-{{ unique_id }}" class="mn-vton-image-preview">
-      <button class="mn-vton-trigger" onclick="MNTryOn.reset('{{ unique_id }}')" style="margin-top:20px;">🔄 Try Another Photo</button>
+      <button type="button" class="mn-vton-trigger" onclick="MNTryOn.reset('{{ unique_id }}')" style="margin-top:20px;">🔄 Try Another Photo</button>
     </div>
 
   </div>
