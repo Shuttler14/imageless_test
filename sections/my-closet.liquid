@@ -1,1 +1,199 @@
-Tool call argument 'initial_content' pruned from message history.
+<div class="digital-closet-page" style="min-height: 100vh; background: #000; color: #fff; padding: 40px 20px;">
+  <div style="max-width: 1200px; margin: 0 auto;">
+    
+    <!-- Header -->
+    <div style="text-align: center; margin-bottom: 40px;">
+      <h1 style="font-size: 32px; font-weight: 700; margin-bottom: 10px;">👕 My Digital Closet</h1>
+      <p style="color: #888; font-size: 14px;">Your personal wardrobe in the cloud</p>
+    </div>
+
+    <!-- Upload Section -->
+    <div style="background: #111; border: 2px dashed #39A596; border-radius: 12px; padding: 40px; text-align: center; margin-bottom: 40px; cursor: pointer;" 
+         onclick="document.getElementById('closet-upload').click()">
+      <div style="font-size: 48px; margin-bottom: 15px;">📸</div>
+      <div style="font-size: 16px; font-weight: 700; margin-bottom: 10px;">Upload Clothing Item</div>
+      <div style="font-size: 12px; color: #888;">Snap a photo of your favorite clothes</div>
+      <input type="file" id="closet-upload" accept="image/*" style="display: none;" onchange="DigitalCloset.upload(this)">
+    </div>
+
+    <!-- Wardrobe Grid -->
+    <div id="wardrobe-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;">
+      <!-- Items will be loaded here dynamically -->
+    </div>
+
+    <!-- Empty State -->
+    <div id="empty-state" style="text-align: center; padding: 60px 20px; color: #666;">
+      <div style="font-size: 64px; margin-bottom: 20px;">👔</div>
+      <div style="font-size: 18px; margin-bottom: 10px;">Your closet is empty</div>
+      <div style="font-size: 14px;">Upload your first item to get started!</div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+.closet-item {
+  position: relative;
+  background: #111;
+  border-radius: 12px;
+  overflow: hidden;
+  aspect-ratio: 1;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.closet-item:hover {
+  transform: scale(1.05);
+}
+.closet-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.closet-item-tag {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background: rgba(0,0,0,0.8);
+  color: #39A596;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.closet-item-delete {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255,0,0,0.8);
+  color: #fff;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  display: none;
+}
+.closet-item:hover .closet-item-delete {
+  display: block;
+}
+</style>
+
+<script>
+if (!window.DigitalCloset) {
+  window.DigitalCloset = {
+    api: "https://mynarrative-ai.vercel.app/api/profile_manager",
+    userId: "{{ customer.id }}",
+
+    init: async function() {
+      if (!this.userId) {
+        window.location.href = '/account/login';
+        return;
+      }
+      await this.loadItems();
+    },
+
+    loadItems: async function() {
+      try {
+        const response = await fetch(`${this.api}?action=get_closet&user_id=${this.userId}`);
+        const data = await response.json();
+        
+        const grid = document.getElementById('wardrobe-grid');
+        const emptyState = document.getElementById('empty-state');
+
+        if (data.success && data.items && data.items.length > 0) {
+          emptyState.style.display = 'none';
+          grid.innerHTML = data.items.map(item => `
+            <div class="closet-item" data-id="${item.id}">
+              <img src="${item.image_url}" alt="${item.category || 'Item'}">
+              <div class="closet-item-tag">${item.category || 'Clothing'}</div>
+              <button class="closet-item-delete" onclick="DigitalCloset.deleteItem('${item.id}')">×</button>
+            </div>
+          `).join('');
+        } else {
+          emptyState.style.display = 'block';
+          grid.innerHTML = '';
+        }
+      } catch (error) {
+        console.error('Failed to load closet:', error);
+      }
+    },
+
+    upload: async function(input) {
+      if (!input.files || !input.files[0]) return;
+
+      const file = input.files[0];
+      const reader = new FileReader();
+
+      reader.onload = async (e) => {
+        try {
+          // Show loading
+          document.getElementById('empty-state').innerHTML = `
+            <div style="font-size: 48px; margin-bottom: 15px;">⏳</div>
+            <div style="font-size: 16px;">Uploading to your closet...</div>
+          `;
+
+          const response = await fetch(this.api, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'add_to_closet',
+              user_id: this.userId,
+              image: e.target.result
+            })
+          });
+
+          const data = await response.json();
+          
+          if (data.success) {
+            await this.loadItems();
+            input.value = ''; // Clear input
+          } else {
+            alert('Upload failed: ' + (data.error || 'Unknown error'));
+          }
+        } catch (error) {
+          console.error('Upload error:', error);
+          alert('Upload failed. Please try again.');
+        }
+      };
+
+      reader.readAsDataURL(file);
+    },
+
+    deleteItem: async function(itemId) {
+      if (!confirm('Delete this item from your closet?')) return;
+
+      try {
+        const response = await fetch(this.api, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'delete_closet_item',
+            user_id: this.userId,
+            item_id: itemId
+          })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          await this.loadItems();
+        }
+      } catch (error) {
+        console.error('Delete error:', error);
+      }
+    }
+  };
+
+  // Auto-load on page load
+  document.addEventListener('DOMContentLoaded', () => {
+    DigitalCloset.init();
+  });
+}
+</script>
+
+{% schema %}
+{
+  "name": "My Digital Closet",
+  "settings": []
+}
+{% endschema %}
