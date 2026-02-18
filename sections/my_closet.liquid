@@ -130,17 +130,32 @@ if (!window.DigitalCloset) {
         try {
           // Show loading
           document.getElementById('empty-state').innerHTML = `
-            <div style="font-size: 48px; margin-bottom: 15px;">⏳</div>
-            <div style="font-size: 16px;">Uploading to your closet...</div>
+            <div style="font-size: 48px; margin-bottom: 15px;">🤖</div>
+            <div style="font-size: 16px;">AI is analyzing your item...</div>
           `;
 
+          // Step 1: Classify the item with GPT-4o-mini
+          const classifyResponse = await fetch('https://mynarrative-ai.vercel.app/api/classify_item', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image: e.target.result })
+          });
+          
+          const classifyData = await classifyResponse.json();
+          
+          if (!classifyData.success) {
+            throw new Error('Classification failed');
+          }
+
+          // Step 2: Upload to closet with classification metadata
           const response = await fetch(this.api, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               action: 'add_to_closet',
               user_id: this.userId,
-              image: e.target.result
+              image: e.target.result,
+              metadata: classifyData.classification
             })
           });
 

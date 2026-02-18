@@ -1,7 +1,7 @@
 {
   "sections": {
     "main": {
-      "type": "my-closet"
+      "type": "my_closet"
     }
   },
   "order": [
