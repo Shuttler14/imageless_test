@@ -1,0 +1,426 @@
+<!-- 
+═══════════════════════════════════════════════════════════
+MY NARRATIVE - USER DASHBOARD
+Displays user's style profile, preferences, and saved data
+═══════════════════════════════════════════════════════════
+-->
+
+<style>
+  .mn-user-dashboard {
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    max-width: 1200px;
+    margin: 60px auto;
+    padding: 0 24px;
+  }
+
+  .mn-dashboard-header {
+    text-align: center;
+    margin-bottom: 48px;
+    animation: fadeInUp 0.6s ease-out;
+  }
+
+  .mn-dashboard-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 42px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #39A596, #4fffd9);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
+  }
+
+  .mn-dashboard-subtitle {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+    color: rgba(0, 0, 0, 0.6);
+    font-weight: 400;
+  }
+
+  .mn-dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 24px;
+    margin-bottom: 48px;
+  }
+
+  .mn-dashboard-card {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(57, 165, 150, 0.2);
+    border-radius: 20px;
+    padding: 32px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: fadeInUp 0.6s ease-out;
+    animation-fill-mode: both;
+  }
+
+  .mn-dashboard-card:nth-child(1) { animation-delay: 0.1s; }
+  .mn-dashboard-card:nth-child(2) { animation-delay: 0.2s; }
+  .mn-dashboard-card:nth-child(3) { animation-delay: 0.3s; }
+
+  .mn-dashboard-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 16px 48px rgba(57, 165, 150, 0.15);
+    border-color: rgba(57, 165, 150, 0.4);
+  }
+
+  .mn-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .mn-card-icon {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #39A596, #4fffd9);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    box-shadow: 0 4px 12px rgba(57, 165, 150, 0.3);
+  }
+
+  .mn-card-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0;
+  }
+
+  .mn-card-content {
+    font-family: 'Montserrat', sans-serif;
+    color: rgba(0, 0, 0, 0.7);
+    line-height: 1.6;
+  }
+
+  .mn-profile-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  }
+
+  .mn-profile-item:last-child {
+    border-bottom: none;
+  }
+
+  .mn-profile-label {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  .mn-profile-value {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: #1a1a1a;
+    background: rgba(57, 165, 150, 0.1);
+    padding: 6px 12px;
+    border-radius: 8px;
+  }
+
+  .mn-archetype-display {
+    text-align: center;
+    padding: 32px;
+    background: linear-gradient(135deg, rgba(57, 165, 150, 0.05), rgba(79, 255, 217, 0.05));
+    border-radius: 16px;
+    margin-bottom: 24px;
+  }
+
+  .mn-archetype-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+  }
+
+  .mn-archetype-name {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 8px;
+  }
+
+  .mn-archetype-tagline {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+    font-style: italic;
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  .mn-empty-state {
+    text-align: center;
+    padding: 48px 24px;
+    color: rgba(0, 0, 0, 0.4);
+  }
+
+  .mn-empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+
+  .mn-empty-text {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+    margin-bottom: 24px;
+  }
+
+  .mn-btn-primary {
+    font-family: 'Montserrat', sans-serif;
+    background: linear-gradient(135deg, #39A596, #4fffd9);
+    color: white;
+    border: none;
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(57, 165, 150, 0.3);
+  }
+
+  .mn-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(57, 165, 150, 0.4);
+  }
+
+  .mn-palette-display {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 16px;
+  }
+
+  .mn-palette-swatch {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .mn-dashboard-title {
+      font-size: 32px;
+    }
+
+    .mn-dashboard-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="mn-user-dashboard">
+  <div class="mn-dashboard-header">
+    <h1 class="mn-dashboard-title">Your Style Profile</h1>
+    <p class="mn-dashboard-subtitle">Your personalized fashion identity and preferences</p>
+  </div>
+
+  <div class="mn-dashboard-grid">
+    <!-- Style Identity Card -->
+    <div class="mn-dashboard-card">
+      <div class="mn-card-header">
+        <div class="mn-card-icon">✨</div>
+        <h2 class="mn-card-title">Style Identity</h2>
+      </div>
+      <div class="mn-card-content" id="identity-content">
+        <div class="mn-empty-state">
+          <div class="mn-empty-icon">🎨</div>
+          <p class="mn-empty-text">Start your style journey to discover your unique fashion archetype</p>
+          <button class="mn-btn-primary" onclick="document.getElementById('mn-widget-minimized').click()">
+            Begin Journey
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Personal Details Card -->
+    <div class="mn-dashboard-card">
+      <div class="mn-card-header">
+        <div class="mn-card-icon">👤</div>
+        <h2 class="mn-card-title">Personal Details</h2>
+      </div>
+      <div class="mn-card-content" id="details-content">
+        <div class="mn-empty-state">
+          <div class="mn-empty-icon">📋</div>
+          <p class="mn-empty-text">Complete your profile to get personalized recommendations</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preferences Card -->
+    <div class="mn-dashboard-card">
+      <div class="mn-card-header">
+        <div class="mn-card-icon">🌍</div>
+        <h2 class="mn-card-title">Lifestyle & Preferences</h2>
+      </div>
+      <div class="mn-card-content" id="preferences-content">
+        <div class="mn-empty-state">
+          <div class="mn-empty-icon">⚙️</div>
+          <p class="mn-empty-text">Your style preferences will appear here</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Load user data from localStorage and populate dashboard
+  (function() {
+    const STORAGE_KEY = 'mn_core_identity';
+    
+    function loadDashboardData() {
+      try {
+        const storedData = localStorage.getItem(STORAGE_KEY);
+        if (!storedData) return;
+        
+        const identity = JSON.parse(storedData);
+        
+        // Populate Style Identity
+        if (identity.archetype) {
+          const identityHTML = `
+            <div class="mn-archetype-display">
+              <div class="mn-archetype-icon">${identity.archetype.icon}</div>
+              <h3 class="mn-archetype-name">${identity.archetype.name}</h3>
+              <p class="mn-archetype-tagline">"${identity.archetype.tagline}"</p>
+              <div class="mn-palette-display">
+                ${identity.archetype.palette.map(color => 
+                  `<div class="mn-palette-swatch" style="background-color: ${color};"></div>`
+                ).join('')}
+              </div>
+            </div>
+            <div class="mn-profile-item">
+              <span class="mn-profile-label">Core Expression</span>
+              <span class="mn-profile-value">${identity.coreExpression || 'Not set'}</span>
+            </div>
+            <div class="mn-profile-item">
+              <span class="mn-profile-label">Presence</span>
+              <span class="mn-profile-value">${identity.presence || 'Not set'}</span>
+            </div>
+            <div class="mn-profile-item">
+              <span class="mn-profile-label">Signal</span>
+              <span class="mn-profile-value">${identity.signal || 'Not set'}</span>
+            </div>
+          `;
+          document.getElementById('identity-content').innerHTML = identityHTML;
+        }
+        
+        // Populate Personal Details
+        if (identity.height || identity.build || identity.skinTone) {
+          const detailsHTML = `
+            ${identity.gender ? `
+              <div class="mn-profile-item">
+                <span class="mn-profile-label">Gender Identity</span>
+                <span class="mn-profile-value">${identity.gender}</span>
+              </div>
+            ` : ''}
+            ${identity.height ? `
+              <div class="mn-profile-item">
+                <span class="mn-profile-label">Height</span>
+                <span class="mn-profile-value">${identity.height} cm</span>
+              </div>
+            ` : ''}
+            ${identity.build ? `
+              <div class="mn-profile-item">
+                <span class="mn-profile-label">Build</span>
+                <span class="mn-profile-value">${identity.build}</span>
+              </div>
+            ` : ''}
+            ${identity.skinTone ? `
+              <div class="mn-profile-item">
+                <span class="mn-profile-label">Skin Tone</span>
+                <span class="mn-profile-value">${identity.skinTone}</span>
+              </div>
+            ` : ''}
+            ${identity.undertone ? `
+              <div class="mn-profile-item">
+                <span class="mn-profile-label">Undertone</span>
+                <span class="mn-profile-value">${identity.undertone}</span>
+              </div>
+            ` : ''}
+          `;
+          document.getElementById('details-content').innerHTML = detailsHTML;
+        }
+        
+        // Populate Preferences
+        if (identity.region || identity.climate || identity.budget) {
+          const preferencesHTML = `
+            ${identity.region ? `
+              <div class="mn-profile-item">
+                <span class="mn-profile-label">Region</span>
+                <span class="mn-profile-value">${identity.region}</span>
+              </div>
+            ` : ''}
+            ${identity.climate ? `
+              <div class="mn-profile-item">
+                <span class="mn-profile-label">Climate</span>
+                <span class="mn-profile-value">${identity.climate}</span>
+              </div>
+            ` : ''}
+            ${identity.budget ? `
+              <div class="mn-profile-item">
+                <span class="mn-profile-label">Budget Range</span>
+                <span class="mn-profile-value">${identity.budget}</span>
+              </div>
+            ` : ''}
+            ${identity.closet && identity.closet.length > 0 ? `
+              <div class="mn-profile-item">
+                <span class="mn-profile-label">Closet Items</span>
+                <span class="mn-profile-value">${identity.closet.length} items</span>
+              </div>
+            ` : ''}
+          `;
+          document.getElementById('preferences-content').innerHTML = preferencesHTML;
+        }
+        
+      } catch (error) {
+        console.error('Error loading dashboard data:', error);
+      }
+    }
+    
+    // Load data on page load
+    loadDashboardData();
+    
+    // Listen for storage changes
+    window.addEventListener('storage', function(e) {
+      if (e.key === STORAGE_KEY) {
+        loadDashboardData();
+      }
+    });
+    
+    // Listen for custom event from AI widget
+    window.addEventListener('mn-identity-updated', loadDashboardData);
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "User Dashboard",
+  "settings": [],
+  "presets": [
+    {
+      "name": "User Dashboard"
+    }
+  ]
+}
+{% endschema %}

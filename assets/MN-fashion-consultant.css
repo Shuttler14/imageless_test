@@ -496,10 +496,13 @@
   -webkit-backdrop-filter: blur(10px);
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
   opacity: 0;
   pointer-events: none;
   transition: var(--mn-transition);
   z-index: 10000;
+  overflow-y: auto;
 }
 
 .mn-widget-expanded[aria-hidden="false"] {
@@ -2973,6 +2976,42 @@
   font-style: italic;
   color: var(--mn-text-muted);
   font-family: 'Playfair Display', serif;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   UPLOAD IMPROVEMENTS
+   ═══════════════════════════════════════════════════════════ */
+
+.mn-upload-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  width: 100%;
+  justify-content: center;
+}
+
+.mn-upload-btn {
+  font-family: 'Montserrat', sans-serif;
+  background: linear-gradient(135deg, rgba(57, 165, 150, 0.2), rgba(79, 255, 217, 0.2));
+  border: 1px solid var(--mn-glass-border-bright);
+  color: var(--mn-text-main);
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.mn-upload-btn:hover {
+  background: linear-gradient(135deg, var(--mn-teal), var(--mn-teal-glow));
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(57, 165, 150, 0.4);
+}
+
+.mn-upload-area {
+  cursor: default !important;
 }
 
 /* ═══════════════════════════════════════════════════════════

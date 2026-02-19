@@ -356,6 +356,8 @@ const MNAIStylist = (() => {
     try {
       state.identity = { ...state.tempCalibration };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state.identity));
+      // Dispatch custom event for dashboard to listen
+      window.dispatchEvent(new CustomEvent('mn-identity-updated'));
     } catch (error) {
       console.error('❌ Error saving identity:', error);
     }
@@ -609,6 +611,8 @@ const MNAIStylist = (() => {
     const archetype = deriveArchetype(state.identity);
     state.identity.archetype = archetype;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state.identity));
+    // Dispatch custom event for dashboard to listen
+    window.dispatchEvent(new CustomEvent('mn-identity-updated'));
 
     const html = `
       <div class="mn-archetype-reveal mn-fade-in">
@@ -909,9 +913,18 @@ const MNAIStylist = (() => {
         <div class="mn-closet-upload">
           <label for="closet-photos" class="mn-upload-area" id="upload-area">
             <div class="mn-upload-icon">📸</div>
-            <div class="mn-upload-title">Snap Your Wardrobe</div>
-            <div class="mn-upload-subtitle">Take photos — we auto-detect items</div>
+            <div class="mn-upload-title">Upload Wardrobe Photos</div>
+            <div class="mn-upload-subtitle">💡 Full body photos give better AI detection results</div>
+            <div class="mn-upload-actions">
+              <button type="button" class="mn-upload-btn" id="btn-upload-file">
+                📁 Choose Files
+              </button>
+              <button type="button" class="mn-upload-btn" id="btn-take-photo">
+                📷 Take Photo
+              </button>
+            </div>
             <input type="file" id="closet-photos" multiple accept="image/*" style="display:none" />
+            <input type="file" id="closet-camera" accept="image/*" capture="environment" style="display:none" />
           </label>
           <div id="upload-preview" class="mn-upload-preview"></div>
         </div>
@@ -944,7 +957,19 @@ const MNAIStylist = (() => {
 
     DOM.container.innerHTML = html;
 
+    // Upload button handlers
+    document.getElementById('btn-upload-file').addEventListener('click', (e) => {
+      e.preventDefault();
+      document.getElementById('closet-photos').click();
+    });
+    
+    document.getElementById('btn-take-photo').addEventListener('click', (e) => {
+      e.preventDefault();
+      document.getElementById('closet-camera').click();
+    });
+
     document.getElementById('closet-photos').addEventListener('change', handlePhotoUpload);
+    document.getElementById('closet-camera').addEventListener('change', handlePhotoUpload);
 
     DOM.container.querySelectorAll('.mn-ghost-chip').forEach(chip => {
       chip.addEventListener('click', () => {
@@ -1052,6 +1077,8 @@ const MNAIStylist = (() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(fullProfile));
     state.identity = fullProfile;
     console.log('💾 Full profile saved:', fullProfile);
+    // Dispatch custom event for dashboard to listen
+    window.dispatchEvent(new CustomEvent('mn-identity-updated'));
     generateAIRecommendations();
   };
 
