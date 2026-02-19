@@ -45,7 +45,7 @@
   position: fixed;
   bottom: 20px;
   right: 20px;
-  z-index: 30;
+  z-index: 999999;
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -498,7 +498,7 @@
   opacity: 0;
   pointer-events: none;
   transition: var(--mn-transition);
-  z-index: 10000;
+  z-index: 9999999;
   overflow-y: auto;
 }
 
