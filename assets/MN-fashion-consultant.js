@@ -298,8 +298,87 @@ const MNAIStylist = (() => {
     cacheDOM();
     bindEvents();
     loadIdentityFromStorage();
-    console.log('🎨 MY NARRATIVE AI Stylist - NEW WIDGET v3.0 ✨');
-    console.log('✅ Clean minimized button | ✅ Floating panel | ✅ INFO9 Dashboard inside');
+    console.log('🎨 MY NARRATIVE AI Stylist - INFO5 Auto-Expand Widget v4.0 ✨');
+    console.log('✅ Glassmorphism | ✅ Breathing Glow | ✅ Auto-Expand/Collapse | ✅ INFO9 Dashboard');
+    
+    // INFO5: Auto-expand after 1.5-2 seconds
+    setTimeout(() => {
+      if (!state.isExpanded && !sessionStorage.getItem('mn_widget_dismissed')) {
+        autoExpandWidget();
+      }
+    }, 1800); // 1.8 seconds
+  };
+
+  // INFO5: Auto-expansion with message bubble
+  let autoCollapseTimer = null;
+  
+  const autoExpandWidget = () => {
+    state.isExpanded = true;
+    DOM.widget.classList.add('is-expanded');
+    DOM.widget.classList.add('auto-expanded'); // Mark as auto-expanded
+    DOM.expanded.setAttribute('aria-hidden', 'false');
+    
+    // Show message bubble instead of full dashboard
+    renderMessageBubble();
+    
+    // INFO5: Auto-collapse after 6-8 seconds if no interaction
+    autoCollapseTimer = setTimeout(() => {
+      if (DOM.widget.classList.contains('auto-expanded')) {
+        minimizeWidget();
+        sessionStorage.setItem('mn_widget_dismissed', 'true'); // Don't auto-expand again this session
+      }
+    }, 7000); // 7 seconds
+  };
+  
+  // Render message bubble (INFO5 spec)
+  const renderMessageBubble = () => {
+    const messages = [
+      "Let me plan your outfit of the day",
+      "Ready to style something special?",
+      "What's the occasion today?",
+      "I can help you look amazing"
+    ];
+    const message = messages[Math.floor(Math.random() * messages.length)];
+    
+    const html = `
+      <div class="mn-message-bubble mn-fade-in">
+        <div class="mn-avatar-small">
+          <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100&h=100&fit=crop" alt="AI" />
+        </div>
+        <div class="mn-bubble-content">
+          <div class="mn-bubble-text">
+            <span class="mn-typing-effect">${message}</span>
+          </div>
+          <button class="mn-bubble-cta" id="btn-bubble-open">Get Started →</button>
+        </div>
+      </div>
+    `;
+    
+    DOM.container.innerHTML = html;
+    
+    // Typing effect
+    const typingEl = DOM.container.querySelector('.mn-typing-effect');
+    if (typingEl) {
+      const text = typingEl.textContent;
+      typingEl.textContent = '';
+      let i = 0;
+      const typeInterval = setInterval(() => {
+        if (i < text.length) {
+          typingEl.textContent += text.charAt(i);
+          i++;
+        } else {
+          clearInterval(typeInterval);
+        }
+      }, 40); // Typing speed
+    }
+    
+    // Click to open full dashboard
+    document.getElementById('btn-bubble-open')?.addEventListener('click', () => {
+      clearTimeout(autoCollapseTimer);
+      DOM.widget.classList.remove('auto-expanded');
+      if (!state.identity) renderWelcomeScreen();
+      else renderContextDashboard();
+    });
   };
 
   const cacheDOM = () => {
