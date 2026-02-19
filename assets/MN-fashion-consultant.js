@@ -490,16 +490,36 @@ const MNAIStylist = (() => {
     updateProgressBar(0);
     const html = `
       <div class="mn-dashboard mn-fade-in">
+        <!-- Premium Header with AI Avatar -->
+        <div class="mn-premium-header">
+          <div class="mn-ai-avatar-glow">
+            <div class="mn-ai-avatar-circle">
+              <span class="mn-avatar-icon">✨</span>
+            </div>
+          </div>
+          <h2 class="mn-premium-title">AI Fashion Consultant</h2>
+          <p class="mn-premium-greeting">Hey there! I'm here to help you look amazing.</p>
+        </div>
+        
+        <!-- Identity Bar -->
         <div class="mn-identity-bar">
           <div class="mn-identity-info">
             <span class="mn-identity-dot"></span>
-            <span class="mn-identity-label">Identity Profile:</span>
+            <span class="mn-identity-label">Style Profile:</span>
             <span class="mn-identity-value">${state.identity.coreExpression}</span>
           </div>
           <button id="mn-recalibrate-btn" class="mn-text-link">🔄 Recalibrate</button>
         </div>
-        <h2 class="mn-dashboard-title">Welcome back.</h2>
-        <p class="mn-dashboard-subtitle">Who are you designing for today?</p>
+        
+        <!-- Suggestion Chips -->
+        <div class="mn-suggestion-chips">
+          <button class="mn-suggestion-chip" data-action="outfit">Suggest an outfit for today</button>
+          <button class="mn-suggestion-chip" data-action="occasion">What should I wear for...?</button>
+          <button class="mn-suggestion-chip" data-action="style">Help me define my style</button>
+        </div>
+        
+        <!-- Mode Selection -->
+        <h3 class="mn-dashboard-subtitle">or choose your mode:</h3>
         <div class="mn-mode-grid">
           <button id="btn-mode-self" class="mn-mode-card" style="animation-delay: 0.1s">
             <div class="mn-mode-icon">👤</div>
@@ -518,6 +538,18 @@ const MNAIStylist = (() => {
     DOM.container.innerHTML = html;
     DOM.container.style.opacity = '1';
     DOM.container.style.transform = 'translateY(0)';
+
+    // Suggestion chip handlers
+    DOM.container.querySelectorAll('.mn-suggestion-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const action = chip.dataset.action;
+        if (action === 'outfit' || action === 'occasion') {
+          renderSelfContext();
+        } else if (action === 'style') {
+          renderCalibrationFlow(0);
+        }
+      });
+    });
 
     document.getElementById('btn-mode-self').addEventListener('click', renderSelfContext);
     document.getElementById('btn-mode-gift').addEventListener('click', renderGiftContext);
@@ -661,7 +693,7 @@ const MNAIStylist = (() => {
                <span class="mn-face-title">Upload Selfie</span>
                <span class="mn-face-subtitle">For AI Face Swap</span>
              </div>
-             <input type="file" id="face-input" accept="image/*" style="display:none" />
+             <input type="file" id="face-input" accept="image/*" capture="user" style="display:none" />
              <button id="btn-clear-face" class="mn-btn-icon" style="display:none; margin-left:auto;">✕</button>
           </div>
         </div>
