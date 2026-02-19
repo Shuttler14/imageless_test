@@ -58,24 +58,42 @@
    MINIMIZED STATE: Compact Chat Button
    ═══════════════════════════════════════════════════════════ */
 
+/* INFO5 Spec: Glassmorphism Pill with Breathing Glow */
 .mn-widget-minimized {
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 14px 18px;
-  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
-  border: 1px solid rgba(110, 231, 183, 0.3);
+  background: rgba(10, 10, 10, 0.6) !important;
+  border: 1px solid rgba(110, 231, 183, 0.4);
   border-radius: 50px;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer !important;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   box-shadow: 
-    0 8px 24px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(110, 231, 183, 0.1) inset;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  position: relative;
-  z-index: 999999;
-  pointer-events: auto;
+    0 8px 32px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(110, 231, 183, 0.2) inset,
+    0 0 20px rgba(110, 231, 183, 0.15);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  position: relative !important;
+  z-index: 2147483647 !important;
+  pointer-events: auto !important;
+  animation: breathingGlow 3s ease-in-out infinite;
+}
+
+@keyframes breathingGlow {
+  0%, 100% {
+    box-shadow: 
+      0 8px 32px rgba(0, 0, 0, 0.6),
+      0 0 0 1px rgba(110, 231, 183, 0.2) inset,
+      0 0 20px rgba(110, 231, 183, 0.15);
+  }
+  50% {
+    box-shadow: 
+      0 8px 32px rgba(0, 0, 0, 0.6),
+      0 0 0 1px rgba(110, 231, 183, 0.4) inset,
+      0 0 30px rgba(110, 231, 183, 0.3);
+  }
 }
 
 .mn-widget-minimized:hover {
@@ -124,8 +142,9 @@
 /* Hide minimized widget when expanded */
 .mn-ai-widget.is-expanded .mn-widget-minimized {
   opacity: 0;
-  pointer-events: none;
+  pointer-events: none !important;
   transform: scale(0.8);
+  display: none;
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -215,6 +234,88 @@
 
 .mn-content-container::-webkit-scrollbar-track {
   background: rgba(255, 255, 255, 0.03);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   INFO5: MESSAGE BUBBLE (Auto-Expand State)
+   ═══════════════════════════════════════════════════════════ */
+
+.mn-message-bubble {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 20px;
+  animation: slideInBubble 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes slideInBubble {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.mn-avatar-small {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 2px solid rgba(110, 231, 183, 0.3);
+  box-shadow: 0 0 16px rgba(110, 231, 183, 0.2);
+}
+
+.mn-avatar-small img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mn-bubble-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mn-bubble-text {
+  background: rgba(20, 20, 20, 0.8);
+  border: 1px solid rgba(110, 231, 183, 0.2);
+  border-radius: 16px;
+  padding: 14px 18px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.mn-typing-effect {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.5;
+  display: inline-block;
+}
+
+.mn-bubble-cta {
+  align-self: flex-start;
+  background: linear-gradient(135deg, #6EE7B7, #34D399);
+  color: #000;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 10px 20px;
+  border-radius: 24px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(110, 231, 183, 0.25);
+}
+
+.mn-bubble-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(110, 231, 183, 0.4);
 }
 
 /* ═══════════════════════════════════════════════════════════
