@@ -93,7 +93,7 @@
     </a>
   </div>
 
-  <!-- User Profile Section -->
+  <!-- User Profile Section Styles -->
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap');
     
@@ -101,11 +101,12 @@
       font-family: 'Montserrat', sans-serif;
       background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
       border: 1px solid #39A596;
-      border-radius: 20px;
-      padding: 2rem;
+      border-radius: 16px;
+      padding: 1.25rem;
       position: relative;
       overflow: hidden;
-      box-shadow: 0 0 40px rgba(57, 165, 150, 0.15);
+      box-shadow: 0 0 30px rgba(57, 165, 150, 0.12);
+      margin-top: 2rem;
     }
 
     .user-profile-section::before {
@@ -123,7 +124,7 @@
     .profile-hero {
       display: flex;
       flex-direction: column;
-      gap: 2rem;
+      gap: 1rem;
       position: relative;
       z-index: 1;
     }
@@ -131,7 +132,7 @@
     .profile-top-row {
       display: flex;
       flex-wrap: wrap;
-      gap: 2rem;
+      gap: 1.5rem;
       align-items: flex-start;
     }
 
@@ -139,27 +140,38 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 1rem;
+      gap: 0.5rem;
     }
 
     .profile-avatar {
-      width: 120px;
-      height: 120px;
+      width: 100px;
+      height: 100px;
       border-radius: 50%;
-      border: 3px solid #39A596;
+      border: 2px solid #39A596;
       background: linear-gradient(135deg, #1a1a1a, #0a0a0a);
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      box-shadow: 0 0 30px rgba(57, 165, 150, 0.3);
+      box-shadow: 0 0 20px rgba(57, 165, 150, 0.25);
       transition: transform 0.3s ease, box-shadow 0.3s ease;
       position: relative;
+      cursor: pointer;
     }
 
     .profile-avatar:hover {
       transform: scale(1.05);
-      box-shadow: 0 0 40px rgba(57, 165, 150, 0.5);
+      box-shadow: 0 0 30px rgba(57, 165, 150, 0.4);
+    }
+
+    .profile-upload-prompt {
+      text-align: center;
+      font-size: 10px;
+      color: #39A596;
+      font-weight: 600;
+      max-width: 120px;
+      line-height: 1.3;
+      letter-spacing: 0.3px;
     }
 
     .profile-avatar img {
@@ -169,35 +181,35 @@
     }
 
     .profile-avatar-placeholder {
-      font-size: 48px;
+      font-size: 40px;
       color: #39A596;
     }
 
     .profile-name-section {
       flex: 1;
-      min-width: 250px;
+      min-width: 200px;
     }
 
     .profile-name {
-      font-size: 28px;
-      font-weight: 800;
+      font-size: 22px;
+      font-weight: 700;
       color: #ffffff;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.4rem;
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 0.8px;
     }
 
     .profile-personality {
       display: inline-block;
       background: linear-gradient(135deg, #39A596, #2d8578);
       color: #ffffff;
-      padding: 0.4rem 1rem;
-      border-radius: 20px;
-      font-size: 12px;
+      padding: 0.3rem 0.8rem;
+      border-radius: 16px;
+      font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 1rem;
+      letter-spacing: 0.8px;
+      margin-bottom: 0.8rem;
     }
 
     .digital-closet-btn {
@@ -206,37 +218,37 @@
       gap: 0.5rem;
       background: linear-gradient(135deg, #39A596, #2d8578);
       color: #ffffff;
-      padding: 0.8rem 1.5rem;
-      border-radius: 12px;
-      font-weight: 700;
-      font-size: 14px;
+      padding: 0.6rem 1.2rem;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 13px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       transition: all 0.3s ease;
       border: none;
       cursor: pointer;
-      box-shadow: 0 4px 15px rgba(57, 165, 150, 0.3);
+      box-shadow: 0 3px 12px rgba(57, 165, 150, 0.25);
       text-decoration: none;
     }
 
     .digital-closet-btn:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 25px rgba(57, 165, 150, 0.5);
+      box-shadow: 0 5px 20px rgba(57, 165, 150, 0.4);
       background: linear-gradient(135deg, #2d8578, #39A596);
     }
 
     .quick-stats-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 1rem;
-      margin-top: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 0.75rem;
+      margin-top: 1rem;
     }
 
     .stat-card {
       background: rgba(10, 10, 10, 0.6);
       border: 1px solid #2a2a2a;
-      border-radius: 12px;
-      padding: 1rem;
+      border-radius: 10px;
+      padding: 0.75rem;
       text-align: center;
       transition: all 0.3s ease;
       backdrop-filter: blur(10px);
@@ -245,41 +257,41 @@
     .stat-card:hover {
       border-color: #39A596;
       background: rgba(57, 165, 150, 0.05);
-      transform: translateY(-3px);
+      transform: translateY(-2px);
     }
 
     .stat-icon {
-      font-size: 24px;
-      margin-bottom: 0.5rem;
+      font-size: 20px;
+      margin-bottom: 0.4rem;
     }
 
     .stat-label {
-      font-size: 11px;
+      font-size: 10px;
       color: #888888;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.4px;
       font-weight: 600;
-      margin-bottom: 0.3rem;
+      margin-bottom: 0.25rem;
     }
 
     .stat-value {
-      font-size: 15px;
+      font-size: 13px;
       color: #ffffff;
       font-weight: 700;
     }
 
     .profile-details-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
-      margin-top: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 0.75rem;
+      margin-top: 1rem;
     }
 
     .detail-card {
       background: rgba(10, 10, 10, 0.4);
       border: 1px solid #2a2a2a;
-      border-radius: 10px;
-      padding: 1rem;
+      border-radius: 8px;
+      padding: 0.75rem;
       transition: all 0.3s ease;
     }
 
@@ -289,25 +301,30 @@
     }
 
     .detail-label {
-      font-size: 11px;
+      font-size: 10px;
       color: #39A596;
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 0.8px;
       font-weight: 700;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.4rem;
       display: flex;
       align-items: center;
       gap: 0.3rem;
     }
 
     .detail-value {
-      font-size: 14px;
+      font-size: 13px;
       color: #ffffff;
       font-weight: 600;
     }
 
     .detail-icon {
-      font-size: 14px;
+      font-size: 12px;
+    }
+    
+    /* Hidden file input for selfie upload */
+    #selfieUploadInput {
+      display: none;
     }
 
     @media (max-width: 768px) {
@@ -334,95 +351,32 @@
     }
   </style>
 
-  <div class="user-profile-section" id="userProfileSection">
-    <div class="profile-hero">
-      <!-- Top Row: Avatar + Name + Digital Closet Button -->
-      <div class="profile-top-row">
-        <div class="profile-avatar-section">
-          <div class="profile-avatar" id="profileAvatar">
-            <span class="profile-avatar-placeholder" id="avatarPlaceholder">👤</span>
-            <img id="avatarImage" src="" alt="Profile" style="display: none;">
-          </div>
-        </div>
-
-        <div class="profile-name-section">
-          <h2 class="profile-name" id="profileName">{{ customer.first_name }} {{ customer.last_name }}</h2>
-          <div class="profile-personality" id="profilePersonality">
-            <span id="personalityTone">Style Explorer</span>
-          </div>
-          <div style="margin-top: 1rem;">
-            <a href="/pages/my-closet" class="digital-closet-btn">
-              <span>👔</span>
-              <span>My Digital Closet</span>
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Quick Stats -->
-      <div class="quick-stats-grid">
-        <div class="stat-card">
-          <div class="stat-icon">📏</div>
-          <div class="stat-label">Height</div>
-          <div class="stat-value" id="statHeight">-</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">💪</div>
-          <div class="stat-label">Body Type</div>
-          <div class="stat-value" id="statBodyType">-</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">🎨</div>
-          <div class="stat-label">Skin Tone</div>
-          <div class="stat-value" id="statSkinTone">-</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">🌡️</div>
-          <div class="stat-label">Climate</div>
-          <div class="stat-value" id="statTemperature">-</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">💰</div>
-          <div class="stat-label">Budget Range</div>
-          <div class="stat-value" id="statPriceRange">-</div>
-        </div>
-      </div>
-
-      <!-- Detailed Profile Information -->
-      <div class="profile-details-grid">
-        <div class="detail-card">
-          <div class="detail-label">
-            <span class="detail-icon">🎯</span>
-            <span>Fashion Goals</span>
-          </div>
-          <div class="detail-value" id="detailGoals">-</div>
-        </div>
-        <div class="detail-card">
-          <div class="detail-label">
-            <span class="detail-icon">🎨</span>
-            <span>Favorite Colors</span>
-          </div>
-          <div class="detail-value" id="detailColors">-</div>
-        </div>
-        <div class="detail-card">
-          <div class="detail-label">
-            <span class="detail-icon">👕</span>
-            <span>Closet Items</span>
-          </div>
-          <div class="detail-value" id="detailClosetCount">-</div>
-        </div>
-        <div class="detail-card">
-          <div class="detail-label">
-            <span class="detail-icon">🌍</span>
-            <span>Location</span>
-          </div>
-          <div class="detail-value" id="detailLocation">-</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <script>
+    // Handle selfie upload
+    function handleSelfieUpload(input) {
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const imageData = e.target.result;
+          
+          // Update avatar display
+          document.getElementById('avatarImage').src = imageData;
+          document.getElementById('avatarImage').style.display = 'block';
+          document.getElementById('avatarPlaceholder').style.display = 'none';
+          
+          // Save to localStorage
+          const coreIdentity = JSON.parse(localStorage.getItem('mn_core_identity') || '{}');
+          coreIdentity.uploadedImage = imageData;
+          coreIdentity.selfieUploaded = true;
+          localStorage.setItem('mn_core_identity', JSON.stringify(coreIdentity));
+          
+          // Show success message
+          alert('✨ Selfie uploaded! Your AI stylist now has a better understanding of your style.');
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
     // Load user profile data from localStorage
     document.addEventListener('DOMContentLoaded', function() {
       try {
@@ -431,6 +385,9 @@
         if (coreIdentity) {
           const profile = JSON.parse(coreIdentity);
           console.log('Loading profile:', profile);
+          
+          // Show profile section if data exists
+          document.getElementById('userProfileSection').style.display = 'block';
           
           // Avatar/Profile Picture
           if (profile.uploadedImage) {
@@ -837,7 +794,7 @@
 
       background: rgba(0, 0, 0, 0.95);
 
-      z-index: 9999;
+      z-index: 40;
 
       align-items: center;
 
@@ -1414,6 +1371,97 @@
     </div>
   </div>
 
+  <!-- User Profile Section - Positioned AFTER Vibe Cards -->
+  <div class="user-profile-section" id="userProfileSection" style="display: none;">
+    <div class="profile-hero">
+      <!-- Top Row: Avatar + Name + Digital Closet Button -->
+      <div class="profile-top-row">
+        <div class="profile-avatar-section">
+          <div class="profile-avatar" id="profileAvatar" onclick="document.getElementById('selfieUploadInput').click()">
+            <span class="profile-avatar-placeholder" id="avatarPlaceholder">👤</span>
+            <img id="avatarImage" src="" alt="Profile" style="display: none;">
+          </div>
+          <p class="profile-upload-prompt">📸 Upload your selfie to unlock personalized AI styling!</p>
+          <input type="file" id="selfieUploadInput" accept="image/*" onchange="handleSelfieUpload(this)">
+        </div>
+
+        <div class="profile-name-section">
+          <h2 class="profile-name" id="profileName">{{ customer.first_name }} {{ customer.last_name }}</h2>
+          <div class="profile-personality" id="profilePersonality">
+            <span id="personalityTone">Style Explorer</span>
+          </div>
+          <div style="margin-top: 1rem;">
+            <a href="/pages/my-closet" class="digital-closet-btn">
+              <span>👔</span>
+              <span>My Digital Closet</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="quick-stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">📏</div>
+          <div class="stat-label">Height</div>
+          <div class="stat-value" id="statHeight">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">💪</div>
+          <div class="stat-label">Body Type</div>
+          <div class="stat-value" id="statBodyType">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🎨</div>
+          <div class="stat-label">Skin Tone</div>
+          <div class="stat-value" id="statSkinTone">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🌡️</div>
+          <div class="stat-label">Climate</div>
+          <div class="stat-value" id="statTemperature">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">💰</div>
+          <div class="stat-label">Budget Range</div>
+          <div class="stat-value" id="statPriceRange">-</div>
+        </div>
+      </div>
+
+      <!-- Detailed Profile Information -->
+      <div class="profile-details-grid">
+        <div class="detail-card">
+          <div class="detail-label">
+            <span class="detail-icon">🎯</span>
+            <span>Fashion Goals</span>
+          </div>
+          <div class="detail-value" id="detailGoals">-</div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-label">
+            <span class="detail-icon">🎨</span>
+            <span>Favorite Colors</span>
+          </div>
+          <div class="detail-value" id="detailColors">-</div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-label">
+            <span class="detail-icon">👕</span>
+            <span>Closet Items</span>
+          </div>
+          <div class="detail-value" id="detailClosetCount">-</div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-label">
+            <span class="detail-icon">🌍</span>
+            <span>Location</span>
+          </div>
+          <div class="detail-value" id="detailLocation">-</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="artifact-modal" id="artifactModal">
     <div class="modal-content">
       <button class="modal-close" onclick="closeArtifactModal()">×</button>
@@ -1629,7 +1677,7 @@
 
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
 
-    background: #000; z-index: 99999;
+    background: #000; z-index: 40;
 
     flex-direction: column; align-items: center; justify-content: center;
 
@@ -1645,7 +1693,7 @@
 
     position: absolute; top: 20px; right: 20px; color: #fff;
 
-    font-size: 40px; cursor: pointer; background: none; border: none; z-index: 100000;
+    font-size: 40px; cursor: pointer; background: none; border: none; z-index: 41;
 
   }
 
