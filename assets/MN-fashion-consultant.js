@@ -298,8 +298,8 @@ const MNAIStylist = (() => {
     cacheDOM();
     bindEvents();
     loadIdentityFromStorage();
-    console.log('🎨 MY NARRATIVE AI Stylist Initialized - INFO9 Design v2.0 ✨');
-    console.log('📊 Widget loaded with: Glowing Orb + AI Avatar + Premium UI');
+    console.log('🎨 MY NARRATIVE AI Stylist - NEW WIDGET v3.0 ✨');
+    console.log('✅ Clean minimized button | ✅ Floating panel | ✅ INFO9 Dashboard inside');
   };
 
   const cacheDOM = () => {
