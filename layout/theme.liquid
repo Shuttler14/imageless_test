@@ -197,6 +197,8 @@
     }
   }
 </script>
-  {% section 'MN-fashion-consultant' %}
+  {% unless template contains 'product' %}
+    {% section 'MN-fashion-consultant' %}
+  {% endunless %}
 </body>
 </html>
