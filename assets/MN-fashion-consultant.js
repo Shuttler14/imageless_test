@@ -490,15 +490,25 @@ const MNAIStylist = (() => {
     updateProgressBar(0);
     const html = `
       <div class="mn-dashboard mn-fade-in">
-        <!-- Premium Header with AI Avatar -->
+        <!-- Premium Header with Glowing Orb (INFO9 Design) -->
         <div class="mn-premium-header">
-          <div class="mn-ai-avatar-glow">
-            <div class="mn-ai-avatar-circle">
-              <span class="mn-avatar-icon">✨</span>
+          <div class="mn-header-top">
+            <div class="mn-orb-icon">
+              <div class="mn-orb-glow"></div>
+              <div class="mn-orb-core"></div>
+            </div>
+            <h2 class="mn-premium-title">AI Fashion Consultant</h2>
+          </div>
+          
+          <!-- AI Avatar Section with Photo -->
+          <div class="mn-ai-avatar-section">
+            <div class="mn-avatar-photo">
+              <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&h=200&fit=crop" alt="AI Consultant" class="mn-avatar-img" />
+            </div>
+            <div class="mn-greeting-text">
+              <p class="mn-premium-greeting">Hello! Here to help you customize your style. What would you like to create today?</p>
             </div>
           </div>
-          <h2 class="mn-premium-title">AI Fashion Consultant</h2>
-          <p class="mn-premium-greeting">Hello! Here to help you customize your style.<br>What would you like to create today?</p>
         </div>
         
         <!-- Identity Bar -->
