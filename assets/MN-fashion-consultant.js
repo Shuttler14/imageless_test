@@ -298,15 +298,22 @@ const MNAIStylist = (() => {
     cacheDOM();
     bindEvents();
     loadIdentityFromStorage();
-    console.log('🎨 MY NARRATIVE AI Stylist - INFO5 Auto-Expand Widget v4.0 ✨');
-    console.log('✅ Glassmorphism | ✅ Breathing Glow | ✅ Auto-Expand/Collapse | ✅ INFO9 Dashboard');
+    console.log('🎨 AI Fashion Consultant - Horizontal Premium Card v5.0 ✨');
+    console.log('✅ Reference image design | ✅ Center-bottom | ✅ Appears after preloader');
     
-    // INFO5: Auto-expand after 1.5-2 seconds
-    setTimeout(() => {
-      if (!state.isExpanded && !sessionStorage.getItem('mn_widget_dismissed')) {
-        autoExpandWidget();
+    // Wait for preloader to complete before showing widget
+    const checkPreloader = setInterval(() => {
+      const preloader = document.querySelector('.preloader-narrative, #preloader, [class*="preload"]');
+      if (!preloader || preloader.style.display === 'none' || preloader.classList.contains('hidden')) {
+        clearInterval(checkPreloader);
+        // Show widget with fade-in
+        setTimeout(() => {
+          if (DOM.widget) {
+            DOM.widget.classList.add('visible');
+          }
+        }, 500);
       }
-    }, 1800); // 1.8 seconds
+    }, 100);
   };
 
   // INFO5: Auto-expansion with message bubble

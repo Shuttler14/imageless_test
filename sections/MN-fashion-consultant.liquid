@@ -3,7 +3,43 @@
      INFO9 Premium Design | Floating Chat Interface
     ═══════════════════════════════════════════════════════════ -->
 
-Tool call argument 'replace' pruned from message history.
+<div id="mn-ai-widget" class="mn-ai-widget">
+  
+  <!-- MINIMIZED STATE: Simple Floating Button -->
+  <div id="mn-widget-minimized" class="mn-widget-minimized">
+    <div class="mn-mini-avatar">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+      </svg>
+    </div>
+    <div class="mn-mini-text">
+      <div class="mn-mini-title">AI Stylist</div>
+      <div class="mn-mini-status">Online</div>
+    </div>
+  </div>
+
+  <!-- EXPANDED STATE: Premium Floating Chat Panel -->
+  <div id="mn-widget-expanded" class="mn-widget-expanded" aria-hidden="true">
+    
+    <!-- Close Button (X in top-right) -->
+    <button id="mn-minimize-btn" class="mn-close-btn" aria-label="Close">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 6L6 18M6 6l12 12"></path>
+      </svg>
+    </button>
+
+    <!-- Progress Bar -->
+    <div id="mn-progress-bar" class="mn-progress-bar">
+      <div class="mn-progress-fill"></div>
+    </div>
+
+    <!-- Dynamic Content Container (where dashboard/calibration renders) -->
+    <div id="mn-content-container" class="mn-content-container">
+      <!-- JavaScript injects content here -->
+    </div>
+
+  </div>
+</div>
 
 <!-- Load Assets -->
 <script>
@@ -13,5 +49,5 @@ Tool call argument 'replace' pruned from message history.
     studioUrl: "/pages/ai-studio"  // AI Studio handles both self and gift design flows
   };
 </script>
-<script src="{{ 'MN-fashion-consultant.js' | asset_url }}?v=INFO5-v1.0" defer></script>
-<link rel="stylesheet" href="{{ 'MN-fashion-consultant.css' | asset_url }}?v=INFO5-v1.0">
+<script src="{{ 'MN-fashion-consultant.js' | asset_url }}?v=20260220-FIX" defer></script>
+<link rel="stylesheet" href="{{ 'MN-fashion-consultant.css' | asset_url }}?v=20260220-FIX">
