@@ -1,0 +1,372 @@
+<!-- AI Fashion Consultant Premium Card -->
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+.ai-consultant-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 24px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), 0 0 40px rgba(110, 231, 183, 0.08);
+  font-family: 'Inter', sans-serif;
+  min-height: 450px;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.4s ease;
+}
+
+.ai-card-visible { opacity: 1; transform: translateY(0); }
+
+.ai-consultant-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 60px rgba(110, 231, 183, 0.15);
+  border-color: rgba(110, 231, 183, 0.2);
+}
+
+.ai-card-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #050505 0%, #0A0A0A 100%);
+  z-index: -1;
+}
+
+.ai-card-bg::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  opacity: 0.4;
+}
+
+.ai-particles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.ai-particle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: rgba(110, 231, 183, 0.6);
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(110, 231, 183, 0.8);
+  animation: float 8s infinite ease-in-out;
+}
+
+.ai-particle:nth-child(1) { left: 20%; top: 30%; animation-duration: 6s; }
+.ai-particle:nth-child(2) { left: 60%; top: 70%; animation-duration: 8s; animation-delay: 2s; }
+.ai-particle:nth-child(3) { left: 80%; top: 20%; animation-duration: 7s; animation-delay: 4s; }
+
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.3; }
+  50% { transform: translate(10px, -20px) scale(1.5); opacity: 0.8; }
+}
+
+.ai-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.ai-orb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #6EE7B7 0%, #34D399 100%);
+  box-shadow: 0 0 20px rgba(110, 231, 183, 0.6);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+.ai-header-text {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.ai-body {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  position: relative;
+  z-index: 1;
+}
+
+.ai-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: 0 0 20px rgba(110, 231, 183, 0.3);
+  border: 2px solid rgba(110, 231, 183, 0.3);
+  position: relative;
+}
+
+.ai-avatar::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(110, 231, 183, 0.3) 0%, transparent 70%);
+  animation: avatarGlow 3s ease-in-out infinite;
+}
+
+@keyframes avatarGlow {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+.ai-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: relative;
+  z-index: 2;
+}
+
+.ai-text-content {
+  flex: 1;
+}
+
+.ai-greeting {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 14px;
+  line-height: 1.6;
+  animation: fadeIn 0.8s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.typing-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 16px;
+  background: #6EE7B7;
+  margin-left: 2px;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.ai-suggestions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.ai-chip {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 10px 14px;
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 13px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.ai-chip:hover {
+  background: rgba(110, 231, 183, 0.1);
+  border-color: #6EE7B7;
+  color: #6EE7B7;
+  transform: scale(1.03);
+}
+
+.ai-chip:active {
+  transform: scale(0.98);
+}
+
+.ai-input-wrapper {
+  position: relative;
+  z-index: 1;
+  margin-top: auto;
+}
+
+.ai-input-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 12px 16px;
+  transition: all 0.3s ease;
+}
+
+.ai-input-container:focus-within {
+  border-color: rgba(110, 231, 183, 0.6);
+  box-shadow: 0 0 20px rgba(110, 231, 183, 0.3);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.ai-input-container input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+}
+
+.ai-input-container input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.ai-submit-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #6EE7B7, #34D399);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.ai-submit-btn:hover {
+  transform: translateX(3px);
+  box-shadow: 0 0 20px rgba(110, 231, 183, 0.5);
+}
+
+.ai-submit-btn svg {
+  width: 16px;
+  height: 16px;
+  color: #000;
+}
+
+@media (max-width: 768px) {
+  .ai-consultant-card {
+    padding: 20px;
+    min-height: 400px;
+  }
+  
+  .ai-body {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .ai-suggestions {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+
+<div class="ai-consultant-card">
+  <div class="ai-card-bg"></div>
+  
+  <div class="ai-particles">
+    <div class="ai-particle"></div>
+    <div class="ai-particle"></div>
+    <div class="ai-particle"></div>
+  </div>
+  
+  <div class="ai-header">
+    <div class="ai-orb"></div>
+    <div class="ai-header-text">AI Fashion Consultant</div>
+  </div>
+  
+  <div class="ai-body">
+    <div class="ai-avatar">
+      <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop" alt="AI Assistant">
+    </div>
+    <div class="ai-text-content">
+      <div class="ai-greeting">
+        Hello! Here to help you customize your style.<br>
+        What would you like to create today?<span class="typing-cursor"></span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="ai-suggestions">
+    <div class="ai-chip" onclick="fillInput(this)">Luxury streetwear</div>
+    <div class="ai-chip" onclick="fillInput(this)">Minimal collection</div>
+    <div class="ai-chip" onclick="fillInput(this)">Dark and bold statement</div>
+    <div class="ai-chip" onclick="fillInput(this)">Nature inspired</div>
+  </div>
+  
+  <div class="ai-input-wrapper">
+    <div class="ai-input-container">
+      <input type="text" id="aiInput" placeholder="Generate a new design..." />
+      <button class="ai-submit-btn" onclick="handleSubmit()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+function fillInput(chip) {
+  document.getElementById('aiInput').value = chip.textContent.trim();
+  document.getElementById('aiInput').focus();
+}
+
+function handleSubmit() {
+  const input = document.getElementById('aiInput').value;
+  if (input.trim()) {
+    // Open the AI Fashion Consultant widget
+    if (window.MN_CONFIG) {
+      const widget = document.getElementById('mn-widget-minimized');
+      if (widget) widget.click();
+    }
+  }
+}
+
+// Card entrance animation
+setTimeout(() => {
+  document.querySelector('.ai-consultant-card').classList.add('ai-card-visible');
+}, 200);
+</script>
+
+{% schema %}
+{
+  "name": "AI Consultant Card",
+  "settings": [],
+  "presets": [
+    {
+      "name": "AI Consultant Card"
+    }
+  ]
+}
+{% endschema %}
