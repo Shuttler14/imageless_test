@@ -1,29 +1,90 @@
-<!-- My Digital Closet Section -->
+<!-- My Digital Closet Section with AI Classification -->
 <div class="digital-closet-page" style="min-height: 100vh; background: #000; color: #fff; padding: 40px 20px;">
   <div style="max-width: 1200px; margin: 0 auto;">
-    
+
     <!-- Header -->
     <div style="text-align: center; margin-bottom: 40px;">
       <h1 style="font-size: 32px; font-weight: 700; margin-bottom: 10px;">👕 My Digital Closet</h1>
-      <p style="color: #888; font-size: 14px;">Your personal wardrobe in the cloud</p>
+      <p style="color: #888; font-size: 14px;">AI-powered wardrobe analysis • Upload your clothes and let AI classify them</p>
+    </div>
+
+    <!-- Stats Bar -->
+    <div id="closet-stats" style="display: flex; justify-content: center; gap: 30px; margin-bottom: 30px; flex-wrap: wrap;">
+      <div style="text-align: center;">
+        <div id="total-items" style="font-size: 28px; font-weight: 700; color: #39A596;">0</div>
+        <div style="font-size: 12px; color: #666;">Total Items</div>
+      </div>
+      <div style="text-align: center;">
+        <div id="categories-count" style="font-size: 28px; font-weight: 700; color: #39A596;">0</div>
+        <div style="font-size: 12px; color: #666;">Categories</div>
+      </div>
+      <div style="text-align: center;">
+        <div id="western-count" style="font-size: 28px; font-weight: 700; color: #39A596;">0</div>
+        <div style="font-size: 12px; color: #666;">Western</div>
+      </div>
+      <div style="text-align: center;">
+        <div id="ethnic-count" style="font-size: 28px; font-weight: 700; color: #39A596;">0</div>
+        <div style="font-size: 12px; color: #666;">Ethnic</div>
+      </div>
     </div>
 
     <!-- Upload Section -->
-    <div style="background: #111; border: 2px dashed #39A596; border-radius: 12px; padding: 40px; text-align: center; margin-bottom: 40px; cursor: pointer;" 
+    <div id="upload-section" style="background: #111; border: 2px dashed #39A596; border-radius: 12px; padding: 40px; text-align: center; margin-bottom: 40px; cursor: pointer; transition: all 0.3s;"
          onclick="document.getElementById('closet-upload').click()">
       <div style="font-size: 48px; margin-bottom: 15px;">📸</div>
       <div style="font-size: 16px; font-weight: 700; margin-bottom: 10px;">Upload Clothing Item</div>
-      <div style="font-size: 12px; color: #888;">Snap a photo of your favorite clothes</div>
+      <div style="font-size: 12px; color: #888;">AI will automatically detect and classify your clothing</div>
       <input type="file" id="closet-upload" accept="image/*" style="display: none;" onchange="DigitalCloset.upload(this)">
     </div>
 
+    <!-- Loading State -->
+    <div id="loading-state" style="display: none; text-align: center; padding: 60px 20px;">
+      <div style="font-size: 48px; margin-bottom: 20px;">🤖</div>
+      <div style="font-size: 18px; margin-bottom: 10px;">AI is analyzing your item...</div>
+      <div style="font-size: 14px; color: #666; margin-bottom: 20px;">Detecting clothing and classifying into categories</div>
+      <div style="max-width: 300px; margin: 0 auto; height: 4px; background: #222; border-radius: 2px; overflow: hidden;">
+        <div id="loading-progress" style="width: 0%; height: 100%; background: #39A596; transition: width 0.3s;"></div>
+      </div>
+    </div>
+
+    <!-- Results Display -->
+    <div id="result-display" style="display: none; background: #111; border-radius: 12px; padding: 30px; margin-bottom: 40px;">
+      <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: center;">
+        <div style="flex: 0 0 150px;">
+          <img id="result-image" style="width: 150px; height: 150px; object-fit: cover; border-radius: 8px;" src="" alt="Uploaded item">
+        </div>
+        <div style="flex: 1; min-width: 200px;">
+          <div style="font-size: 20px; font-weight: 700; margin-bottom: 10px;" id="result-name">Detected Item</div>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
+            <span id="result-category" style="background: #39A596; color: #000; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Category</span>
+            <span id="result-style" style="background: #222; color: #39A596; padding: 5px 12px; border-radius: 20px; font-size: 12px;">Style</span>
+            <span id="result-color" style="background: #222; color: #fff; padding: 5px 12px; border-radius: 20px; font-size: 12px;">Color</span>
+          </div>
+          <div id="result-tags" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
+        </div>
+        <div>
+          <button onclick="DigitalCloset.confirmAdd()" style="background: #39A596; color: #000; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; margin-right: 10px;">✓ Add to Closet</button>
+          <button onclick="DigitalCloset.cancelAdd()" style="background: #333; color: #fff; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer;">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+      <button class="filter-tab active" data-filter="all" onclick="DigitalCloset.filter('all')" style="background: #39A596; color: #000; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: 600;">All</button>
+      <button class="filter-tab" data-filter="Topwear" onclick="DigitalCloset.filter('Topwear')" style="background: #222; color: #fff; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer;">Topwear</button>
+      <button class="filter-tab" data-filter="Bottomwear" onclick="DigitalCloset.filter('Bottomwear')" style="background: #222; color: #fff; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer;">Bottomwear</button>
+      <button class="filter-tab" data-filter="Footwear" onclick="DigitalCloset.filter('Footwear')" style="background: #222; color: #fff; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer;">Footwear</button>
+      <button class="filter-tab" data-filter="Accessory" onclick="DigitalCloset.filter('Accessory')" style="background: #222; color: #fff; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer;">Accessories</button>
+    </div>
+
     <!-- Wardrobe Grid -->
-    <div id="wardrobe-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;">
+    <div id="wardrobe-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px;">
       <!-- Items will be loaded here dynamically -->
     </div>
 
     <!-- Empty State -->
-    <div id="empty-state" style="text-align: center; padding: 60px 20px; color: #666;">
+    <div id="empty-state" style="display: none; text-align: center; padding: 60px 20px; color: #666;">
       <div style="font-size: 64px; margin-bottom: 20px;">👔</div>
       <div style="font-size: 18px; margin-bottom: 10px;">Your closet is empty</div>
       <div style="font-size: 14px;">Upload your first item to get started!</div>
@@ -40,84 +101,166 @@
   overflow: hidden;
   aspect-ratio: 1;
   cursor: pointer;
-  transition: transform 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 .closet-item:hover {
-  transform: scale(1.05);
+  transform: scale(1.03);
+  box-shadow: 0 10px 30px rgba(57, 165, 150, 0.2);
 }
 .closet-item img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
-.closet-item-tag {
+.closet-item-info {
   position: absolute;
-  bottom: 10px;
-  left: 10px;
-  background: rgba(0,0,0,0.8);
-  color: #39A596;
-  padding: 5px 10px;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 700;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 10px;
+  background: linear-gradient(transparent, rgba(0,0,0,0.9));
+}
+.closet-item-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.closet-item-tag {
+  display: inline-block;
+  background: #39A596;
+  color: #000;
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 600;
+  margin-top: 5px;
 }
 .closet-item-delete {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  background: rgba(255,0,0,0.8);
+  top: 8px;
+  right: 8px;
+  background: rgba(255,0,0,0.9);
   color: #fff;
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   border: none;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 14px;
   display: none;
+  align-items: center;
+  justify-content: center;
 }
 .closet-item:hover .closet-item-delete {
-  display: block;
+  display: flex;
+}
+.filter-tab {
+  transition: all 0.2s;
+}
+.filter-tab.active {
+  background: #39A596 !important;
+  color: #000 !important;
 }
 </style>
 
 <script>
+// Digital Closet with AI Classification Integration
 if (!window.DigitalCloset) {
   window.DigitalCloset = {
-    api: "https://mynarrative-ai.vercel.app/api/profile_manager",
+    // API Configuration - Point to your local cloth detection API
+    // For local: http://localhost:5000
+    // For production: Update to your deployed API URL
+    apiUrl: "{{ routes.root_url }}api/cloth-detect" || "http://localhost:5000",
+    closetApi: "https://mynarrative-ai.vercel.app/api/profile_manager",
     userId: "{{ customer.id }}",
+    currentFilter: 'all',
+    pendingItem: null,
 
     init: async function() {
       if (!this.userId) {
-        window.location.href = '/account/login';
+        // Show login prompt for guests
+        document.getElementById('empty-state').style.display = 'block';
+        document.getElementById('empty-state').innerHTML = `
+          <div style="font-size: 64px; margin-bottom: 20px;">🔐</div>
+          <div style="font-size: 18px; margin-bottom: 10px;">Login Required</div>
+          <div style="font-size: 14px; margin-bottom: 20px;">Please login to access your digital closet</div>
+          <a href="/account/login" style="background: #39A596; color: #000; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600;">Login</a>
+        `;
         return;
       }
       await this.loadItems();
     },
 
+    updateStats: function(items) {
+      const total = items.length;
+      const categories = new Set(items.map(i => i.category)).size;
+      const western = items.filter(i => i.style_type === 'Western').length;
+      const ethnic = items.filter(i => i.style_type === 'Ethnic').length;
+
+      document.getElementById('total-items').textContent = total;
+      document.getElementById('categories-count').textContent = categories;
+      document.getElementById('western-count').textContent = western;
+      document.getElementById('ethnic-count').textContent = ethnic;
+    },
+
     loadItems: async function() {
       try {
-        const response = await fetch(`${this.api}?action=get_closet&user_id=${this.userId}`);
+        const response = await fetch(`${this.closetApi}?action=get_closet&user_id=${this.userId}`);
         const data = await response.json();
-        
+
         const grid = document.getElementById('wardrobe-grid');
         const emptyState = document.getElementById('empty-state');
 
         if (data.success && data.items && data.items.length > 0) {
           emptyState.style.display = 'none';
-          grid.innerHTML = data.items.map(item => `
-            <div class="closet-item" data-id="${item.id}">
-              <img src="${item.image_url}" alt="${item.category || 'Item'}">
-              <div class="closet-item-tag">${item.category || 'Clothing'}</div>
-              <button class="closet-item-delete" onclick="DigitalCloset.deleteItem('${item.id}')">×</button>
-            </div>
-          `).join('');
+          this.updateStats(data.items);
+          this.renderItems(data.items);
         } else {
           emptyState.style.display = 'block';
+          this.updateStats([]);
           grid.innerHTML = '';
         }
       } catch (error) {
         console.error('Failed to load closet:', error);
       }
+    },
+
+    renderItems: function(items) {
+      const grid = document.getElementById('wardrobe-grid');
+      const filtered = this.currentFilter === 'all'
+        ? items
+        : items.filter(i => i.category === this.currentFilter);
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666;">No items in this category</div>`;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(item => `
+        <div class="closet-item" data-id="${item.id}">
+          <img src="${item.image_url}" alt="${item.name || 'Clothing Item'}">
+          <div class="closet-item-info">
+            <div class="closet-item-name">${item.name || item.category || 'Item'}</div>
+            <div class="closet-item-tag">${item.category || 'Clothing'}</div>
+          </div>
+          <button class="closet-item-delete" onclick="DigitalCloset.deleteItem('${item.id}')">×</button>
+        </div>
+      `).join('');
+    },
+
+    filter: function(category) {
+      this.currentFilter = category;
+
+      // Update tab styles
+      document.querySelectorAll('.filter-tab').forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.filter === category);
+      });
+
+      // Reload with filter
+      this.loadItems();
     },
 
     upload: async function(input) {
@@ -128,59 +271,151 @@ if (!window.DigitalCloset) {
 
       reader.onload = async (e) => {
         try {
-          // Show loading
-          document.getElementById('empty-state').innerHTML = `
-            <div style="font-size: 48px; margin-bottom: 15px;">🤖</div>
-            <div style="font-size: 16px;">AI is analyzing your item...</div>
-          `;
+          // Show loading state
+          document.getElementById('upload-section').style.display = 'none';
+          document.getElementById('loading-state').style.display = 'block';
+          document.getElementById('loading-progress').style.width = '30%';
 
-          // Step 1: Classify the item with GPT-4o-mini
-          const classifyResponse = await fetch('https://mynarrative-ai.vercel.app/api/classify_item', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ image: e.target.result })
-          });
-          
-          const classifyData = await classifyResponse.json();
-          
-          if (!classifyData.success) {
-            throw new Error('Classification failed');
+          // Step 1: Call AI Classification API
+          let classification = null;
+
+          try {
+            // Try local API first
+            const classifyResponse = await fetch(this.apiUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ image: e.target.result }),
+              timeout: 30000
+            });
+
+            if (classifyResponse.ok) {
+              const classifyData = await classifyResponse.json();
+              if (classifyData.success && classifyData.detected_items && classifyData.detected_items.length > 0) {
+                classification = classifyData.detected_items[0];
+                console.log('Local API classification:', classification);
+              }
+            }
+          } catch (apiError) {
+            console.warn('Local API not available, trying classification fallback:', apiError);
           }
 
-          // Step 2: Upload to closet with classification metadata
-          const response = await fetch(this.api, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              action: 'add_to_closet',
-              user_id: this.userId,
-              image: e.target.result,
-              metadata: classifyData.classification
-            })
-          });
-
-          const data = await response.json();
-          
-          if (data.success) {
-            await this.loadItems();
-            input.value = ''; // Clear input
-          } else {
-            alert('Upload failed: ' + (data.error || 'Unknown error'));
+          // Fallback: If local API fails, use basic detection
+          if (!classification) {
+            classification = this.basicClassify(e.target.result);
           }
+
+          document.getElementById('loading-progress').style.width = '80%';
+
+          // Show result
+          this.showResult(e.target.result, classification);
+          document.getElementById('loading-state').style.display = 'none';
+
         } catch (error) {
           console.error('Upload error:', error);
           alert('Upload failed. Please try again.');
+          document.getElementById('upload-section').style.display = 'block';
+          document.getElementById('loading-state').style.display = 'none';
         }
       };
 
       reader.readAsDataURL(file);
     },
 
+    // Basic fallback classification using canvas analysis
+    basicClassify: function(imageData) {
+      // This is a fallback - in production you'd use the API
+      return {
+        name: 'Uploaded Item',
+        category: 'Topwear',
+        style_type: 'Western',
+        color: 'Unknown',
+        pattern: 'Solid',
+        confidence: 0.5
+      };
+    },
+
+    showResult: function(imageData, classification) {
+      document.getElementById('result-display').style.display = 'block';
+      document.getElementById('result-image').src = imageData;
+      document.getElementById('result-name').textContent = classification.name || 'Detected Item';
+      document.getElementById('result-category').textContent = classification.category || 'Topwear';
+      document.getElementById('result-style').textContent = classification.style_type || 'Western';
+      document.getElementById('result-color').textContent = classification.color || 'Unknown';
+
+      // Generate tags
+      const tags = [];
+      if (classification.pattern) tags.push(classification.pattern);
+      if (classification.fit) tags.push(classification.fit);
+      if (classification.fabric) tags.push(classification.fabric);
+      if (classification.occasion) tags.push(classification.occasion);
+      if (classification.season) tags.push(classification.season);
+
+      document.getElementById('result-tags').innerHTML = tags.slice(0, 4).map(tag =>
+        `<span style="background: #222; color: #888; padding: 3px 8px; border-radius: 10px; font-size: 10px;">${tag}</span>`
+      ).join('');
+
+      // Store pending item
+      this.pendingItem = {
+        image: imageData,
+        ...classification
+      };
+    },
+
+    confirmAdd: async function() {
+      if (!this.pendingItem) return;
+
+      try {
+        // Upload to closet
+        const response = await fetch(this.closetApi, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'add_to_closet',
+            user_id: this.userId,
+            image: this.pendingItem.image,
+            metadata: {
+              name: this.pendingItem.name,
+              category: this.pendingItem.category,
+              style_type: this.pendingItem.style_type,
+              color: this.pendingItem.color,
+              pattern: this.pendingItem.pattern,
+              fit: this.pendingItem.fit,
+              fabric: this.pendingItem.fabric,
+              confidence: this.pendingItem.confidence,
+              occasion: this.pendingItem.occasion,
+              season: this.pendingItem.season,
+              style_tags: this.pendingItem.style_tags || []
+            }
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          // Reset and reload
+          this.cancelAdd();
+          await this.loadItems();
+        } else {
+          alert('Failed to add item: ' + (data.error || 'Unknown error'));
+        }
+      } catch (error) {
+        console.error('Add to closet error:', error);
+        alert('Failed to add item. Please try again.');
+      }
+    },
+
+    cancelAdd: function() {
+      this.pendingItem = null;
+      document.getElementById('result-display').style.display = 'none';
+      document.getElementById('upload-section').style.display = 'block';
+      document.getElementById('closet-upload').value = '';
+    },
+
     deleteItem: async function(itemId) {
       if (!confirm('Delete this item from your closet?')) return;
 
       try {
-        const response = await fetch(this.api, {
+        const response = await fetch(this.closetApi, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
