@@ -8,18 +8,88 @@ Displays user's style profile, preferences, and saved data
 <style>
   .mn-user-dashboard {
     font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 60px auto;
     padding: 0 24px;
   }
 
-  .mn-dashboard-header {
-    text-align: center;
+  /* Profile Hero Section */
+  .mn-profile-hero {
+    background: linear-gradient(135deg, rgba(57, 165, 150, 0.08), rgba(79, 255, 217, 0.08));
+    border: 1px solid rgba(57, 165, 150, 0.2);
+    border-radius: 24px;
+    padding: 48px;
     margin-bottom: 48px;
+    display: flex;
+    align-items: center;
+    gap: 48px;
     animation: fadeInUp 0.6s ease-out;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
   }
 
-  .mn-dashboard-title {
+  .mn-profile-avatar-section {
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .mn-profile-avatar {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    border: 4px solid rgba(57, 165, 150, 0.3);
+    box-shadow: 0 12px 32px rgba(57, 165, 150, 0.2);
+    object-fit: cover;
+    margin-bottom: 20px;
+    transition: all 0.4s ease;
+    background: linear-gradient(135deg, #39A596, #4fffd9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 72px;
+    color: white;
+  }
+
+  .mn-profile-avatar:hover {
+    transform: scale(1.05);
+    box-shadow: 0 16px 48px rgba(57, 165, 150, 0.3);
+  }
+
+  .mn-profile-avatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .mn-closet-btn {
+    font-family: 'Montserrat', sans-serif;
+    background: linear-gradient(135deg, #39A596, #4fffd9);
+    color: white;
+    border: none;
+    padding: 14px 24px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 16px rgba(57, 165, 150, 0.3);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+  }
+
+  .mn-closet-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(57, 165, 150, 0.4);
+  }
+
+  .mn-profile-info {
+    flex: 1;
+  }
+
+  .mn-profile-name {
     font-family: 'Montserrat', sans-serif;
     font-size: 42px;
     font-weight: 700;
@@ -27,20 +97,65 @@ Displays user's style profile, preferences, and saved data
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
     letter-spacing: -0.5px;
   }
 
-  .mn-dashboard-subtitle {
+  .mn-profile-personality {
     font-family: 'Montserrat', sans-serif;
-    font-size: 16px;
+    font-size: 18px;
     color: rgba(0, 0, 0, 0.6);
-    font-weight: 400;
+    font-style: italic;
+    margin-bottom: 24px;
   }
 
+  .mn-quick-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    margin-top: 24px;
+  }
+
+  .mn-stat-box {
+    background: white;
+    border: 1px solid rgba(57, 165, 150, 0.15);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+
+  .mn-stat-box:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(57, 165, 150, 0.15);
+  }
+
+  .mn-stat-icon {
+    font-size: 28px;
+    margin-bottom: 8px;
+  }
+
+  .mn-stat-label {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(0, 0, 0, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+
+  .mn-stat-value {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+
+  /* Dashboard Grid */
   .mn-dashboard-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
     gap: 24px;
     margin-bottom: 48px;
   }
@@ -57,9 +172,9 @@ Displays user's style profile, preferences, and saved data
     animation-fill-mode: both;
   }
 
-  .mn-dashboard-card:nth-child(1) { animation-delay: 0.1s; }
-  .mn-dashboard-card:nth-child(2) { animation-delay: 0.2s; }
-  .mn-dashboard-card:nth-child(3) { animation-delay: 0.3s; }
+  .mn-dashboard-card:nth-child(1) { animation-delay: 0.2s; }
+  .mn-dashboard-card:nth-child(2) { animation-delay: 0.3s; }
+  .mn-dashboard-card:nth-child(3) { animation-delay: 0.4s; }
 
   .mn-dashboard-card:hover {
     transform: translateY(-8px);
@@ -72,6 +187,8 @@ Displays user's style profile, preferences, and saved data
     align-items: center;
     gap: 12px;
     margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid rgba(57, 165, 150, 0.1);
   }
 
   .mn-card-icon {
@@ -104,8 +221,8 @@ Displays user's style profile, preferences, and saved data
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 0;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
   }
 
   .mn-profile-item:last-child {
@@ -117,15 +234,18 @@ Displays user's style profile, preferences, and saved data
     font-size: 14px;
     font-weight: 600;
     color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
 
   .mn-profile-value {
     font-family: 'Montserrat', sans-serif;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
     color: #1a1a1a;
     background: rgba(57, 165, 150, 0.1);
-    padding: 6px 12px;
+    padding: 8px 14px;
     border-radius: 8px;
   }
 
@@ -208,6 +328,20 @@ Displays user's style profile, preferences, and saved data
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   }
 
+  .mn-personality-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, rgba(57, 165, 150, 0.1), rgba(79, 255, 217, 0.1));
+    border: 1px solid rgba(57, 165, 150, 0.3);
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #39A596;
+  }
+
   @keyframes fadeInUp {
     from {
       opacity: 0;
@@ -219,21 +353,89 @@ Displays user's style profile, preferences, and saved data
     }
   }
 
-  @media (max-width: 768px) {
-    .mn-dashboard-title {
+  @media (max-width: 968px) {
+    .mn-profile-hero {
+      flex-direction: column;
+      text-align: center;
+      padding: 32px;
+    }
+
+    .mn-profile-name {
       font-size: 32px;
     }
 
+    .mn-quick-stats {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 768px) {
     .mn-dashboard-grid {
       grid-template-columns: 1fr;
+    }
+
+    .mn-quick-stats {
+      grid-template-columns: 1fr;
+    }
+
+    .mn-profile-avatar {
+      width: 140px;
+      height: 140px;
+      font-size: 56px;
     }
   }
 </style>
 
 <div class="mn-user-dashboard">
-  <div class="mn-dashboard-header">
-    <h1 class="mn-dashboard-title">Your Style Profile</h1>
-    <p class="mn-dashboard-subtitle">Your personalized fashion identity and preferences</p>
+  <!-- Profile Hero Section -->
+  <div class="mn-profile-hero">
+    <div class="mn-profile-avatar-section">
+      <div class="mn-profile-avatar" id="profile-avatar">
+        👤
+      </div>
+      <a href="/pages/my-closet" class="mn-closet-btn">
+        <span>👗</span>
+        <span>Digital Closet</span>
+      </a>
+    </div>
+
+    <div class="mn-profile-info">
+      <h1 class="mn-profile-name" id="profile-name">Welcome Back</h1>
+      <p class="mn-profile-personality" id="profile-personality">
+        <span class="mn-personality-badge">
+          <span>✨</span>
+          <span id="personality-tone">Complete your profile to discover your style personality</span>
+        </span>
+      </p>
+
+      <div class="mn-quick-stats" id="quick-stats">
+        <div class="mn-stat-box">
+          <div class="mn-stat-icon">📏</div>
+          <div class="mn-stat-label">Height</div>
+          <div class="mn-stat-value" id="stat-height">-</div>
+        </div>
+        <div class="mn-stat-box">
+          <div class="mn-stat-icon">💪</div>
+          <div class="mn-stat-label">Body Type</div>
+          <div class="mn-stat-value" id="stat-body">-</div>
+        </div>
+        <div class="mn-stat-box">
+          <div class="mn-stat-icon">🎨</div>
+          <div class="mn-stat-label">Skin Tone</div>
+          <div class="mn-stat-value" id="stat-skin">-</div>
+        </div>
+        <div class="mn-stat-box">
+          <div class="mn-stat-icon">🌡️</div>
+          <div class="mn-stat-label">Temperature</div>
+          <div class="mn-stat-value" id="stat-temp">-</div>
+        </div>
+        <div class="mn-stat-box">
+          <div class="mn-stat-icon">💰</div>
+          <div class="mn-stat-label">Budget Range</div>
+          <div class="mn-stat-value" id="stat-budget">-</div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="mn-dashboard-grid">
@@ -241,7 +443,7 @@ Displays user's style profile, preferences, and saved data
     <div class="mn-dashboard-card">
       <div class="mn-card-header">
         <div class="mn-card-icon">✨</div>
-        <h2 class="mn-card-title">Style Identity</h2>
+        <h2 class="mn-card-title">Style Archetype</h2>
       </div>
       <div class="mn-card-content" id="identity-content">
         <div class="mn-empty-state">
@@ -296,6 +498,57 @@ Displays user's style profile, preferences, and saved data
         
         const identity = JSON.parse(storedData);
         
+        // Populate Profile Avatar
+        const avatarEl = document.getElementById('profile-avatar');
+        if (identity.profileImage) {
+          avatarEl.innerHTML = `<img src="${identity.profileImage}" alt="Profile Picture">`;
+        } else if (identity.archetype && identity.archetype.icon) {
+          avatarEl.innerHTML = identity.archetype.icon;
+        }
+        
+        // Populate Profile Name
+        const nameEl = document.getElementById('profile-name');
+        if (identity.name) {
+          nameEl.textContent = identity.name;
+        } else if (identity.archetype) {
+          nameEl.textContent = `The ${identity.archetype.name}`;
+        }
+        
+        // Populate Personality Tone
+        const personalityEl = document.getElementById('personality-tone');
+        if (identity.personalityTone) {
+          personalityEl.textContent = identity.personalityTone;
+        } else if (identity.coreExpression && identity.presence && identity.signal) {
+          personalityEl.textContent = `${identity.coreExpression} · ${identity.presence} · ${identity.signal}`;
+        }
+        
+        // Populate Quick Stats
+        if (identity.height) {
+          document.getElementById('stat-height').textContent = `${identity.height} cm`;
+        }
+        
+        if (identity.build || identity.bodyType) {
+          document.getElementById('stat-body').textContent = identity.build || identity.bodyType;
+        }
+        
+        if (identity.skinTone) {
+          document.getElementById('stat-skin').textContent = identity.skinTone;
+        }
+        
+        // Temperature (check for climate or temperature data)
+        if (identity.temperature) {
+          document.getElementById('stat-temp').textContent = identity.temperature;
+        } else if (identity.climate) {
+          document.getElementById('stat-temp').textContent = identity.climate;
+        } else if (identity.region) {
+          // Try to fetch temperature for region (placeholder for now)
+          document.getElementById('stat-temp').textContent = identity.region;
+        }
+        
+        if (identity.budget || identity.priceRange) {
+          document.getElementById('stat-budget').textContent = identity.budget || identity.priceRange;
+        }
+        
         // Populate Style Identity
         if (identity.archetype) {
           const identityHTML = `
@@ -310,15 +563,15 @@ Displays user's style profile, preferences, and saved data
               </div>
             </div>
             <div class="mn-profile-item">
-              <span class="mn-profile-label">Core Expression</span>
+              <span class="mn-profile-label"><span>💫</span> Core Expression</span>
               <span class="mn-profile-value">${identity.coreExpression || 'Not set'}</span>
             </div>
             <div class="mn-profile-item">
-              <span class="mn-profile-label">Presence</span>
+              <span class="mn-profile-label"><span>👁️</span> Presence</span>
               <span class="mn-profile-value">${identity.presence || 'Not set'}</span>
             </div>
             <div class="mn-profile-item">
-              <span class="mn-profile-label">Signal</span>
+              <span class="mn-profile-label"><span>📢</span> Signal</span>
               <span class="mn-profile-value">${identity.signal || 'Not set'}</span>
             </div>
           `;
@@ -326,36 +579,42 @@ Displays user's style profile, preferences, and saved data
         }
         
         // Populate Personal Details
-        if (identity.height || identity.build || identity.skinTone) {
+        if (identity.height || identity.build || identity.skinTone || identity.bodyType) {
           const detailsHTML = `
             ${identity.gender ? `
               <div class="mn-profile-item">
-                <span class="mn-profile-label">Gender Identity</span>
+                <span class="mn-profile-label"><span>⚧️</span> Gender</span>
                 <span class="mn-profile-value">${identity.gender}</span>
               </div>
             ` : ''}
             ${identity.height ? `
               <div class="mn-profile-item">
-                <span class="mn-profile-label">Height</span>
+                <span class="mn-profile-label"><span>📏</span> Height</span>
                 <span class="mn-profile-value">${identity.height} cm</span>
               </div>
             ` : ''}
-            ${identity.build ? `
+            ${identity.build || identity.bodyType ? `
               <div class="mn-profile-item">
-                <span class="mn-profile-label">Build</span>
-                <span class="mn-profile-value">${identity.build}</span>
+                <span class="mn-profile-label"><span>💪</span> Body Type</span>
+                <span class="mn-profile-value">${identity.build || identity.bodyType}</span>
               </div>
             ` : ''}
             ${identity.skinTone ? `
               <div class="mn-profile-item">
-                <span class="mn-profile-label">Skin Tone</span>
+                <span class="mn-profile-label"><span>🎨</span> Skin Tone</span>
                 <span class="mn-profile-value">${identity.skinTone}</span>
               </div>
             ` : ''}
             ${identity.undertone ? `
               <div class="mn-profile-item">
-                <span class="mn-profile-label">Undertone</span>
+                <span class="mn-profile-label"><span>🌈</span> Undertone</span>
                 <span class="mn-profile-value">${identity.undertone}</span>
+              </div>
+            ` : ''}
+            ${identity.age ? `
+              <div class="mn-profile-item">
+                <span class="mn-profile-label"><span>🎂</span> Age</span>
+                <span class="mn-profile-value">${identity.age}</span>
               </div>
             ` : ''}
           `;
@@ -363,30 +622,42 @@ Displays user's style profile, preferences, and saved data
         }
         
         // Populate Preferences
-        if (identity.region || identity.climate || identity.budget) {
+        if (identity.region || identity.climate || identity.budget || identity.temperature || identity.priceRange) {
           const preferencesHTML = `
             ${identity.region ? `
               <div class="mn-profile-item">
-                <span class="mn-profile-label">Region</span>
+                <span class="mn-profile-label"><span>📍</span> Region</span>
                 <span class="mn-profile-value">${identity.region}</span>
               </div>
             ` : ''}
             ${identity.climate ? `
               <div class="mn-profile-item">
-                <span class="mn-profile-label">Climate</span>
+                <span class="mn-profile-label"><span>☀️</span> Climate</span>
                 <span class="mn-profile-value">${identity.climate}</span>
               </div>
             ` : ''}
-            ${identity.budget ? `
+            ${identity.temperature ? `
               <div class="mn-profile-item">
-                <span class="mn-profile-label">Budget Range</span>
-                <span class="mn-profile-value">${identity.budget}</span>
+                <span class="mn-profile-label"><span>🌡️</span> Temperature</span>
+                <span class="mn-profile-value">${identity.temperature}</span>
+              </div>
+            ` : ''}
+            ${identity.budget || identity.priceRange ? `
+              <div class="mn-profile-item">
+                <span class="mn-profile-label"><span>💰</span> Budget Range</span>
+                <span class="mn-profile-value">${identity.budget || identity.priceRange}</span>
               </div>
             ` : ''}
             ${identity.closet && identity.closet.length > 0 ? `
               <div class="mn-profile-item">
-                <span class="mn-profile-label">Closet Items</span>
+                <span class="mn-profile-label"><span>👗</span> Closet Items</span>
                 <span class="mn-profile-value">${identity.closet.length} items</span>
+              </div>
+            ` : ''}
+            ${identity.favoriteColors && identity.favoriteColors.length > 0 ? `
+              <div class="mn-profile-item">
+                <span class="mn-profile-label"><span>🎨</span> Favorite Colors</span>
+                <span class="mn-profile-value">${identity.favoriteColors.join(', ')}</span>
               </div>
             ` : ''}
           `;
