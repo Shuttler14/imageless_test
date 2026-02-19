@@ -93,6 +93,412 @@
     </a>
   </div>
 
+  <!-- User Profile Section -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap');
+    
+    .user-profile-section {
+      font-family: 'Montserrat', sans-serif;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
+      border: 1px solid #39A596;
+      border-radius: 20px;
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 40px rgba(57, 165, 150, 0.15);
+    }
+
+    .user-profile-section::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(57, 165, 150, 0.1) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .profile-hero {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .profile-top-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      align-items: flex-start;
+    }
+
+    .profile-avatar-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .profile-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 3px solid #39A596;
+      background: linear-gradient(135deg, #1a1a1a, #0a0a0a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      box-shadow: 0 0 30px rgba(57, 165, 150, 0.3);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+    }
+
+    .profile-avatar:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 40px rgba(57, 165, 150, 0.5);
+    }
+
+    .profile-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .profile-avatar-placeholder {
+      font-size: 48px;
+      color: #39A596;
+    }
+
+    .profile-name-section {
+      flex: 1;
+      min-width: 250px;
+    }
+
+    .profile-name {
+      font-size: 28px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .profile-personality {
+      display: inline-block;
+      background: linear-gradient(135deg, #39A596, #2d8578);
+      color: #ffffff;
+      padding: 0.4rem 1rem;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 1rem;
+    }
+
+    .digital-closet-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: linear-gradient(135deg, #39A596, #2d8578);
+      color: #ffffff;
+      padding: 0.8rem 1.5rem;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(57, 165, 150, 0.3);
+      text-decoration: none;
+    }
+
+    .digital-closet-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(57, 165, 150, 0.5);
+      background: linear-gradient(135deg, #2d8578, #39A596);
+    }
+
+    .quick-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .stat-card {
+      background: rgba(10, 10, 10, 0.6);
+      border: 1px solid #2a2a2a;
+      border-radius: 12px;
+      padding: 1rem;
+      text-align: center;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .stat-card:hover {
+      border-color: #39A596;
+      background: rgba(57, 165, 150, 0.05);
+      transform: translateY(-3px);
+    }
+
+    .stat-icon {
+      font-size: 24px;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: #888888;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+
+    .stat-value {
+      font-size: 15px;
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    .profile-details-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .detail-card {
+      background: rgba(10, 10, 10, 0.4);
+      border: 1px solid #2a2a2a;
+      border-radius: 10px;
+      padding: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .detail-card:hover {
+      border-color: #39A596;
+      background: rgba(57, 165, 150, 0.03);
+    }
+
+    .detail-label {
+      font-size: 11px;
+      color: #39A596;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .detail-value {
+      font-size: 14px;
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .detail-icon {
+      font-size: 14px;
+    }
+
+    @media (max-width: 768px) {
+      .profile-top-row {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+
+      .profile-name-section {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .quick-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .profile-details-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+
+  <div class="user-profile-section" id="userProfileSection">
+    <div class="profile-hero">
+      <!-- Top Row: Avatar + Name + Digital Closet Button -->
+      <div class="profile-top-row">
+        <div class="profile-avatar-section">
+          <div class="profile-avatar" id="profileAvatar">
+            <span class="profile-avatar-placeholder" id="avatarPlaceholder">👤</span>
+            <img id="avatarImage" src="" alt="Profile" style="display: none;">
+          </div>
+        </div>
+
+        <div class="profile-name-section">
+          <h2 class="profile-name" id="profileName">{{ customer.first_name }} {{ customer.last_name }}</h2>
+          <div class="profile-personality" id="profilePersonality">
+            <span id="personalityTone">Style Explorer</span>
+          </div>
+          <div style="margin-top: 1rem;">
+            <a href="/pages/my-closet" class="digital-closet-btn">
+              <span>👔</span>
+              <span>My Digital Closet</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="quick-stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">📏</div>
+          <div class="stat-label">Height</div>
+          <div class="stat-value" id="statHeight">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">💪</div>
+          <div class="stat-label">Body Type</div>
+          <div class="stat-value" id="statBodyType">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🎨</div>
+          <div class="stat-label">Skin Tone</div>
+          <div class="stat-value" id="statSkinTone">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🌡️</div>
+          <div class="stat-label">Climate</div>
+          <div class="stat-value" id="statTemperature">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">💰</div>
+          <div class="stat-label">Budget Range</div>
+          <div class="stat-value" id="statPriceRange">-</div>
+        </div>
+      </div>
+
+      <!-- Detailed Profile Information -->
+      <div class="profile-details-grid">
+        <div class="detail-card">
+          <div class="detail-label">
+            <span class="detail-icon">🎯</span>
+            <span>Fashion Goals</span>
+          </div>
+          <div class="detail-value" id="detailGoals">-</div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-label">
+            <span class="detail-icon">🎨</span>
+            <span>Favorite Colors</span>
+          </div>
+          <div class="detail-value" id="detailColors">-</div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-label">
+            <span class="detail-icon">👕</span>
+            <span>Closet Items</span>
+          </div>
+          <div class="detail-value" id="detailClosetCount">-</div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-label">
+            <span class="detail-icon">🌍</span>
+            <span>Location</span>
+          </div>
+          <div class="detail-value" id="detailLocation">-</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Load user profile data from localStorage
+    document.addEventListener('DOMContentLoaded', function() {
+      try {
+        const coreIdentity = localStorage.getItem('mn_core_identity');
+        
+        if (coreIdentity) {
+          const profile = JSON.parse(coreIdentity);
+          console.log('Loading profile:', profile);
+          
+          // Avatar/Profile Picture
+          if (profile.uploadedImage) {
+            document.getElementById('avatarImage').src = profile.uploadedImage;
+            document.getElementById('avatarImage').style.display = 'block';
+            document.getElementById('avatarPlaceholder').style.display = 'none';
+          } else if (profile.archetype && profile.archetype.icon) {
+            document.getElementById('avatarPlaceholder').textContent = profile.archetype.icon;
+          }
+          
+          // Personality Tone
+          if (profile.tone) {
+            document.getElementById('personalityTone').textContent = profile.tone;
+          }
+          
+          // Quick Stats
+          if (profile.height) {
+            document.getElementById('statHeight').textContent = profile.height + ' cm';
+          }
+          if (profile.bodyType) {
+            document.getElementById('statBodyType').textContent = profile.bodyType;
+          }
+          if (profile.skinTone) {
+            document.getElementById('statSkinTone').textContent = profile.skinTone;
+          }
+          if (profile.temperature || profile.climate) {
+            document.getElementById('statTemperature').textContent = profile.temperature || profile.climate || '-';
+          }
+          if (profile.priceRange || profile.budget) {
+            const priceRange = profile.priceRange || profile.budget;
+            document.getElementById('statPriceRange').textContent = priceRange;
+          }
+          
+          // Detailed Information
+          if (profile.goals || profile.fashionGoals) {
+            document.getElementById('detailGoals').textContent = profile.goals || profile.fashionGoals;
+          }
+          if (profile.favoriteColors || profile.colors) {
+            const colors = profile.favoriteColors || profile.colors;
+            if (Array.isArray(colors)) {
+              document.getElementById('detailColors').textContent = colors.join(', ');
+            } else {
+              document.getElementById('detailColors').textContent = colors;
+            }
+          }
+          
+          // Closet count from localStorage
+          const closetItems = localStorage.getItem('mn_closet_items');
+          if (closetItems) {
+            try {
+              const items = JSON.parse(closetItems);
+              document.getElementById('detailClosetCount').textContent = items.length + ' items';
+            } catch(e) {
+              document.getElementById('detailClosetCount').textContent = '0 items';
+            }
+          }
+          
+          // Location
+          if (profile.location || profile.city) {
+            document.getElementById('detailLocation').textContent = profile.location || profile.city;
+          }
+        }
+      } catch (error) {
+        console.error('Error loading profile data:', error);
+      }
+    });
+  </script>
+
   {% if customer.orders.size > 0 %}
     {% assign latest_order = customer.orders.first %}
 
