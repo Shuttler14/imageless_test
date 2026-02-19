@@ -498,7 +498,7 @@ const MNAIStylist = (() => {
             </div>
           </div>
           <h2 class="mn-premium-title">AI Fashion Consultant</h2>
-          <p class="mn-premium-greeting">Hey there! I'm here to help you look amazing.</p>
+          <p class="mn-premium-greeting">Hello! Here to help you customize your style.<br>What would you like to create today?</p>
         </div>
         
         <!-- Identity Bar -->
@@ -511,11 +511,22 @@ const MNAIStylist = (() => {
           <button id="mn-recalibrate-btn" class="mn-text-link">🔄 Recalibrate</button>
         </div>
         
-        <!-- Suggestion Chips -->
+        <!-- Suggestion Chips (INFO9 spec) -->
         <div class="mn-suggestion-chips">
-          <button class="mn-suggestion-chip" data-action="outfit">Suggest an outfit for today</button>
-          <button class="mn-suggestion-chip" data-action="occasion">What should I wear for...?</button>
-          <button class="mn-suggestion-chip" data-action="style">Help me define my style</button>
+          <button class="mn-suggestion-chip" data-fill="Luxury streetwear">Luxury streetwear</button>
+          <button class="mn-suggestion-chip" data-fill="Minimal collection">Minimal collection</button>
+          <button class="mn-suggestion-chip" data-fill="Dark and bold statement">Dark and bold statement</button>
+          <button class="mn-suggestion-chip" data-fill="Nature inspired">Nature inspired</button>
+        </div>
+
+        <!-- Premium Input Bar (INFO9 spec) -->
+        <div class="mn-generate-bar">
+          <input type="text" id="mn-generate-input" class="mn-generate-input" placeholder="Generate a new design..." autocomplete="off" />
+          <button id="mn-generate-btn" class="mn-generate-btn" aria-label="Generate">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </button>
         </div>
         
         <!-- Mode Selection -->
@@ -539,16 +550,38 @@ const MNAIStylist = (() => {
     DOM.container.style.opacity = '1';
     DOM.container.style.transform = 'translateY(0)';
 
-    // Suggestion chip handlers
+    const generateInput = document.getElementById('mn-generate-input');
+    const generateBtn = document.getElementById('mn-generate-btn');
+
+    // Chip click → autofill input (INFO9 spec)
     DOM.container.querySelectorAll('.mn-suggestion-chip').forEach(chip => {
       chip.addEventListener('click', () => {
-        const action = chip.dataset.action;
-        if (action === 'outfit' || action === 'occasion') {
-          renderSelfContext();
-        } else if (action === 'style') {
-          renderCalibrationFlow(0);
+        const fillText = chip.dataset.fill;
+        if (fillText && generateInput) {
+          generateInput.value = fillText;
+          generateInput.focus();
+          // Brief visual feedback on chip
+          chip.classList.add('mn-chip-selected');
+          setTimeout(() => chip.classList.remove('mn-chip-selected'), 600);
         }
       });
+    });
+
+    // Generate button click → route as self context
+    generateBtn.addEventListener('click', () => {
+      const query = generateInput.value.trim();
+      if (query) {
+        state.currentContext = { mode: 'self', contexts: [query], loudness: 'Balanced' };
+        if (hasBodyData()) generateAIRecommendations();
+        else renderSelfContext();
+      } else {
+        renderSelfContext();
+      }
+    });
+
+    // Enter key on input
+    generateInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') generateBtn.click();
     });
 
     document.getElementById('btn-mode-self').addEventListener('click', renderSelfContext);
@@ -994,7 +1027,7 @@ const MNAIStylist = (() => {
       e.preventDefault();
       document.getElementById('closet-photos').click();
     });
-    
+
     document.getElementById('btn-take-photo').addEventListener('click', (e) => {
       e.preventDefault();
       document.getElementById('closet-camera').click();
