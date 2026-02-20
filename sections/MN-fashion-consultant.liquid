@@ -3,10 +3,10 @@
      INFO9 Premium Design | Floating Chat Interface
     ═══════════════════════════════════════════════════════════ -->
 
-<div id="mn-ai-widget" class="mn-ai-widget">
-  
+<div id="mn-ai-widget" class="mn-ai-widget" style="opacity: 1 !important; pointer-events: auto !important;">
+
   <!-- MINIMIZED STATE: Simple Floating Button -->
-  <div id="mn-widget-minimized" class="mn-widget-minimized">
+  <div id="mn-widget-minimized" class="mn-widget-minimized" onclick="window.MNAIStylist && window.MNAIStylist.expand ? window.MNAIStylist.expand() : console.log('Loading...');">
     <div class="mn-mini-avatar">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
@@ -20,7 +20,7 @@
 
   <!-- EXPANDED STATE: Premium Floating Chat Panel -->
   <div id="mn-widget-expanded" class="mn-widget-expanded" aria-hidden="true">
-    
+
     <!-- Close Button (X in top-right) -->
     <button id="mn-minimize-btn" class="mn-close-btn" aria-label="Close">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -40,6 +40,26 @@
 
   </div>
 </div>
+
+<!-- Immediate show widget without waiting -->
+<script>
+  (function() {
+    // Show widget immediately
+    var widget = document.getElementById('mn-ai-widget');
+    if (widget) {
+      widget.style.opacity = '1';
+      widget.classList.add('visible');
+      console.log('✅ Widget shown immediately');
+    }
+
+    // Make sure preloader overlay is hidden
+    var preloader = document.getElementById('mn-preloader-overlay');
+    if (preloader) {
+      preloader.style.display = 'none';
+      preloader.style.opacity = '0';
+    }
+  })();
+</script>
 
 <!-- Load Assets -->
 <script>

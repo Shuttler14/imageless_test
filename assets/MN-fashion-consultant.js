@@ -300,20 +300,43 @@ const MNAIStylist = (() => {
     loadIdentityFromStorage();
     console.log('🎨 AI Fashion Consultant - Horizontal Premium Card v5.0 ✨');
     console.log('✅ Reference image design | ✅ Center-bottom | ✅ Appears after preloader');
-    
-    // Wait for preloader to complete before showing widget
+
+    // Force show widget after a timeout (fallback)
+    const forceShowWidget = () => {
+      if (DOM.widget) {
+        DOM.widget.classList.add('visible');
+        console.log('✅ Widget visible (forced)');
+      }
+    };
+
+    // Check for preloader and show widget when ready
     const checkPreloader = setInterval(() => {
-      const preloader = document.querySelector('.preloader-narrative, #preloader, [class*="preload"]');
-      if (!preloader || preloader.style.display === 'none' || preloader.classList.contains('hidden')) {
+      // Check various preloader selectors
+      const preloaderOverlay = document.getElementById('mn-preloader-overlay');
+      const preloaderHidden = !preloaderOverlay ||
+                             preloaderOverlay.style.display === 'none' ||
+                             preloaderOverlay.style.opacity === '0' ||
+                             getComputedStyle(preloaderOverlay).display === 'none';
+
+      if (preloaderHidden) {
         clearInterval(checkPreloader);
-        // Show widget with fade-in
-        setTimeout(() => {
-          if (DOM.widget) {
-            DOM.widget.classList.add('visible');
-          }
-        }, 500);
+        forceShowWidget();
       }
     }, 100);
+
+    // Force show after 5 seconds as final fallback
+    setTimeout(() => {
+      clearInterval(checkPreloader);
+      forceShowWidget();
+    }, 5000);
+
+    // Auto-expand on first visit (INFO5 feature)
+    const alreadySeen = sessionStorage.getItem('mn_widget_dismissed');
+    if (!alreadySeen && DOM.widget) {
+      setTimeout(() => {
+        autoExpandWidget();
+      }, 3000); // Auto-expand after 3 seconds
+    }
   };
 
   // INFO5: Auto-expansion with message bubble
@@ -1494,7 +1517,16 @@ const MNAIStylist = (() => {
     return '#333333';
   };
 
-  return { init, expandWidget, minimizeWidget, clearIdentity, selectSlogan };
+  // Alias for expand (called from inline onclick)
+  const expand = () => expandWidget();
+  const minimize = () => minimizeWidget();
+
+  const module = { init, expand, minimize, expandWidget, minimizeWidget, clearIdentity, selectSlogan };
+
+  // Assign to window for global access
+  window.MNAIStylist = module;
+
+  return module;
 
 })();
 
