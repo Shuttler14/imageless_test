@@ -503,24 +503,34 @@ const MNAIStylist = (() => {
   // ═══════════════════════════════════════════════════════════
 
   const expandWidget = () => {
+    console.log('expandWidget called!');
+    if (!DOM.widget || !DOM.expanded) {
+      console.error('DOM elements missing!', { widget: !!DOM.widget, expanded: !!DOM.expanded });
+      return;
+    }
+
     state.isExpanded = true;
     DOM.widget.classList.add('is-expanded');
+    DOM.expanded.classList.add('expanded');
     DOM.expanded.setAttribute('aria-hidden', 'false');
-    setTimeout(() => { DOM.expanded.style.animation = 'fadeIn 0.4s ease-out'; }, 10);
+    DOM.expanded.style.opacity = '1';
+    DOM.expanded.style.transform = 'translateY(0)';
+    DOM.expanded.style.pointerEvents = 'auto';
+
+    console.log('Expanded panel shown');
+
     if (!state.identity) renderWelcomeScreen();
     else renderContextDashboard();
   };
 
   const minimizeWidget = () => {
+    console.log('minimizeWidget called!');
     state.isExpanded = false;
-    DOM.expanded.style.animation = 'fadeOut 0.3s ease-out';
-    setTimeout(() => {
-      DOM.widget.classList.remove('is-expanded');
-      DOM.expanded.setAttribute('aria-hidden', 'true');
-      DOM.container.innerHTML = '';
-      updateProgressBar(0);
-      DOM.expanded.style.animation = '';
-    }, 300);
+    DOM.expanded.classList.remove('expanded');
+    DOM.widget.classList.remove('is-expanded');
+    DOM.expanded.setAttribute('aria-hidden', 'true');
+    DOM.container.innerHTML = '';
+    updateProgressBar(0);
   };
 
   // ═══════════════════════════════════════════════════════════
