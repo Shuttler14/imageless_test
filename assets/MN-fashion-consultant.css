@@ -270,26 +270,23 @@
 
 .mn-widget-expanded {
   position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 440px;
-  max-width: calc(100vw - 48px);
-  height: 680px;
-  max-height: calc(100vh - 48px);
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  max-width: 100vw;
+  max-height: 100vh;
   background: linear-gradient(135deg, #050505 0%, #0f0f0f 50%, #050505 100%);
-  border: 1px solid rgba(110, 231, 183, 0.25);
-  border-radius: 20px;
-  box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.7),
-    0 0 0 1px rgba(110, 231, 183, 0.1) inset;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   display: flex;
   flex-direction: column;
   opacity: 0;
   pointer-events: none;
-  transform: translateX(-50%) translateY(20px) scale(0.96);
+  transform: translateY(20px);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 999999;
   overflow: hidden;
@@ -298,30 +295,31 @@
 .mn-widget-expanded[aria-hidden="false"] {
   opacity: 1;
   pointer-events: auto;
-  transform: translateX(-50%) translateY(0) scale(1);
+  transform: translateY(0);
 }
 
-/* Close Button (Simple X in corner) */
+/* Close Button (Fullscreen X in top-right) */
 .mn-close-btn {
   position: absolute;
-  top: 20px;
-  right: 20px;
-  width: 32px;
-  height: 32px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  top: 24px;
+  right: 24px;
+  width: 48px;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 50%;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.8);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
-  z-index: 10;
+  z-index: 100;
+  font-size: 24px;
 }
 
 .mn-close-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.2);
   border-color: var(--mn-green-primary);
   color: var(--mn-green-primary);
   transform: rotate(90deg);
