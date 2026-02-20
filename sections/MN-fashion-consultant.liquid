@@ -1,46 +1,35 @@
-<!-- ═══════════════════════════════════════════════════════════
-     MY NARRATIVE - AI FASHION CONSULTANT WIDGET
-     INFO9 Premium Design | Floating Chat Interface
-    ═══════════════════════════════════════════════════════════ -->
+<!-- AI Stylist Widget - Global Floating Assistant -->
+<div id="mn-ai-widget" class="mn-ai-widget">
 
-<!-- Configuration - Must load first -->
+  <!-- Minimized State: Premium Card -->
+  <div id="mn-widget-minimized" class="mn-widget-minimized">
+    <div class="mn-card-avatar">
+      <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=80&h=80&fit=crop" alt="AI Consultant" />
+    </div>
+    <div class="mn-card-content">
+      <div class="mn-card-title">AI Fashion Consultant</div>
+      <div class="mn-card-message">Let me plan your outfit of the day.</div>
+    </div>
+    <button class="mn-card-cta">Try me →</button>
+  </div>
+
+  <!-- Expanded State: Full Dashboard -->
+  <div id="mn-widget-expanded" class="mn-widget-expanded" aria-hidden="true">
+    <button id="mn-close-btn" class="mn-close-btn" aria-label="Close">×</button>
+    <div id="mn-progress-bar" class="mn-progress-bar">
+      <div class="mn-progress-fill"></div>
+    </div>
+    <div id="mn-content-container" class="mn-content-container"></div>
+  </div>
+
+</div>
+
+<!-- Load Assets -->
 <script>
   window.MN_CONFIG = {
     apiUrl: "https://mynarrative-ai.vercel.app/api/fashion_consultant",
     studioUrl: "/pages/ai-studio"
   };
 </script>
-
-<!-- Widget HTML -->
-<div id="mn-ai-widget" class="mn-ai-widget">
-
-  <!-- MINIMIZED STATE -->
-  <div id="mn-widget-minimized" class="mn-widget-minimized" onclick="var w=document.getElementById('mn-widget-expanded');w.classList.add('expanded');w.setAttribute('aria-hidden','false');if(window.MNAIStylist){window.MNAIStylist.expandWidget();}">
-    <div class="mn-mini-avatar">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-      </svg>
-    </div>
-    <div class="mn-mini-text">
-      <div class="mn-mini-title">AI Stylist</div>
-      <div class="mn-mini-status">Online</div>
-    </div>
-  </div>
-
-  <!-- EXPANDED STATE -->
-  <div id="mn-widget-expanded" class="mn-widget-expanded" aria-hidden="true">
-    <button id="mn-minimize-btn" class="mn-close-btn" aria-label="Close" onclick="document.getElementById('mn-widget-expanded').classList.remove('expanded');document.getElementById('mn-widget-expanded').setAttribute('aria-hidden','true');">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M18 6L6 18M6 6l12 12"></path>
-      </svg>
-    </button>
-    <div id="mn-progress-bar" class="mn-progress-bar">
-      <div class="mn-progress-fill"></div>
-    </div>
-    <div id="mn-content-container" class="mn-content-container"></div>
-  </div>
-</div>
-
-<!-- Load Assets -->
-<script src="{{ 'MN-fashion-consultant.js' | asset_url }}?v=20260220-FIX7"></script>
-<link rel="stylesheet" href="{{ 'MN-fashion-consultant.css' | asset_url }}?v=20260220-FIX7">
+<script src="{{ 'MN-fashion-consultant.js' | asset_url }}?v=REFERENCE-FIX" defer></script>
+<link rel="stylesheet" href="{{ 'MN-fashion-consultant.css' | asset_url }}?v=REFERENCE-FIX">

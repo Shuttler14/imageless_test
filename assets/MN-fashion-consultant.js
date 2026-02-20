@@ -298,63 +298,18 @@ const MNAIStylist = (() => {
     cacheDOM();
     bindEvents();
     loadIdentityFromStorage();
-    console.log('🎨 AI Fashion Consultant - Fullscreen Widget v6.0 ✨');
+    console.log('🎨 AI Fashion Consultant - INFO5 State Machine v6.0 ✨');
+    console.log('✅ Widget visible immediately | ✅ Auto-expand on homepage | ✅ Clean state management');
 
-    // Wait for preloader to fully complete before showing widget
-    // Preloader takes ~11 seconds total
-    const waitForPreloader = () => {
-      return new Promise((resolve) => {
-        const checkPreloader = setInterval(() => {
-          const preloader = document.getElementById('mn-preloader-overlay');
+    // Widget is always visible (CSS sets opacity: 1)
+    // Only auto-expand on homepage after 10 seconds
+    const isHomepage = window.location.pathname === '/' || window.location.pathname === '';
 
-          // Check if preloader is hidden/removed
-          if (!preloader) {
-            clearInterval(checkPreloader);
-            resolve();
-            return;
-          }
-
-          const style = preloader.style;
-          const compStyle = getComputedStyle(preloader);
-
-          // Check various hidden states
-          if (style.display === 'none' ||
-              style.visibility === 'hidden' ||
-              style.opacity === '0' ||
-              compStyle.display === 'none' ||
-              compStyle.opacity === '0') {
-            clearInterval(checkPreloader);
-            // Wait a bit more for transition to complete
-            setTimeout(resolve, 1500);
-          }
-        }, 200);
-
-        // Force resolve after 13 seconds as fallback
-        setTimeout(() => {
-          clearInterval(checkPreloader);
-          resolve();
-        }, 13000);
-      });
-    };
-
-    // Show widget only after preloader is done
-    waitForPreloader().then(() => {
-      if (DOM.widget) {
-        DOM.widget.classList.add('visible');
-        console.log('✅ Widget visible after preloader');
-      }
-
-      // NOTE: Auto-expand disabled for now - user must click to open
-      // This can be enabled later by uncommenting below:
-      /*
-      const alreadySeen = sessionStorage.getItem('mn_widget_dismissed');
-      if (!alreadySeen && DOM.widget) {
-        setTimeout(() => {
-          autoExpandWidget();
-        }, 2000);
-      }
-      */
-    });
+    if (isHomepage && !sessionStorage.getItem('mn_widget_dismissed')) {
+      setTimeout(() => {
+        autoExpandWidget();
+      }, 10000); // 10 seconds
+    }
   };
 
   // INFO5: Auto-expansion with message bubble
@@ -439,11 +394,32 @@ const MNAIStylist = (() => {
   };
 
   const bindEvents = () => {
-    DOM.minimized.addEventListener('click', expandWidget);
-    DOM.minimizeBtn.addEventListener('click', minimizeWidget);
-    DOM.expanded.addEventListener('click', (e) => {
-      if (e.target === DOM.expanded) minimizeWidget();
-    });
+    // Click anywhere on the minimized widget to expand
+    if (DOM.minimized) {
+      DOM.minimized.addEventListener('click', (e) => {
+        console.log('🎨 Static widget clicked - expanding...');
+        // Clear any auto-dismiss flags
+        sessionStorage.removeItem('mn_widget_dismissed');
+        expandWidget();
+      });
+    }
+
+    // Close button
+    if (DOM.minimizeBtn) {
+      DOM.minimizeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        minimizeWidget();
+      });
+    }
+
+    // Close on backdrop click
+    if (DOM.expanded) {
+      DOM.expanded.addEventListener('click', (e) => {
+        if (e.target === DOM.expanded) minimizeWidget();
+      });
+    }
+
+    // Close on Escape key
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && state.isExpanded) minimizeWidget();
     });
