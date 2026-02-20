@@ -298,45 +298,60 @@ const MNAIStylist = (() => {
     cacheDOM();
     bindEvents();
     loadIdentityFromStorage();
-    console.log('🎨 AI Fashion Consultant - Horizontal Premium Card v5.0 ✨');
-    console.log('✅ Reference image design | ✅ Center-bottom | ✅ Appears after preloader');
+    console.log('🎨 AI Fashion Consultant - Fullscreen Widget v6.0 ✨');
 
-    // Force show widget after a timeout (fallback)
-    const forceShowWidget = () => {
-      if (DOM.widget) {
-        DOM.widget.classList.add('visible');
-        console.log('✅ Widget visible (forced)');
-      }
+    // Wait for preloader to fully complete before showing widget
+    // Preloader takes ~11 seconds total
+    const waitForPreloader = () => {
+      return new Promise((resolve) => {
+        const checkPreloader = setInterval(() => {
+          const preloader = document.getElementById('mn-preloader-overlay');
+
+          // Check if preloader is hidden/removed
+          if (!preloader) {
+            clearInterval(checkPreloader);
+            resolve();
+            return;
+          }
+
+          const style = preloader.style;
+          const compStyle = getComputedStyle(preloader);
+
+          // Check various hidden states
+          if (style.display === 'none' ||
+              style.visibility === 'hidden' ||
+              style.opacity === '0' ||
+              compStyle.display === 'none' ||
+              compStyle.opacity === '0') {
+            clearInterval(checkPreloader);
+            // Wait a bit more for transition to complete
+            setTimeout(resolve, 1500);
+          }
+        }, 200);
+
+        // Force resolve after 13 seconds as fallback
+        setTimeout(() => {
+          clearInterval(checkPreloader);
+          resolve();
+        }, 13000);
+      });
     };
 
-    // Check for preloader and show widget when ready
-    const checkPreloader = setInterval(() => {
-      // Check various preloader selectors
-      const preloaderOverlay = document.getElementById('mn-preloader-overlay');
-      const preloaderHidden = !preloaderOverlay ||
-                             preloaderOverlay.style.display === 'none' ||
-                             preloaderOverlay.style.opacity === '0' ||
-                             getComputedStyle(preloaderOverlay).display === 'none';
-
-      if (preloaderHidden) {
-        clearInterval(checkPreloader);
-        forceShowWidget();
+    // Show widget only after preloader is done
+    waitForPreloader().then(() => {
+      if (DOM.widget) {
+        DOM.widget.classList.add('visible');
+        console.log('✅ Widget visible after preloader');
       }
-    }, 100);
 
-    // Force show after 5 seconds as final fallback
-    setTimeout(() => {
-      clearInterval(checkPreloader);
-      forceShowWidget();
-    }, 5000);
-
-    // Auto-expand on first visit (INFO5 feature)
-    const alreadySeen = sessionStorage.getItem('mn_widget_dismissed');
-    if (!alreadySeen && DOM.widget) {
-      setTimeout(() => {
-        autoExpandWidget();
-      }, 3000); // Auto-expand after 3 seconds
-    }
+      // Auto-expand on first visit
+      const alreadySeen = sessionStorage.getItem('mn_widget_dismissed');
+      if (!alreadySeen && DOM.widget) {
+        setTimeout(() => {
+          autoExpandWidget();
+        }, 2000);
+      }
+    });
   };
 
   // INFO5: Auto-expansion with message bubble
