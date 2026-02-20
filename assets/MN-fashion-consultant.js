@@ -344,13 +344,16 @@ const MNAIStylist = (() => {
         console.log('✅ Widget visible after preloader');
       }
 
-      // Auto-expand on first visit
+      // NOTE: Auto-expand disabled for now - user must click to open
+      // This can be enabled later by uncommenting below:
+      /*
       const alreadySeen = sessionStorage.getItem('mn_widget_dismissed');
       if (!alreadySeen && DOM.widget) {
         setTimeout(() => {
           autoExpandWidget();
         }, 2000);
       }
+      */
     });
   };
 
@@ -1540,6 +1543,19 @@ const MNAIStylist = (() => {
 
   // Assign to window for global access
   window.MNAIStylist = module;
+
+  // Direct click handler as backup (in case DOM not ready when event listener attached)
+  window.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+      var minimized = document.getElementById('mn-widget-minimized');
+      if (minimized) {
+        minimized.onclick = function() {
+          console.log('Direct click handler fired');
+          expandWidget();
+        };
+      }
+    }, 500);
+  });
 
   return module;
 
