@@ -186,7 +186,12 @@ MST_COLOR_THEORY: dict[int, dict] = {
 # FASTAPI ROUTE HANDLERS
 # ═══════════════════════════════════════════════════════════════════════════════
 
-from pipeline_core import run_stylist_pipeline, get_affiliate_recommendation
+from pipeline_core import (
+    run_stylist_pipeline,
+    get_affiliate_recommendation,
+    extract_biometrics,
+    segment_wardrobe,
+)
 
 
 @app.get("/api/health")

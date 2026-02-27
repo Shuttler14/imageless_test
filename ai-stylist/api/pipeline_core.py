@@ -430,7 +430,11 @@ def get_affiliate_recommendation(item_type: str, style_vibe: str) -> dict:
     Returns:
         dict with product info, affiliate link, and bank offer string.
     """
-    # Curated mock catalogue — replace with DB lookup in production
+    # Curated mock catalogue — replace with a DB / CMS lookup in production.
+    # Structure: catalogue[item_type][vibe_id] → product dict
+    # All affiliate_url values are deep-links with ?aff=mynarrative tracking param.
+    # NOTE: Do NOT replace with a real-time Myntra scraper — affiliate agreements
+    #       require pre-approved deep-links only.
     catalogue: dict[str, dict[str, dict]] = {
         "footwear": {
             "sarcastic_rizzler": {
@@ -494,6 +498,110 @@ def get_affiliate_recommendation(item_type: str, style_vibe: str) -> dict:
                 "image_url": "https://assets.myntra.com/tanishq-chain.jpg",
                 "bank_offer": "₹750 off on orders above ₹7500 with Axis Bank.",
                 "why_it_works": "A delicate gold chain is the only accessory quiet luxury needs.",
+            },
+            "surviving_on_caffeine": {
+                "item_name": "Canvas Tote Bag",
+                "brand": "The Bear House",
+                "price": 899,
+                "discounted_price": 649,
+                "affiliate_url": "https://www.myntra.com/bear-house-tote?aff=mynarrative",
+                "image_url": "https://assets.myntra.com/bearhouse-tote.jpg",
+                "bank_offer": "Free shipping above ₹499. No bank offer.",
+                "why_it_works": "A canvas tote is the unofficial uniform of the unbothered aesthetic.",
+            },
+            "cottagecore_chaos": {
+                "item_name": "Woven Straw Bucket Bag",
+                "brand": "Accessorize",
+                "price": 2499,
+                "discounted_price": 1799,
+                "affiliate_url": "https://www.myntra.com/accessorize-straw-bag?aff=mynarrative",
+                "image_url": "https://assets.myntra.com/accessorize-straw.jpg",
+                "bank_offer": "10% off with Kotak Credit Card.",
+                "why_it_works": "A woven straw bag completes the cottagecore fantasy with earthy texture.",
+            },
+        },
+        "top": {
+            "sarcastic_rizzler": {
+                "item_name": "Oversized Graphic Drop-Shoulder Tee",
+                "brand": "HRX by Hrithik Roshan",
+                "price": 1299,
+                "discounted_price": 899,
+                "affiliate_url": "https://www.myntra.com/hrx-graphic-tee?aff=mynarrative",
+                "image_url": "https://assets.myntra.com/hrx-graphic-tee.jpg",
+                "bank_offer": "Flat 20% off on first Myntra order. Code: FIRST20",
+                "why_it_works": "An oversized graphic tee anchors the streetwear silhouette with effortless attitude.",
+            },
+            "quiet_luxury": {
+                "item_name": "Premium Linen Relaxed Shirt",
+                "brand": "Marks & Spencer",
+                "price": 3499,
+                "discounted_price": 2799,
+                "affiliate_url": "https://www.myntra.com/ms-linen-shirt?aff=mynarrative",
+                "image_url": "https://assets.myntra.com/ms-linen-shirt.jpg",
+                "bank_offer": "5% cashback with HDFC Millennia card.",
+                "why_it_works": "A tailored linen shirt in a neutral tone is the cornerstone of quiet luxury.",
+            },
+            "surviving_on_caffeine": {
+                "item_name": "Washed Oversized Hoodie",
+                "brand": "Bewakoof",
+                "price": 1499,
+                "discounted_price": 999,
+                "affiliate_url": "https://www.myntra.com/bewakoof-hoodie?aff=mynarrative",
+                "image_url": "https://assets.myntra.com/bewakoof-hoodie.jpg",
+                "bank_offer": "Buy 2 at ₹1499. No bank offer.",
+                "why_it_works": "A washed oversized hoodie is the ultimate 'I tried but also didn't' energy.",
+            },
+            "cottagecore_chaos": {
+                "item_name": "Floral Smocked Puff-Sleeve Blouse",
+                "brand": "AND",
+                "price": 2299,
+                "discounted_price": 1599,
+                "affiliate_url": "https://www.myntra.com/and-floral-blouse?aff=mynarrative",
+                "image_url": "https://assets.myntra.com/and-floral-blouse.jpg",
+                "bank_offer": "₹300 off with SBI SimplyCLICK card.",
+                "why_it_works": "Floral smocking and puff sleeves are the soul of cottagecore done right.",
+            },
+        },
+        "bottom": {
+            "sarcastic_rizzler": {
+                "item_name": "Baggy Cargo Pants",
+                "brand": "Snitch",
+                "price": 1799,
+                "discounted_price": 1299,
+                "affiliate_url": "https://www.myntra.com/snitch-cargo?aff=mynarrative",
+                "image_url": "https://assets.myntra.com/snitch-cargo.jpg",
+                "bank_offer": "Flat ₹200 off with Paytm wallet. Code: PAYTM200",
+                "why_it_works": "Baggy cargo pants add the utilitarian edge that makes the streetwear look complete.",
+            },
+            "quiet_luxury": {
+                "item_name": "Straight-Leg Tailored Trousers",
+                "brand": "Van Heusen",
+                "price": 2999,
+                "discounted_price": 2399,
+                "affiliate_url": "https://www.myntra.com/vanheusen-trousers?aff=mynarrative",
+                "image_url": "https://assets.myntra.com/vh-trousers.jpg",
+                "bank_offer": "10% cashback with ICICI Bank cards.",
+                "why_it_works": "Straight-leg tailored trousers are the quiet luxury uniform — nothing more needed.",
+            },
+            "surviving_on_caffeine": {
+                "item_name": "Relaxed Fit Joggers",
+                "brand": "Puma",
+                "price": 2499,
+                "discounted_price": 1799,
+                "affiliate_url": "https://www.myntra.com/puma-joggers?aff=mynarrative",
+                "image_url": "https://assets.myntra.com/puma-joggers.jpg",
+                "bank_offer": "Extra 15% off with HDFC Bank NetBanking.",
+                "why_it_works": "Relaxed joggers are the only socially acceptable pants for the grind era.",
+            },
+            "cottagecore_chaos": {
+                "item_name": "Tiered Midi Skirt with Floral Print",
+                "brand": "Global Desi",
+                "price": 2199,
+                "discounted_price": 1549,
+                "affiliate_url": "https://www.myntra.com/global-desi-midi-skirt?aff=mynarrative",
+                "image_url": "https://assets.myntra.com/globaldesi-skirt.jpg",
+                "bank_offer": "₹250 off on orders above ₹1499 with Amazon Pay.",
+                "why_it_works": "A tiered floral midi skirt is the ground zero of the cottagecore universe.",
             },
         },
     }
@@ -596,16 +704,28 @@ async def run_stylist_pipeline(
     generated_items = []
     affiliate_recommendations = []
 
-    # If FLUX added footwear that user doesn't own → flag as gap
+    # If FLUX added footwear that user doesn't own → flag as gap item (highlighted RED in UI)
     if "footwear" not in user_item_categories:
         generated_items.append("footwear")
         rec = get_affiliate_recommendation("footwear", selections.get("vibe_id", "sarcastic_rizzler"))
         affiliate_recommendations.append(rec)
 
-    # If no accessory detected → suggest one
+    # If no accessory detected → suggest one as a gap item
     if "accessory" not in user_item_categories:
         generated_items.append("accessory")
         rec = get_affiliate_recommendation("accessory", selections.get("vibe_id", "sarcastic_rizzler"))
+        affiliate_recommendations.append(rec)
+
+    # If no top detected → suggest one as a gap item
+    if "top" not in user_item_categories:
+        generated_items.append("top")
+        rec = get_affiliate_recommendation("top", selections.get("vibe_id", "sarcastic_rizzler"))
+        affiliate_recommendations.append(rec)
+
+    # If no bottom detected → suggest one as a gap item
+    if "bottom" not in user_item_categories:
+        generated_items.append("bottom")
+        rec = get_affiliate_recommendation("bottom", selections.get("vibe_id", "sarcastic_rizzler"))
         affiliate_recommendations.append(rec)
 
     return {
