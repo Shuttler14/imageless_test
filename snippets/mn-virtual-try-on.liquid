@@ -156,6 +156,12 @@
       <p style="font-size:11px; color:#666; margin-top:10px;">This takes about 15-25 seconds.</p>
     </div>
 
+    <div id="step-error-{{ unique_id }}" style="display:none; padding:20px 0; text-align:center;">
+      <div style="font-size:32px; margin-bottom:12px;">⚠️</div>
+      <p id="error-msg-{{ unique_id }}" style="color:#ff6b6b; font-size:13px; line-height:1.5; margin-bottom:16px;"></p>
+      <button type="button" class="mn-vton-trigger" onclick="MNTryOn.reset('{{ unique_id }}')" style="margin-top:0;">🔄 Try Again</button>
+    </div>
+
     <div id="step-result-{{ unique_id }}" style="display:none;">
       <img id="img-result-{{ unique_id }}" class="mn-vton-image-preview">
       <button type="button" class="mn-vton-trigger" onclick="MNTryOn.reset('{{ unique_id }}')" style="margin-top:20px;">🔄 Try Another Photo</button>
@@ -202,11 +208,20 @@
       
       close: (id) => document.getElementById(`modal-${id}`).classList.remove('active'),
       
+      showError: (id, msg) => {
+        document.getElementById(`step-upload-${id}`).style.display = 'none';
+        document.getElementById(`step-loading-${id}`).style.display = 'none';
+        document.getElementById(`step-result-${id}`).style.display = 'none';
+        document.getElementById(`error-msg-${id}`).textContent = msg;
+        document.getElementById(`step-error-${id}`).style.display = 'block';
+      },
+
       reset: (id) => {
         document.getElementById(`step-upload-${id}`).style.display = 'block';
         document.getElementById(`step-result-${id}`).style.display = 'none';
         document.getElementById(`step-loading-${id}`).style.display = 'none';
-        document.getElementById(`input-${id}`).value = ''; // Clear input
+        document.getElementById(`step-error-${id}`).style.display = 'none';
+        document.getElementById(`input-${id}`).value = '';
       },
 
       useTwin: async (id) => {
@@ -240,12 +255,10 @@
             document.getElementById(`step-loading-${id}`).style.display = 'none';
             document.getElementById(`step-result-${id}`).style.display = 'block';
           } else {
-            alert("AI Error: " + (data.error || "Unknown error"));
-            MNTryOn.reset(id);
+            MNTryOn.showError(id, data.error || 'AI error. Please try again.');
           }
         } catch (err) {
-          alert("Connection Failed: " + err.message);
-          MNTryOn.reset(id);
+          MNTryOn.showError(id, 'Connection failed: ' + err.message);
         }
       },
 
@@ -305,8 +318,9 @@
           if (!response.ok) {
             const errorText = await response.text();
             console.error("❌ Server Error:", errorText);
-            alert(`Server Error (${response.status}): ${errorText.substring(0, 200)}`);
-            MNTryOn.reset(id);
+            let errMsg = `Server Error (${response.status})`;
+            try { const j = JSON.parse(errorText); errMsg = j.error || errMsg; } catch(e) {}
+            MNTryOn.showError(id, errMsg);
             return;
           }
 
@@ -321,13 +335,11 @@
             document.getElementById(`step-result-${id}`).style.display = 'block';
           } else {
             console.error("❌ API Error:", data.error);
-            alert("AI Error: " + (data.error || "Unknown error"));
-            MNTryOn.reset(id);
+            MNTryOn.showError(id, data.error || 'AI error. Please try again.');
           }
         } catch (err) {
           console.error("❌ Network Error:", err);
-          alert("Connection Failed: " + err.message);
-          MNTryOn.reset(id);
+          MNTryOn.showError(id, 'Connection failed: ' + err.message);
         }
       }
     };

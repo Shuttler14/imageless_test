@@ -322,136 +322,556 @@
       font-size: 12px;
     }
     
-    /* Hidden file input for selfie upload */
-    #selfieUploadInput {
+    #selfieUploadInput { display: none; }
+
+    /* ── Black Glass UI (matches AI stylist exactly) ── */
+    .user-profile-section {
+      background: linear-gradient(135deg, rgba(5,5,5,0.98) 0%, rgba(15,15,15,0.95) 100%) !important;
+      border: 1px solid rgba(57,165,150,0.3) !important;
+      backdrop-filter: blur(24px) saturate(180%) !important;
+      -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(57,165,150,0.1) inset !important;
+    }
+    .stat-card {
+      background: rgba(255,255,255,0.04) !important;
+      border: 1px solid rgba(255,255,255,0.08) !important;
+      backdrop-filter: blur(12px) !important;
+      transition: all 0.3s ease !important;
+      cursor: pointer;
+    }
+    .stat-card:hover { border-color: rgba(57,165,150,0.5) !important; background: rgba(57,165,150,0.08) !important; transform: translateY(-2px) !important; }
+    .stat-card.clickable:hover { box-shadow: 0 4px 16px rgba(57,165,150,0.2); }
+    .detail-card {
+      background: rgba(255,255,255,0.03) !important;
+      border: 1px solid rgba(255,255,255,0.08) !important;
+      backdrop-filter: blur(8px) !important;
+      cursor: pointer;
+      transition: all 0.3s ease !important;
+    }
+    .detail-card:hover { border-color: rgba(57,165,150,0.4) !important; background: rgba(57,165,150,0.06) !important; }
+    .detail-value { color: rgba(244,244,244,0.9) !important; }
+    .detail-label { color: #39A596 !important; }
+    .stat-value { color: rgba(244,244,244,0.95) !important; }
+    .stat-label { color: rgba(244,244,244,0.5) !important; }
+    .profile-name { color: #fff !important; }
+
+    /* ── Edit Hint ── */
+    .edit-hint {
+      display: inline-block;
+      font-size: 9px;
+      color: rgba(57,165,150,0.6);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-left: 4px;
+      vertical-align: middle;
+      transition: color 0.2s;
+    }
+    .stat-card:hover .edit-hint, .detail-card:hover .edit-hint { color: #39A596; }
+
+    /* ── Glass Edit Modal ── */
+    .mn-edit-modal-overlay {
       display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(8px);
+      z-index: 99999;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .mn-edit-modal-overlay.active { display: flex; }
+    .mn-edit-modal {
+      background: linear-gradient(135deg, #080808 0%, #111 100%);
+      border: 1px solid rgba(57,165,150,0.4);
+      border-radius: 20px;
+      padding: 28px 24px;
+      max-width: 460px;
+      width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: 0 0 60px rgba(57,165,150,0.3), 0 20px 60px rgba(0,0,0,0.8);
+      animation: mnModalZoom 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    @keyframes mnModalZoom { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .mn-edit-modal-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+    .mn-edit-modal-sub {
+      font-size: 12px;
+      color: rgba(255,255,255,0.45);
+      margin-bottom: 20px;
+    }
+    .mn-edit-chip-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .mn-edit-chip {
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      color: rgba(255,255,255,0.8);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      text-align: center;
+    }
+    .mn-edit-chip:hover { border-color: #39A596; background: rgba(57,165,150,0.12); color: #fff; }
+    .mn-edit-chip.selected { background: rgba(57,165,150,0.2); border-color: #39A596; color: #4fffd9; font-weight: 700; box-shadow: 0 0 12px rgba(57,165,150,0.3); }
+    .mn-edit-chip-single { grid-column: 1 / -1; }
+    .mn-edit-custom-input {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 10px;
+      padding: 12px 16px;
+      color: #fff;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.3s;
+      margin-bottom: 16px;
+      box-sizing: border-box;
+    }
+    .mn-edit-custom-input:focus { border-color: #39A596; box-shadow: 0 0 0 3px rgba(57,165,150,0.1); }
+    .mn-edit-modal-actions { display: flex; gap: 10px; }
+    .mn-edit-save-btn {
+      flex: 1;
+      padding: 12px;
+      background: linear-gradient(135deg, #39A596, #2d8578);
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .mn-edit-save-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(57,165,150,0.4); }
+    .mn-edit-cancel-btn {
+      padding: 12px 20px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      color: rgba(255,255,255,0.5);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .mn-edit-cancel-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+    /* ── Closet Panel (inline, below profile) ── */
+    .mn-dashboard-panel {
+      display: none;
+      margin-top: 20px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(57,165,150,0.2);
+      border-radius: 16px;
+      padding: 20px;
+      animation: mnModalZoom 0.3s ease;
+    }
+    .mn-dashboard-panel.active { display: block; }
+    .mn-panel-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #39A596;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .mn-panel-close {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.4);
+      font-size: 18px;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .mn-panel-close:hover { color: #fff; }
+
+    /* Closet grid inside panel */
+    .mn-panel-closet-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 10px;
+    }
+    .mn-panel-closet-card {
+      background: rgba(57,165,150,0.06);
+      border: 1px solid rgba(57,165,150,0.2);
+      border-radius: 14px;
+      padding: 12px 8px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+    .mn-panel-closet-card:hover { border-color: #39A596; transform: translateY(-2px); background: rgba(57,165,150,0.12); }
+    .mn-panel-closet-emoji { font-size: 32px; margin-bottom: 6px; }
+    .mn-panel-closet-name { font-size: 10px; font-weight: 700; color: #fff; margin-bottom: 3px; line-height: 1.3; }
+    .mn-panel-closet-meta { font-size: 9px; color: rgba(57,165,150,0.8); }
+    .mn-panel-section-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #39A596;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin: 16px 0 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(57,165,150,0.15);
     }
 
+    /* Past Looks panel */
+    .mn-panel-look-card {
+      background: rgba(139,92,246,0.06);
+      border: 1px solid rgba(139,92,246,0.2);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 10px;
+      transition: all 0.3s ease;
+    }
+    .mn-panel-look-card:hover { border-color: rgba(139,92,246,0.5); transform: translateY(-1px); }
+    .mn-panel-look-date { font-size: 10px; color: rgba(255,255,255,0.4); margin-bottom: 6px; }
+    .mn-panel-look-direction { font-size: 13px; font-style: italic; color: #e2e8f0; margin-bottom: 10px; line-height: 1.5; }
+    .mn-panel-look-pieces { display: flex; flex-wrap: wrap; gap: 5px; }
+    .mn-panel-look-piece { background: rgba(255,255,255,0.06); border-radius: 20px; padding: 2px 9px; font-size: 10px; color: #aaa; }
+    .mn-panel-look-piece.owned { background: rgba(57,165,150,0.15); color: #4fffd9; }
+
     @media (max-width: 768px) {
-      .profile-top-row {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-      }
-
-      .profile-name-section {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-      }
-
-      .quick-stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .profile-details-grid {
-        grid-template-columns: 1fr;
-      }
+      .profile-top-row { flex-direction: column; align-items: center; text-align: center; }
+      .profile-name-section { width: 100%; display: flex; flex-direction: column; align-items: center; }
+      .quick-stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .profile-details-grid { grid-template-columns: 1fr; }
+      .mn-edit-chip-grid { grid-template-columns: 1fr; }
+      .mn-panel-closet-grid { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); }
     }
   </style>
 
+  <!-- Glass Edit Modal -->
+  <div class="mn-edit-modal-overlay" id="mnEditModalOverlay">
+    <div class="mn-edit-modal" id="mnEditModal">
+      <div class="mn-edit-modal-title" id="mnEditModalTitle">Edit</div>
+      <div class="mn-edit-modal-sub" id="mnEditModalSub">Choose an option or type a custom value</div>
+      <div class="mn-edit-chip-grid" id="mnEditChipGrid"></div>
+      <input class="mn-edit-custom-input" id="mnEditCustomInput" type="text" placeholder="Or type a custom value…">
+      <div class="mn-edit-modal-actions">
+        <button class="mn-edit-cancel-btn" id="mnEditCancelBtn">Cancel</button>
+        <button class="mn-edit-save-btn" id="mnEditSaveBtn">Save ✓</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    // Handle selfie upload
-    function handleSelfieUpload(input) {
-      if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          const imageData = e.target.result;
-          
-          // Update avatar display
-          document.getElementById('avatarImage').src = imageData;
-          document.getElementById('avatarImage').style.display = 'block';
-          document.getElementById('avatarPlaceholder').style.display = 'none';
-          
-          // Save to localStorage
-          const coreIdentity = JSON.parse(localStorage.getItem('mn_core_identity') || '{}');
-          coreIdentity.uploadedImage = imageData;
-          coreIdentity.selfieUploaded = true;
-          localStorage.setItem('mn_core_identity', JSON.stringify(coreIdentity));
-          
-          // Show success message
-          alert('✨ Selfie uploaded! Your AI stylist now has a better understanding of your style.');
-        };
-        reader.readAsDataURL(input.files[0]);
-      }
+    // ─── Helpers ──────────────────────────────────────────────
+    function getProfile()  { try { return JSON.parse(localStorage.getItem('mn_core_identity') || '{}'); } catch(e) { return {}; } }
+    function saveProfile(p){ localStorage.setItem('mn_core_identity', JSON.stringify(p)); window.dispatchEvent(new CustomEvent('mn-identity-updated')); }
+    function getCloset()   { try { return JSON.parse(localStorage.getItem('mn_digital_closet') || '[]'); } catch(e) { return []; } }
+    function getHistory()  { try { return JSON.parse(localStorage.getItem('mn_outfit_history') || '[]'); } catch(e) { return []; } }
+
+    // ─── Emoji Map (same as AI stylist) ───────────────────────
+    const GARMENT_EMOJI_MAP = {
+      'T-Shirt':'👕','Tshirt':'👕','Tee':'👕','Shirt':'👔','Formal Shirt':'👔','Kurta':'👘','Kurti':'👘',
+      'Dress':'👗','Saree':'🥻','Lehenga':'👗','Salwar':'👘','Dupatta':'🧣','Top':'👚','Blouse':'👚',
+      'Jeans':'👖','Trousers':'👖','Chinos':'👖','Pants':'👖','Shorts':'🩳','Skirt':'👗','Leggings':'🩱',
+      'Jacket':'🧥','Blazer':'🧥','Coat':'🧥','Hoodie':'🧥','Sweater':'🧥','Sherwani':'🤵','Suit':'🤵',
+      'Sneakers':'👟','Shoes':'👟','Loafers':'👞','Boots':'👢','Heels':'👠','Sandals':'🩴','Juttis':'👡','Flats':'👡',
+      'Watch':'⌚','Belt':'🪡','Sunglasses':'🕶️','Cap':'🧢','Hat':'🎩','Scarf':'🧣',
+      'Bag':'👜','Backpack':'🎒','Wallet':'👛','Earrings':'💎','Necklace':'📿','Ring':'💍',
+      'Topwear':'👕','Bottomwear':'👖','Footwear':'👟','Outerwear':'🧥',
+      'Ethnic Wear':'👘','Accessories':'⌚','Innerwear':'🩲','Sportswear':'🏃','Bags':'👜'
+    };
+    function getItemEmoji(item) {
+      const name = (item.original_name || item.name || item.type || '').trim();
+      const lookup = (k) => { const kl = k.toLowerCase(); return Object.keys(GARMENT_EMOJI_MAP).find(g => g.toLowerCase() === kl); };
+      const direct = lookup(name); if (direct) return GARMENT_EMOJI_MAP[direct];
+      for (const word of name.split(/\s+/)) { const m = lookup(word); if (m) return GARMENT_EMOJI_MAP[m]; }
+      const section = item.closet_section || item.category || '';
+      return GARMENT_EMOJI_MAP[section] || '👔';
     }
 
-    // Load user profile data from localStorage
+    // ─── Selfie Upload ────────────────────────────────────────
+    function handleSelfieUpload(input) {
+      if (!input.files || !input.files[0]) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const imageData = e.target.result;
+        document.getElementById('avatarImage').src = imageData;
+        document.getElementById('avatarImage').style.display = 'block';
+        document.getElementById('avatarPlaceholder').style.display = 'none';
+        const p = getProfile(); p.uploadedImage = imageData; p.selfieUploaded = true; saveProfile(p);
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+
+    // ─── Glass Edit Modal ─────────────────────────────────────
+    const FIELD_OPTIONS = {
+      height:       { title: 'Your Height', sub: 'Choose or type your height in cm', multi: false,
+        options: ['150 cm','155 cm','160 cm','165 cm','170 cm','175 cm','180 cm','185 cm','190 cm'] },
+      build:        { title: 'Body Type', sub: 'How would you describe your build?', multi: false,
+        options: ['Slim','Athletic','Average','Muscular','Broad','Plus Size','Petite','Tall & Lean'] },
+      skinTone:     { title: 'Skin Tone', sub: 'Select your skin tone', multi: false,
+        options: ['Fair','Light','Wheatish','Medium','Olive','Tan','Brown','Dark Brown','Deep'] },
+      climate:      { title: 'Your Climate', sub: 'What climate do you mostly dress for?', multi: false,
+        options: ['Hot & Humid','Tropical','Dry Heat','Mild','Cool','Cold','Monsoon','Mixed Seasons'] },
+      budget:       { title: 'Budget Range', sub: 'Your typical outfit spend', multi: false,
+        options: ['Under ₹1,000','₹1,000–₹3,000','₹3,000–₹7,000','₹7,000–₹15,000','₹15,000+','No budget limit'] },
+      goals:        { title: 'Fashion Goals', sub: 'What are you trying to achieve?', multi: false,
+        options: ['Look more confident','Dress for my body','Build a capsule wardrobe','Stand out in a crowd',
+                  'Look professional','Dress more traditionally','Be more sustainable','Express my personality'] },
+      favoriteColors:{ title: 'Favourite Colors', sub: 'Pick all that apply', multi: true,
+        options: ['Black','White','Navy','Beige','Olive','Grey','Brown','Maroon','Teal','Mustard',
+                  'Rust','Coral','Blush Pink','Lavender','Royal Blue','Emerald Green'] },
+      coreExpression:{ title: 'Style Expression', sub: 'How do you like to dress?', multi: false,
+        options: ['Minimalist & Clean','Bold & Expressive','Traditional & Ethnic','Smart Casual',
+                  'Streetwear','Business Formal','Boho & Free','Dark & Edgy','Preppy','Sporty'] },
+      occasion:     { title: 'Go-to Occasion', sub: 'Where do you dress up most?', multi: false,
+        options: ['Daily Casual','College / Campus','Office / Workwear','Festive & Weddings',
+                  'Date Night','Party / Nightout','Outdoor / Travel','Sports / Gym'] },
+      region:       { title: 'Region / City', sub: 'Type your city or region', multi: false, options: [] },
+      undertone:    { title: 'Skin Undertone', sub: 'Your natural undertone', multi: false,
+        options: ['Warm (yellow/golden)','Cool (pink/bluish)','Neutral (balanced)','Olive (green-ish)','Not sure'] }
+    };
+
+    let _currentField = null, _currentProfileKey = null, _isMulti = false, _selectedValues = [];
+
+    function openEditModal(profileKey, displayElId) {
+      const cfg = FIELD_OPTIONS[profileKey];
+      if (!cfg) return;
+      _currentField = displayElId; _currentProfileKey = profileKey;
+      _isMulti = cfg.multi; _selectedValues = [];
+      const p = getProfile();
+      const current = _isMulti
+        ? (Array.isArray(p[profileKey]) ? p[profileKey] : (p[profileKey] ? [p[profileKey]] : []))
+        : (p[profileKey] || '');
+
+      document.getElementById('mnEditModalTitle').textContent = cfg.title;
+      document.getElementById('mnEditModalSub').textContent   = cfg.sub;
+      document.getElementById('mnEditCustomInput').value = _isMulti ? '' : (current || '');
+      document.getElementById('mnEditCustomInput').placeholder = _isMulti ? 'Or type a custom colour…' : 'Or type a custom value…';
+
+      // Build chip grid
+      const grid = document.getElementById('mnEditChipGrid');
+      grid.innerHTML = '';
+      _selectedValues = _isMulti ? [...current] : [];
+      cfg.options.forEach(opt => {
+        const chip = document.createElement('button');
+        chip.className = 'mn-edit-chip' + (cfg.options.length === 1 ? ' mn-edit-chip-single' : '');
+        chip.textContent = opt;
+        const isSelected = _isMulti ? current.includes(opt) : (current === opt);
+        if (isSelected) { chip.classList.add('selected'); if (_isMulti && !_selectedValues.includes(opt)) _selectedValues.push(opt); }
+        chip.addEventListener('click', () => {
+          if (_isMulti) {
+            chip.classList.toggle('selected');
+            if (chip.classList.contains('selected')) { if (!_selectedValues.includes(opt)) _selectedValues.push(opt); }
+            else { _selectedValues = _selectedValues.filter(v => v !== opt); }
+          } else {
+            grid.querySelectorAll('.mn-edit-chip').forEach(c => c.classList.remove('selected'));
+            chip.classList.add('selected');
+            document.getElementById('mnEditCustomInput').value = opt;
+          }
+        });
+        grid.appendChild(chip);
+      });
+
+      // Hide custom input for fields with no options OR keep for all
+      document.getElementById('mnEditCustomInput').style.display = cfg.options.length > 0 ? '' : '';
+      document.getElementById('mnEditModalOverlay').classList.add('active');
+    }
+
+    function closeEditModal() { document.getElementById('mnEditModalOverlay').classList.remove('active'); }
+
+    document.getElementById('mnEditCancelBtn').addEventListener('click', closeEditModal);
+    document.getElementById('mnEditModalOverlay').addEventListener('click', function(e) { if (e.target === this) closeEditModal(); });
+
+    document.getElementById('mnEditSaveBtn').addEventListener('click', function() {
+      const p = getProfile();
+      const customVal = document.getElementById('mnEditCustomInput').value.trim();
+      if (_isMulti) {
+        if (customVal) { _selectedValues = [...new Set([..._selectedValues, ...customVal.split(',').map(s => s.trim()).filter(Boolean)])]; }
+        p[_currentProfileKey] = _selectedValues;
+        const el = document.getElementById(_currentField);
+        if (el) el.textContent = _selectedValues.join(', ') || '-';
+      } else {
+        const val = customVal || document.querySelector('#mnEditChipGrid .mn-edit-chip.selected')?.textContent || '';
+        p[_currentProfileKey] = val;
+        const el = document.getElementById(_currentField);
+        if (el) el.textContent = val || '-';
+      }
+      saveProfile(p);
+      closeEditModal();
+    });
+
+    // ─── Closet Panel ─────────────────────────────────────────
+    function togglePanel(panelId) {
+      const panel = document.getElementById(panelId);
+      if (!panel) return;
+      const isActive = panel.classList.contains('active');
+      document.querySelectorAll('.mn-dashboard-panel').forEach(p => p.classList.remove('active'));
+      if (!isActive) panel.classList.add('active');
+    }
+
+    function renderClosetPanel() {
+      const closet = getCloset();
+      const container = document.getElementById('mnClosetPanelContent');
+      if (!container) return;
+      if (closet.length === 0) {
+        container.innerHTML = '<p style="color:rgba(255,255,255,0.4);font-size:13px;text-align:center;padding:20px;">No items yet — upload clothing photos in the AI Stylist</p>';
+        return;
+      }
+      // Group by section
+      const sections = {};
+      closet.forEach(item => {
+        const s = item.closet_section || item.category || 'Other';
+        if (!sections[s]) sections[s] = [];
+        sections[s].push(item);
+      });
+      let html = '';
+      Object.entries(sections).forEach(([section, items]) => {
+        html += `<div class="mn-panel-section-label">${section} <span style="opacity:0.5;">(${items.length})</span></div>`;
+        html += '<div class="mn-panel-closet-grid">';
+        items.forEach(item => {
+          const emoji = getItemEmoji(item);
+          const name  = item.original_name || item.name || 'Item';
+          const meta  = [item.color, item.fabric].filter(Boolean).join(' · ');
+          html += `<div class="mn-panel-closet-card">
+            <div class="mn-panel-closet-emoji">${emoji}</div>
+            <div class="mn-panel-closet-name">${name}</div>
+            ${meta ? `<div class="mn-panel-closet-meta">${meta}</div>` : ''}
+          </div>`;
+        });
+        html += '</div>';
+      });
+      container.innerHTML = html;
+    }
+
+    function renderHistoryPanel() {
+      const history = getHistory();
+      const container = document.getElementById('mnHistoryPanelContent');
+      if (!container) return;
+      if (history.length === 0) {
+        container.innerHTML = '<p style="color:rgba(255,255,255,0.4);font-size:13px;text-align:center;padding:20px;">No outfits generated yet — open the AI Stylist to create your first look</p>';
+        return;
+      }
+      let html = '';
+      history.slice(0, 10).forEach(look => {
+        const date = look.savedAt ? new Date(look.savedAt).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : '';
+        const pieces = (look.outfit_pieces || []);
+        html += `<div class="mn-panel-look-card">
+          <div class="mn-panel-look-date">${date}</div>
+          <div class="mn-panel-look-direction">${look.direction || look.context || 'AI Generated Outfit'}</div>
+          <div class="mn-panel-look-pieces">
+            ${pieces.map(p => `<span class="mn-panel-look-piece ${p.owned ? 'owned' : ''}">${getItemEmoji(p)} ${p.name || ''}</span>`).join('')}
+          </div>
+        </div>`;
+      });
+      container.innerHTML = html;
+    }
+
+    // ─── Load & Render ────────────────────────────────────────
     document.addEventListener('DOMContentLoaded', function() {
       try {
-        const coreIdentity = localStorage.getItem('mn_core_identity');
-        
-        if (coreIdentity) {
-          const profile = JSON.parse(coreIdentity);
-          console.log('Loading profile:', profile);
-          
-          // Show profile section if data exists
-          document.getElementById('userProfileSection').style.display = 'block';
-          
-          // Avatar/Profile Picture
-          if (profile.uploadedImage) {
-            document.getElementById('avatarImage').src = profile.uploadedImage;
-            document.getElementById('avatarImage').style.display = 'block';
-            document.getElementById('avatarPlaceholder').style.display = 'none';
-          } else if (profile.archetype && profile.archetype.icon) {
-            document.getElementById('avatarPlaceholder').textContent = profile.archetype.icon;
-          }
-          
-          // Personality Tone
-          if (profile.tone) {
-            document.getElementById('personalityTone').textContent = profile.tone;
-          }
-          
-          // Quick Stats
-          if (profile.height) {
-            document.getElementById('statHeight').textContent = profile.height + ' cm';
-          }
-          if (profile.bodyType) {
-            document.getElementById('statBodyType').textContent = profile.bodyType;
-          }
-          if (profile.skinTone) {
-            document.getElementById('statSkinTone').textContent = profile.skinTone;
-          }
-          if (profile.temperature || profile.climate) {
-            document.getElementById('statTemperature').textContent = profile.temperature || profile.climate || '-';
-          }
-          if (profile.priceRange || profile.budget) {
-            const priceRange = profile.priceRange || profile.budget;
-            document.getElementById('statPriceRange').textContent = priceRange;
-          }
-          
-          // Detailed Information
-          if (profile.goals || profile.fashionGoals) {
-            document.getElementById('detailGoals').textContent = profile.goals || profile.fashionGoals;
-          }
-          if (profile.favoriteColors || profile.colors) {
-            const colors = profile.favoriteColors || profile.colors;
-            if (Array.isArray(colors)) {
-              document.getElementById('detailColors').textContent = colors.join(', ');
-            } else {
-              document.getElementById('detailColors').textContent = colors;
-            }
-          }
-          
-          // Closet count from localStorage
-          const closetItems = localStorage.getItem('mn_closet_items');
-          if (closetItems) {
-            try {
-              const items = JSON.parse(closetItems);
-              document.getElementById('detailClosetCount').textContent = items.length + ' items';
-            } catch(e) {
-              document.getElementById('detailClosetCount').textContent = '0 items';
-            }
-          }
-          
-          // Location
-          if (profile.location || profile.city) {
-            document.getElementById('detailLocation').textContent = profile.location || profile.city;
-          }
+        const profile = getProfile();
+        const closet  = getCloset();
+        const history = getHistory();
+
+        document.getElementById('userProfileSection').style.display = 'block';
+
+        // Avatar
+        if (profile.uploadedImage) {
+          document.getElementById('avatarImage').src = profile.uploadedImage;
+          document.getElementById('avatarImage').style.display = 'block';
+          document.getElementById('avatarPlaceholder').style.display = 'none';
+        } else if (profile.archetype?.icon) {
+          document.getElementById('avatarPlaceholder').textContent = profile.archetype.icon;
         }
+
+        // Personality badge
+        document.getElementById('personalityTone').textContent = profile.tone || profile.coreExpression || 'Style Explorer';
+
+        // Quick stats
+        document.getElementById('statHeight').textContent       = profile.height ? profile.height + '' : '-';
+        document.getElementById('statBodyType').textContent     = profile.build || profile.bodyType || '-';
+        document.getElementById('statSkinTone').textContent     = profile.skinTone || '-';
+        document.getElementById('statTemperature').textContent  = profile.climate || profile.temperature || '-';
+        document.getElementById('statPriceRange').textContent   = profile.budget || profile.priceRange || '-';
+        document.getElementById('statClosetItems').textContent  = closet.length + ' items';
+        document.getElementById('statOutfitsSaved').textContent = history.length + ' looks';
+
+        // Detail cards
+        document.getElementById('detailGoals').textContent    = profile.goals || profile.fashionGoals || profile.signal || '-';
+        const colors = profile.favoriteColors || profile.colors;
+        document.getElementById('detailColors').textContent   = Array.isArray(colors) ? colors.join(', ') : (colors || '-');
+        document.getElementById('detailStyle').textContent    = profile.coreExpression || profile.style || '-';
+        document.getElementById('detailOccasion').textContent = profile.occasion || (Array.isArray(profile.contexts) ? profile.contexts.join(', ') : '-');
+        document.getElementById('detailRegion').textContent   = profile.region || profile.location || profile.city || '-';
+        document.getElementById('detailUndertone').textContent = profile.undertone || '-';
+
+        // Closet breakdown
+        if (closet.length > 0) {
+          const sections = {};
+          closet.forEach(i => { const s = i.closet_section || i.category || 'Other'; sections[s] = (sections[s]||0)+1; });
+          document.getElementById('detailClosetBreakdown').textContent = Object.entries(sections).map(([s,n])=>n+' '+s).join(' · ') || '-';
+        }
+
+        // Most recent outfit
+        if (history.length > 0) {
+          const last = history[0];
+          document.getElementById('detailLastOutfit').textContent = last.direction || last.context || last.occasion || '-';
+        }
+
+        // Wire stat cards to edit modal
+        const editMap = [
+          ['statHeight','height'],['statBodyType','build'],['statSkinTone','skinTone'],
+          ['statTemperature','climate'],['statPriceRange','budget']
+        ];
+        editMap.forEach(([elId, key]) => {
+          const el = document.getElementById(elId);
+          if (el) el.addEventListener('click', () => openEditModal(key, elId));
+        });
+
+        // Wire detail cards to edit modal
+        const detailMap = [
+          ['detailGoals','goals'],['detailColors','favoriteColors'],['detailStyle','coreExpression'],
+          ['detailOccasion','occasion'],['detailRegion','region'],['detailUndertone','undertone']
+        ];
+        detailMap.forEach(([elId, key]) => {
+          const el = document.getElementById(elId);
+          if (el) el.addEventListener('click', () => openEditModal(key, elId));
+        });
+
+        // Wire Digital Closet stat card → show closet panel
+        const closetStatCard = document.getElementById('statClosetItems');
+        if (closetStatCard) {
+          closetStatCard.parentElement.addEventListener('click', () => {
+            renderClosetPanel();
+            togglePanel('mnClosetPanel');
+          });
+        }
+
+        // Wire Outfits Saved stat card → show history panel
+        const histStatCard = document.getElementById('statOutfitsSaved');
+        if (histStatCard) {
+          histStatCard.parentElement.addEventListener('click', () => {
+            renderHistoryPanel();
+            togglePanel('mnHistoryPanel');
+          });
+        }
+
       } catch (error) {
-        console.error('Error loading profile data:', error);
+        console.error('Error loading AI Stylist profile:', error);
       }
     });
   </script>
@@ -1371,6 +1791,24 @@
     </div>
   </div>
 
+  <!-- Closet Panel (shown inline below profile on click) -->
+  <div class="mn-dashboard-panel" id="mnClosetPanel">
+    <div class="mn-panel-title">
+      <span>👗 My Digital Closet</span>
+      <button class="mn-panel-close" onclick="togglePanel('mnClosetPanel')">✕</button>
+    </div>
+    <div id="mnClosetPanelContent"></div>
+  </div>
+
+  <!-- Past Looks Panel -->
+  <div class="mn-dashboard-panel" id="mnHistoryPanel" style="border-color:rgba(139,92,246,0.25);">
+    <div class="mn-panel-title" style="color:#a78bfa;">
+      <span>✨ Past AI Looks</span>
+      <button class="mn-panel-close" onclick="togglePanel('mnHistoryPanel')">✕</button>
+    </div>
+    <div id="mnHistoryPanelContent"></div>
+  </div>
+
   <!-- User Profile Section - Positioned AFTER Vibe Cards -->
   <div class="user-profile-section" id="userProfileSection" style="display: none;">
     <div class="profile-hero">
@@ -1390,73 +1828,89 @@
           <div class="profile-personality" id="profilePersonality">
             <span id="personalityTone">Style Explorer</span>
           </div>
-          <div style="margin-top: 1rem;">
-            <a href="/pages/my-closet" class="digital-closet-btn">
-              <span>👔</span>
-              <span>My Digital Closet</span>
-            </a>
+          <div style="margin-top: 1rem; display:flex; gap:10px; flex-wrap:wrap;">
+            <button onclick="renderClosetPanel(); togglePanel('mnClosetPanel');" class="digital-closet-btn">
+              <span>👗</span><span>My Closet</span>
+            </button>
+            <button onclick="renderHistoryPanel(); togglePanel('mnHistoryPanel');" class="digital-closet-btn" style="background:linear-gradient(135deg,#7c3aed,#a78bfa);">
+              <span>✨</span><span>Past Looks</span>
+            </button>
           </div>
         </div>
       </div>
 
       <!-- Quick Stats -->
       <div class="quick-stats-grid">
-        <div class="stat-card">
+        <div class="stat-card clickable">
           <div class="stat-icon">📏</div>
-          <div class="stat-label">Height</div>
+          <div class="stat-label">Height <span class="edit-hint">✏ edit</span></div>
           <div class="stat-value" id="statHeight">-</div>
         </div>
-        <div class="stat-card">
+        <div class="stat-card clickable">
           <div class="stat-icon">💪</div>
-          <div class="stat-label">Body Type</div>
+          <div class="stat-label">Body Type <span class="edit-hint">✏ edit</span></div>
           <div class="stat-value" id="statBodyType">-</div>
         </div>
-        <div class="stat-card">
+        <div class="stat-card clickable">
           <div class="stat-icon">🎨</div>
-          <div class="stat-label">Skin Tone</div>
+          <div class="stat-label">Skin Tone <span class="edit-hint">✏ edit</span></div>
           <div class="stat-value" id="statSkinTone">-</div>
         </div>
-        <div class="stat-card">
+        <div class="stat-card clickable">
           <div class="stat-icon">🌡️</div>
-          <div class="stat-label">Climate</div>
+          <div class="stat-label">Climate <span class="edit-hint">✏ edit</span></div>
           <div class="stat-value" id="statTemperature">-</div>
         </div>
-        <div class="stat-card">
+        <div class="stat-card clickable">
           <div class="stat-icon">💰</div>
-          <div class="stat-label">Budget Range</div>
+          <div class="stat-label">Budget Range <span class="edit-hint">✏ edit</span></div>
           <div class="stat-value" id="statPriceRange">-</div>
+        </div>
+        <div class="stat-card" style="cursor:pointer;" title="Click to view your closet">
+          <div class="stat-icon">👗</div>
+          <div class="stat-label">Digital Closet <span class="edit-hint">👁 view</span></div>
+          <div class="stat-value" id="statClosetItems" style="color:#39A596;">0 items</div>
+        </div>
+        <div class="stat-card" style="cursor:pointer;" title="Click to view past looks">
+          <div class="stat-icon">✨</div>
+          <div class="stat-label">Outfits Saved <span class="edit-hint">👁 view</span></div>
+          <div class="stat-value" id="statOutfitsSaved" style="color:#a78bfa;">0 looks</div>
         </div>
       </div>
 
       <!-- Detailed Profile Information -->
       <div class="profile-details-grid">
         <div class="detail-card">
-          <div class="detail-label">
-            <span class="detail-icon">🎯</span>
-            <span>Fashion Goals</span>
-          </div>
+          <div class="detail-label"><span class="detail-icon">🎯</span><span>Fashion Goals</span><span class="edit-hint">✏ edit</span></div>
           <div class="detail-value" id="detailGoals">-</div>
         </div>
         <div class="detail-card">
-          <div class="detail-label">
-            <span class="detail-icon">🎨</span>
-            <span>Favorite Colors</span>
-          </div>
+          <div class="detail-label"><span class="detail-icon">🎨</span><span>Favorite Colors</span><span class="edit-hint">✏ multi-select</span></div>
           <div class="detail-value" id="detailColors">-</div>
         </div>
         <div class="detail-card">
-          <div class="detail-label">
-            <span class="detail-icon">👕</span>
-            <span>Closet Items</span>
-          </div>
-          <div class="detail-value" id="detailClosetCount">-</div>
+          <div class="detail-label"><span class="detail-icon">🧠</span><span>Style Expression</span><span class="edit-hint">✏ edit</span></div>
+          <div class="detail-value" id="detailStyle">-</div>
         </div>
         <div class="detail-card">
-          <div class="detail-label">
-            <span class="detail-icon">🌍</span>
-            <span>Location</span>
-          </div>
-          <div class="detail-value" id="detailLocation">-</div>
+          <div class="detail-label"><span class="detail-icon">📅</span><span>Go-to Occasion</span><span class="edit-hint">✏ edit</span></div>
+          <div class="detail-value" id="detailOccasion">-</div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-label"><span class="detail-icon">🌍</span><span>Region / City</span><span class="edit-hint">✏ edit</span></div>
+          <div class="detail-value" id="detailRegion">-</div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-label"><span class="detail-icon">🎭</span><span>Skin Undertone</span><span class="edit-hint">✏ edit</span></div>
+          <div class="detail-value" id="detailUndertone">-</div>
+        </div>
+        <div class="detail-card" style="grid-column: 1 / -1;">
+          <div class="detail-label"><span class="detail-icon">👔</span><span>Closet Breakdown</span></div>
+          <div class="detail-value" id="detailClosetBreakdown" style="font-size:12px; color:#aaa;">Upload clothing photos to see your closet breakdown</div>
+        </div>
+        <div class="detail-card" style="grid-column: 1 / -1;">
+          <div class="detail-label"><span class="detail-icon">✨</span><span>Most Recent AI Outfit</span></div>
+          <div class="detail-value" id="detailLastOutfit" style="font-size:12px; font-style:italic; color:#aaa;">No outfits generated yet</div>
         </div>
       </div>
     </div>

@@ -387,41 +387,60 @@ class DigitalClosetManager {
     const file = input.files[0];
     if (!file) return;
 
-    // Optimistic UI update (optional) or just loading
     this.renderLoading(); // Show loading state immediately
     
-    // Read file
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      try {
-        const payload = {
-          action: 'add_item',
-          user_id: this.userId,
-          image: e.target.result
+    // --- FIX: COMPRESS IMAGE BEFORE UPLOADING ---
+    const resizeImage = (file) => {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 800; // Optimal for OpenAI Vision
+            const scale = MAX_WIDTH / img.width;
+            canvas.width = MAX_WIDTH;
+            canvas.height = img.height * scale;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            // Convert to highly optimized JPEG
+            resolve(canvas.toDataURL('image/jpeg', 0.8)); 
+          };
+          img.src = e.target.result;
         };
-
-        const res = await fetch(this.api, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-
-        const data = await res.json();
-        
-        if (data.success) {
-           await this.loadItems(); // Reload to show new item with AI tags
-           input.value = ''; 
-        } else {
-           alert('Upload Error: ' + data.error);
-           this.renderGrid(this.items); // Revert
-        }
-      } catch (err) {
-        console.error(err);
-        alert('Failed to upload item');
-        this.renderGrid(this.items);
-      }
+        reader.readAsDataURL(file);
+      });
     };
-    reader.readAsDataURL(file);
+
+    try {
+      const compressedBase64 = await resizeImage(file);
+      
+      const payload = {
+        action: 'add_item',
+        user_id: this.userId,
+        image: compressedBase64
+      };
+
+      const res = await fetch(this.api, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      
+      const data = await res.json();
+      
+      if (data.success) {
+         await this.loadItems();
+         input.value = '';
+      } else {
+         alert('Upload Error: ' + data.error);
+         this.renderGrid(this.items);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Failed to upload item');
+      this.renderGrid(this.items);
+    }
   }
 
   async deleteItem(id) {

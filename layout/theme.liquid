@@ -197,7 +197,7 @@
     }
   }
 </script>
-  {% unless template contains 'product' %}
+  {% unless template contains 'product' or template == 'index' %}
     {% section 'MN-fashion-consultant' %}
   {% endunless %}
 </body>

@@ -285,6 +285,43 @@ Updated:
       <button class="text-xl text-white p-2" data-for="nav-close-btn"><i class="bi bi-x-lg"></i></button>
     </div>
     <div class="drawer-content">
+      <!-- AI Fashion Consultant Entry -->
+      <button
+        id="drawer-ai-consultant-btn"
+        style="
+          width: 100%;
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          background: linear-gradient(135deg, rgba(57,165,150,0.18), rgba(57,165,150,0.06));
+          border: 1px solid rgba(57,165,150,0.4);
+          border-radius: 16px;
+          padding: 14px 18px;
+          margin-bottom: 24px;
+          cursor: pointer;
+          text-align: left;
+          transition: background 0.2s, border-color 0.2s;
+        "
+        onclick="
+          document.getElementById('mobile-menu-drawer').classList.remove('active');
+          document.getElementById('nav-overlay').classList.add('opacity-0');
+          setTimeout(function(){ document.getElementById('nav-overlay').classList.add('hidden'); }, 300);
+          document.body.style.overflow = '';
+          if (window.MNAIStylist && window.MNAIStylist.expandWidget) {
+            window.MNAIStylist.expandWidget();
+          }
+        "
+      >
+        <div style="width:42px;height:42px;border-radius:50%;overflow:hidden;border:2px solid #39A596;flex-shrink:0;">
+          <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=80&h=80&fit=crop" style="width:100%;height:100%;object-fit:cover;" alt="AI Stylist" />
+        </div>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:#fff;letter-spacing:0.3px;">AI Fashion Consultant</div>
+          <div style="font-size:11px;color:#39A596;margin-top:2px;">Get personalized style advice →</div>
+        </div>
+        <span style="margin-left:auto;width:8px;height:8px;background:#22c55e;border-radius:50%;box-shadow:0 0 8px rgba(34,197,94,0.8);flex-shrink:0;"></span>
+      </button>
+
       <span class="narrative-grid-title">Select Narrative</span>
       <div id="js-narrative-grid" class="narrative-grid">
         <p class="col-span-3 text-center text-xs text-gray-600 mt-4">Loading Narratives...</p>

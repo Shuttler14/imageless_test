@@ -284,9 +284,34 @@
           {% endif %}
         {% endfor %}
 
-        <div class="flex mt-3 md:mt-5 gap-3 md:gap-5 flex-wrap">
+        <style>
+          /* Add to Cart + Wishlist side-by-side: 85% / 15% */
+          .mn-atc-row {
+            display: flex;
+            gap: 10px;
+            align-items: stretch;
+            margin-top: 12px;
+          }
+          .mn-atc-btn {
+            flex: 0 0 85%;
+            max-width: 85%;
+          }
+          .mn-wishlist-btn {
+            flex: 0 0 calc(15% - 10px);
+            min-width: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+          /* Visual Toggle Logic for Single Product */
+          button[data-for="single-product-wishlist"].active .bi-heart { display: none; }
+          button[data-for="single-product-wishlist"].active .bi-heart-fill { display: block; }
+          button[data-for="single-product-wishlist"] .bi-heart-fill { display: none; }
+        </style>
+
+        <div class="mn-atc-row mt-3 md:mt-5">
           <button
-            class="bg-white hover:bg-teal-600 cursor-pointer disabled:text-red-500 disabled:cursor-not-allowed p-2 text-black flex-1 "
+            class="mn-atc-btn bg-white hover:bg-teal-600 cursor-pointer disabled:text-red-500 disabled:cursor-not-allowed p-2 text-black"
             type="submit"
             data-for="add-to-cart"
             {% unless product.selected_or_first_available_variant.available %}
@@ -300,26 +325,19 @@
             {% endif %}
           </button>
 
-          {% render 'mn-virtual-try-on' %}
-          
           <button
             type="button"
-            class="border aspect-square w-11 cursor-pointer flex items-center justify-center transition-all hover:bg-white/10"
-            data-for="single-product-wishlist" 
+            class="mn-wishlist-btn border cursor-pointer transition-all hover:bg-white/10"
+            data-for="single-product-wishlist"
             data-product-handle="{{ product.handle }}"
             title="Add to Wishlist"
           >
-            <style>
-                /* Visual Toggle Logic for Single Product */
-                button[data-for="single-product-wishlist"].active .bi-heart { display: none; }
-                button[data-for="single-product-wishlist"].active .bi-heart-fill { display: block; }
-                button[data-for="single-product-wishlist"] .bi-heart-fill { display: none; }
-            </style>
             <i class="bi bi-heart text-xl"></i>
             <i class="bi bi-heart-fill text-xl text-[#39A596]"></i>
           </button>
-
         </div>
+
+        {% render 'mn-virtual-try-on' %}
 
         {% for block in section.blocks %}
           {% if block.type == '@app' %}

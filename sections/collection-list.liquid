@@ -66,9 +66,15 @@
         lazyImgs.forEach(img => {
            if(img.dataset.src) {
              img.src = img.dataset.src;
-             img.srcset = img.dataset.srcset;
-             img.classList.remove('opacity-0');
+             if(img.dataset.srcset) img.srcset = img.dataset.srcset;
              img.removeAttribute('data-src');
+             img.removeAttribute('data-srcset');
+             if (img.complete) {
+               img.classList.remove('opacity-0');
+             } else {
+               img.onload = () => img.classList.remove('opacity-0');
+               img.onerror = () => img.classList.remove('opacity-0');
+             }
            }
         });
       });
@@ -104,9 +110,15 @@
                  if (img.dataset.src) {
                    img.src = img.dataset.src;
                    if(img.dataset.srcset) img.srcset = img.dataset.srcset;
-                   img.onload = () => img.classList.remove('opacity-0'); // Fade in
                    img.removeAttribute('data-src');
                    img.removeAttribute('data-srcset');
+                   // If already cached, onload won't fire — check .complete immediately
+                   if (img.complete) {
+                     img.classList.remove('opacity-0');
+                   } else {
+                     img.onload = () => img.classList.remove('opacity-0');
+                     img.onerror = () => img.classList.remove('opacity-0');
+                   }
                  }
               }
             });

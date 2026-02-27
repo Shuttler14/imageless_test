@@ -1,16 +1,12 @@
 <!-- AI Stylist Widget - Global Floating Assistant -->
 <div id="mn-ai-widget" class="mn-ai-widget">
-
-  <!-- Minimized State: Premium Card -->
-  <div id="mn-widget-minimized" class="mn-widget-minimized">
-    <div class="mn-card-avatar">
-      <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=80&h=80&fit=crop" alt="AI Consultant" />
+  
+  <!-- Minimized State: Avatar Bubble with Green Online Dot -->
+  <div id="mn-widget-minimized" class="mn-widget-minimized" title="Open AI Fashion Consultant">
+    <div class="mn-avatar-bubble">
+      <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=80&h=80&fit=crop" alt="AI Consultant" class="mn-avatar-bubble-img" />
+      <span class="mn-avatar-online-dot"></span>
     </div>
-    <div class="mn-card-content">
-      <div class="mn-card-title">AI Fashion Consultant</div>
-      <div class="mn-card-message">Let me plan your outfit of the day.</div>
-    </div>
-    <button class="mn-card-cta">Try me →</button>
   </div>
 
   <!-- Expanded State: Full Dashboard -->
@@ -31,5 +27,5 @@
     studioUrl: "/pages/ai-studio"
   };
 </script>
-<script src="{{ 'MN-fashion-consultant.js' | asset_url }}?v=REFERENCE-FIX" defer></script>
-<link rel="stylesheet" href="{{ 'MN-fashion-consultant.css' | asset_url }}?v=REFERENCE-FIX">
+<script src="{{ 'MN-fashion-consultant.js' | asset_url }}?v=CLICKABLE-FIXED" defer></script>
+<link rel="stylesheet" href="{{ 'MN-fashion-consultant.css' | asset_url }}?v=CLICKABLE-FIXED">
