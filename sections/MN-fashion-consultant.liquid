@@ -1,31 +1,46 @@
-<!-- AI Stylist Widget - Global Floating Assistant -->
+<!-- ============================================================
+     MY NARRATIVE — AI STYLIST WIDGET v2.0
+     Zero-Friction 5-Step Flow:
+       1A. Occasion Selector → 1B. Vibe Check →
+       2. Magic Image Upload → 3. Dopamine Loading →
+       4. Editorial Result + Upsell → 5. Gamification
+     ============================================================ -->
+
 <div id="mn-ai-widget" class="mn-ai-widget">
-  
-  <!-- Minimized State: Avatar Bubble with Green Online Dot -->
-  <div id="mn-widget-minimized" class="mn-widget-minimized" title="Open AI Fashion Consultant">
+
+  <!-- Minimized State: Avatar Bubble (shown after first close) -->
+  <div id="mn-widget-minimized" class="mn-widget-minimized" title="Open AI Stylist">
     <div class="mn-avatar-bubble">
-      <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=80&h=80&fit=crop" alt="AI Consultant" class="mn-avatar-bubble-img" />
+      <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=80&h=80&fit=crop" alt="AI Stylist" class="mn-avatar-bubble-img" />
       <span class="mn-avatar-online-dot"></span>
     </div>
   </div>
 
-  <!-- Expanded State: Full Dashboard -->
+  <!-- Expanded State: Full 5-Step Widget -->
   <div id="mn-widget-expanded" class="mn-widget-expanded" aria-hidden="true">
-    <button id="mn-close-btn" class="mn-close-btn" aria-label="Close">×</button>
+    <!-- Close button -->
+    <button id="mn-close-btn" class="mn-close-btn" aria-label="Close AI Stylist">×</button>
+
+    <!-- Progress bar (filled by JS based on current step) -->
     <div id="mn-progress-bar" class="mn-progress-bar">
       <div class="mn-progress-fill"></div>
     </div>
+
+    <!-- Step content rendered here by MN-fashion-consultant.js -->
     <div id="mn-content-container" class="mn-content-container"></div>
   </div>
 
 </div>
 
-<!-- Load Assets -->
+<!-- Widget Configuration -->
+<!-- IMPORTANT: Update apiUrl when Vercel deployment URL changes -->
 <script>
   window.MN_CONFIG = {
-    apiUrl: "https://mynarrative-ai.vercel.app/api/fashion_consultant",
+    apiUrl: "https://mynarrative-ai.vercel.app/api/stylist_pipeline",
     studioUrl: "/pages/ai-studio"
   };
 </script>
-<script src="{{ 'MN-fashion-consultant.js' | asset_url }}?v=CLICKABLE-FIXED" defer></script>
-<link rel="stylesheet" href="{{ 'MN-fashion-consultant.css' | asset_url }}?v=CLICKABLE-FIXED">
+
+<!-- New Zero-Friction Flow JS (v2.0) — replaces old calibration/gift flow -->
+<script src="{{ 'MN-fashion-consultant.js' | asset_url }}?v=2.0.0" defer></script>
+<link rel="stylesheet" href="{{ 'MN-fashion-consultant.css' | asset_url }}?v=2.0.0">
