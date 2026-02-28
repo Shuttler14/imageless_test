@@ -3,16 +3,17 @@
 /**
  * MY NARRATIVE — AI Stylist Flow (Main Orchestrator)
  * ====================================================
- * Manages the 5-step Zero-Friction styling experience:
+ * Manages the Zero-Friction styling experience:
+ *   Step 0  → Gender selector (Men / Women) — NEW
  *   Step 1A → Occasion selector (visual tiles, no text input)
- *   Step 1B → Vibe Card swiper (Tinder-style)
+ *   Step 1B → Vibe Card swiper (Tinder-style, 8 cards filtered by gender)
  *   Step 2  → Photo upload (drag-and-drop data ingestion)
  *   Step 3  → Dopamine loading screen + result reveal
  *   Step 4  → VibeCardResult with affiliate upsell (rendered as child)
  *   Step 5  → Gamification modals (Mascot Quest + Style Graph)
  *
- * API Base: process.env.NEXT_PUBLIC_STYLIST_API_URL
- *   (points to your FastAPI instance, e.g. https://api.mynarrative.in)
+ * API Base: https://mynarrative-ai.vercel.app
+ *   All calls → POST /api/stylist_pipeline with { action, ...payload }
  */
 
 import React, { useState, useCallback, useRef, useEffect } from "react";
@@ -21,6 +22,8 @@ import { Upload, ChevronRight, ChevronLeft, X, RefreshCw, Star } from "lucide-re
 import VibeCardResult from "./VibeCardResult";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
+
+export type Gender = "men" | "women";
 
 export interface Occasion {
   id: string;
@@ -34,9 +37,12 @@ export interface VibeCard {
   label: string;
   description: string;
   flux_style_keywords: string;
+  gender: Gender;
+  emoji: string;
 }
 
 export interface UserSelections {
+  gender: Gender;
   occasion: string;
   occasionLabel: string;
   vibe_id: string;
@@ -44,21 +50,45 @@ export interface UserSelections {
   flux_style_keywords: string;
 }
 
+// Vercel API response shape from /api/stylist_pipeline (action: full_pipeline)
 export interface GenerationResult {
-  session_id: string;
-  final_image_base64: string;
-  flux_prompt_used: string;
+  success: boolean;
+  pipeline_duration_seconds?: number;
   biometrics: {
     monk_skin_tone: number;
-    monk_skin_hex: string;
-    monk_skin_label: string;
+    mst_label: string;
     body_type: string;
+    gender_presentation: string;
+    // legacy shape fallback
+    monk_skin_hex?: string;
+    monk_skin_label?: string;
   };
   wardrobe: {
-    items: Array<{ category: string; label: string; dominant_colors: string[] }>;
+    items_detected: number;
+    items: Array<{ category: string; label?: string; slot?: string; color?: string; dominant_colors?: string[] }>;
   };
-  generated_items: string[];
-  affiliate_recommendations: AffiliateRec[];
+  editorial: {
+    flux_prompt: string;
+    flux_image_url: string;
+    final_image_url: string;
+    occasion: Record<string, unknown>;
+    vibe: Record<string, unknown>;
+  };
+  color_theory: {
+    mst_value: number;
+    best_colors: string[];
+    avoid_colors: string[];
+    undertone_note: string;
+    tooltip_text: string;
+  };
+  affiliate_upsells: AffiliateRec[];
+  outfit_completion_pct: number;
+  gamification: Record<string, unknown>;
+  // legacy fields (from local FastAPI mock) kept for fallback
+  final_image_base64?: string;
+  flux_prompt_used?: string;
+  generated_items?: string[];
+  affiliate_recommendations?: AffiliateRec[];
 }
 
 export interface AffiliateRec {
@@ -75,24 +105,96 @@ export interface AffiliateRec {
   is_gap_item: boolean;
 }
 
-type FlowStep = "occasion" | "vibe" | "upload" | "loading" | "result" | "gamification";
+type FlowStep = "gender" | "occasion" | "vibe" | "upload" | "loading" | "result" | "gamification";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const API_BASE = process.env.NEXT_PUBLIC_STYLIST_API_URL ?? "https://api.mynarrative.in";
+// Real Vercel deployment — all calls go here
+const API_BASE = "https://mynarrative-ai.vercel.app";
+const PIPELINE_ENDPOINT = `${API_BASE}/api/stylist_pipeline`;
 
 const OCCASIONS: Occasion[] = [
-  { id: "date_night",  label: "Date Night",   emoji: "🌙", description: "Romantic, elevated, unforgettable." },
-  { id: "office",      label: "Office",        emoji: "💼", description: "Power dressing. Own the room." },
-  { id: "sangeet",     label: "Sangeet",       emoji: "💃", description: "Festive, vibrant, celebration-ready." },
-  { id: "airport",     label: "Airport Look",  emoji: "✈️", description: "Effortless transit. Runway in the terminal." },
+  { id: "date_night",   label: "Date Night",   emoji: "🌙", description: "Romantic, elevated, unforgettable." },
+  { id: "office",       label: "Office",        emoji: "💼", description: "Power dressing. Own the room." },
+  { id: "sangeet",      label: "Sangeet",       emoji: "💃", description: "Festive, vibrant, celebration-ready." },
+  { id: "airport_look", label: "Airport Look",  emoji: "✈️", description: "Effortless transit. Runway in the terminal." },
 ];
 
-const DEFAULT_VIBES: VibeCard[] = [
-  { vibe_id: "surviving_on_caffeine", label: "Surviving on Caffeine",  description: "That 3am grind energy. Oversized, cozy, unbothered.", flux_style_keywords: "oversized hoodie, relaxed fit, muted tones, moody lighting" },
-  { vibe_id: "sarcastic_rizzler",     label: "The Sarcastic Rizzler",  description: "Main character syndrome. Bold fits, zero apologies.",   flux_style_keywords: "bold streetwear, statement pieces, confident, high contrast" },
-  { vibe_id: "quiet_luxury",          label: "Quiet Luxury",           description: "Let the fabric speak. Minimal, elevated, intentional.", flux_style_keywords: "minimalist luxury, neutral palette, tailored silhouette" },
-  { vibe_id: "cottagecore_chaos",     label: "Cottagecore Chaos",      description: "Pinterest board escaped into real life. Soft but feral.", flux_style_keywords: "floral prints, earthy tones, golden hour, romantic styling" },
+// ─── 8 Style Cards: 4 for Men, 4 for Women ───────────────────────────────────
+//
+// backend_vibe_id maps to the 4 keys the Vercel pipeline knows:
+//   caffeine_survivor | sarcastic_rizzler | main_character | quiet_luxury
+//
+// The frontend shows unique labels/descriptions per gender.
+// When calling the API we send backend_vibe_id so the pipeline never 404s.
+const ALL_VIBES: VibeCard[] = [
+  // ── Men's 4 ─────────────────────────────────────────────────────────────
+  {
+    vibe_id: "caffeine_survivor",       // backend key
+    label: "Surviving on Caffeine",
+    emoji: "☕",
+    description: "That 3am grind energy. Oversized, cozy, unbothered.",
+    flux_style_keywords: "oversized hoodie, distressed denim, messy-chic hair, coffee shop aesthetic",
+    gender: "men",
+  },
+  {
+    vibe_id: "sarcastic_rizzler",       // backend key
+    label: "The Sarcastic Rizzler",
+    emoji: "😏",
+    description: "Main character syndrome. Bold fits, zero apologies.",
+    flux_style_keywords: "sharp tailored blazer, statement sneakers, confident pose, editorial lighting",
+    gender: "men",
+  },
+  {
+    vibe_id: "main_character",          // backend key
+    label: "Main Character Energy",
+    emoji: "✨",
+    description: "The protagonist of every scene. Dramatic and cinematic.",
+    flux_style_keywords: "dramatic flowing outfit, cinematic backlighting, street style, golden hour",
+    gender: "men",
+  },
+  {
+    vibe_id: "quiet_luxury",            // backend key
+    label: "Quiet Luxury",
+    emoji: "🤫",
+    description: "Let the fabric speak. Minimal, elevated, intentional.",
+    flux_style_keywords: "minimal neutral tones, cashmere texture, understated elegance, clean silhouette",
+    gender: "men",
+  },
+  // ── Women's 4 ────────────────────────────────────────────────────────────
+  // Each maps to one of the 4 backend vibe_ids so the pipeline always resolves.
+  {
+    vibe_id: "main_character",          // backend key → "main_character" preset
+    label: "Cottagecore Chaos",
+    emoji: "🌸",
+    description: "Pinterest board escaped into real life. Soft but feral.",
+    flux_style_keywords: "floral midi dress, layered linen textures, wildflower crown, golden hour outdoor editorial, romantic cottagecore styling",
+    gender: "women",
+  },
+  {
+    vibe_id: "sarcastic_rizzler",       // backend key → "sarcastic_rizzler" preset
+    label: "Boss Babe",
+    emoji: "👑",
+    description: "Power suits meet killer heels. Boardroom to bar.",
+    flux_style_keywords: "tailored power blazer, structured shoulders, bold red lip, pointed heels, glass-tower city editorial",
+    gender: "women",
+  },
+  {
+    vibe_id: "quiet_luxury",            // backend key → "quiet_luxury" preset
+    label: "Dark Academia",
+    emoji: "📚",
+    description: "Tweed, turtlenecks, and tortoiseshell. Intellectual and moody.",
+    flux_style_keywords: "camel tweed blazer, ivory turtleneck, plaid midi skirt, oxfords, dim library backdrop, moody editorial",
+    gender: "women",
+  },
+  {
+    vibe_id: "caffeine_survivor",       // backend key → "caffeine_survivor" preset
+    label: "Femme Fatale",
+    emoji: "🖤",
+    description: "Satin, red lips, and an air of mystery. Timeless allure.",
+    flux_style_keywords: "satin slip dress, deep red lips, smoky eye, noir dramatic lighting, old-Hollywood glamour editorial",
+    gender: "women",
+  },
 ];
 
 const LOADING_STAGES = [
@@ -104,16 +206,86 @@ const LOADING_STAGES = [
   { text: "Adding Final Touches…",    duration: 1500 },
 ];
 
+// ─── Step 0: Gender Selector ──────────────────────────────────────────────────
+
+function GenderSelector({
+  selected,
+  onSelect,
+}: {
+  selected: Gender | null;
+  onSelect: (g: Gender) => void;
+}) {
+  const options: { id: Gender; label: string; emoji: string; tagline: string }[] = [
+    { id: "men",   label: "Men",   emoji: "👔", tagline: "Tailored. Bold. Unapologetic." },
+    { id: "women", label: "Women", emoji: "👗", tagline: "Expressive. Elevated. Iconic." },
+  ];
+
+  return (
+    <motion.div
+      key="gender"
+      initial={{ opacity: 0, y: 24 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -24 }}
+      className="flex flex-col items-center gap-8 w-full max-w-sm mx-auto px-4"
+    >
+      <div className="text-center space-y-2">
+        <p className="text-xs uppercase tracking-widest text-zinc-500 font-semibold">Step 1 of 6</p>
+        <h2 className="text-2xl font-black text-white tracking-tight">Who are we styling?</h2>
+        <p className="text-sm text-zinc-500">Choose your style universe. We'll show you the right looks.</p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4 w-full">
+        {options.map((opt) => (
+          <motion.button
+            key={opt.id}
+            whileTap={{ scale: 0.96 }}
+            onClick={() => onSelect(opt.id)}
+            className={`relative flex flex-col items-center justify-center gap-3 rounded-3xl border p-8 text-center transition-all duration-200 ${
+              selected === opt.id
+                ? "border-[#39A596] bg-[#39A596]/10 shadow-[0_0_24px_rgba(57,165,150,0.25)]"
+                : "border-white/10 bg-white/5 hover:border-white/25 hover:bg-white/8"
+            }`}
+          >
+            <span className="text-5xl">{opt.emoji}</span>
+            <span className="text-base font-black text-white">{opt.label}</span>
+            <span className="text-[11px] text-zinc-500 leading-snug">{opt.tagline}</span>
+            {selected === opt.id && (
+              <motion.div
+                layoutId="gender-check"
+                className="absolute top-3 right-3 w-5 h-5 rounded-full bg-[#39A596] flex items-center justify-center"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+              >
+                <span className="text-[10px] text-black font-bold">✓</span>
+              </motion.div>
+            )}
+          </motion.button>
+        ))}
+      </div>
+
+      <button
+        onClick={() => selected && onSelect(selected)}
+        disabled={!selected}
+        className="w-full flex items-center justify-center gap-2 rounded-2xl bg-[#39A596] text-black font-bold py-4 text-sm hover:bg-[#2d8a7d] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+      >
+        Let's Style {selected === "men" ? "Him" : selected === "women" ? "Her" : "You"} <ChevronRight className="w-4 h-4" />
+      </button>
+    </motion.div>
+  );
+}
+
 // ─── Step 1A: Occasion Selector ───────────────────────────────────────────────
 
 function OccasionSelector({
   selected,
   onSelect,
   onNext,
+  onBack,
 }: {
   selected: string | null;
   onSelect: (o: Occasion) => void;
   onNext: () => void;
+  onBack: () => void;
 }) {
   return (
     <motion.div
@@ -124,7 +296,7 @@ function OccasionSelector({
       className="flex flex-col items-center gap-8 w-full max-w-lg mx-auto px-4"
     >
       <div className="text-center space-y-2">
-        <p className="text-xs uppercase tracking-widest text-zinc-500 font-semibold">Step 1 of 5</p>
+        <p className="text-xs uppercase tracking-widest text-zinc-500 font-semibold">Step 2 of 6</p>
         <h2 className="text-2xl font-black text-white tracking-tight">Where are we heading?</h2>
         <p className="text-sm text-zinc-500">Pick your occasion. We'll build your look around it.</p>
       </div>
@@ -165,6 +337,13 @@ function OccasionSelector({
       >
         Set the Scene <ChevronRight className="w-4 h-4" />
       </button>
+
+      <button
+        onClick={onBack}
+        className="flex items-center gap-1.5 text-xs text-zinc-600 hover:text-zinc-300 transition-colors"
+      >
+        <ChevronLeft className="w-4 h-4" /> Back to Gender
+      </button>
     </motion.div>
   );
 }
@@ -175,10 +354,12 @@ function VibeSwiper({
   vibes,
   onSelect,
   onBack,
+  gender,
 }: {
   vibes: VibeCard[];
   onSelect: (v: VibeCard) => void;
   onBack: () => void;
+  gender: Gender;
 }) {
   const [currentIdx, setCurrentIdx] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
@@ -209,7 +390,7 @@ function VibeSwiper({
       className="flex flex-col items-center gap-6 w-full max-w-sm mx-auto px-4"
     >
       <div className="text-center space-y-2">
-        <p className="text-xs uppercase tracking-widest text-zinc-500 font-semibold">Step 2 of 5</p>
+        <p className="text-xs uppercase tracking-widest text-zinc-500 font-semibold">Step 3 of 6 · {gender === "men" ? "Men's" : "Women's"} Styles</p>
         <h2 className="text-2xl font-black text-white tracking-tight">Pick your vibe</h2>
         <p className="text-sm text-zinc-500">Swipe right to choose. Left to skip.</p>
       </div>
@@ -245,7 +426,10 @@ function VibeSwiper({
             <p className="text-xs text-zinc-600 uppercase tracking-widest mb-3 font-semibold">
               {currentIdx + 1} / {vibes.length}
             </p>
-            <h3 className="text-xl font-black text-white mb-3 leading-tight">{current.label}</h3>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-2xl">{current.emoji}</span>
+              <h3 className="text-xl font-black text-white leading-tight">{current.label}</h3>
+            </div>
             <p className="text-sm text-zinc-400 leading-relaxed">{current.description}</p>
           </div>
 
@@ -330,7 +514,7 @@ function PhotoUpload({
       className="flex flex-col items-center gap-6 w-full max-w-lg mx-auto px-4"
     >
       <div className="text-center space-y-2">
-        <p className="text-xs uppercase tracking-widest text-zinc-500 font-semibold">Step 3 of 5</p>
+        <p className="text-xs uppercase tracking-widest text-zinc-500 font-semibold">Step 4 of 6</p>
         <h2 className="text-2xl font-black text-white tracking-tight">Your Magic Image</h2>
         <p className="text-sm text-zinc-400 max-w-xs mx-auto leading-relaxed">
           Upload a recent photo of yourself in a full outfit. We'll extract your fit and generate your editorial look.
@@ -626,23 +810,26 @@ function GamificationModal({
 // ─── Main AIStylistFlow Orchestrator ──────────────────────────────────────────
 
 export default function AIStylistFlow() {
-  const [step, setStep] = useState<FlowStep>("occasion");
+  const [step, setStep] = useState<FlowStep>("gender");
+  const [gender, setGender] = useState<Gender | null>(null);
   const [selections, setSelections] = useState<Partial<UserSelections>>({});
   const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [result, setResult] = useState<GenerationResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [showGamification, setShowGamification] = useState(false);
-  const [vibes, setVibes] = useState<VibeCard[]>(DEFAULT_VIBES);
 
-  // Fetch live vibes from backend on mount (falls back to DEFAULT_VIBES)
-  useEffect(() => {
-    fetch(`${API_BASE}/api/vibes`)
-      .then((r) => r.json())
-      .then((data) => { if (data.vibes?.length) setVibes(data.vibes); })
-      .catch(() => {}); // silent fallback
-  }, []);
+  // Vibes filtered by gender from the full 8-card set
+  const vibes = gender ? ALL_VIBES.filter((v) => v.gender === gender) : ALL_VIBES;
 
-  // ── Step 1A handler ─────────────────────────────────────────────────────────
+  // ── Step 0: Gender handler ────────────────────────────────────────────────
+  function handleGenderSelect(g: Gender) {
+    setGender(g);
+    setSelections((prev) => ({ ...prev, gender: g }));
+    // Auto-advance on selection
+    setTimeout(() => setStep("occasion"), 300);
+  }
+
+  // ── Step 1A: Occasion handler ─────────────────────────────────────────────
   function handleOccasionSelect(occ: Occasion) {
     setSelections((prev) => ({
       ...prev,
@@ -651,7 +838,7 @@ export default function AIStylistFlow() {
     }));
   }
 
-  // ── Step 1B handler ─────────────────────────────────────────────────────────
+  // ── Step 1B: Vibe handler ─────────────────────────────────────────────────
   function handleVibeSelect(vibe: VibeCard) {
     setSelections((prev) => ({
       ...prev,
@@ -663,29 +850,31 @@ export default function AIStylistFlow() {
     setTimeout(() => setStep("upload"), 400);
   }
 
-  // ── Step 2 handler ─────────────────────────────────────────────────────────
+  // ── Step 2: Image upload handler ──────────────────────────────────────────
   function handleImageUpload(base64: string) {
     setImageBase64(base64);
-    // Auto-advance to loading + trigger pipeline
     setStep("loading");
     runPipeline(base64);
   }
 
-  // ── Step 3: Call backend pipeline ─────────────────────────────────────────
+  // ── Step 3: Call real Vercel pipeline ─────────────────────────────────────
+  // Field names match exactly what stylist_pipeline.py expects:
+  //   action, user_id, occasion, vibe_id, user_image (base64)
   async function runPipeline(base64: string) {
     setError(null);
     try {
       const payload = {
-        selections: {
-          occasion: selections.occasionLabel ?? "Casual",
-          vibe_id: selections.vibe_id ?? "sarcastic_rizzler",
-          vibe_label: selections.vibe_label ?? "The Sarcastic Rizzler",
-          flux_style_keywords: selections.flux_style_keywords ?? "bold streetwear",
-        },
-        image_base64: base64,
+        action: "full_pipeline",
+        // user_id: use Shopify customer id if available, else guest token
+        user_id: (window as unknown as Record<string, unknown>).__mn_customer_id as string
+          ?? `guest_${Date.now()}`,
+        occasion: selections.occasion ?? "date_night",
+        vibe_id: selections.vibe_id ?? "caffeine_survivor",
+        user_image: base64,          // ← backend field name (not image_base64)
+        gender: selections.gender ?? "men",
       };
 
-      const resp = await fetch(`${API_BASE}/api/generate`, {
+      const resp = await fetch(PIPELINE_ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -693,12 +882,14 @@ export default function AIStylistFlow() {
 
       if (!resp.ok) {
         const errData = await resp.json().catch(() => ({}));
-        throw new Error(errData.detail ?? `Server error ${resp.status}`);
+        throw new Error(errData.error ?? errData.detail ?? `Server error ${resp.status}`);
       }
 
-      const data: GenerationResult & { success: boolean } = await resp.json();
+      const data: GenerationResult = await resp.json();
 
-      if (!data.success) throw new Error("Pipeline returned failure");
+      if (!data.success) throw new Error(
+        (data as unknown as Record<string, string>).error ?? "Pipeline returned failure"
+      );
 
       setResult(data);
       setStep("result");
@@ -711,28 +902,40 @@ export default function AIStylistFlow() {
 
   // ── Step 5: OOTD upload ────────────────────────────────────────────────────
   async function handleOOTDUpload(file: File) {
-    const formData = new FormData();
-    formData.append("image", file);
-    formData.append("user_id", "guest_session"); // Replace with real Shopify customer ID
-
-    try {
-      await fetch(`${API_BASE}/api/style-graph/upload`, {
-        method: "POST",
-        body: formData,
-      });
-    } catch (e) {
-      console.warn("OOTD upload failed silently:", e);
-    }
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const b64 = (e.target?.result as string).replace(/^data:image\/\w+;base64,/, "");
+      try {
+        await fetch(PIPELINE_ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "upload_ootd",
+            user_id: (window as unknown as Record<string, unknown>).__mn_customer_id as string
+              ?? `guest_${Date.now()}`,
+            user_image: b64,
+          }),
+        });
+      } catch (e) {
+        console.warn("OOTD upload failed silently:", e);
+      }
+    };
+    reader.readAsDataURL(file);
   }
 
   // ── Reset flow ─────────────────────────────────────────────────────────────
   function resetFlow() {
-    setStep("occasion");
+    setStep("gender");
+    setGender(null);
     setSelections({});
     setImageBase64(null);
     setResult(null);
     setError(null);
   }
+
+  // Progress bar steps (exclude loading/result/gamification)
+  const PROGRESS_STEPS: FlowStep[] = ["gender", "occasion", "vibe", "upload"];
+  const currentProgressIdx = PROGRESS_STEPS.indexOf(step);
 
   return (
     <div className="min-h-screen bg-black text-white font-sans antialiased flex flex-col">
@@ -741,9 +944,14 @@ export default function AIStylistFlow() {
         <div className="flex items-center gap-2">
           <span className="text-sm font-black tracking-tight text-white">MY NARRATIVE</span>
           <span className="text-[10px] border border-[#39A596]/40 text-[#39A596] rounded-full px-2 py-0.5 font-semibold uppercase tracking-wider">AI Stylist</span>
+          {gender && (
+            <span className="text-[10px] border border-white/20 text-zinc-400 rounded-full px-2 py-0.5 font-semibold uppercase tracking-wider">
+              {gender === "men" ? "👔 Men" : "👗 Women"}
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-3">
-          {step !== "occasion" && (
+          {step !== "gender" && step !== "occasion" && (
             <button
               onClick={() => setShowGamification(true)}
               className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-white transition-colors border border-white/10 rounded-full px-3 py-1.5"
@@ -762,11 +970,11 @@ export default function AIStylistFlow() {
       {/* ── Flow Step Progress Indicator ── */}
       {step !== "loading" && step !== "result" && (
         <div className="flex items-center gap-1 px-5 py-3">
-          {(["occasion", "vibe", "upload"] as FlowStep[]).map((s, i) => (
+          {PROGRESS_STEPS.map((s, i) => (
             <div key={s} className="flex items-center gap-1">
               <div className={`h-1 rounded-full transition-all duration-500 ${
                 step === s ? "w-8 bg-[#39A596]" :
-                ["occasion", "vibe", "upload"].indexOf(step) > i ? "w-4 bg-[#39A596]/50" : "w-4 bg-zinc-800"
+                currentProgressIdx > i ? "w-4 bg-[#39A596]/50" : "w-4 bg-zinc-800"
               }`} />
             </div>
           ))}
@@ -794,12 +1002,21 @@ export default function AIStylistFlow() {
       {/* ── Main Step Renderer ── */}
       <div className="flex-1 flex items-center justify-center py-8">
         <AnimatePresence mode="wait">
+          {step === "gender" && (
+            <GenderSelector
+              key="gender"
+              selected={gender}
+              onSelect={handleGenderSelect}
+            />
+          )}
+
           {step === "occasion" && (
             <OccasionSelector
               key="occasion"
               selected={selections.occasion ?? null}
               onSelect={handleOccasionSelect}
               onNext={() => { if (selections.occasion) setStep("vibe"); }}
+              onBack={() => setStep("gender")}
             />
           )}
 
@@ -809,6 +1026,7 @@ export default function AIStylistFlow() {
               vibes={vibes}
               onSelect={handleVibeSelect}
               onBack={() => setStep("occasion")}
+              gender={gender ?? "men"}
             />
           )}
 

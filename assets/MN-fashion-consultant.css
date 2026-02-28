@@ -17,7 +17,178 @@
    NEW v2.0 ZERO-FRICTION FLOW STYLES
    ═══════════════════════════════════════════════════════════ */
 
-/* Step container */
+/* ═══════════════════════════════════════════════
+   MN WIDGET v3.0 — MAIN CHARACTER FLOW STYLES
+   ═══════════════════════════════════════════════ */
+
+/* ── PERSISTENT NAV BAR ────────────────────── */
+.mnw-persistent-nav { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px 0; flex-shrink: 0; }
+
+/* Profile Ring */
+.mnw-profile-ring { position: relative; width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.04); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.mnw-ring-svg { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
+.mnw-ring-track { fill: none; stroke: rgba(255,255,255,0.08); stroke-width: 3; }
+.mnw-ring-fill { fill: none; stroke: #39A596; stroke-width: 3; stroke-linecap: round; transition: stroke-dashoffset 0.8s ease; }
+.mnw-ring-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; position: relative; z-index: 1; }
+.mnw-ring-pct { position: absolute; bottom: -14px; left: 50%; transform: translateX(-50%); font-size: 8px; font-weight: 800; color: #39A596; white-space: nowrap; pointer-events: none; }
+
+/* Closet Chip */
+.mnw-closet-chip { display: flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 9999px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: rgba(244,244,244,0.8); font-size: 11px; font-weight: 600; cursor: pointer; transition: border-color 0.2s; font-family: inherit; }
+.mnw-closet-chip:hover { border-color: #39A596; }
+.mnw-closet-count { background: #39A596; color: #000; font-size: 9px; font-weight: 800; border-radius: 9999px; padding: 1px 5px; }
+
+/* Gift Banner */
+.mnw-gift-banner { display: flex; align-items: center; justify-content: space-between; padding: 6px 14px; background: linear-gradient(90deg, #7c3aed, #ec4899); font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0; }
+.mnw-exit-gift { font-size: 10px; color: rgba(255,255,255,0.7); background: none; border: none; cursor: pointer; font-family: inherit; }
+
+/* Gift FAB */
+.mnw-gift-fab-wrap { position: absolute; bottom: 14px; right: 14px; z-index: 10; }
+.mnw-gift-fab { position: relative; width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #7c3aed, #ec4899); border: none; cursor: pointer; color: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px rgba(124,58,237,0.4); }
+.mnw-gift-tooltip { position: absolute; bottom: 52px; right: 0; background: rgba(20,20,20,0.95); border: 1px solid rgba(255,255,255,0.1); color: rgba(244,244,244,0.85); font-size: 10px; font-weight: 500; padding: 7px 10px; border-radius: 8px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.2s; font-family: inherit; }
+.mnw-gift-fab:hover .mnw-gift-tooltip { opacity: 1; }
+
+/* ── MODALS & DRAWERS ──────────────────────── */
+.mnw-overlay-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 20000; display: flex; align-items: center; justify-content: center; padding: 16px; }
+.mnw-overlay-drawer { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 20000; display: flex; align-items: flex-end; justify-content: center; }
+.mnw-modal-box { background: #111; border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 24px; width: 100%; max-width: 340px; position: relative; }
+.mnw-drawer-box { background: #111; border: 1px solid rgba(255,255,255,0.1); border-radius: 20px 20px 0 0; padding: 22px; width: 100%; max-width: 480px; position: relative; max-height: 80vh; overflow-y: auto; }
+.mnw-modal-close { position: absolute; top: 12px; right: 14px; width: 26px; height: 26px; border-radius: 50%; background: rgba(255,255,255,0.06); border: none; color: rgba(244,244,244,0.5); font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-family: inherit; }
+.mnw-modal-title { font-size: 16px; font-weight: 800; color: #fff; margin: 0 0 4px; }
+.mnw-modal-sub { font-size: 11px; color: rgba(244,244,244,0.45); margin: 0 0 16px; }
+.mnw-modal-field { margin-bottom: 14px; }
+.mnw-modal-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(244,244,244,0.4); font-weight: 700; display: block; margin-bottom: 7px; }
+.mnw-slider { width: 100%; accent-color: #39A596; }
+.mnw-slider-val { font-size: 12px; font-weight: 700; color: #39A596; display: block; margin-top: 3px; }
+.mnw-fit-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.mnw-fit-chip { padding: 5px 12px; border-radius: 9999px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: rgba(244,244,244,0.45); font-size: 11px; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+.mnw-fit-chip.mnw-fit-active { border-color: #39A596; color: #39A596; background: rgba(57,165,150,0.1); }
+.mnw-modal-save { width: 100%; padding: 11px; background: #39A596; color: #000; font-size: 13px; font-weight: 800; border: none; border-radius: 11px; cursor: pointer; margin-top: 4px; font-family: inherit; }
+.mnw-drawer-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 14px; min-height: 60px; }
+.mnw-drawer-actions { display: flex; gap: 8px; }
+.mnw-drawer-btn { flex: 1; padding: 11px; border-radius: 11px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; }
+.mnw-drawer-primary { background: #39A596; color: #000; border: none; }
+.mnw-drawer-ghost { background: transparent; color: rgba(244,244,244,0.45); border: 1px solid rgba(255,255,255,0.1); }
+
+/* ── STEP SHELL ───────────────────────────── */
+.mnw-step { padding: 14px 14px 70px; display: flex; flex-direction: column; gap: 12px; animation: mnw-fade-in 0.35s ease forwards; }
+@keyframes mnw-fade-in { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+.mnw-step-hdr { text-align: center; }
+.mnw-step-num { font-size: 10px; font-weight: 800; color: #39A596; text-transform: uppercase; letter-spacing: 0.15em; margin: 0 0 6px; }
+.mnw-step-title { font-size: 18px; font-weight: 900; color: #fff; margin: 0 0 4px; line-height: 1.2; letter-spacing: -0.02em; }
+.mnw-step-sub { font-size: 12px; color: rgba(244,244,244,0.5); margin: 0; line-height: 1.5; }
+
+/* ── STEP 1: HOOK ─────────────────────────── */
+.mnw-step1 { position: relative; min-height: 420px; justify-content: center; overflow: hidden; padding-top: 50px; }
+.mnw-step1-inner { position: relative; z-index: 2; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.mnw-badge { font-size: 9px; font-weight: 800; letter-spacing: 0.2em; color: #39A596; border: 1px solid rgba(57,165,150,0.3); border-radius: 9999px; padding: 5px 14px; text-transform: uppercase; }
+.mnw-hook-title { font-size: 22px; font-weight: 900; color: #fff; line-height: 1.15; letter-spacing: -0.025em; margin: 0; }
+.mnw-gradient-text { background: linear-gradient(135deg, #39A596, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.mnw-hook-sub { font-size: 13px; color: rgba(244,244,244,0.5); margin: 0; }
+.mnw-orb { position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.25; pointer-events: none; animation: mnw-drift 8s ease-in-out infinite; }
+.mnw-orb1 { width: 280px; height: 280px; background: #39A596; top: -80px; left: -80px; }
+.mnw-orb2 { width: 220px; height: 220px; background: #7c3aed; bottom: -60px; right: -60px; animation-delay: -4s; animation-direction: reverse; }
+@keyframes mnw-drift { 0%,100%{transform:translate(0,0)} 50%{transform:translate(20px,15px)} }
+.mnw-step-dots { display: flex; justify-content: center; gap: 5px; }
+.mnw-dot { width: 24px; height: 4px; border-radius: 9999px; background: rgba(255,255,255,0.1); }
+.mnw-dot-active { background: #39A596; }
+.mnw-dot-done { background: rgba(57,165,150,0.35); }
+
+/* ── CTA BUTTONS ──────────────────────────── */
+.mnw-cta { display: inline-flex; align-items: center; gap: 8px; padding: 13px 24px; border-radius: 13px; background: linear-gradient(135deg, #39A596, #2d8a7d); color: #000; font-size: 13px; font-weight: 800; border: none; cursor: pointer; font-family: inherit; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 6px 24px rgba(57,165,150,0.3); }
+.mnw-cta:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(57,165,150,0.45); }
+.mnw-cta:disabled { opacity: 0.3; cursor: not-allowed; transform: none; box-shadow: none; }
+.mnw-cta-sm { padding: 10px 18px; font-size: 12px; }
+.mnw-btn-ghost { padding: 10px 16px; background: transparent; border: 1px solid rgba(255,255,255,0.1); border-radius: 11px; color: rgba(244,244,244,0.45); font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+.mnw-btn-ghost:hover { border-color: rgba(255,255,255,0.25); color: #fff; }
+.mnw-step-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.mnw-sel-count { font-size: 11px; color: rgba(244,244,244,0.4); white-space: nowrap; }
+
+/* ── STEP 2: AESTHETIC GRID ───────────────── */
+.mnw-aesthetic-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.mnw-aesthetic-card { position: relative; border-radius: 12px; overflow: hidden; aspect-ratio: 3/4; cursor: pointer; border: 2px solid transparent; transition: all 0.22s; background: none; padding: 0; -webkit-tap-highlight-color: transparent; }
+.mnw-aesthetic-card:hover { transform: translateY(-2px); }
+.mnw-aesthetic-card.mnw-selected { border-color: #39A596; }
+.mnw-aesthetic-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.mnw-aesthetic-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, transparent 55%); display: flex; flex-direction: column; justify-content: flex-end; padding: 8px; }
+.mnw-aesthetic-style { font-size: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; margin: 0 0 2px; }
+.mnw-aesthetic-name { font-size: 10px; font-weight: 700; color: #fff; margin: 0; line-height: 1.2; }
+.mnw-gender-badge { position: absolute; top: 5px; left: 5px; font-size: 8px; font-weight: 700; border-radius: 9999px; padding: 2px 6px; }
+.mnw-gender-m { background: rgba(96,165,250,0.2); border: 1px solid rgba(96,165,250,0.35); color: #93c5fd; }
+.mnw-gender-f { background: rgba(244,114,182,0.2); border: 1px solid rgba(244,114,182,0.35); color: #f9a8d4; }
+.mnw-check { position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; border-radius: 50%; background: #39A596; color: #000; font-size: 10px; font-weight: 800; align-items: center; justify-content: center; }
+
+/* ── STEP 3: OCCASION CHIPS ───────────────── */
+.mnw-occasion-chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.mnw-occ-chip { display: flex; align-items: center; gap: 6px; padding: 9px 14px; border-radius: 9999px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: rgba(244,244,244,0.5); font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+.mnw-occ-chip:hover { border-color: rgba(255,255,255,0.25); color: #fff; }
+.mnw-occ-chip.mnw-occ-active { border-color: #39A596; background: rgba(57,165,150,0.1); color: #39A596; }
+
+/* ── STEP 4: UPLOAD ───────────────────────── */
+.mnw-upload-zone { border: 2px dashed rgba(255,255,255,0.12); border-radius: 16px; padding: 36px 16px; display: flex; flex-direction: column; align-items: center; gap: 10px; cursor: pointer; transition: all 0.25s; background: rgba(255,255,255,0.01); }
+.mnw-upload-zone:hover, .mnw-upload-zone.mnw-dragging { border-color: #39A596; background: rgba(57,165,150,0.04); }
+.mnw-upload-cam { width: 56px; height: 56px; background: rgba(57,165,150,0.1); border: 1px solid rgba(57,165,150,0.2); border-radius: 14px; display: flex; align-items: center; justify-content: center; color: #39A596; }
+.mnw-upload-main { font-size: 13px; font-weight: 700; color: #fff; margin: 0; }
+.mnw-upload-hint { font-size: 10px; color: rgba(244,244,244,0.3); margin: 0; }
+.mnw-selfie-preview { position: relative; }
+.mnw-selfie-img { width: 100%; max-height: 320px; object-fit: cover; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); display: block; }
+.mnw-retake-btn { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.65); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 5px 11px; border-radius: 9999px; font-size: 11px; cursor: pointer; font-family: inherit; }
+
+/* ── STEP 5: RESULTS ──────────────────────── */
+.mnw-result-wrap, .mnw-scan-wrap, .mnw-assembled-wrap { position: relative; border-radius: 14px; overflow: hidden; }
+.mnw-result-img { width: 100%; max-height: 360px; object-fit: cover; display: block; border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; }
+.mnw-result-badge { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.7); border: 1px solid rgba(255,255,255,0.12); color: #39A596; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; padding: 4px 10px; border-radius: 9999px; }
+.mnw-dopamine-box { background: linear-gradient(135deg, rgba(57,165,150,0.07), rgba(124,58,237,0.05)); border: 1px solid rgba(57,165,150,0.18); border-radius: 14px; padding: 14px; }
+.mnw-dopamine-title { font-size: 13px; font-weight: 800; color: #fff; margin: 0 0 4px; }
+.mnw-dopamine-sub { font-size: 11px; color: rgba(244,244,244,0.55); margin: 0; line-height: 1.5; }
+.mnw-upload-wardrobe-btn { width: 100%; padding: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 11px; color: #fff; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+.mnw-upload-wardrobe-btn:hover { border-color: #39A596; color: #39A596; }
+
+/* Scanning */
+.mnw-scan-overlay { position: absolute; inset: 0; border-radius: 14px; overflow: hidden; background: rgba(57,165,150,0.04); }
+.mnw-scan-line { position: absolute; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, #39A596, transparent); animation: mnw-scan 1.8s linear infinite; box-shadow: 0 0 10px #39A596; }
+@keyframes mnw-scan { 0%{top:0%} 100%{top:100%} }
+.mnw-scan-corner { position: absolute; width: 16px; height: 16px; border-color: #39A596; border-style: solid; border-width: 0; }
+.mnw-sc-tl { top:6px;left:6px;border-top-width:2px;border-left-width:2px; }
+.mnw-sc-tr { top:6px;right:6px;border-top-width:2px;border-right-width:2px; }
+.mnw-sc-bl { bottom:6px;left:6px;border-bottom-width:2px;border-left-width:2px; }
+.mnw-sc-br { bottom:6px;right:6px;border-bottom-width:2px;border-right-width:2px; }
+.mnw-scan-label { font-size: 12px; font-weight: 700; color: #39A596; margin: 0; }
+.mnw-mini-closet { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px; }
+.mnw-closet-item { flex-shrink: 0; width: 64px; }
+.mnw-closet-item-img { width: 64px; height: 84px; object-fit: cover; border-radius: 9px; border: 1px solid rgba(255,255,255,0.1); display: block; }
+.mnw-closet-item-lbl { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(244,244,244,0.35); text-align: center; margin-top: 3px; }
+.mnw-pop-in { animation: mnw-pop 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards; opacity: 0; transform: scale(0.7); }
+@keyframes mnw-pop { to{opacity:1;transform:scale(1)} }
+
+/* Red Gap + Upsell */
+.mnw-red-gap { position: absolute; border: 2px solid #ef4444; border-radius: 7px; background: rgba(239,68,68,0.14); bottom: 8%; left: 15%; right: 15%; height: 13%; animation: mnw-gap-pulse 2s ease-in-out infinite; }
+@keyframes mnw-gap-pulse { 0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,0.4)} 50%{box-shadow:0 0 0 8px rgba(239,68,68,0)} }
+.mnw-red-gap-lbl { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); background: #ef4444; color: #fff; font-size: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em; padding: 2px 7px; border-radius: 4px; white-space: nowrap; }
+.mnw-upsell-fields { display: flex; flex-direction: column; gap: 10px; }
+.mnw-field { display: flex; flex-direction: column; gap: 5px; }
+.mnw-field-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.09em; color: rgba(244,244,244,0.4); font-weight: 700; }
+.mnw-field-input { padding: 10px 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 9px; color: #fff; font-size: 12px; font-family: inherit; outline: none; transition: border-color 0.2s; }
+.mnw-field-input:focus { border-color: #39A596; }
+.mnw-field-select { padding: 10px 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 9px; color: #fff; font-size: 12px; font-family: inherit; outline: none; appearance: none; cursor: pointer; }
+
+/* Affiliate card */
+.mnw-affiliate-card { border: 2px solid rgba(239,68,68,0.28); border-radius: 13px; overflow: hidden; background: linear-gradient(135deg, rgba(239,68,68,0.04), transparent); }
+.mnw-aff-header { display: flex; align-items: center; gap: 7px; padding: 8px 12px; background: rgba(239,68,68,0.08); border-bottom: 1px solid rgba(239,68,68,0.12); font-size: 10px; font-weight: 800; color: #f87171; text-transform: uppercase; letter-spacing: 0.07em; }
+.mnw-gap-dot { width: 6px; height: 6px; border-radius: 50%; background: #ef4444; flex-shrink: 0; animation: mnw-gap-pulse 1.5s infinite; }
+.mnw-aff-body { display: flex; gap: 10px; padding: 12px; }
+.mnw-aff-img { width: 60px; height: 76px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); flex-shrink: 0; }
+.mnw-aff-info { flex: 1; min-width: 0; }
+.mnw-aff-brand { font-size: 10px; color: rgba(244,244,244,0.38); margin: 0 0 2px; }
+.mnw-aff-name { font-size: 13px; font-weight: 700; color: #fff; margin: 0 0 5px; }
+.mnw-aff-prices { display: flex; align-items: baseline; gap: 6px; margin-bottom: 5px; }
+.mnw-price-now { font-size: 16px; font-weight: 900; color: #fff; }
+.mnw-price-was { font-size: 11px; color: rgba(244,244,244,0.3); text-decoration: line-through; }
+.mnw-price-off { font-size: 10px; font-weight: 800; color: #4ade80; }
+.mnw-bank-pill { display: inline-block; background: rgba(96,165,250,0.08); border: 1px solid rgba(96,165,250,0.2); border-radius: 9999px; padding: 3px 9px; font-size: 9px; color: #93c5fd; font-weight: 600; }
+.mnw-aff-cta { display: block; margin: 0 12px 12px; padding: 11px; background: linear-gradient(135deg, #ef4444, #ec4899); color: #fff; font-size: 12px; font-weight: 800; text-align: center; border-radius: 9px; text-decoration: none; transition: opacity 0.2s; }
+.mnw-aff-cta:hover { opacity: 0.85; }
+
+/* Step container (old v2 — kept for compatibility) */
 .mn-step { padding: 20px 16px 24px; display: flex; flex-direction: column; gap: 16px; }
 .mn-step-header { text-align: center; }
 .mn-step-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--mn-teal); font-weight: 700; margin: 0 0 6px; }

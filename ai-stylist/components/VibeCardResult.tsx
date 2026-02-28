@@ -53,27 +53,53 @@ export interface AffiliateRec {
 }
 
 export interface GenerationResult {
-  session_id: string;
-  final_image_base64: string;
-  flux_prompt_used: string;
+  success: boolean;
+  pipeline_duration_seconds?: number;
   biometrics: {
     monk_skin_tone: number;
-    monk_skin_hex: string;
-    monk_skin_label: string;
+    mst_label: string;
     body_type: string;
+    gender_presentation: string;
+    // legacy fields
+    monk_skin_hex?: string;
+    monk_skin_label?: string;
   };
   wardrobe: {
+    items_detected: number;
     items: Array<{
       category: string;
-      label: string;
-      dominant_colors: string[];
+      label?: string;
+      slot?: string;
+      color?: string;
+      dominant_colors?: string[];
     }>;
   };
-  generated_items: string[];
-  affiliate_recommendations: AffiliateRec[];
+  editorial: {
+    flux_prompt: string;
+    flux_image_url: string;
+    final_image_url: string;
+    occasion: Record<string, unknown>;
+    vibe: Record<string, unknown>;
+  };
+  color_theory: {
+    mst_value: number;
+    best_colors: string[];
+    avoid_colors: string[];
+    undertone_note: string;
+    tooltip_text: string;
+  };
+  affiliate_upsells: AffiliateRec[];
+  outfit_completion_pct: number;
+  gamification: Record<string, unknown>;
+  // legacy fallback fields
+  final_image_base64?: string;
+  flux_prompt_used?: string;
+  generated_items?: string[];
+  affiliate_recommendations?: AffiliateRec[];
 }
 
 export interface UserSelections {
+  gender: "men" | "women";
   occasion: string;
   occasionLabel: string;
   vibe_id: string;
@@ -107,14 +133,19 @@ function formatINR(amount: number): string {
 
 function MSTTooltip({
   biometrics,
+  color_theory,
   vibe_label,
 }: {
   biometrics: GenerationResult["biometrics"];
+  color_theory?: GenerationResult["color_theory"];
   vibe_label: string;
 }) {
   const [open, setOpen] = useState(false);
   const mst = biometrics.monk_skin_tone;
-  const colorsForTone = MST_WORKS_WITH[mst] ?? ["neutrals", "classic tones", "earthy hues"];
+  // Prefer live color_theory from Vercel API, fall back to local MST_WORKS_WITH
+  const colorsForTone: string[] = color_theory?.best_colors ?? MST_WORKS_WITH[mst] ?? ["neutrals", "classic tones", "earthy hues"];
+  const skinLabel = biometrics.mst_label ?? biometrics.monk_skin_label ?? "Medium";
+  const undertoneNote = color_theory?.undertone_note ?? "";
 
   return (
     <div className="rounded-2xl border border-white/10 bg-white/4 overflow-hidden">
@@ -127,15 +158,15 @@ function MSTTooltip({
           {/* MST swatch */}
           <div
             className="w-8 h-8 rounded-full border-2 border-white/20 shrink-0 shadow-lg"
-            style={{ backgroundColor: biometrics.monk_skin_hex }}
-            title={`Monk Skin Tone ${mst}: ${biometrics.monk_skin_label}`}
+            style={{ backgroundColor: biometrics.monk_skin_hex ?? "#A07850" }}
+            title={`Monk Skin Tone ${mst}: ${skinLabel}`}
           />
           <div>
             <p className="text-sm font-bold text-white leading-tight">
               Why this look works for you
             </p>
             <p className="text-[11px] text-zinc-500 mt-0.5">
-              MST {mst} · {biometrics.monk_skin_label} · {biometrics.body_type} build
+              MST {mst} · {skinLabel} · {biometrics.body_type} build
             </p>
           </div>
         </div>
@@ -167,9 +198,9 @@ function MSTTooltip({
                 </p>
                 <p className="text-sm text-zinc-300 leading-relaxed">
                   Your{" "}
-                  <span className="font-bold text-white">{biometrics.monk_skin_label}</span> skin
+                  <span className="font-bold text-white">{skinLabel}</span> skin
                   tone (Monk Scale {mst}/10) pairs beautifully with warm and complementary hues that
-                  enhance your natural undertones.
+                  enhance your natural undertones.{undertoneNote ? ` ${undertoneNote}` : ""}
                 </p>
               </div>
 
@@ -197,6 +228,9 @@ function MSTTooltip({
                   tone = this editorial was built for you. The lighting, colour palette, and garment
                   tones were all selected to complement MST {mst}.
                 </p>
+                {color_theory?.tooltip_text && (
+                  <p className="text-xs text-[#39A596] mt-2 leading-relaxed">{color_theory.tooltip_text}</p>
+                )}
               </div>
             </div>
           </motion.div>
@@ -426,10 +460,28 @@ export default function VibeCardResult({
   onRetry: () => void;
   onOpenGamification: () => void;
 }) {
-  const { biometrics, wardrobe, generated_items, affiliate_recommendations } = result;
+  const { biometrics, wardrobe, color_theory } = result;
 
-  // Determine the primary gap-item affiliate rec to hero-highlight
-  const primaryRec = affiliate_recommendations.find((r) => r.is_gap_item) ?? null;
+  // Normalise image: prefer URL from Vercel API, fall back to base64
+  const finalImageUrl = result.editorial?.final_image_url || null;
+  const finalImageBase64 = result.final_image_base64 || null;
+
+  // Normalise affiliate recs: Vercel API uses affiliate_upsells, local mock uses affiliate_recommendations
+  const allRecs: AffiliateRec[] = result.affiliate_upsells ?? result.affiliate_recommendations ?? [];
+  const primaryRec = allRecs.find((r) => r.is_gap_item) ?? allRecs[0] ?? null;
+
+  // Normalise wardrobe items — Vercel uses slot/color, local uses category/label
+  const wardrobeItems = (wardrobe?.items ?? []).map((item) => ({
+    category: item.category ?? item.slot ?? "item",
+    label: item.label ?? `${item.color ?? ""} ${item.slot ?? "item"}`.trim(),
+    dominant_colors: item.dominant_colors ?? [],
+  }));
+
+  // Normalise generated/gap items
+  const generatedItems: string[] = result.generated_items ?? [];
+
+  // MST skin label normalised
+  const skinLabel = biometrics.mst_label ?? biometrics.monk_skin_label ?? "Medium";
 
   return (
     <motion.div
@@ -440,28 +492,37 @@ export default function VibeCardResult({
       {/* ── Header ── */}
       <div className="text-center space-y-1 pt-2">
         <p className="text-xs uppercase tracking-widest text-zinc-500 font-semibold">
-          Step 4 of 5 · Your Editorial Look
+          Step 5 of 6 · Your Editorial Look
         </p>
         <h2 className="text-2xl font-black text-white tracking-tight">
           {selections.vibe_label}
         </h2>
         <p className="text-sm text-zinc-500">
-          {selections.occasionLabel} look · crafted for your skin tone &amp; body type
+          {selections.occasionLabel} · {selections.gender === "men" ? "Men's" : "Women's"} look · crafted for your skin tone &amp; body type
         </p>
       </div>
 
       {/* ── Generated Image ── */}
       <div className="relative w-full rounded-3xl overflow-hidden border border-white/10 shadow-2xl bg-zinc-900">
-        {result.final_image_base64 ? (
+        {finalImageUrl ? (
+          // Vercel API returns a URL (Replicate CDN)
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={`data:image/jpeg;base64,${result.final_image_base64}`}
+            src={finalImageUrl}
+            alt={`AI-generated editorial look for ${selections.vibe_label}`}
+            className="w-full object-cover"
+            style={{ maxHeight: "520px" }}
+          />
+        ) : finalImageBase64 ? (
+          // Local FastAPI returns base64
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={`data:image/jpeg;base64,${finalImageBase64}`}
             alt={`AI-generated editorial look for ${selections.vibe_label}`}
             className="w-full object-cover"
             style={{ maxHeight: "520px" }}
           />
         ) : (
-          // Fallback placeholder when image is not yet available
           <div className="w-full h-72 flex flex-col items-center justify-center gap-3 bg-gradient-to-br from-zinc-900 to-black">
             <div className="w-16 h-16 rounded-2xl bg-[#39A596]/20 flex items-center justify-center">
               <span className="text-3xl">✨</span>
@@ -476,32 +537,32 @@ export default function VibeCardResult({
             {selections.vibe_label}
           </span>
           <span className="text-[10px] border border-white/20 bg-black/70 backdrop-blur-sm text-zinc-300 rounded-full px-3 py-1 font-semibold">
-            MST {biometrics.monk_skin_tone} · {biometrics.monk_skin_label}
+            MST {biometrics.monk_skin_tone} · {skinLabel}
           </span>
         </div>
       </div>
 
       {/* ── MST "Why this works" Tooltip ── */}
-      <MSTTooltip biometrics={biometrics} vibe_label={selections.vibe_label} />
+      <MSTTooltip biometrics={biometrics} color_theory={color_theory} vibe_label={selections.vibe_label} />
 
       {/* ── Outfit Breakdown ── */}
       <OutfitBreakdown
-        wardrobeItems={wardrobe.items}
-        generatedItems={generated_items}
+        wardrobeItems={wardrobeItems}
+        generatedItems={generatedItems}
       />
 
       {/* ── Affiliate Upsell Box (Step 4 "Switzerland" Upsell) ── */}
       {primaryRec && (
         <div className="space-y-2">
           <p className="text-xs text-zinc-500 font-semibold uppercase tracking-wider">
-            Complete Your Look
+            Complete Your Look {result.outfit_completion_pct ? `· ${result.outfit_completion_pct}% done` : ""}
           </p>
           <AffiliateUpsellBox rec={primaryRec} />
         </div>
       )}
 
       {/* Additional affiliate recs (if more than one gap item) */}
-      {affiliate_recommendations.slice(1).map((rec) => (
+      {allRecs.slice(1).map((rec) => (
         <AffiliateUpsellBox key={rec.item_type} rec={rec} />
       ))}
 
@@ -533,7 +594,7 @@ export default function VibeCardResult({
             🛠 Dev: FLUX Prompt Used
           </summary>
           <p className="text-[10px] text-zinc-700 mt-3 leading-relaxed font-mono whitespace-pre-wrap">
-            {result.flux_prompt_used}
+            {result.editorial?.flux_prompt ?? result.flux_prompt_used ?? "No prompt available"}
           </p>
         </details>
       )}

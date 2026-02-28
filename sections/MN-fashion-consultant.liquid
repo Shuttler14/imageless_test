@@ -1,46 +1,123 @@
 <!-- ============================================================
-     MY NARRATIVE — AI STYLIST WIDGET v2.0
-     Zero-Friction 5-Step Flow:
-       1A. Occasion Selector → 1B. Vibe Check →
-       2. Magic Image Upload → 3. Dopamine Loading →
-       4. Editorial Result + Upsell → 5. Gamification
+     MY NARRATIVE — AI STYLIST WIDGET v3.0
+     Main Character 5-Step Onboarding Flow inside floating widget:
+       Step 1: Hook → Step 2: Aesthetic Grid (50/50 Men/Women) →
+       Step 3: Occasion Chips → Step 4: Canvas Upload →
+       Step 5A: AI Look → 5B: Scan → 5C: Dopamine → 5D: Red Gap Upsell
+     Persistent UI: Profile Ring · Closet Chip · Gift FAB
      ============================================================ -->
 
 <div id="mn-ai-widget" class="mn-ai-widget">
 
-  <!-- Minimized State: Avatar Bubble (shown after first close) -->
-  <div id="mn-widget-minimized" class="mn-widget-minimized" title="Open AI Stylist">
+  <!-- ── MINIMIZED: Avatar Bubble ── -->
+  <div id="mn-widget-minimized" class="mn-widget-minimized" title="Open AI Stylist" style="display:none">
     <div class="mn-avatar-bubble">
       <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=80&h=80&fit=crop" alt="AI Stylist" class="mn-avatar-bubble-img" />
       <span class="mn-avatar-online-dot"></span>
     </div>
   </div>
 
-  <!-- Expanded State: Full 5-Step Widget -->
+  <!-- ── EXPANDED: Full Widget Panel ── -->
   <div id="mn-widget-expanded" class="mn-widget-expanded" aria-hidden="true">
+
+    <!-- ── PERSISTENT NAV (always visible inside widget) ── -->
+    <div class="mnw-persistent-nav">
+
+      <!-- Top Left: Profile Ring -->
+      <button id="mnw-profile-ring" class="mnw-profile-ring" title="Profile Completion">
+        <svg class="mnw-ring-svg" viewBox="0 0 44 44">
+          <circle class="mnw-ring-track" cx="22" cy="22" r="18"/>
+          <circle class="mnw-ring-fill" cx="22" cy="22" r="18" stroke-dasharray="113" stroke-dashoffset="45"/>
+        </svg>
+        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=60&h=60&fit=crop&crop=face" class="mnw-ring-avatar" alt="Profile"/>
+        <span class="mnw-ring-pct" id="mnw-ring-pct">60%</span>
+      </button>
+
+      <!-- Top Right: My Closet Chip -->
+      <button id="mnw-closet-chip" class="mnw-closet-chip">
+        <span>👗</span>
+        <span class="mnw-closet-count" id="mnw-closet-count">0</span>
+        <span>My Closet</span>
+      </button>
+
+    </div>
+
+    <!-- Gift Mode Banner (hidden by default) -->
+    <div id="mnw-gift-banner" class="mnw-gift-banner" style="display:none">
+      <span>🎁 Gift Mode Active — styling for someone else</span>
+      <button id="mnw-exit-gift" class="mnw-exit-gift">Exit</button>
+    </div>
+
     <!-- Close button -->
     <button id="mn-close-btn" class="mn-close-btn" aria-label="Close AI Stylist">×</button>
 
-    <!-- Progress bar (filled by JS based on current step) -->
-    <div id="mn-progress-bar" class="mn-progress-bar">
-      <div class="mn-progress-fill"></div>
+    <!-- Progress bar -->
+    <div class="mn-progress-bar"><div class="mn-progress-fill"></div></div>
+
+    <!-- Step content (rendered by JS) -->
+    <div id="mn-content-container" class="mn-content-container"></div>
+
+    <!-- Bottom Right: Gift FAB (inside expanded panel) -->
+    <div class="mnw-gift-fab-wrap">
+      <button id="mnw-gift-fab" class="mnw-gift-fab" title="Styling for someone else? Try Gift Mode.">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="20 12 20 22 4 22 4 12"/>
+          <rect x="2" y="7" width="20" height="5"/>
+          <line x1="12" y1="22" x2="12" y2="7"/>
+          <path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/>
+          <path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/>
+        </svg>
+        <span class="mnw-gift-tooltip">Styling for someone else? Try Gift Mode.</span>
+      </button>
     </div>
 
-    <!-- Step content rendered here by MN-fashion-consultant.js -->
-    <div id="mn-content-container" class="mn-content-container"></div>
-  </div>
+  </div><!-- end mn-widget-expanded -->
 
+</div><!-- end mn-ai-widget -->
+
+<!-- ── PROFILE MODAL (outside widget so it overlays everything) ── -->
+<div id="mnw-profile-modal" class="mnw-overlay-modal" style="display:none">
+  <div class="mnw-modal-box">
+    <button id="mnw-modal-close" class="mnw-modal-close">×</button>
+    <h3 class="mnw-modal-title">Recalibrate Your Fit</h3>
+    <p class="mnw-modal-sub">Update height and fit preferences for better AI recommendations.</p>
+    <div class="mnw-modal-field">
+      <label class="mnw-modal-lbl">Height</label>
+      <input type="range" min="150" max="200" value="172" id="mnw-height-slider" class="mnw-slider"/>
+      <span id="mnw-height-val" class="mnw-slider-val">172 cm</span>
+    </div>
+    <div class="mnw-modal-field">
+      <label class="mnw-modal-lbl">Preferred Fit</label>
+      <div class="mnw-fit-chips">
+        <button class="mnw-fit-chip" data-fit="slim">Slim</button>
+        <button class="mnw-fit-chip mnw-fit-active" data-fit="regular">Regular</button>
+        <button class="mnw-fit-chip" data-fit="oversized">Oversized</button>
+        <button class="mnw-fit-chip" data-fit="relaxed">Relaxed</button>
+      </div>
+    </div>
+    <button id="mnw-save-profile" class="mnw-modal-save">Save Preferences</button>
+  </div>
 </div>
 
-<!-- Widget Configuration -->
-<!-- IMPORTANT: Update apiUrl when Vercel deployment URL changes -->
+<!-- ── CLOSET DRAWER ── -->
+<div id="mnw-closet-drawer" class="mnw-overlay-drawer" style="display:none">
+  <div class="mnw-drawer-box">
+    <button id="mnw-drawer-close" class="mnw-modal-close">×</button>
+    <h3 class="mnw-modal-title">My Digital Closet</h3>
+    <p class="mnw-modal-sub" id="mnw-drawer-count">0 items digitized</p>
+    <div class="mnw-drawer-grid" id="mnw-drawer-grid"></div>
+    <div class="mnw-drawer-actions">
+      <button id="mnw-snap-pic" class="mnw-drawer-btn mnw-drawer-primary">📸 Snap a Pic</button>
+      <button id="mnw-ghost-mode" class="mnw-drawer-btn mnw-drawer-ghost">👻 Ghost Mode</button>
+    </div>
+  </div>
+</div>
+
 <script>
   window.MN_CONFIG = {
     apiUrl: "https://mynarrative-ai.vercel.app/api/stylist_pipeline",
     studioUrl: "/pages/ai-studio"
   };
 </script>
-
-<!-- New Zero-Friction Flow JS (v2.0) — replaces old calibration/gift flow -->
-<script src="{{ 'MN-fashion-consultant.js' | asset_url }}?v=2.0.0" defer></script>
-<link rel="stylesheet" href="{{ 'MN-fashion-consultant.css' | asset_url }}?v=2.0.0">
+<script src="{{ 'MN-fashion-consultant.js' | asset_url }}?v=3.0.0" defer></script>
+<link rel="stylesheet" href="{{ 'MN-fashion-consultant.css' | asset_url }}?v=3.0.0">
