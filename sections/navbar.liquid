@@ -228,8 +228,8 @@ Updated:
     </button>
 
     <a class="md:hidden flex items-center justify-center text-xl relative" 
-       href="{% if customer %}/pages/wishlist{% else %}{{ routes.account_url }}{% endif %}"
-       title="Wishlist">
+       href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}"
+       title="{% if customer %}My Account{% else %}Login / Sign Up{% endif %}">
       <i class="bi bi-heart"></i>
       <span data-wishlist-count class="absolute top-0 right-0 -mr-1 -mt-1 flex h-4 w-4 items-center justify-center rounded-full text-[8px] font-normal leading-none bg-[#39A596] text-white hidden">0</span>
       </a>
@@ -243,8 +243,8 @@ Updated:
       </a>
 
       <a class="flex items-center justify-center text-xl md:text-2xl relative" 
-         href="{% if customer %}/pages/wishlist{% else %}{{ routes.account_url }}{% endif %}"
-         title="Wishlist">
+         href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}"
+         title="{% if customer %}My Account{% else %}Login / Sign Up{% endif %}">
         <i class="bi bi-heart"></i>
         <span data-wishlist-count class="absolute top-0 right-0 -mr-1 -mt-1 flex h-4 w-4 items-center justify-center rounded-full text-[9px] font-normal leading-none bg-[#39A596] text-white hidden">0</span>
         </a>

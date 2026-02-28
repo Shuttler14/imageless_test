@@ -61,26 +61,29 @@ const MNAIStylist = (() => {
   // ── DATA: AESTHETICS (50/50 Men/Women) ────────────────────────────────
   // 4 Men (_m) + 4 Women (_f) — 8 distinct styles as per brief
   const AESTHETICS = [
-    // MEN (4)
-    { id: 'old_money_m',    style: 'Old Money',           name: 'The Heritage Edit',  gender: 'M', accent: '#a8916e',
-      img: 'https://images.unsplash.com/photo-1617196034183-421b4040ed20?w=400&h=533&fit=crop&crop=top' },
-    { id: 'street_m',       style: 'Street Style',        name: 'Urban Architect',    gender: 'M', accent: '#f59e0b',
-      img: 'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=400&h=533&fit=crop&crop=top' },
-    { id: 'indo_western_m', style: 'Indo-Western Fusion', name: 'Desi Modernist',     gender: 'M', accent: '#ef4444',
-      img: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=400&h=533&fit=crop&crop=top' },
-    { id: 'corporate_m',   style: 'Corporate Core',      name: 'Power Suit Era',     gender: 'M', accent: '#6366f1',
-      img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=533&fit=crop&crop=top' },
-    // WOMEN (4)
-    { id: 'minimalist_f',  style: 'Minimalist',          name: 'The Edit',           gender: 'F', accent: '#e4e4e4',
-      img: 'https://images.unsplash.com/photo-1485968579580-b6d095142e6e?w=400&h=533&fit=crop&crop=top' },
-    { id: 'y2k_f',         style: 'Y2K Chrome',          name: 'Millennial Glitch',  gender: 'F', accent: '#c0c0c0',
-      img: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=533&fit=crop&crop=top' },
-    { id: 'cyberpunk_f',   style: 'Cyberpunk',           name: 'Neon Manifesto',     gender: 'F', accent: '#00ff87',
-      img: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=400&h=533&fit=crop&crop=top' },
-    { id: 'casual_f',      style: 'Casual Essentials',   name: 'The Daily Uniform',  gender: 'F', accent: '#fb923c',
-      img: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&h=533&fit=crop&crop=top' },
-  ];
+  // DATA: AESTHETICS (50/50 Men/Women)
+  // 8 Men (_m) + 8 Women (_f) — 16 total styles
+  const AESTHETICS = [
+    // MEN (8)
+    { id: 'old_money_m',    style: 'Old Money',           name: 'The Heritage Edit',    gender: 'M', accent: '#a8916e', img: 'https://images.unsplash.com/photo-1617196034183-421b4040ed20?w=400&h=533&fit=crop&crop=top' },
+    { id: 'street_m',       style: 'Street Style',        name: 'Urban Architect',      gender: 'M', accent: '#f59e0b', img: 'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=400&h=533&fit=crop&crop=top' },
+    { id: 'indo_western_m', style: 'Indo-Western Fusion', name: 'Desi Modernist',       gender: 'M', accent: '#ef4444', img: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=400&h=533&fit=crop&crop=top' },
+    { id: 'corporate_m',    style: 'Corporate Core',      name: 'Power Suit Era',       gender: 'M', accent: '#6366f1', img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=533&fit=crop&crop=top' },
+    { id: 'athleisure_m',   style: 'Athleisure',          name: 'Functional Minimal',   gender: 'M', accent: '#22c55e', img: 'https://images.unsplash.com/photo-1603252109303-2751441dd157?w=400&h=533&fit=crop&crop=top' },
+    { id: 'denimcore_m',    style: 'Denimcore',           name: 'Indigo Standard',      gender: 'M', accent: '#60a5fa', img: 'https://images.unsplash.com/photo-1516826957135-700dedea698c?w=400&h=533&fit=crop&crop=top' },
+    { id: 'resort_m',       style: 'Resort Casual',       name: 'Coastal Light',        gender: 'M', accent: '#fbbf24', img: 'https://images.unsplash.com/photo-1521335629791-ce4aec67dd53?w=400&h=533&fit=crop&crop=top' },
+    { id: 'techwear_m',     style: 'Techwear',            name: 'Utility Future',       gender: 'M', accent: '#94a3b8', img: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&h=533&fit=crop&crop=top' },
 
+    // WOMEN (8)
+    { id: 'minimalist_f',   style: 'Minimalist',          name: 'The Edit',             gender: 'F', accent: '#e4e4e4', img: 'https://images.unsplash.com/photo-1485968579580-b6d095142e6e?w=400&h=533&fit=crop&crop=top' },
+    { id: 'y2k_f',          style: 'Y2K Chrome',          name: 'Millennial Glitch',    gender: 'F', accent: '#c0c0c0', img: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=533&fit=crop&crop=top' },
+    { id: 'cyberpunk_f',    style: 'Cyberpunk',           name: 'Neon Manifesto',       gender: 'F', accent: '#00ff87', img: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=400&h=533&fit=crop&crop=top' },
+    { id: 'casual_f',       style: 'Casual Essentials',   name: 'The Daily Uniform',    gender: 'F', accent: '#fb923c', img: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&h=533&fit=crop&crop=top' },
+    { id: 'quietlux_f',     style: 'Quiet Luxury',        name: 'Soft Power',           gender: 'F', accent: '#a3a3a3', img: 'https://images.unsplash.com/photo-1520975916090-3105956dac38?w=400&h=533&fit=crop&crop=top' },
+    { id: 'coquette_f',     style: 'Coquette',            name: 'Sugar & Satin',        gender: 'F', accent: '#f472b6', img: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=400&h=533&fit=crop&crop=top' },
+    { id: 'boho_f',         style: 'Boho',                name: 'Free Stitch',          gender: 'F', accent: '#f59e0b', img: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&h=533&fit=crop&crop=top' },
+    { id: 'power_suit_f',   style: 'Power Suit',          name: 'Boardroom Royale',     gender: 'F', accent: '#6366f1', img: 'https://images.unsplash.com/photo-1540574163026-643ea20ade25?w=400&h=533&fit=crop&crop=top' },
+  ];
   // ── DATA: OCCASIONS ────────────────────────────────────────────────────
   const OCCASIONS = [
     { id: 'college',  label: 'College Fest / Campus',     emoji: '🎓' },

@@ -102,6 +102,34 @@
     {% section 'footer' %}
   </main>
 
+ <!-- Global MN Identity Bootstrap: keep identity consistent across theme -->
+ <script>
+   (function(){
+     try {
+       window.MN = window.MN || {};
+       const saved = localStorage.getItem('mn_identity');
+       const profile = saved ? JSON.parse(saved) : {};
+       window.MN_IDENTITY = profile;
+       window.MN = Object.assign(window.MN, {
+         saveIdentity: function(partial){
+           const cur = window.MN_IDENTITY || {};
+           const next = Object.assign({}, cur, partial || {});
+           window.MN_IDENTITY = next;
+           localStorage.setItem('mn_identity', JSON.stringify(next));
+           window.dispatchEvent(new CustomEvent('mn-identity-updated', { detail: next }));
+         }
+       });
+       // Update optional global header ring if present
+       const pct = profile.completion_pct || 0;
+       const circ = 344.97; // if using 120px circle
+       const ring = document.querySelector('.mn-global-ring-fill');
+       if (ring) ring.style.strokeDashoffset = String(circ - (pct/100)*circ);
+       const label = document.querySelector('.mn-global-ring-label');
+       if (label) label.textContent = pct + '%';
+     } catch(e) { console.warn('[MN] identity bootstrap failed', e); }
+   })();
+ </script>
+
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       
