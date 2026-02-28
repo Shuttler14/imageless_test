@@ -6564,3 +6564,52 @@
     font-size: 22px;
   }
 }
+
+/* ── Gender Selector Step ── */
+.mnw-gender-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  width: 100%;
+  margin: 0 auto;
+  max-width: 320px;
+}
+.mnw-gender-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 28px 16px;
+  border-radius: 20px;
+  border: 1.5px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.04);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Montserrat', sans-serif;
+}
+.mnw-gender-card:hover {
+  border-color: rgba(57,165,150,0.4);
+  background: rgba(57,165,150,0.07);
+}
+.mnw-gender-card.mnw-gender-selected {
+  border-color: #39A596;
+  background: rgba(57,165,150,0.12);
+  box-shadow: 0 0 20px rgba(57,165,150,0.2);
+}
+.mnw-gender-emoji {
+  font-size: 40px;
+  line-height: 1;
+}
+.mnw-gender-label {
+  font-size: 16px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.02em;
+}
+.mnw-gender-tagline {
+  font-size: 10px;
+  color: rgba(255,255,255,0.4);
+  text-align: center;
+  line-height: 1.4;
+}

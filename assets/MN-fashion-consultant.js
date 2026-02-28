@@ -1,4 +1,4 @@
-/**
+﻿/**
  * MY NARRATIVE — AI STYLIST WIDGET v3.0 (Main Character Flow)
  * ============================================================
  * The full 5-step "Main Character" onboarding flow inside the
@@ -31,8 +31,9 @@ const MNAIStylist = (() => {
   // ── STATE ──────────────────────────────────────────────────────────────
   const state = {
     isExpanded: false,
-    step: 1,           // 1|2|3|4|5
+    step: 1,           // 0|1|2|3|4|5
     step5State: null,  // 'A'|'B'|'C'|'D'
+    gender: null,      // 'men'|'women'|null
     // Step 2
     selectedAesthetics: [],
     // Step 3
@@ -136,7 +137,7 @@ const MNAIStylist = (() => {
   };
 
   const updateProgress = () => {
-    const pct = { 1: 10, 2: 30, 3: 50, 4: 70, 5: 90 };
+    const pct = { 0: 5, 1: 15, 2: 35, 3: 55, 4: 75, 5: 95 };
     const fill = $('.mn-progress-fill');
     if (fill) fill.style.width = (pct[state.step] || 10) + '%';
   };
@@ -161,6 +162,63 @@ const MNAIStylist = (() => {
 // STEP RENDERERS
 // ═══════════════════════════════════════════════════════════
 const { state, AESTHETICS, OCCASIONS, MOCK_WARDROBE, AFFILIATE_RECS, $, $$, INR, setContent, updateProgress, getGeneratedImg } = MNAIStylist;
+
+// ── STEP 0: GENDER SELECTOR ──────────────────────────────────
+function renderStep0() {
+  state.step = 0;
+  setContent(`
+    <div class="mnw-step mnw-step-gender">
+      <div class="mnw-orb mnw-orb1"></div>
+      <div class="mnw-orb mnw-orb2"></div>
+      <div class="mnw-step1-inner" style="padding-top:20px">
+        <span class="mnw-badge">✦ MY NARRATIVE</span>
+        <h2 class="mnw-hook-title" style="font-size:26px;margin-bottom:8px">
+          Who are we <span class="mnw-gradient-text">styling today?</span>
+        </h2>
+        <p class="mnw-hook-sub" style="margin-bottom:32px">Choose your style universe — we'll show the right looks.</p>
+        <div class="mnw-gender-cards">
+          <button class="mnw-gender-card" data-gender="men" id="mnw-gender-men">
+            <span class="mnw-gender-emoji">👔</span>
+            <span class="mnw-gender-label">Men</span>
+            <span class="mnw-gender-tagline">Tailored. Bold. Unapologetic.</span>
+          </button>
+          <button class="mnw-gender-card" data-gender="women" id="mnw-gender-women">
+            <span class="mnw-gender-emoji">👗</span>
+            <span class="mnw-gender-label">Women</span>
+            <span class="mnw-gender-tagline">Expressive. Elevated. Iconic.</span>
+          </button>
+        </div>
+        <button class="mnw-cta" id="mnw-step0-cta" disabled style="width:100%;justify-content:center;margin-top:24px">
+          Let's Style You
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+      <div class="mnw-step-dots">
+        <span class="mnw-dot mnw-dot-active"></span>
+        <span class="mnw-dot"></span><span class="mnw-dot"></span>
+        <span class="mnw-dot"></span><span class="mnw-dot"></span><span class="mnw-dot"></span>
+      </div>
+    </div>
+  `);
+
+  // Gender card click handlers
+  $$('.mnw-gender-card').forEach(card => {
+    card.addEventListener('click', () => {
+      $$('.mnw-gender-card').forEach(c => c.classList.remove('mnw-gender-selected'));
+      card.classList.add('mnw-gender-selected');
+      state.gender = card.dataset.gender;
+      const cta = $('#mnw-step0-cta');
+      if (cta) {
+        cta.disabled = false;
+        cta.textContent = state.gender === 'men' ? "Style the Men's Look →" : "Style the Women's Look →";
+      }
+    });
+  });
+
+  $('#mnw-step0-cta').addEventListener('click', () => {
+    if (state.gender) renderStep1();
+  });
+}
 
 // ── STEP 1: HOOK ──────────────────────────────────────────
 function renderStep1() {
@@ -202,7 +260,9 @@ function renderStep2() {
         <p class="mnw-step-sub">Choose your favorites — pick as many as feel right.</p>
       </div>
       <div class="mnw-aesthetic-grid" id="mnw-aesthetic-grid">
-        ${AESTHETICS.map(a => `
+        ${(() => {
+          const visibleAesthetics = state.gender ? AESTHETICS.filter(a => state.gender === 'men' ? a.gender === 'M' : a.gender === 'F') : AESTHETICS;
+          return visibleAesthetics.map(a => `
           <button class="mnw-aesthetic-card" data-id="${a.id}" aria-label="${a.style}">
             <img class="mnw-aesthetic-img" src="${a.img}" alt="${a.name}"
                  onerror="this.src='https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400&h=533&fit=crop'"/>
@@ -215,7 +275,8 @@ function renderStep2() {
             </span>
             <span class="mnw-check" style="display:none">✓</span>
           </button>
-        `).join('')}
+        `).join('');
+        })()}
       </div>
       <div class="mnw-step-footer">
         <button class="mnw-btn-ghost" id="mnw-s2-back">← Back</button>
@@ -246,7 +307,7 @@ function renderStep2() {
     });
   });
 
-  $('#mnw-s2-back').addEventListener('click', renderStep1);
+  $('#mnw-s2-back').addEventListener('click', renderStep0);
   $('#mnw-s2-next').addEventListener('click', renderStep3);
 }
 
@@ -368,25 +429,48 @@ function renderStep4() {
 // ── STEP 5A: FLUX-GENERATED LOOK (simulated) ─────────────
 function renderStep5A() {
   state.step = 5; state.step5State = 'A';
-  const selectedLabels = state.selectedAesthetics.map(id => AESTHETICS.find(a => a.id === id)?.style || id).join(' · ');
+  const selectedLabels = state.selectedAesthetics.map(id => AESTHETICS.find(a => a.id === id)?.style || id).join(' / ');
+
+  // Map aesthetic -> vibe_id for Vercel pipeline
+  const vibeMap = {
+    old_money_m:'quiet_luxury', street_m:'sarcastic_rizzler',
+    indo_western_m:'main_character', corporate_m:'caffeine_survivor',
+    minimalist_f:'quiet_luxury', y2k_f:'sarcastic_rizzler',
+    cyberpunk_f:'main_character', casual_f:'caffeine_survivor',
+  };
+  const vibeId = vibeMap[state.selectedAesthetics[0]] || 'caffeine_survivor';
+
+  // Map occasion -> occasion_id for Vercel pipeline
+  const occMap = {
+    office:'office', date:'date_night', sangeet:'sangeet',
+    airport:'airport_look', gym:'date_night', college:'office',
+    pooja:'sangeet', casual:'date_night',
+  };
+  const occasionId = occMap[state.selectedOccasions[0]] || 'date_night';
+
   setContent(`
     <div class="mnw-step">
       <div class="mnw-step-hdr">
         <p class="mnw-step-num">05 / 05</p>
-        <h2 class="mnw-step-title">Your main character look, generated. ✦</h2>
+        <h2 class="mnw-step-title">Generating your main character look</h2>
+        <p class="mnw-step-sub">AI is crafting a look for your skin tone, body type &amp; vibe.</p>
       </div>
-      <div class="mnw-result-wrap">
-        <img class="mnw-result-img" src="${getGeneratedImg()}" alt="AI Generated Look"
-             onerror="this.src='https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=480&h=640&fit=crop'"/>
-        <span class="mnw-result-badge">✦ AI Generated</span>
+      <div class="mnw-result-wrap" id="mnw-result-wrap">
+        <div id="mnw-loading-state" style="height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:rgba(255,255,255,0.03);border-radius:16px;border:1px solid rgba(255,255,255,0.08)">
+          <div style="width:40px;height:40px;border:3px solid rgba(57,165,150,0.2);border-top-color:#39A596;border-radius:50%;animation:mnw-spin 0.8s linear infinite"></div>
+          <p id="mnw-loading-text" style="font-size:13px;color:rgba(255,255,255,0.5);text-align:center;max-width:220px">Reading your style DNA...</p>
+        </div>
+        <img class="mnw-result-img" id="mnw-result-img" alt="AI Generated Look" style="display:none"/>
+        <span class="mnw-result-badge" id="mnw-result-badge" style="display:none">AI Generated</span>
       </div>
-      <div class="mnw-dopamine-box">
+      <div class="mnw-dopamine-box" id="mnw-result-info" style="display:none">
         <p style="font-size:10px;font-weight:800;color:#39A596;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:6px">Based on: ${selectedLabels || 'Your Aesthetic'}</p>
-        <p class="mnw-dopamine-title">Want to style this with clothes you already own?</p>
-        <p class="mnw-dopamine-sub">Upload a wardrobe pic — we'll extract your existing items and remix them into the look.</p>
+        <p class="mnw-dopamine-title" id="mnw-result-title">Your look is ready.</p>
+        <p class="mnw-dopamine-sub">Want to style this with clothes you already own?</p>
       </div>
-      <button class="mnw-upload-wardrobe-btn" id="mnw-upload-wardrobe">📸 Upload Wardrobe Pic</button>
+      <button class="mnw-upload-wardrobe-btn" id="mnw-upload-wardrobe" style="display:none">Upload Wardrobe Pic</button>
       <input type="file" id="mnw-wardrobe-input" accept="image/*" style="display:none"/>
+      <div id="mnw-api-error" style="display:none;margin-top:12px;padding:12px 16px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:12px;font-size:12px;color:#fca5a5;text-align:center"></div>
       <div class="mnw-step-dots">
         <span class="mnw-dot mnw-dot-done"></span><span class="mnw-dot mnw-dot-done"></span>
         <span class="mnw-dot mnw-dot-done"></span><span class="mnw-dot mnw-dot-done"></span>
@@ -394,15 +478,82 @@ function renderStep5A() {
       </div>
     </div>
   `);
-  $('#mnw-upload-wardrobe').addEventListener('click', () => $('#mnw-wardrobe-input').click());
-  $('#mnw-wardrobe-input').addEventListener('change', function() {
-    if (!this.files[0]) return;
-    const r = new FileReader();
-    r.onload = (e) => { state.wardrobeBase64 = e.target.result; renderStep5B(); };
-    r.readAsDataURL(this.files[0]);
-  });
-}
 
+  // Rotating loading messages
+  const msgs = ['Reading your style DNA...','Analysing skin tone & body type...','Matching your vibe...','FLUX is painting your outfit...','Final touches...'];
+  let mi = 0;
+  const msgInt = setInterval(() => { const el = $('#mnw-loading-text'); if (el && msgs[++mi]) el.textContent = msgs[mi]; }, 4000);
+
+  const rawBase64 = state.selfieBase64 ? state.selfieBase64.replace(/^data:image\/\w+;base64,/, '') : null;
+  if (!rawBase64) {
+    clearInterval(msgInt);
+    const e = $('#mnw-api-error'); if (e) { e.style.display='block'; e.textContent='No photo found. Please go back and upload your selfie.'; }
+    const ls = $('#mnw-loading-state'); if (ls) ls.style.display='none';
+    return;
+  }
+
+  const userId = (window.MN_CONFIG && window.MN_CONFIG.customerId) ? String(window.MN_CONFIG.customerId) : 'guest_' + Math.random().toString(36).slice(2,9);
+
+  fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action:'full_pipeline', user_id:userId, occasion:occasionId, vibe_id:vibeId, user_image:rawBase64 }),
+  })
+  .then(r => r.ok ? r.json() : r.json().then(d => Promise.reject(d.error || ('Server error ' + r.status))))
+  .then(data => {
+    clearInterval(msgInt);
+    if (!data.success) throw new Error(data.error || 'Pipeline failed');
+    state.pipelineResult = data;
+    state.affiliateRecs = data.affiliate_upsells || [];
+
+    const imgUrl = (data.editorial && data.editorial.final_image_url) ||
+                   (data.final_image_base64 ? 'data:image/jpeg;base64,' + data.final_image_base64 : null);
+
+    const ls = $('#mnw-loading-state'), imgEl = $('#mnw-result-img'), badge = $('#mnw-result-badge');
+    const info = $('#mnw-result-info'), ub = $('#mnw-upload-wardrobe'), title = $('#mnw-result-title');
+
+    if (imgUrl && imgEl) {
+      imgEl.src = imgUrl;
+      imgEl.onerror = () => { imgEl.src = 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=480&h=640&fit=crop'; };
+      imgEl.onload = () => {
+        if (ls) ls.style.display = 'none';
+        imgEl.style.display = 'block';
+        if (badge) badge.style.display = 'block';
+        if (info) info.style.display = 'block';
+        if (ub) ub.style.display = 'flex';
+        if (title && data.biometrics) {
+          const bt = data.biometrics.body_type || 'your build';
+          const vl = (data.editorial && data.editorial.vibe && data.editorial.vibe.label) || selectedLabels || 'your vibe';
+          title.textContent = 'This is your ' + bt + ' in ' + vl + ' energy.';
+        }
+      };
+    } else {
+      if (ls) ls.style.display = 'none';
+      if (info) info.style.display = 'block';
+      if (ub) ub.style.display = 'flex';
+    }
+  })
+  .catch(err => {
+    clearInterval(msgInt);
+    console.error('[MN] Pipeline error:', err);
+    const ls = $('#mnw-loading-state'), errEl = $('#mnw-api-error');
+    if (ls) ls.style.display = 'none';
+    if (errEl) { errEl.style.display='block'; errEl.innerHTML='Something went wrong: ' + err + '. <button onclick="renderStep5A()" style="color:#39A596;background:none;border:none;cursor:pointer;font-weight:700">Retry</button>'; }
+  });
+
+  setTimeout(() => {
+    const wb = $('#mnw-upload-wardrobe'), wi = $('#mnw-wardrobe-input');
+    if (wb && wi) {
+      wb.addEventListener('click', () => wi.click());
+      wi.addEventListener('change', function() {
+        if (!this.files[0]) return;
+        const r = new FileReader();
+        r.onload = (e) => { state.wardrobeBase64 = e.target.result; renderStep5B(); };
+        r.readAsDataURL(this.files[0]);
+      });
+    }
+  }, 300);
+}
 // ── STEP 5B: SCANNING ANIMATION ──────────────────────────
 function renderStep5B() {
   state.step5State = 'B'; state.scanVisibleItems = 0;
@@ -595,7 +746,7 @@ function expandWidget() {
   const minimized = document.getElementById('mn-widget-minimized');
   if (expanded)  { expanded.style.display = 'flex'; expanded.removeAttribute('aria-hidden'); }
   if (minimized) minimized.style.display = 'none';
-  if (state.step === 1 && !$('#mnw-step1-cta')) renderStep1();
+  if (state.step <= 1 && !$('#mnw-step0-cta')) renderStep0();
 }
 
 function collapseWidget() {

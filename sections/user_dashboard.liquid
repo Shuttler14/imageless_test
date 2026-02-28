@@ -1,697 +1,1331 @@
-<!-- 
-═══════════════════════════════════════════════════════════
-MY NARRATIVE - USER DASHBOARD
-Displays user's style profile, preferences, and saved data
-═══════════════════════════════════════════════════════════
--->
+﻿{% assign customer_name = customer.first_name | default: "Stylist" %}
+{% assign customer_id = customer.id | default: "guest" %}
 
 <style>
-  .mn-user-dashboard {
-    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    max-width: 1400px;
-    margin: 60px auto;
-    padding: 0 24px;
-  }
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap');
 
-  /* Profile Hero Section */
-  .mn-profile-hero {
-    background: linear-gradient(135deg, rgba(57, 165, 150, 0.08), rgba(79, 255, 217, 0.08));
-    border: 1px solid rgba(57, 165, 150, 0.2);
-    border-radius: 24px;
-    padding: 48px;
-    margin-bottom: 48px;
-    display: flex;
-    align-items: center;
-    gap: 48px;
-    animation: fadeInUp 0.6s ease-out;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
-  }
+:root {
+  --mn-accent: #39A596;
+  --mn-accent-dim: rgba(57,165,150,0.15);
+  --mn-bg: #0a0a0a;
+  --mn-card: rgba(255,255,255,0.04);
+  --mn-border: rgba(255,255,255,0.09);
+  --mn-text: #ffffff;
+  --mn-muted: rgba(255,255,255,0.45);
+  --mn-radius: 20px;
+}
 
-  .mn-profile-avatar-section {
-    text-align: center;
-    flex-shrink: 0;
-  }
+.mn-dashboard {
+  background: var(--mn-bg);
+  min-height: 100vh;
+  font-family: 'Montserrat', sans-serif;
+  color: var(--mn-text);
+  padding: 0 0 120px 0;
+}
 
-  .mn-profile-avatar {
-    width: 180px;
-    height: 180px;
-    border-radius: 50%;
-    border: 4px solid rgba(57, 165, 150, 0.3);
-    box-shadow: 0 12px 32px rgba(57, 165, 150, 0.2);
-    object-fit: cover;
-    margin-bottom: 20px;
-    transition: all 0.4s ease;
-    background: linear-gradient(135deg, #39A596, #4fffd9);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 72px;
-    color: white;
-  }
+/* ── PROFILE HERO ── */
+.mn-hero {
+  background: linear-gradient(180deg, rgba(57,165,150,0.08) 0%, transparent 100%);
+  border-bottom: 1px solid var(--mn-border);
+  padding: 32px 20px 28px;
+}
+.mn-hero-inner {
+  max-width: 700px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.mn-avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+  width: 110px;
+  height: 110px;
+  cursor: pointer;
+}
+.mn-avatar-wrap input[type=file] { display:none; }
+.mn-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  background: rgba(57,165,150,0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  border: 2px solid rgba(57,165,150,0.3);
+}
+.mn-ring-svg {
+  position: absolute;
+  top: -5px; left: -5px;
+  width: 120px; height: 120px;
+  transform: rotate(-90deg);
+  pointer-events: none;
+}
+.mn-ring-bg { fill:none; stroke:rgba(255,255,255,0.07); stroke-width:4; }
+.mn-ring-fill { fill:none; stroke:var(--mn-accent); stroke-width:4; stroke-linecap:round;
+  stroke-dasharray: 345; stroke-dashoffset: 345;
+  transition: stroke-dashoffset 0.8s cubic-bezier(0.4,0,0.2,1);
+  filter: drop-shadow(0 0 6px rgba(57,165,150,0.6));
+}
+.mn-avatar-overlay {
+  position: absolute; inset: 0; border-radius: 50%;
+  background: rgba(0,0,0,0.45); display:flex; align-items:center; justify-content:center;
+  opacity:0; transition:opacity 0.2s; font-size:20px;
+}
+.mn-avatar-wrap:hover .mn-avatar-overlay { opacity:1; }
+.mn-hero-info { flex:1; min-width:0; }
+.mn-hero-name { font-size: 22px; font-weight: 900; letter-spacing:-0.02em; margin-bottom:4px; }
+.mn-hero-sub { font-size: 12px; color: var(--mn-muted); margin-bottom: 14px; }
+.mn-linear-bar-wrap { margin-bottom: 12px; }
+.mn-linear-label { display:flex; justify-content:space-between; font-size:11px; color:var(--mn-muted); font-weight:600; margin-bottom:6px; }
+.mn-linear-track { height: 6px; background: rgba(255,255,255,0.08); border-radius:99px; overflow:hidden; }
+.mn-linear-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--mn-accent), #2dd4bf);
+  border-radius: 99px;
+  width: 0%;
+  transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
+  box-shadow: 0 0 10px rgba(57,165,150,0.4);
+}
+.mn-hero-badges { display:flex; gap:8px; flex-wrap:wrap; }
+.mn-hero-badge {
+  font-size:10px; font-weight:700; padding:4px 10px; border-radius:99px;
+  border: 1px solid var(--mn-border); color: var(--mn-muted);
+  text-transform: uppercase; letter-spacing:0.08em;
+}
+.mn-hero-badge.active { border-color:var(--mn-accent); color:var(--mn-accent); background:var(--mn-accent-dim); }
+.mn-ai-fill-btn {
+  margin-top: 14px; display:inline-flex; align-items:center; gap:8px;
+  background: var(--mn-accent); color:#000; font-size:12px; font-weight:800;
+  padding: 10px 18px; border-radius:12px; border:none; cursor:pointer;
+  letter-spacing:0.04em; transition:all 0.2s;
+}
+.mn-ai-fill-btn:hover { background:#2d8a7d; transform:translateY(-1px); }
+.mn-ai-fill-input { display:none; }
 
-  .mn-profile-avatar:hover {
-    transform: scale(1.05);
-    box-shadow: 0 16px 48px rgba(57, 165, 150, 0.3);
-  }
+/* ── SECTIONS ── */
+.mn-sections { max-width: 700px; margin: 0 auto; padding: 24px 20px; display:flex; flex-direction:column; gap:20px; }
+.mn-section {
+  background: var(--mn-card);
+  border: 1px solid var(--mn-border);
+  border-radius: var(--mn-radius);
+  padding: 24px;
+  border-left: 3px solid var(--mn-accent);
+  transition: all 0.25s;
+  position: relative;
+}
+.mn-section:hover { background:rgba(255,255,255,0.06); box-shadow:0 8px 32px rgba(57,165,150,0.08); }
+.mn-section-title {
+  font-size: 14px; font-weight: 800; text-transform:uppercase;
+  letter-spacing: 0.1em; color: var(--mn-accent); margin-bottom: 20px;
+  display:flex; align-items:center; gap:8px;
+}
+.mn-filled-check {
+  width:18px; height:18px; border-radius:50%; background:var(--mn-accent);
+  display:inline-flex; align-items:center; justify-content:center;
+  font-size:10px; color:#000; font-weight:900; margin-left:auto;
+  opacity:0; transition:opacity 0.3s;
+}
+.mn-filled-check.show { opacity:1; }
 
-  .mn-profile-avatar img {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    object-fit: cover;
-  }
+/* ── HEIGHT SLIDER ── */
+.mn-height-display {
+  text-align: center; margin-bottom: 20px;
+}
+.mn-height-cm { font-size: 48px; font-weight: 900; line-height:1; letter-spacing:-0.03em; }
+.mn-height-ft { font-size: 18px; color: var(--mn-muted); font-weight: 600; margin-top: 4px; }
+.mn-height-wrap { display:flex; align-items:flex-end; gap: 24px; }
+.mn-body-svg-wrap { flex-shrink:0; }
+.mn-slider-wrap { flex:1; }
+.mn-range { -webkit-appearance:none; width:100%; height:6px; border-radius:99px; background:rgba(255,255,255,0.1); outline:none; }
+.mn-range::-webkit-slider-thumb { -webkit-appearance:none; width:22px; height:22px; border-radius:50%; background:var(--mn-accent); cursor:pointer; box-shadow:0 0 12px rgba(57,165,150,0.5); }
+.mn-range::-moz-range-thumb { width:22px; height:22px; border-radius:50%; background:var(--mn-accent); cursor:pointer; border:none; }
+.mn-range-labels { display:flex; justify-content:space-between; font-size:10px; color:var(--mn-muted); margin-top:8px; }
 
-  .mn-closet-btn {
-    font-family: 'Montserrat', sans-serif;
-    background: linear-gradient(135deg, #39A596, #4fffd9);
-    color: white;
-    border: none;
-    padding: 14px 24px;
-    border-radius: 12px;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 16px rgba(57, 165, 150, 0.3);
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-  }
+/* ── SKIN TONE ── */
+.mn-mst-row { display:flex; gap:8px; flex-wrap:wrap; }
+.mn-mst-swatch {
+  width:36px; height:36px; border-radius:50%; cursor:pointer;
+  border:3px solid transparent; transition:all 0.2s; flex-shrink:0;
+  position:relative;
+}
+.mn-mst-swatch:hover { transform:scale(1.15); }
+.mn-mst-swatch.selected { border-color:#fff; box-shadow: 0 0 0 3px var(--mn-accent); transform:scale(1.2); }
+.mn-mst-label { font-size:11px; color:var(--mn-muted); margin-top:10px; font-weight:600; min-height:16px; }
 
-  .mn-closet-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(57, 165, 150, 0.4);
-  }
+/* ── CHIPS ── */
+.mn-chips { display:flex; flex-wrap:wrap; gap:8px; }
+.mn-chip {
+  font-size:12px; font-weight:600; padding:8px 16px; border-radius:99px;
+  border:1.5px solid var(--mn-border); background:transparent; color:#fff;
+  cursor:pointer; transition:all 0.2s; user-select:none;
+}
+.mn-chip:hover { border-color:rgba(57,165,150,0.5); background:rgba(57,165,150,0.07); }
+.mn-chip.selected { border-color:var(--mn-accent); background:var(--mn-accent-dim); color:var(--mn-accent); }
+.mn-chip-single { border-radius:12px; }
 
-  .mn-profile-info {
-    flex: 1;
-  }
+/* ── PRICE RANGE ── */
+.mn-price-display { font-size:20px; font-weight:800; margin-bottom:16px; color:var(--mn-accent); }
+.mn-dual-range { position:relative; height:6px; background:rgba(255,255,255,0.1); border-radius:99px; margin:20px 0 8px; }
+.mn-dual-range-fill { position:absolute; height:100%; background:var(--mn-accent); border-radius:99px; }
+.mn-dual-range input[type=range] { position:absolute; width:100%; -webkit-appearance:none; background:transparent; height:6px; pointer-events:none; top:0; }
+.mn-dual-range input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:20px; height:20px; border-radius:50%; background:var(--mn-accent); cursor:pointer; pointer-events:all; box-shadow:0 0 10px rgba(57,165,150,0.4); }
+.mn-price-presets { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
+.mn-preset-btn {
+  font-size:11px; font-weight:700; padding:6px 14px; border-radius:99px;
+  border:1.5px solid var(--mn-border); background:transparent; color:var(--mn-muted);
+  cursor:pointer; transition:all 0.2s;
+}
+.mn-preset-btn:hover, .mn-preset-btn.active { border-color:var(--mn-accent); color:var(--mn-accent); background:var(--mn-accent-dim); }
 
-  .mn-profile-name {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 42px;
-    font-weight: 700;
-    background: linear-gradient(135deg, #39A596, #4fffd9);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 8px;
-    letter-spacing: -0.5px;
-  }
+/* ── WEATHER ── */
+.mn-weather-display {
+  display:flex; align-items:center; gap:16px; padding:16px 20px;
+  background:rgba(255,255,255,0.04); border-radius:14px; margin-bottom:16px;
+  border:1px solid var(--mn-border);
+}
+.mn-weather-emoji { font-size:36px; }
+.mn-weather-info { flex:1; }
+.mn-weather-city { font-size:14px; font-weight:800; }
+.mn-weather-temp { font-size:28px; font-weight:900; color:var(--mn-accent); }
+.mn-weather-cond { font-size:11px; color:var(--mn-muted); margin-top:2px; }
+.mn-weather-row { display:flex; gap:10px; align-items:center; }
+.mn-city-input {
+  flex:1; background:rgba(255,255,255,0.06); border:1.5px solid var(--mn-border);
+  border-radius:12px; padding:10px 14px; color:#fff; font-size:13px;
+  font-family:'Montserrat',sans-serif; outline:none; transition:border-color 0.2s;
+}
+.mn-city-input:focus { border-color:var(--mn-accent); }
+.mn-weather-btn {
+  background:var(--mn-accent); color:#000; font-size:12px; font-weight:800;
+  padding:10px 16px; border-radius:12px; border:none; cursor:pointer;
+  white-space:nowrap; transition:all 0.2s;
+}
+.mn-weather-btn:hover { background:#2d8a7d; }
+.mn-locate-btn {
+  background:rgba(255,255,255,0.08); color:#fff; font-size:11px; font-weight:700;
+  padding:10px 14px; border-radius:12px; border:1px solid var(--mn-border); cursor:pointer;
+  white-space:nowrap; transition:all 0.2s;
+}
 
-  .mn-profile-personality {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 18px;
-    color: rgba(0, 0, 0, 0.6);
-    font-style: italic;
-    margin-bottom: 24px;
-  }
+/* ── STYLE VIBE CARDS ── */
+.mn-vibe-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.mn-vibe-card {
+  border:1.5px solid var(--mn-border); border-radius:14px; padding:14px;
+  cursor:pointer; transition:all 0.2s; background:transparent; text-align:left;
+}
+.mn-vibe-card:hover { border-color:rgba(57,165,150,0.4); background:rgba(57,165,150,0.05); }
+.mn-vibe-card.selected { border-color:var(--mn-accent); background:var(--mn-accent-dim); }
+.mn-vibe-emoji { font-size:22px; margin-bottom:6px; }
+.mn-vibe-name { font-size:12px; font-weight:800; color:#fff; margin-bottom:2px; }
+.mn-vibe-desc { font-size:10px; color:var(--mn-muted); line-height:1.4; }
 
-  .mn-quick-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 16px;
-    margin-top: 24px;
-  }
+/* ── BANK CARDS ── */
+.mn-bank-row { display:flex; gap:10px; margin-bottom:12px; }
+.mn-select {
+  flex:1; background:rgba(255,255,255,0.06); border:1.5px solid var(--mn-border);
+  border-radius:12px; padding:10px 14px; color:#fff; font-size:13px;
+  font-family:'Montserrat',sans-serif; outline:none; transition:border-color 0.2s;
+  cursor:pointer;
+}
+.mn-select:focus { border-color:var(--mn-accent); }
+.mn-select option { background:#1a1a1a; color:#fff; }
+.mn-add-btn {
+  background:var(--mn-accent); color:#000; font-size:18px; font-weight:900;
+  width:42px; height:42px; border-radius:10px; border:none; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  transition:all 0.2s;
+}
+.mn-add-btn:hover { background:#2d8a7d; }
+.mn-card-tags { display:flex; flex-wrap:wrap; gap:8px; }
+.mn-card-tag {
+  display:flex; align-items:center; gap:6px; padding:6px 12px;
+  background:rgba(57,165,150,0.1); border:1px solid rgba(57,165,150,0.3);
+  border-radius:99px; font-size:11px; font-weight:700; color:var(--mn-accent);
+}
+.mn-card-tag-remove { cursor:pointer; color:var(--mn-muted); font-size:14px; font-weight:900; line-height:1; }
+.mn-card-tag-remove:hover { color:#ef4444; }
 
-  .mn-stat-box {
-    background: white;
-    border: 1px solid rgba(57, 165, 150, 0.15);
-    border-radius: 12px;
-    padding: 16px;
-    text-align: center;
-    transition: all 0.3s ease;
-  }
+/* ── INTERESTS ── */
+.mn-interest-input-row { display:flex; gap:10px; margin-top:14px; }
+.mn-interest-input {
+  flex:1; background:rgba(255,255,255,0.06); border:1.5px solid var(--mn-border);
+  border-radius:12px; padding:10px 14px; color:#fff; font-size:13px;
+  font-family:'Montserrat',sans-serif; outline:none;
+}
+.mn-interest-input:focus { border-color:var(--mn-accent); }
 
-  .mn-stat-box:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(57, 165, 150, 0.15);
-  }
+/* ── DIGITAL CLOSET ── */
+.mn-closet-actions { display:flex; gap:12px; margin-bottom:20px; }
+.mn-closet-btn {
+  flex:1; padding:14px; border-radius:14px; font-size:13px; font-weight:800;
+  border:1.5px solid var(--mn-border); background:rgba(255,255,255,0.04);
+  color:#fff; cursor:pointer; transition:all 0.2s; text-align:center;
+}
+.mn-closet-btn.primary { background:var(--mn-accent); color:#000; border-color:var(--mn-accent); }
+.mn-closet-btn:hover { opacity:0.85; transform:translateY(-1px); }
+.mn-closet-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.mn-closet-thumb { border-radius:10px; overflow:hidden; aspect-ratio:3/4; background:rgba(255,255,255,0.04); border:1px solid var(--mn-border); position:relative; }
+.mn-closet-thumb img { width:100%; height:100%; object-fit:cover; }
+.mn-closet-empty { text-align:center; padding:40px 20px; color:var(--mn-muted); }
+.mn-closet-empty-icon { font-size:48px; margin-bottom:12px; }
 
-  .mn-stat-icon {
-    font-size: 28px;
-    margin-bottom: 8px;
-  }
+/* ── AI LOADING OVERLAY ── */
+.mn-ai-overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px);
+  display:none; align-items:center; justify-content:center; z-index:9999;
+  flex-direction:column; gap:20px;
+}
+.mn-ai-overlay.active { display:flex; }
+.mn-ai-spinner { width:56px; height:56px; border:4px solid rgba(57,165,150,0.2); border-top-color:var(--mn-accent); border-radius:50%; animation:mn-spin 0.9s linear infinite; }
+.mn-ai-msg { font-size:15px; font-weight:700; color:#fff; text-align:center; max-width:260px; line-height:1.5; }
+.mn-ai-sub { font-size:12px; color:var(--mn-muted); }
 
-  .mn-stat-label {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 12px;
-    font-weight: 600;
-    color: rgba(0, 0, 0, 0.5);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 4px;
-  }
+/* ── SAVE BUTTON ── */
+.mn-save-bar {
+  position:fixed; bottom:0; left:0; right:0; z-index:1000;
+  padding:16px 20px; background:rgba(10,10,10,0.95); backdrop-filter:blur(12px);
+  border-top:1px solid var(--mn-border); display:flex; justify-content:center;
+}
+.mn-save-btn {
+  background:var(--mn-accent); color:#000; font-size:14px; font-weight:900;
+  padding:14px 40px; border-radius:14px; border:none; cursor:pointer;
+  letter-spacing:0.05em; transition:all 0.2s; display:flex; align-items:center; gap:8px;
+  max-width:400px; width:100%; justify-content:center;
+}
+.mn-save-btn:hover { background:#2d8a7d; transform:translateY(-1px); }
+.mn-save-btn.saved { background:#16a34a; }
 
-  .mn-stat-value {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 16px;
-    font-weight: 700;
-    color: #1a1a1a;
-  }
+/* ── AI FLASH ANIMATION ── */
+@keyframes mn-flash { 0%,100%{background:var(--mn-card)} 50%{background:rgba(57,165,150,0.15)} }
+.mn-ai-flash { animation: mn-flash 0.6s ease 2; }
+@keyframes mn-spin { to { transform:rotate(360deg); } }
+@keyframes mn-pop-in { from{opacity:0;transform:scale(0.85)} to{opacity:1;transform:scale(1)} }
+.mn-pop-in { animation: mn-pop-in 0.3s ease forwards; }
 
-  /* Dashboard Grid */
-  .mn-dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-    gap: 24px;
-    margin-bottom: 48px;
-  }
-
-  .mn-dashboard-card {
-    background: rgba(255, 255, 255, 0.95);
-    border: 1px solid rgba(57, 165, 150, 0.2);
-    border-radius: 20px;
-    padding: 32px;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    animation: fadeInUp 0.6s ease-out;
-    animation-fill-mode: both;
-  }
-
-  .mn-dashboard-card:nth-child(1) { animation-delay: 0.2s; }
-  .mn-dashboard-card:nth-child(2) { animation-delay: 0.3s; }
-  .mn-dashboard-card:nth-child(3) { animation-delay: 0.4s; }
-
-  .mn-dashboard-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 16px 48px rgba(57, 165, 150, 0.15);
-    border-color: rgba(57, 165, 150, 0.4);
-  }
-
-  .mn-card-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 24px;
-    padding-bottom: 16px;
-    border-bottom: 2px solid rgba(57, 165, 150, 0.1);
-  }
-
-  .mn-card-icon {
-    width: 48px;
-    height: 48px;
-    background: linear-gradient(135deg, #39A596, #4fffd9);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    box-shadow: 0 4px 12px rgba(57, 165, 150, 0.3);
-  }
-
-  .mn-card-title {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 20px;
-    font-weight: 700;
-    color: #1a1a1a;
-    margin: 0;
-  }
-
-  .mn-card-content {
-    font-family: 'Montserrat', sans-serif;
-    color: rgba(0, 0, 0, 0.7);
-    line-height: 1.6;
-  }
-
-  .mn-profile-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 14px 0;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-  }
-
-  .mn-profile-item:last-child {
-    border-bottom: none;
-  }
-
-  .mn-profile-label {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    color: rgba(0, 0, 0, 0.6);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .mn-profile-value {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    color: #1a1a1a;
-    background: rgba(57, 165, 150, 0.1);
-    padding: 8px 14px;
-    border-radius: 8px;
-  }
-
-  .mn-archetype-display {
-    text-align: center;
-    padding: 32px;
-    background: linear-gradient(135deg, rgba(57, 165, 150, 0.05), rgba(79, 255, 217, 0.05));
-    border-radius: 16px;
-    margin-bottom: 24px;
-  }
-
-  .mn-archetype-icon {
-    font-size: 64px;
-    margin-bottom: 16px;
-  }
-
-  .mn-archetype-name {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 28px;
-    font-weight: 700;
-    color: #1a1a1a;
-    margin-bottom: 8px;
-  }
-
-  .mn-archetype-tagline {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 16px;
-    font-style: italic;
-    color: rgba(0, 0, 0, 0.6);
-  }
-
-  .mn-empty-state {
-    text-align: center;
-    padding: 48px 24px;
-    color: rgba(0, 0, 0, 0.4);
-  }
-
-  .mn-empty-icon {
-    font-size: 48px;
-    margin-bottom: 16px;
-    opacity: 0.5;
-  }
-
-  .mn-empty-text {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 16px;
-    margin-bottom: 24px;
-  }
-
-  .mn-btn-primary {
-    font-family: 'Montserrat', sans-serif;
-    background: linear-gradient(135deg, #39A596, #4fffd9);
-    color: white;
-    border: none;
-    padding: 14px 28px;
-    border-radius: 12px;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(57, 165, 150, 0.3);
-  }
-
-  .mn-btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(57, 165, 150, 0.4);
-  }
-
-  .mn-palette-display {
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-    margin-top: 16px;
-  }
-
-  .mn-palette-swatch {
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  }
-
-  .mn-personality-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: linear-gradient(135deg, rgba(57, 165, 150, 0.1), rgba(79, 255, 217, 0.1));
-    border: 1px solid rgba(57, 165, 150, 0.3);
-    padding: 10px 20px;
-    border-radius: 20px;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    color: #39A596;
-  }
-
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @media (max-width: 968px) {
-    .mn-profile-hero {
-      flex-direction: column;
-      text-align: center;
-      padding: 32px;
-    }
-
-    .mn-profile-name {
-      font-size: 32px;
-    }
-
-    .mn-quick-stats {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
-  @media (max-width: 768px) {
-    .mn-dashboard-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .mn-quick-stats {
-      grid-template-columns: 1fr;
-    }
-
-    .mn-profile-avatar {
-      width: 140px;
-      height: 140px;
-      font-size: 56px;
-    }
-  }
+@media (max-width:600px) {
+  .mn-hero-inner { flex-direction:column; text-align:center; }
+  .mn-vibe-grid { grid-template-columns:1fr 1fr; }
+  .mn-height-wrap { flex-direction:column; align-items:center; }
+  .mn-closet-grid { grid-template-columns:repeat(2,1fr); }
+}
 </style>
 
-<div class="mn-user-dashboard">
-  <!-- Profile Hero Section -->
-  <div class="mn-profile-hero">
-    <div class="mn-profile-avatar-section">
-      <div class="mn-profile-avatar" id="profile-avatar">
-        👤
-      </div>
-      <a href="/pages/my-closet" class="mn-closet-btn">
-        <span>👗</span>
-        <span>Digital Closet</span>
-      </a>
-    </div>
+<!-- AI loading overlay -->
+<div class="mn-ai-overlay" id="mn-ai-overlay">
+  <div class="mn-ai-spinner"></div>
+  <div class="mn-ai-msg" id="mn-ai-msg">AI is reading your style DNA...</div>
+  <div class="mn-ai-sub">Scanning skin tone, hair, body type & more</div>
+</div>
 
-    <div class="mn-profile-info">
-      <h1 class="mn-profile-name" id="profile-name">Welcome Back</h1>
-      <p class="mn-profile-personality" id="profile-personality">
-        <span class="mn-personality-badge">
-          <span>✨</span>
-          <span id="personality-tone">Complete your profile to discover your style personality</span>
-        </span>
-      </p>
+<div class="mn-dashboard">
 
-      <div class="mn-quick-stats" id="quick-stats">
-        <div class="mn-stat-box">
-          <div class="mn-stat-icon">📏</div>
-          <div class="mn-stat-label">Height</div>
-          <div class="mn-stat-value" id="stat-height">-</div>
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- HERO: Profile pic + ring + progress bar            -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div class="mn-hero">
+    <div class="mn-hero-inner">
+      <div class="mn-avatar-wrap" id="mn-avatar-wrap" title="Upload photo for AI auto-fill">
+        <div class="mn-avatar-img" id="mn-avatar-img">
+          <span id="mn-avatar-emoji">👤</span>
+          <img id="mn-avatar-photo" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:50%;position:absolute;inset:0;"/>
         </div>
-        <div class="mn-stat-box">
-          <div class="mn-stat-icon">💪</div>
-          <div class="mn-stat-label">Body Type</div>
-          <div class="mn-stat-value" id="stat-body">-</div>
-        </div>
-        <div class="mn-stat-box">
-          <div class="mn-stat-icon">🎨</div>
-          <div class="mn-stat-label">Skin Tone</div>
-          <div class="mn-stat-value" id="stat-skin">-</div>
-        </div>
-        <div class="mn-stat-box">
-          <div class="mn-stat-icon">🌡️</div>
-          <div class="mn-stat-label">Temperature</div>
-          <div class="mn-stat-value" id="stat-temp">-</div>
-        </div>
-        <div class="mn-stat-box">
-          <div class="mn-stat-icon">💰</div>
-          <div class="mn-stat-label">Budget Range</div>
-          <div class="mn-stat-value" id="stat-budget">-</div>
-        </div>
+        <svg class="mn-ring-svg" viewBox="0 0 120 120">
+          <circle class="mn-ring-bg" cx="60" cy="60" r="54.9"/>
+          <circle class="mn-ring-fill" id="mn-ring-fill" cx="60" cy="60" r="54.9"/>
+        </svg>
+        <div class="mn-avatar-overlay">📷</div>
+        <input type="file" id="mn-profile-photo-input" accept="image/*" class="mn-ai-fill-input"/>
       </div>
-    </div>
-  </div>
-
-  <div class="mn-dashboard-grid">
-    <!-- Style Identity Card -->
-    <div class="mn-dashboard-card">
-      <div class="mn-card-header">
-        <div class="mn-card-icon">✨</div>
-        <h2 class="mn-card-title">Style Archetype</h2>
-      </div>
-      <div class="mn-card-content" id="identity-content">
-        <div class="mn-empty-state">
-          <div class="mn-empty-icon">🎨</div>
-          <p class="mn-empty-text">Start your style journey to discover your unique fashion archetype</p>
-          <button class="mn-btn-primary" onclick="document.getElementById('mn-widget-minimized').click()">
-            Begin Journey
-          </button>
+      <div class="mn-hero-info">
+        <div class="mn-hero-name">{{ customer_name }}'s Style Profile</div>
+        <div class="mn-hero-sub">The more you fill, the smarter your stylist gets.</div>
+        <div class="mn-linear-bar-wrap">
+          <div class="mn-linear-label">
+            <span>Profile Completion</span>
+            <span id="mn-pct-label">0%</span>
+          </div>
+          <div class="mn-linear-track">
+            <div class="mn-linear-fill" id="mn-linear-fill"></div>
+          </div>
         </div>
-      </div>
-    </div>
-
-    <!-- Personal Details Card -->
-    <div class="mn-dashboard-card">
-      <div class="mn-card-header">
-        <div class="mn-card-icon">👤</div>
-        <h2 class="mn-card-title">Personal Details</h2>
-      </div>
-      <div class="mn-card-content" id="details-content">
-        <div class="mn-empty-state">
-          <div class="mn-empty-icon">📋</div>
-          <p class="mn-empty-text">Complete your profile to get personalized recommendations</p>
+        <div class="mn-hero-badges">
+          <span class="mn-hero-badge" id="badge-gender">Gender</span>
+          <span class="mn-hero-badge" id="badge-height">Height</span>
+          <span class="mn-hero-badge" id="badge-skin">Skin</span>
+          <span class="mn-hero-badge" id="badge-style">Styles</span>
+          <span class="mn-hero-badge" id="badge-closet">Closet</span>
         </div>
-      </div>
-    </div>
-
-    <!-- Preferences Card -->
-    <div class="mn-dashboard-card">
-      <div class="mn-card-header">
-        <div class="mn-card-icon">🌍</div>
-        <h2 class="mn-card-title">Lifestyle & Preferences</h2>
-      </div>
-      <div class="mn-card-content" id="preferences-content">
-        <div class="mn-empty-state">
-          <div class="mn-empty-icon">⚙️</div>
-          <p class="mn-empty-text">Your style preferences will appear here</p>
-        </div>
+        <button class="mn-ai-fill-btn" id="mn-ai-photo-btn">
+          ✨ Auto-Fill from Photo
+        </button>
       </div>
     </div>
   </div>
+
+  <div class="mn-sections">
+    <!-- ═══ SECTION 1: GENDER ═══ -->
+    <div class="mn-section" id="mn-sec-gender">
+      <div class="mn-section-title">👤 Gender <span class="mn-filled-check" id="chk-gender">✓</span></div>
+      <div class="mn-chips">
+        <button class="mn-chip mn-chip-single" data-field="gender" data-val="men" onclick="mnSelectSingle(this,'gender')">👔 Men</button>
+        <button class="mn-chip mn-chip-single" data-field="gender" data-val="women" onclick="mnSelectSingle(this,'gender')">👗 Women</button>
+        <button class="mn-chip mn-chip-single" data-field="gender" data-val="non-binary" onclick="mnSelectSingle(this,'gender')">🌈 Non-Binary</button>
+        <button class="mn-chip mn-chip-single" data-field="gender" data-val="prefer-not" onclick="mnSelectSingle(this,'gender')">🤍 Prefer Not to Say</button>
+      </div>
+    </div>
+
+    <!-- ═══ SECTION 2: HEIGHT ═══ -->
+    <div class="mn-section" id="mn-sec-height">
+      <div class="mn-section-title">📏 Height <span class="mn-filled-check" id="chk-height">✓</span></div>
+      <div class="mn-height-display">
+        <div class="mn-height-cm" id="mn-height-cm">172 cm</div>
+        <div class="mn-height-ft" id="mn-height-ft">5 ft 7.7 in</div>
+      </div>
+      <div class="mn-height-wrap">
+        <!-- SVG body silhouette — scales with height -->
+        <div class="mn-body-svg-wrap">
+          <svg id="mn-body-svg" width="60" viewBox="0 0 60 200" fill="none" xmlns="http://www.w3.org/2000/svg" style="transition:height 0.3s ease">
+            <!-- Head -->
+            <circle cx="30" cy="18" r="14" stroke="#39A596" stroke-width="2.5" fill="rgba(57,165,150,0.1)"/>
+            <!-- Neck -->
+            <rect x="26" y="32" width="8" height="10" rx="3" fill="rgba(57,165,150,0.15)" stroke="#39A596" stroke-width="2"/>
+            <!-- Shoulders + Torso -->
+            <path id="mn-torso" d="M8 44 Q30 40 52 44 L48 100 Q30 104 12 100 Z" stroke="#39A596" stroke-width="2.5" fill="rgba(57,165,150,0.08)"/>
+            <!-- Left arm -->
+            <path id="mn-larm" d="M8 46 L2 90 Q1 95 5 96 L10 96 L14 52" stroke="#39A596" stroke-width="2" fill="rgba(57,165,150,0.05)" stroke-linejoin="round"/>
+            <!-- Right arm -->
+            <path id="mn-rarm" d="M52 46 L58 90 Q59 95 55 96 L50 96 L46 52" stroke="#39A596" stroke-width="2" fill="rgba(57,165,150,0.05)" stroke-linejoin="round"/>
+            <!-- Left leg -->
+            <path id="mn-lleg" d="M12 100 L8 170 Q8 178 14 178 L22 178 L24 100" stroke="#39A596" stroke-width="2.5" fill="rgba(57,165,150,0.08)" stroke-linejoin="round"/>
+            <!-- Right leg -->
+            <path id="mn-rleg" d="M48 100 L52 170 Q52 178 46 178 L38 178 L36 100" stroke="#39A596" stroke-width="2.5" fill="rgba(57,165,150,0.08)" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="mn-slider-wrap">
+          <input type="range" class="mn-range" id="mn-height-slider" min="140" max="220" value="172" oninput="mnHeightChange(this.value)"/>
+          <div class="mn-range-labels"><span>140 cm (4'7")</span><span>220 cm (7'2")</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SECTION 3: SKIN TONE ═══ -->
+    <div class="mn-section" id="mn-sec-skin">
+      <div class="mn-section-title">🎨 Skin Tone <span class="mn-filled-check" id="chk-skin">✓</span></div>
+      <div class="mn-mst-row" id="mn-mst-row">
+        <div class="mn-mst-swatch" data-mst="1" style="background:#f6ede4" onclick="mnSelectMST(1,'Very Light','#f6ede4')" title="MST 1 – Very Light"></div>
+        <div class="mn-mst-swatch" data-mst="2" style="background:#f3e7db" onclick="mnSelectMST(2,'Light','#f3e7db')" title="MST 2 – Light"></div>
+        <div class="mn-mst-swatch" data-mst="3" style="background:#f7ead0" onclick="mnSelectMST(3,'Light Medium','#f7ead0')" title="MST 3 – Light Medium"></div>
+        <div class="mn-mst-swatch" data-mst="4" style="background:#eadaba" onclick="mnSelectMST(4,'Medium Light','#eadaba')" title="MST 4 – Medium Light"></div>
+        <div class="mn-mst-swatch" data-mst="5" style="background:#d7bd96" onclick="mnSelectMST(5,'Medium','#d7bd96')" title="MST 5 – Medium"></div>
+        <div class="mn-mst-swatch" data-mst="6" style="background:#a07850" onclick="mnSelectMST(6,'Medium Dark','#a07850')" title="MST 6 – Medium Dark"></div>
+        <div class="mn-mst-swatch" data-mst="7" style="background:#825c43" onclick="mnSelectMST(7,'Dark','#825c43')" title="MST 7 – Dark"></div>
+        <div class="mn-mst-swatch" data-mst="8" style="background:#604134" onclick="mnSelectMST(8,'Very Dark','#604134')" title="MST 8 – Very Dark"></div>
+        <div class="mn-mst-swatch" data-mst="9" style="background:#3a312a" onclick="mnSelectMST(9,'Deep','#3a312a')" title="MST 9 – Deep"></div>
+        <div class="mn-mst-swatch" data-mst="10" style="background:#292420" onclick="mnSelectMST(10,'Deepest','#292420')" title="MST 10 – Deepest"></div>
+      </div>
+      <div class="mn-mst-label" id="mn-mst-label">Select your skin tone</div>
+    </div>
+
+    <!-- ═══ SECTION 4: PREFERRED FIT ═══ -->
+    <div class="mn-section" id="mn-sec-fit">
+      <div class="mn-section-title">👕 Preferred Fit <span class="mn-filled-check" id="chk-fit">✓</span></div>
+      <div class="mn-chips">
+        <button class="mn-chip mn-chip-single" data-field="fit" data-val="slim" onclick="mnSelectSingle(this,'fit')">⚡ Slim</button>
+        <button class="mn-chip mn-chip-single" data-field="fit" data-val="regular" onclick="mnSelectSingle(this,'fit')">✅ Regular</button>
+        <button class="mn-chip mn-chip-single" data-field="fit" data-val="oversized" onclick="mnSelectSingle(this,'fit')">🏔️ Oversized</button>
+        <button class="mn-chip mn-chip-single" data-field="fit" data-val="relaxed" onclick="mnSelectSingle(this,'fit')">🌊 Relaxed</button>
+        <button class="mn-chip mn-chip-single" data-field="fit" data-val="athletic" onclick="mnSelectSingle(this,'fit')">💪 Athletic</button>
+      </div>
+    </div>
+
+    <!-- ═══ SECTION 5: GO-TO OCCASIONS ═══ -->
+    <div class="mn-section" id="mn-sec-occasions">
+      <div class="mn-section-title">📍 Go-To Places <span class="mn-filled-check" id="chk-occasions">✓</span></div>
+      <div class="mn-chips" id="mn-occasions-chips">
+        <button class="mn-chip" data-field="occasions" data-val="office" onclick="mnToggleMulti(this,'occasions')">💼 Office</button>
+        <button class="mn-chip" data-field="occasions" data-val="gym" onclick="mnToggleMulti(this,'occasions')">🏋️ Gym</button>
+        <button class="mn-chip" data-field="occasions" data-val="college" onclick="mnToggleMulti(this,'occasions')">🎓 College</button>
+        <button class="mn-chip" data-field="occasions" data-val="casual" onclick="mnToggleMulti(this,'occasions')">🌿 Casual</button>
+        <button class="mn-chip" data-field="occasions" data-val="date_night" onclick="mnToggleMulti(this,'occasions')">🌙 Date Night</button>
+        <button class="mn-chip" data-field="occasions" data-val="airport" onclick="mnToggleMulti(this,'occasions')">✈️ Airport</button>
+        <button class="mn-chip" data-field="occasions" data-val="sangeet" onclick="mnToggleMulti(this,'occasions')">💃 Sangeet</button>
+        <button class="mn-chip" data-field="occasions" data-val="pooja" onclick="mnToggleMulti(this,'occasions')">🪔 Pooja</button>
+        <button class="mn-chip" data-field="occasions" data-val="cafe" onclick="mnToggleMulti(this,'occasions')">☕ Café</button>
+        <button class="mn-chip" data-field="occasions" data-val="mall" onclick="mnToggleMulti(this,'occasions')">🛍️ Mall</button>
+      </div>
+    </div>
+
+    <!-- ═══ SECTION 6: HAIR STYLE ═══ -->
+    <div class="mn-section" id="mn-sec-hair">
+      <div class="mn-section-title">💇 Hair Style <span class="mn-filled-check" id="chk-hair">✓</span></div>
+      <div class="mn-chips">
+        <button class="mn-chip mn-chip-single" data-field="hair" data-val="Short & Neat" onclick="mnSelectSingle(this,'hair')">✂️ Short & Neat</button>
+        <button class="mn-chip mn-chip-single" data-field="hair" data-val="Medium Waves" onclick="mnSelectSingle(this,'hair')">🌊 Medium Waves</button>
+        <button class="mn-chip mn-chip-single" data-field="hair" data-val="Long & Straight" onclick="mnSelectSingle(this,'hair')">💁 Long & Straight</button>
+        <button class="mn-chip mn-chip-single" data-field="hair" data-val="Curly/Coily" onclick="mnSelectSingle(this,'hair')">🌀 Curly / Coily</button>
+        <button class="mn-chip mn-chip-single" data-field="hair" data-val="Buzz Cut" onclick="mnSelectSingle(this,'hair')">⚡ Buzz Cut</button>
+        <button class="mn-chip mn-chip-single" data-field="hair" data-val="Man Bun" onclick="mnSelectSingle(this,'hair')">🪢 Man Bun</button>
+        <button class="mn-chip mn-chip-single" data-field="hair" data-val="Bob Cut" onclick="mnSelectSingle(this,'hair')">💆 Bob Cut</button>
+        <button class="mn-chip mn-chip-single" data-field="hair" data-val="Braids" onclick="mnSelectSingle(this,'hair')">🤝 Braids</button>
+        <button class="mn-chip mn-chip-single" data-field="hair" data-val="Afro" onclick="mnSelectSingle(this,'hair')">✊ Afro</button>
+        <button class="mn-chip mn-chip-single" data-field="hair" data-val="Bald" onclick="mnSelectSingle(this,'hair')">😎 Bald</button>
+      </div>
+    </div>
+
+    <!-- ═══ SECTION 7: PRICE RANGE ═══ -->
+    <div class="mn-section" id="mn-sec-price">
+      <div class="mn-section-title">💰 Preferred Price Range <span class="mn-filled-check" id="chk-price">✓</span></div>
+      <div class="mn-price-display" id="mn-price-display">₹2,000 – ₹8,000</div>
+      <div class="mn-dual-range">
+        <div class="mn-dual-range-fill" id="mn-price-fill"></div>
+        <input type="range" id="mn-price-min" min="500" max="50000" value="2000" step="500" oninput="mnPriceChange()"/>
+        <input type="range" id="mn-price-max" min="500" max="50000" value="8000" step="500" oninput="mnPriceChange()"/>
+      </div>
+      <div class="mn-range-labels"><span>₹500</span><span>₹50,000</span></div>
+      <div class="mn-price-presets">
+        <button class="mn-preset-btn" onclick="mnSetPreset(500,2000,this)">🪙 Budget (under ₹2K)</button>
+        <button class="mn-preset-btn" onclick="mnSetPreset(2000,8000,this)">💳 Mid-Range (₹2K–8K)</button>
+        <button class="mn-preset-btn" onclick="mnSetPreset(8000,20000,this)">💎 Premium (₹8K–20K)</button>
+        <button class="mn-preset-btn" onclick="mnSetPreset(20000,50000,this)">👑 Luxury (₹20K+)</button>
+      </div>
+    </div>
+
+    <!-- ═══ SECTION 8: WEATHER ═══ -->
+    <div class="mn-section" id="mn-sec-weather">
+      <div class="mn-section-title">🌤️ Current Weather <span class="mn-filled-check" id="chk-weather">✓</span></div>
+      <div class="mn-weather-display" id="mn-weather-display" style="display:none">
+        <div class="mn-weather-emoji" id="mn-weather-emoji">🌤️</div>
+        <div class="mn-weather-info">
+          <div class="mn-weather-city" id="mn-weather-city">—</div>
+          <div class="mn-weather-temp" id="mn-weather-temp">—°C</div>
+          <div class="mn-weather-cond" id="mn-weather-cond">—</div>
+        </div>
+      </div>
+      <div class="mn-weather-row">
+        <input type="text" class="mn-city-input" id="mn-city-input" placeholder="Enter city (e.g. Mumbai, Delhi)"/>
+        <button class="mn-weather-btn" onclick="mnFetchWeatherByCity()">Get Weather</button>
+        <button class="mn-locate-btn" onclick="mnAutoLocate()" title="Use my location">📍</button>
+      </div>
+    </div>
+
+    <!-- ═══ SECTION 9: STYLE VIBES (8 cards) ═══ -->
+    <div class="mn-section" id="mn-sec-vibes">
+      <div class="mn-section-title">✨ Style Preferences <span class="mn-filled-check" id="chk-vibes">✓</span></div>
+      <p style="font-size:11px;color:var(--mn-muted);margin-bottom:16px">Select all that feel like you. Multi-select allowed.</p>
+      <div class="mn-vibe-grid" id="mn-vibe-grid">
+        <!-- Men's vibes -->
+        <button class="mn-vibe-card" data-vibe="caffeine_survivor" data-gender-tag="men" onclick="mnToggleVibe(this)">
+          <div class="mn-vibe-emoji">☕</div>
+          <div class="mn-vibe-name">Surviving on Caffeine</div>
+          <div class="mn-vibe-desc">3am grind energy. Oversized, cozy, unbothered.</div>
+        </button>
+        <button class="mn-vibe-card" data-vibe="sarcastic_rizzler" data-gender-tag="men" onclick="mnToggleVibe(this)">
+          <div class="mn-vibe-emoji">😏</div>
+          <div class="mn-vibe-name">The Sarcastic Rizzler</div>
+          <div class="mn-vibe-desc">Bold fits, zero apologies. Main character syndrome.</div>
+        </button>
+        <button class="mn-vibe-card" data-vibe="main_character" data-gender-tag="men" onclick="mnToggleVibe(this)">
+          <div class="mn-vibe-emoji">✨</div>
+          <div class="mn-vibe-name">Main Character Energy</div>
+          <div class="mn-vibe-desc">Protagonist of every scene. Dramatic, cinematic.</div>
+        </button>
+        <button class="mn-vibe-card" data-vibe="quiet_luxury" data-gender-tag="men" onclick="mnToggleVibe(this)">
+          <div class="mn-vibe-emoji">🤫</div>
+          <div class="mn-vibe-name">Quiet Luxury</div>
+          <div class="mn-vibe-desc">Let the fabric speak. Minimal, elevated, intentional.</div>
+        </button>
+        <!-- Women's vibes -->
+        <button class="mn-vibe-card" data-vibe="cottagecore_chaos" data-gender-tag="women" onclick="mnToggleVibe(this)">
+          <div class="mn-vibe-emoji">🌸</div>
+          <div class="mn-vibe-name">Cottagecore Chaos</div>
+          <div class="mn-vibe-desc">Pinterest board IRL. Soft but feral.</div>
+        </button>
+        <button class="mn-vibe-card" data-vibe="boss_babe" data-gender-tag="women" onclick="mnToggleVibe(this)">
+          <div class="mn-vibe-emoji">👑</div>
+          <div class="mn-vibe-name">Boss Babe</div>
+          <div class="mn-vibe-desc">Power suits meet killer heels. Boardroom to bar.</div>
+        </button>
+        <button class="mn-vibe-card" data-vibe="dark_academia" data-gender-tag="women" onclick="mnToggleVibe(this)">
+          <div class="mn-vibe-emoji">📚</div>
+          <div class="mn-vibe-name">Dark Academia</div>
+          <div class="mn-vibe-desc">Tweed, turtlenecks, tortoiseshell. Intellectual & moody.</div>
+        </button>
+        <button class="mn-vibe-card" data-vibe="femme_fatale" data-gender-tag="women" onclick="mnToggleVibe(this)">
+          <div class="mn-vibe-emoji">🖤</div>
+          <div class="mn-vibe-name">Femme Fatale</div>
+          <div class="mn-vibe-desc">Satin, red lips, air of mystery. Timeless allure.</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- ═══ SECTION 10: BANK CARDS ═══ -->
+    <div class="mn-section" id="mn-sec-bank">
+      <div class="mn-section-title">💳 My Bank Cards <span class="mn-filled-check" id="chk-bank">✓</span></div>
+      <p style="font-size:11px;color:var(--mn-muted);margin-bottom:16px">We use this to surface the best bank offers on your style picks.</p>
+      <div class="mn-bank-row">
+        <select class="mn-select" id="mn-bank-select" onchange="mnPopulateCardVariants()">
+          <option value="">Select Bank</option>
+          <option value="HDFC">HDFC Bank</option>
+          <option value="SBI">SBI</option>
+          <option value="ICICI">ICICI Bank</option>
+          <option value="Axis">Axis Bank</option>
+          <option value="Kotak">Kotak Mahindra</option>
+          <option value="PNB">PNB</option>
+          <option value="IndusInd">IndusInd Bank</option>
+          <option value="Yes Bank">Yes Bank</option>
+          <option value="IDFC First">IDFC First Bank</option>
+          <option value="Canara">Canara Bank</option>
+        </select>
+        <select class="mn-select" id="mn-card-variant-select">
+          <option value="">Select Card</option>
+        </select>
+        <button class="mn-add-btn" onclick="mnAddBankCard()" title="Add card">+</button>
+      </div>
+      <div class="mn-card-tags" id="mn-card-tags"></div>
+    </div>
+
+    <!-- ═══ SECTION 11: CORE INTERESTS ═══ -->
+    <div class="mn-section" id="mn-sec-interests">
+      <div class="mn-section-title">🎯 Core Interests & Narratives <span class="mn-filled-check" id="chk-interests">✓</span></div>
+      <p style="font-size:11px;color:var(--mn-muted);margin-bottom:16px">Choose from our store narratives or type your own.</p>
+      <div class="mn-chips" id="mn-interest-chips">
+        <button class="mn-chip" onclick="mnToggleInterest(this,'The CEO Edit')">👔 The CEO Edit</button>
+        <button class="mn-chip" onclick="mnToggleInterest(this,'Street Culture')">🛹 Street Culture</button>
+        <button class="mn-chip" onclick="mnToggleInterest(this,'Heritage Craft')">🏺 Heritage Craft</button>
+        <button class="mn-chip" onclick="mnToggleInterest(this,'Minimalist Living')">🤍 Minimalist Living</button>
+        <button class="mn-chip" onclick="mnToggleInterest(this,'Fitness First')">💪 Fitness First</button>
+        <button class="mn-chip" onclick="mnToggleInterest(this,'Wanderlust')">✈️ Wanderlust</button>
+        <button class="mn-chip" onclick="mnToggleInterest(this,'Festive Glow')">✨ Festive Glow</button>
+        <button class="mn-chip" onclick="mnToggleInterest(this,'Tech Aesthetic')">💻 Tech Aesthetic</button>
+        <button class="mn-chip" onclick="mnToggleInterest(this,'Music & Art')">🎵 Music & Art</button>
+        <button class="mn-chip" onclick="mnToggleInterest(this,'Sustainable Style')">🌱 Sustainable Style</button>
+      </div>
+      <div class="mn-interest-input-row">
+        <input type="text" class="mn-interest-input" id="mn-interest-custom" placeholder="Add custom interest (e.g. Vintage Denim)..." onkeydown="if(event.key==='Enter')mnAddCustomInterest()"/>
+        <button class="mn-weather-btn" onclick="mnAddCustomInterest()">Add</button>
+      </div>
+      <div class="mn-chips" id="mn-custom-interests" style="margin-top:10px"></div>
+    </div>
+
+    <!-- ═══ SECTION 12: DIGITAL CLOSET ═══ -->
+    <div class="mn-section" id="mn-sec-closet">
+      <div class="mn-section-title">👗 Digital Closet <span class="mn-filled-check" id="chk-closet">✓</span></div>
+      <div class="mn-closet-actions">
+        <button class="mn-closet-btn primary" onclick="document.getElementById('mn-closet-upload-input').click()">
+          📷 Upload to Closet
+        </button>
+        <button class="mn-closet-btn" onclick="mnGhostMode()">
+          👻 Ghost Mode
+        </button>
+      </div>
+      <input type="file" id="mn-closet-upload-input" accept="image/*" multiple style="display:none" onchange="mnHandleClosetUpload(this)"/>
+      <div class="mn-closet-grid" id="mn-closet-grid"></div>
+      <div class="mn-closet-empty" id="mn-closet-empty">
+        <div class="mn-closet-empty-icon">🗂️</div>
+        <p style="font-weight:700;margin-bottom:4px">Your closet is empty</p>
+        <p style="font-size:12px">Upload photos of your clothes to get AI outfit recommendations from your own wardrobe.</p>
+      </div>
+    </div>
+
+  </div><!-- end .mn-sections -->
+</div><!-- end .mn-dashboard -->
+
+<!-- ═══ STICKY SAVE BAR ═══ -->
+<div class="mn-save-bar">
+  <button class="mn-save-btn" id="mn-save-btn" onclick="mnSaveProfile()">
+    <span id="mn-save-label">💾 Save Style Profile</span>
+  </button>
 </div>
 
 <script>
-  // Load user data from localStorage and populate dashboard
-  (function() {
-    const STORAGE_KEY = 'mn_core_identity';
-    
-    function loadDashboardData() {
-      try {
-        const storedData = localStorage.getItem(STORAGE_KEY);
-        if (!storedData) return;
-        
-        const identity = JSON.parse(storedData);
-        
-        // Populate Profile Avatar
-        const avatarEl = document.getElementById('profile-avatar');
-        if (identity.profileImage) {
-          avatarEl.innerHTML = `<img src="${identity.profileImage}" alt="Profile Picture">`;
-        } else if (identity.archetype && identity.archetype.icon) {
-          avatarEl.innerHTML = identity.archetype.icon;
-        }
-        
-        // Populate Profile Name
-        const nameEl = document.getElementById('profile-name');
-        if (identity.name) {
-          nameEl.textContent = identity.name;
-        } else if (identity.archetype) {
-          nameEl.textContent = `The ${identity.archetype.name}`;
-        }
-        
-        // Populate Personality Tone
-        const personalityEl = document.getElementById('personality-tone');
-        if (identity.personalityTone) {
-          personalityEl.textContent = identity.personalityTone;
-        } else if (identity.coreExpression && identity.presence && identity.signal) {
-          personalityEl.textContent = `${identity.coreExpression} · ${identity.presence} · ${identity.signal}`;
-        }
-        
-        // Populate Quick Stats
-        if (identity.height) {
-          document.getElementById('stat-height').textContent = `${identity.height} cm`;
-        }
-        
-        if (identity.build || identity.bodyType) {
-          document.getElementById('stat-body').textContent = identity.build || identity.bodyType;
-        }
-        
-        if (identity.skinTone) {
-          document.getElementById('stat-skin').textContent = identity.skinTone;
-        }
-        
-        // Temperature (check for climate or temperature data)
-        if (identity.temperature) {
-          document.getElementById('stat-temp').textContent = identity.temperature;
-        } else if (identity.climate) {
-          document.getElementById('stat-temp').textContent = identity.climate;
-        } else if (identity.region) {
-          // Try to fetch temperature for region (placeholder for now)
-          document.getElementById('stat-temp').textContent = identity.region;
-        }
-        
-        if (identity.budget || identity.priceRange) {
-          document.getElementById('stat-budget').textContent = identity.budget || identity.priceRange;
-        }
-        
-        // Populate Style Identity
-        if (identity.archetype) {
-          const identityHTML = `
-            <div class="mn-archetype-display">
-              <div class="mn-archetype-icon">${identity.archetype.icon}</div>
-              <h3 class="mn-archetype-name">${identity.archetype.name}</h3>
-              <p class="mn-archetype-tagline">"${identity.archetype.tagline}"</p>
-              <div class="mn-palette-display">
-                ${identity.archetype.palette.map(color => 
-                  `<div class="mn-palette-swatch" style="background-color: ${color};"></div>`
-                ).join('')}
-              </div>
-            </div>
-            <div class="mn-profile-item">
-              <span class="mn-profile-label"><span>💫</span> Core Expression</span>
-              <span class="mn-profile-value">${identity.coreExpression || 'Not set'}</span>
-            </div>
-            <div class="mn-profile-item">
-              <span class="mn-profile-label"><span>👁️</span> Presence</span>
-              <span class="mn-profile-value">${identity.presence || 'Not set'}</span>
-            </div>
-            <div class="mn-profile-item">
-              <span class="mn-profile-label"><span>📢</span> Signal</span>
-              <span class="mn-profile-value">${identity.signal || 'Not set'}</span>
-            </div>
-          `;
-          document.getElementById('identity-content').innerHTML = identityHTML;
-        }
-        
-        // Populate Personal Details
-        if (identity.height || identity.build || identity.skinTone || identity.bodyType) {
-          const detailsHTML = `
-            ${identity.gender ? `
-              <div class="mn-profile-item">
-                <span class="mn-profile-label"><span>⚧️</span> Gender</span>
-                <span class="mn-profile-value">${identity.gender}</span>
-              </div>
-            ` : ''}
-            ${identity.height ? `
-              <div class="mn-profile-item">
-                <span class="mn-profile-label"><span>📏</span> Height</span>
-                <span class="mn-profile-value">${identity.height} cm</span>
-              </div>
-            ` : ''}
-            ${identity.build || identity.bodyType ? `
-              <div class="mn-profile-item">
-                <span class="mn-profile-label"><span>💪</span> Body Type</span>
-                <span class="mn-profile-value">${identity.build || identity.bodyType}</span>
-              </div>
-            ` : ''}
-            ${identity.skinTone ? `
-              <div class="mn-profile-item">
-                <span class="mn-profile-label"><span>🎨</span> Skin Tone</span>
-                <span class="mn-profile-value">${identity.skinTone}</span>
-              </div>
-            ` : ''}
-            ${identity.undertone ? `
-              <div class="mn-profile-item">
-                <span class="mn-profile-label"><span>🌈</span> Undertone</span>
-                <span class="mn-profile-value">${identity.undertone}</span>
-              </div>
-            ` : ''}
-            ${identity.age ? `
-              <div class="mn-profile-item">
-                <span class="mn-profile-label"><span>🎂</span> Age</span>
-                <span class="mn-profile-value">${identity.age}</span>
-              </div>
-            ` : ''}
-          `;
-          document.getElementById('details-content').innerHTML = detailsHTML;
-        }
-        
-        // Populate Preferences
-        if (identity.region || identity.climate || identity.budget || identity.temperature || identity.priceRange) {
-          const preferencesHTML = `
-            ${identity.region ? `
-              <div class="mn-profile-item">
-                <span class="mn-profile-label"><span>📍</span> Region</span>
-                <span class="mn-profile-value">${identity.region}</span>
-              </div>
-            ` : ''}
-            ${identity.climate ? `
-              <div class="mn-profile-item">
-                <span class="mn-profile-label"><span>☀️</span> Climate</span>
-                <span class="mn-profile-value">${identity.climate}</span>
-              </div>
-            ` : ''}
-            ${identity.temperature ? `
-              <div class="mn-profile-item">
-                <span class="mn-profile-label"><span>🌡️</span> Temperature</span>
-                <span class="mn-profile-value">${identity.temperature}</span>
-              </div>
-            ` : ''}
-            ${identity.budget || identity.priceRange ? `
-              <div class="mn-profile-item">
-                <span class="mn-profile-label"><span>💰</span> Budget Range</span>
-                <span class="mn-profile-value">${identity.budget || identity.priceRange}</span>
-              </div>
-            ` : ''}
-            ${identity.closet && identity.closet.length > 0 ? `
-              <div class="mn-profile-item">
-                <span class="mn-profile-label"><span>👗</span> Closet Items</span>
-                <span class="mn-profile-value">${identity.closet.length} items</span>
-              </div>
-            ` : ''}
-            ${identity.favoriteColors && identity.favoriteColors.length > 0 ? `
-              <div class="mn-profile-item">
-                <span class="mn-profile-label"><span>🎨</span> Favorite Colors</span>
-                <span class="mn-profile-value">${identity.favoriteColors.join(', ')}</span>
-              </div>
-            ` : ''}
-          `;
-          document.getElementById('preferences-content').innerHTML = preferencesHTML;
-        }
-        
-      } catch (error) {
-        console.error('Error loading dashboard data:', error);
+// ═══════════════════════════════════════════════════════════
+// MY NARRATIVE — User Style Dashboard JS
+// ═══════════════════════════════════════════════════════════
+
+const MN_API = 'https://mynarrative-ai.vercel.app/api/stylist_pipeline';
+const MN_WEATHER_KEY = '{{ section.settings.weather_api_key | escape }}';
+const MN_CUSTOMER_ID = '{{ customer.id | default: "guest" }}';
+
+// ── Bank card variants lookup ────────────────────────────
+const BANK_CARDS = {
+  'HDFC':       ['Regalia','Millennia','Diners Club','Infinia','MoneyBack+','Tata Neu Infinity','Swiggy','Business Regalia','Diners Black','Freedom'],
+  'SBI':        ['SimplyCLICK','SimplyMOVE','Prime','Elite','Pulse','Cashback','Club Vistara','IRCTC Platinum','Unnati','Aurum'],
+  'ICICI':      ['Amazon Pay','Coral','Sapphiro','Rubyx','Platinum','Emeralde','HPCL Super Saver','MMT Signature','MakeMyTrip Platinum','Business Advantage'],
+  'Axis':       ['Flipkart','Magnus','Neo','MY Zone','Privilege','Vistara Infinite','Atlas','Reserve','Olympus','ACE'],
+  'Kotak':      ['811','Royale','Zen','White Reserve','League','Essentia','Corporate Platinum','Delight','6E Rewards','PVR'],
+  'PNB':        ['RuPay Platinum','RuPay Select','PNB-Pride','Millennia','Global Classic','Power','Heritage','International Platinum','RuPay NCMC','Rupay Select'],
+  'IndusInd':   ['Legend','Pinnacle','Celesta','Tiger','Platinum Aura','Club Vistara','Nexxt','EazyDiner','Duo Signature','Avios'],
+  'Yes Bank':   ['Yes First Preferred','Marquee','POP','Prosperity Rewards Plus','Business Prime','Travel','Wellness','ACE','RuPay Select','Yes Premia'],
+  'IDFC First': ['Wealth','Select','Classic','Millennia','HPCL Power+','WoW','Mayura','Ashva','LTF Millennia','Club Vistara'],
+  'Canara':     ['RuPay Platinum','Visa Gold','Classic','Mastercard Platinum','Global','RuPay Select','Canara Credit','Titanium','Sapphire','Corporate'],
+};
+
+// ── MST labels ───────────────────────────────────────────
+const MST_LABELS = {1:'Very Light',2:'Light',3:'Light Medium',4:'Medium Light',5:'Medium',6:'Medium Dark',7:'Dark',8:'Very Dark',9:'Deep',10:'Deepest'};
+
+// ── Profile state ────────────────────────────────────────
+let mnProfile = {
+  gender: null, height_cm: 172, skin_mst: null, skin_label: null,
+  preferred_fit: null, occasions: [], hair_style: null,
+  price_min: 2000, price_max: 8000,
+  weather: null, style_vibes: [], bank_cards: [],
+  interests: [], profile_photo_b64: null, closet: [],
+  hidden_biometrics: {}, completion_pct: 0,
+};
+
+// ── Weight map for completion % ──────────────────────────
+const WEIGHTS = {
+  gender:8, height:8, skin:8, fit:8, occasions:8,
+  hair:8, price:6, weather:6, vibes:10, bank:8,
+  interests:8, photo:10, closet:10,
+};
+
+// Load from localStorage on init
+function mnLoadProfile() {
+  try {
+    const saved = localStorage.getItem('mn_identity');
+    if (saved) {
+      const p = JSON.parse(saved);
+      Object.assign(mnProfile, p);
+      mnRestoreUI();
+    }
+  } catch(e) { console.warn('MN: load error', e); }
+}
+
+// Save to localStorage + fire event
+function mnSaveToStorage() {
+  mnProfile.completion_pct = mnCalcCompletion();
+  localStorage.setItem('mn_identity', JSON.stringify(mnProfile));
+  window.dispatchEvent(new CustomEvent('mn-identity-updated', { detail: mnProfile }));
+}
+
+// ── Completion calculation ───────────────────────────────
+function mnCalcCompletion() {
+  let pct = 0;
+  if (mnProfile.gender) pct += WEIGHTS.gender;
+  if (mnProfile.height_cm && mnProfile.height_cm !== 172) pct += WEIGHTS.height;
+  if (mnProfile.skin_mst) pct += WEIGHTS.skin;
+  if (mnProfile.preferred_fit) pct += WEIGHTS.fit;
+  if (mnProfile.occasions && mnProfile.occasions.length) pct += WEIGHTS.occasions;
+  if (mnProfile.hair_style) pct += WEIGHTS.hair;
+  if (mnProfile.price_min !== 2000 || mnProfile.price_max !== 8000) pct += WEIGHTS.price;
+  if (mnProfile.weather && mnProfile.weather.city) pct += WEIGHTS.weather;
+  if (mnProfile.style_vibes && mnProfile.style_vibes.length) pct += WEIGHTS.vibes;
+  if (mnProfile.bank_cards && mnProfile.bank_cards.length) pct += WEIGHTS.bank;
+  if (mnProfile.interests && mnProfile.interests.length) pct += WEIGHTS.interests;
+  if (mnProfile.profile_photo_b64) pct += WEIGHTS.photo;
+  if (mnProfile.closet && mnProfile.closet.length) pct += WEIGHTS.closet;
+  return Math.min(100, pct);
+}
+
+// ── Update progress rings + bar ──────────────────────────
+function mnUpdateProgress() {
+  const pct = mnCalcCompletion();
+  // Circular ring: circumference = 2 * pi * 54.9 = 344.97
+  const circ = 344.97;
+  const offset = circ - (pct / 100) * circ;
+  const ring = document.getElementById('mn-ring-fill');
+  if (ring) ring.style.strokeDashoffset = offset;
+  // Linear bar
+  const fill = document.getElementById('mn-linear-fill');
+  if (fill) fill.style.width = pct + '%';
+  const label = document.getElementById('mn-pct-label');
+  if (label) label.textContent = pct + '%';
+  // Hero badges
+  function setBadge(id, active) {
+    const b = document.getElementById(id);
+    if (b) b.classList.toggle('active', active);
+  }
+  setBadge('badge-gender', !!mnProfile.gender);
+  setBadge('badge-height', mnProfile.height_cm !== 172);
+  setBadge('badge-skin', !!mnProfile.skin_mst);
+  setBadge('badge-style', !!(mnProfile.style_vibes && mnProfile.style_vibes.length));
+  setBadge('badge-closet', !!(mnProfile.closet && mnProfile.closet.length));
+}
+
+// ── Section filled checkmarks ────────────────────────────
+function mnSetCheck(id, val) {
+  const el = document.getElementById('chk-' + id);
+  if (el) el.classList.toggle('show', !!val);
+}
+
+// ── Height ───────────────────────────────────────────────
+function mnHeightChange(val) {
+  val = parseInt(val);
+  mnProfile.height_cm = val;
+  const totalIn = Math.round(val / 2.54);
+  const ft = Math.floor(totalIn / 12);
+  const inch = totalIn % 12;
+  document.getElementById('mn-height-cm').textContent = val + ' cm';
+  document.getElementById('mn-height-ft').textContent = ft + " ft " + inch + " in";
+  // Scale SVG body: map 140cm->100px, 220cm->220px
+  const svgH = Math.round(100 + ((val - 140) / 80) * 120);
+  const svg = document.getElementById('mn-body-svg');
+  if (svg) svg.setAttribute('height', svgH);
+  mnSetCheck('height', val !== 172);
+  mnUpdateProgress(); mnSaveToStorage();
+}
+
+// ── Skin tone ────────────────────────────────────────────
+function mnSelectMST(mst, label, hex) {
+  document.querySelectorAll('.mn-mst-swatch').forEach(s => s.classList.remove('selected'));
+  const sw = document.querySelector('.mn-mst-swatch[data-mst="' + mst + '"]');
+  if (sw) sw.classList.add('selected');
+  document.getElementById('mn-mst-label').textContent = 'MST ' + mst + ' — ' + label;
+  mnProfile.skin_mst = mst; mnProfile.skin_label = label;
+  mnSetCheck('skin', true); mnUpdateProgress(); mnSaveToStorage();
+}
+
+// ── Single-select chips ───────────────────────────────────
+function mnSelectSingle(btn, field) {
+  document.querySelectorAll('.mn-chip-single[data-field="' + field + '"]').forEach(c => c.classList.remove('selected'));
+  btn.classList.add('selected');
+  const val = btn.dataset.val;
+  if (field === 'gender') {
+    mnProfile.gender = val;
+    mnFilterVibesByGender(val);
+    mnSetCheck('gender', true);
+  } else if (field === 'fit') {
+    mnProfile.preferred_fit = val;
+    mnSetCheck('fit', true);
+  } else if (field === 'hair') {
+    mnProfile.hair_style = val;
+    mnSetCheck('hair', true);
+  }
+  mnUpdateProgress(); mnSaveToStorage();
+}
+
+// ── Multi-select chips (occasions) ───────────────────────
+function mnToggleMulti(btn, field) {
+  btn.classList.toggle('selected');
+  const val = btn.dataset.val;
+  if (!mnProfile[field]) mnProfile[field] = [];
+  if (btn.classList.contains('selected')) {
+    if (!mnProfile[field].includes(val)) mnProfile[field].push(val);
+  } else {
+    mnProfile[field] = mnProfile[field].filter(v => v !== val);
+  }
+  mnSetCheck(field, mnProfile[field].length > 0);
+  mnUpdateProgress(); mnSaveToStorage();
+}
+
+// ── Style vibe cards ─────────────────────────────────────
+function mnToggleVibe(card) {
+  card.classList.toggle('selected');
+  const vibe = card.dataset.vibe;
+  if (!mnProfile.style_vibes) mnProfile.style_vibes = [];
+  if (card.classList.contains('selected')) {
+    if (!mnProfile.style_vibes.includes(vibe)) mnProfile.style_vibes.push(vibe);
+  } else {
+    mnProfile.style_vibes = mnProfile.style_vibes.filter(v => v !== vibe);
+  }
+  mnSetCheck('vibes', mnProfile.style_vibes.length > 0);
+  mnUpdateProgress(); mnSaveToStorage();
+}
+
+// Filter vibe cards by gender
+function mnFilterVibesByGender(gender) {
+  document.querySelectorAll('.mn-vibe-card').forEach(card => {
+    const tag = card.dataset.genderTag;
+    if (!gender || gender === 'non-binary' || gender === 'prefer-not') {
+      card.style.display = '';
+    } else {
+      card.style.display = (tag === gender) ? '' : 'none';
+    }
+  });
+}
+
+// ── Price range ───────────────────────────────────────────
+function mnPriceChange() {
+  let minV = parseInt(document.getElementById('mn-price-min').value);
+  let maxV = parseInt(document.getElementById('mn-price-max').value);
+  if (minV > maxV) { const t = minV; minV = maxV; maxV = t; }
+  mnProfile.price_min = minV; mnProfile.price_max = maxV;
+  document.getElementById('mn-price-display').textContent = '\u20b9' + minV.toLocaleString('en-IN') + ' \u2013 \u20b9' + maxV.toLocaleString('en-IN');
+  // Update fill bar
+  const total = 50000 - 500;
+  const leftPct = ((minV - 500) / total) * 100;
+  const rightPct = ((maxV - 500) / total) * 100;
+  const fill = document.getElementById('mn-price-fill');
+  if (fill) { fill.style.left = leftPct + '%'; fill.style.width = (rightPct - leftPct) + '%'; }
+  mnSetCheck('price', true); mnUpdateProgress(); mnSaveToStorage();
+}
+
+function mnSetPreset(min, max, btn) {
+  document.querySelectorAll('.mn-preset-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('mn-price-min').value = min;
+  document.getElementById('mn-price-max').value = max;
+  mnPriceChange();
+}
+
+// ── Weather ───────────────────────────────────────────────
+const WEATHER_EMOJIS = { Clear:'☀️', Clouds:'☁️', Rain:'🌧️', Drizzle:'🌦️', Thunderstorm:'⛈️', Snow:'❄️', Mist:'🌫️', Haze:'🌫️', Fog:'🌫️', Smoke:'🌫️' };
+function mnShowWeather(city, temp, cond, humidity) {
+  document.getElementById('mn-weather-display').style.display = 'flex';
+  document.getElementById('mn-weather-city').textContent = city;
+  document.getElementById('mn-weather-temp').textContent = Math.round(temp) + '\u00b0C';
+  document.getElementById('mn-weather-cond').textContent = cond + (humidity ? ' \u00b7 ' + humidity + '% humidity' : '');
+  document.getElementById('mn-weather-emoji').textContent = WEATHER_EMOJIS[cond] || '🌤️';
+  mnProfile.weather = { city, temp, condition: cond, humidity };
+  mnSetCheck('weather', true); mnUpdateProgress(); mnSaveToStorage();
+}
+
+function mnFetchWeatherByCity() {
+  const city = document.getElementById('mn-city-input').value.trim();
+  if (!city) return;
+  const key = MN_WEATHER_KEY && MN_WEATHER_KEY.length > 5 ? MN_WEATHER_KEY : null;
+  if (!key) {
+    // No API key — store city manually without weather data
+    mnProfile.weather = { city, temp: null, condition: 'Manual', humidity: null };
+    document.getElementById('mn-weather-display').style.display = 'flex';
+    document.getElementById('mn-weather-city').textContent = city;
+    document.getElementById('mn-weather-temp').textContent = 'Set in Shopify';
+    document.getElementById('mn-weather-cond').textContent = 'Add OpenWeather key in theme settings';
+    document.getElementById('mn-weather-emoji').textContent = '🌍';
+    mnSetCheck('weather', true); mnUpdateProgress(); mnSaveToStorage();
+    return;
+  }
+  fetch('https://api.openweathermap.org/data/2.5/weather?q=' + encodeURIComponent(city) + '&appid=' + key + '&units=metric')
+    .then(r => r.json())
+    .then(d => {
+      if (d.cod !== 200) throw new Error(d.message);
+      mnShowWeather(d.name, d.main.temp, d.weather[0].main, d.main.humidity);
+    })
+    .catch(e => alert('Weather lookup failed: ' + e.message));
+}
+
+function mnAutoLocate() {
+  if (!navigator.geolocation) return alert('Geolocation not supported.');
+  navigator.geolocation.getCurrentPosition(pos => {
+    const key = MN_WEATHER_KEY && MN_WEATHER_KEY.length > 5 ? MN_WEATHER_KEY : null;
+    if (!key) { alert('Add your OpenWeather API key in Shopify Theme Settings to use auto-locate.'); return; }
+    fetch('https://api.openweathermap.org/data/2.5/weather?lat=' + pos.coords.latitude + '&lon=' + pos.coords.longitude + '&appid=' + key + '&units=metric')
+      .then(r => r.json())
+      .then(d => mnShowWeather(d.name, d.main.temp, d.weather[0].main, d.main.humidity))
+      .catch(e => alert('Location weather failed: ' + e.message));
+  }, () => alert('Location access denied.'));
+}
+
+// ── Bank cards ────────────────────────────────────────────
+function mnPopulateCardVariants() {
+  const bank = document.getElementById('mn-bank-select').value;
+  const sel = document.getElementById('mn-card-variant-select');
+  sel.innerHTML = '<option value="">Select Card</option>';
+  if (bank && BANK_CARDS[bank]) {
+    BANK_CARDS[bank].forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = c; sel.appendChild(o); });
+  }
+}
+
+function mnAddBankCard() {
+  const bank = document.getElementById('mn-bank-select').value;
+  const variant = document.getElementById('mn-card-variant-select').value;
+  if (!bank || !variant) return;
+  if (!mnProfile.bank_cards) mnProfile.bank_cards = [];
+  const exists = mnProfile.bank_cards.some(c => c.bank === bank && c.variant === variant);
+  if (exists) return;
+  mnProfile.bank_cards.push({ bank, variant });
+  mnRenderCardTags();
+  mnSetCheck('bank', true); mnUpdateProgress(); mnSaveToStorage();
+  document.getElementById('mn-bank-select').value = '';
+  document.getElementById('mn-card-variant-select').innerHTML = '<option value="">Select Card</option>';
+}
+
+function mnRenderCardTags() {
+  const container = document.getElementById('mn-card-tags');
+  if (!container) return;
+  container.innerHTML = '';
+  (mnProfile.bank_cards || []).forEach((c, i) => {
+    const tag = document.createElement('div');
+    tag.className = 'mn-card-tag mn-pop-in';
+    tag.innerHTML = '<span>💳 ' + c.bank + ' ' + c.variant + '</span><span class="mn-card-tag-remove" onclick="mnRemoveCard(' + i + ')">×</span>';
+    container.appendChild(tag);
+  });
+}
+
+function mnRemoveCard(i) {
+  mnProfile.bank_cards.splice(i, 1);
+  mnRenderCardTags();
+  mnSetCheck('bank', mnProfile.bank_cards.length > 0);
+  mnUpdateProgress(); mnSaveToStorage();
+}
+
+// ── Interests ─────────────────────────────────────────────
+function mnToggleInterest(btn, val) {
+  btn.classList.toggle('selected');
+  if (!mnProfile.interests) mnProfile.interests = [];
+  if (btn.classList.contains('selected')) {
+    if (!mnProfile.interests.includes(val)) mnProfile.interests.push(val);
+  } else {
+    mnProfile.interests = mnProfile.interests.filter(v => v !== val);
+  }
+  mnSetCheck('interests', mnProfile.interests.length > 0);
+  mnUpdateProgress(); mnSaveToStorage();
+}
+
+function mnAddCustomInterest() {
+  const inp = document.getElementById('mn-interest-custom');
+  const val = inp.value.trim();
+  if (!val) return;
+  if (!mnProfile.interests) mnProfile.interests = [];
+  if (mnProfile.interests.includes(val)) { inp.value = ''; return; }
+  mnProfile.interests.push(val);
+  const chip = document.createElement('button');
+  chip.className = 'mn-chip selected mn-pop-in';
+  chip.textContent = '✏️ ' + val;
+  chip.onclick = function() { chip.classList.toggle('selected'); mnProfile.interests = mnProfile.interests.filter(v => v !== val); mnSaveToStorage(); };
+  document.getElementById('mn-custom-interests').appendChild(chip);
+  inp.value = '';
+  mnSetCheck('interests', true); mnUpdateProgress(); mnSaveToStorage();
+}
+
+// ── Digital Closet ────────────────────────────────────────
+function mnHandleClosetUpload(input) {
+  const files = Array.from(input.files);
+  if (!files.length) return;
+  if (!mnProfile.closet) mnProfile.closet = [];
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const b64 = e.target.result;
+      mnProfile.closet.push({ b64, name: file.name, ts: Date.now() });
+      mnRenderCloset();
+      mnSetCheck('closet', true); mnUpdateProgress(); mnSaveToStorage();
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function mnRenderCloset() {
+  const grid = document.getElementById('mn-closet-grid');
+  const empty = document.getElementById('mn-closet-empty');
+  if (!grid) return;
+  grid.innerHTML = '';
+  if (!mnProfile.closet || !mnProfile.closet.length) {
+    if (empty) empty.style.display = 'block';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+  mnProfile.closet.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'mn-closet-thumb mn-pop-in';
+    div.innerHTML = '<img src="' + item.b64 + '" alt="Closet item ' + (i+1) + '" loading="lazy"/>';
+    grid.appendChild(div);
+  });
+}
+
+function mnGhostMode() {
+  alert('Ghost Mode: Browse styles and get recommendations without saving your data. Available in the next update!');
+}
+
+// ── AI Auto-fill from photo ───────────────────────────────
+function mnAutoFillFromPhoto(b64raw) {
+  const overlay = document.getElementById('mn-ai-overlay');
+  const msg = document.getElementById('mn-ai-msg');
+  if (overlay) overlay.classList.add('active');
+  const msgs = ['AI is reading your style DNA...','Detecting skin tone...','Analysing body proportions...','Checking hair style...','Building your hidden biometrics...','Almost done — populating fields...'];
+  let mi = 0;
+  const interval = setInterval(() => { if (msg && msgs[++mi]) msg.textContent = msgs[mi]; }, 3000);
+
+  const userId = MN_CUSTOMER_ID || 'guest_' + Math.random().toString(36).slice(2,9);
+
+  fetch(MN_API, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'extract_profile', user_id: userId, user_image: b64raw }),
+  })
+  .then(r => r.json())
+  .then(data => {
+    clearInterval(interval);
+    if (overlay) overlay.classList.remove('active');
+
+    // The extract_profile action returns biometrics + profile fields
+    // Support both direct extract_profile response and full_pipeline response shapes
+    const bio = data.biometrics || data.profile || {};
+    const hidden = data.hidden_biometrics || {};
+
+    // Map API response fields to profile
+    if (bio.monk_skin_tone || bio.skin_mst) {
+      const mst = bio.monk_skin_tone || bio.skin_mst;
+      const label = MST_LABELS[mst] || bio.mst_label || 'Medium';
+      mnProfile.skin_mst = mst;
+      mnProfile.skin_label = label;
+      mnFlash('mn-sec-skin');
+      mnSelectMST(mst, label, '#a07850');
+    }
+    if (bio.hair_style || bio.hair_length) {
+      const hair = bio.hair_style || bio.hair_length || 'Short & Neat';
+      mnProfile.hair_style = hair;
+      mnFlash('mn-sec-hair');
+      document.querySelectorAll('.mn-chip-single[data-field="hair"]').forEach(c => {
+        c.classList.toggle('selected', c.dataset.val === hair);
+      });
+      mnSetCheck('hair', true);
+    }
+    if (bio.body_type) {
+      const fitMap = { slim:'slim', athletic:'athletic', regular:'regular', relaxed:'relaxed', oversized:'oversized', average:'regular', lean:'slim', muscular:'athletic' };
+      const fit = fitMap[bio.body_type.toLowerCase()] || 'regular';
+      mnProfile.preferred_fit = fit;
+      mnFlash('mn-sec-fit');
+      document.querySelectorAll('.mn-chip-single[data-field="fit"]').forEach(c => {
+        c.classList.toggle('selected', c.dataset.val === fit);
+      });
+      mnSetCheck('fit', true);
+    }
+    if (bio.height_cm || bio.estimated_height_cm) {
+      const h = parseInt(bio.height_cm || bio.estimated_height_cm);
+      if (h >= 140 && h <= 220) {
+        mnProfile.height_cm = h;
+        const slider = document.getElementById('mn-height-slider');
+        if (slider) { slider.value = h; mnHeightChange(h); }
+        mnFlash('mn-sec-height');
       }
     }
-    
-    // Load data on page load
-    loadDashboardData();
-    
-    // Listen for storage changes
-    window.addEventListener('storage', function(e) {
-      if (e.key === STORAGE_KEY) {
-        loadDashboardData();
-      }
+    if (bio.gender_presentation) {
+      const g = bio.gender_presentation.toLowerCase().includes('female') ? 'women' : 'men';
+      mnProfile.gender = g;
+      mnFlash('mn-sec-gender');
+      document.querySelectorAll('.mn-chip-single[data-field="gender"]').forEach(c => {
+        c.classList.toggle('selected', c.dataset.val === g);
+      });
+      mnFilterVibesByGender(g);
+      mnSetCheck('gender', true);
+    }
+
+    // Store all hidden biometrics (30 fields for ML enrichment)
+    mnProfile.hidden_biometrics = Object.assign(mnProfile.hidden_biometrics || {}, hidden, {
+      face_shape: bio.face_shape || hidden.face_shape || null,
+      undertone_warm_cool: bio.undertone || hidden.undertone_warm_cool || null,
+      eye_color: bio.eye_color || null,
+      brow_thickness: hidden.brow_thickness || null,
+      jaw_width_ratio: hidden.jaw_width_ratio || null,
+      cheekbone_prominence: hidden.cheekbone_prominence || null,
+      shoulder_to_waist_ratio: bio.shoulder_to_waist_ratio || hidden.shoulder_to_waist_ratio || null,
+      waist_to_hip_ratio: bio.waist_to_hip_ratio || hidden.waist_to_hip_ratio || null,
+      leg_to_torso_ratio: hidden.leg_to_torso_ratio || null,
+      arm_length_category: hidden.arm_length_category || null,
+      neck_length: hidden.neck_length || null,
+      posture_type: bio.posture || hidden.posture_type || null,
+      hair_density: hidden.hair_density || null,
+      hair_texture: bio.hair_texture || hidden.hair_texture || null,
+      skin_clarity_score: hidden.skin_clarity_score || null,
+      wrinkle_presence: hidden.wrinkle_presence || null,
+      beard_style: bio.beard_style || hidden.beard_style || null,
+      muscle_definition: hidden.muscle_definition || null,
+      weight_category: bio.weight_category || hidden.weight_category || null,
+      style_confidence_score: hidden.style_confidence_score || null,
+      color_contrast_level: bio.color_contrast || hidden.color_contrast_level || null,
+      pattern_tolerance: hidden.pattern_tolerance || null,
+      layering_preference: hidden.layering_preference || null,
+      accessory_affinity: hidden.accessory_affinity || null,
+      footwear_preference: hidden.footwear_preference || null,
+      cultural_fusion_index: hidden.cultural_fusion_index || null,
+      formality_default: hidden.formality_default || null,
+      occasion_versatility_score: hidden.occasion_versatility_score || null,
+      trend_adoption_rate: hidden.trend_adoption_rate || null,
+      price_sensitivity_index: hidden.price_sensitivity_index || null,
+      _source: 'photo_ai', _ts: Date.now(),
     });
-    
-    // Listen for custom event from AI widget
-    window.addEventListener('mn-identity-updated', loadDashboardData);
-  })();
+
+    mnProfile.profile_photo_b64 = b64raw;
+    mnSetCheck('skin', !!mnProfile.skin_mst);
+    mnUpdateProgress();
+    mnSaveToStorage();
+
+    // Success toast
+    const toast = document.createElement('div');
+    toast.style.cssText = 'position:fixed;top:20px;right:20px;z-index:10000;background:#16a34a;color:#fff;padding:14px 20px;border-radius:12px;font-size:13px;font-weight:700;font-family:Montserrat,sans-serif;animation:mn-pop-in 0.3s ease;max-width:280px;';
+    toast.textContent = 'Profile auto-filled from your photo! Review and adjust below.';
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 4000);
+  })
+  .catch(err => {
+    clearInterval(interval);
+    if (overlay) overlay.classList.remove('active');
+    // Graceful fallback — don't block the user
+    console.warn('[MN] extract_profile failed, using full_pipeline fallback:', err);
+    // Try full_pipeline as fallback to still get biometrics
+    fetch(MN_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'full_pipeline', user_id: userId, occasion: 'date_night', vibe_id: 'caffeine_survivor', user_image: b64raw }),
+    })
+    .then(r => r.json())
+    .then(data => { if (data.success && data.biometrics) mnAutoFillBiometrics(data.biometrics); })
+    .catch(() => {});
+  });
+}
+
+// Fallback: apply biometrics from full_pipeline response
+function mnAutoFillBiometrics(bio) {
+  if (bio.monk_skin_tone) mnSelectMST(bio.monk_skin_tone, MST_LABELS[bio.monk_skin_tone] || 'Medium', '#a07850');
+  if (bio.body_type) {
+    const fitMap = { slim:'slim', athletic:'athletic', regular:'regular', average:'regular', lean:'slim', muscular:'athletic' };
+    const fit = fitMap[bio.body_type.toLowerCase()] || 'regular';
+    document.querySelectorAll('.mn-chip-single[data-field="fit"]').forEach(c => c.classList.toggle('selected', c.dataset.val === fit));
+    mnProfile.preferred_fit = fit;
+  }
+  mnUpdateProgress(); mnSaveToStorage();
+}
+
+// Flash animation on auto-filled sections
+function mnFlash(sectionId) {
+  const el = document.getElementById(sectionId);
+  if (!el) return;
+  el.classList.add('mn-ai-flash');
+  setTimeout(() => el.classList.remove('mn-ai-flash'), 1200);
+}
+
+// ── Save button ───────────────────────────────────────────
+function mnSaveProfile() {
+  mnSaveToStorage();
+  const btn = document.getElementById('mn-save-btn');
+  const label = document.getElementById('mn-save-label');
+  if (btn) { btn.classList.add('saved'); }
+  if (label) label.textContent = 'Profile Saved!';
+  setTimeout(() => {
+    if (btn) btn.classList.remove('saved');
+    if (label) label.textContent = 'Save Style Profile';
+  }, 2500);
+
+  // Sync to Shopify customer metafields via AJAX if logged in
+  if (MN_CUSTOMER_ID && MN_CUSTOMER_ID !== 'guest') {
+    fetch('/cart/update.js', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ attributes: { mn_profile_pct: mnProfile.completion_pct + '', mn_gender: mnProfile.gender || '', mn_vibe: (mnProfile.style_vibes || []).join(',') } }),
+    }).catch(() => {});
+  }
+}
+
+// ── Restore UI from saved profile ────────────────────────
+function mnRestoreUI() {
+  // Gender
+  if (mnProfile.gender) {
+    document.querySelectorAll('.mn-chip-single[data-field="gender"]').forEach(c => c.classList.toggle('selected', c.dataset.val === mnProfile.gender));
+    mnFilterVibesByGender(mnProfile.gender);
+    mnSetCheck('gender', true);
+  }
+  // Height
+  if (mnProfile.height_cm) {
+    const sl = document.getElementById('mn-height-slider');
+    if (sl) { sl.value = mnProfile.height_cm; mnHeightChange(mnProfile.height_cm); }
+  }
+  // Skin
+  if (mnProfile.skin_mst) mnSelectMST(mnProfile.skin_mst, mnProfile.skin_label || MST_LABELS[mnProfile.skin_mst], '#a07850');
+  // Fit
+  if (mnProfile.preferred_fit) {
+    document.querySelectorAll('.mn-chip-single[data-field="fit"]').forEach(c => c.classList.toggle('selected', c.dataset.val === mnProfile.preferred_fit));
+    mnSetCheck('fit', true);
+  }
+  // Occasions
+  if (mnProfile.occasions && mnProfile.occasions.length) {
+    document.querySelectorAll('.mn-chip[data-field="occasions"]').forEach(c => {
+      if (mnProfile.occasions.includes(c.dataset.val)) c.classList.add('selected');
+    });
+    mnSetCheck('occasions', true);
+  }
+  // Hair
+  if (mnProfile.hair_style) {
+    document.querySelectorAll('.mn-chip-single[data-field="hair"]').forEach(c => c.classList.toggle('selected', c.dataset.val === mnProfile.hair_style));
+    mnSetCheck('hair', true);
+  }
+  // Price
+  if (mnProfile.price_min || mnProfile.price_max) {
+    const mn = document.getElementById('mn-price-min'), mx = document.getElementById('mn-price-max');
+    if (mn) mn.value = mnProfile.price_min || 2000;
+    if (mx) mx.value = mnProfile.price_max || 8000;
+    mnPriceChange();
+  }
+  // Weather
+  if (mnProfile.weather && mnProfile.weather.city) {
+    mnShowWeather(mnProfile.weather.city, mnProfile.weather.temp || 0, mnProfile.weather.condition || 'Clear', mnProfile.weather.humidity);
+  }
+  // Vibes
+  if (mnProfile.style_vibes && mnProfile.style_vibes.length) {
+    document.querySelectorAll('.mn-vibe-card').forEach(c => {
+      if (mnProfile.style_vibes.includes(c.dataset.vibe)) c.classList.add('selected');
+    });
+    mnSetCheck('vibes', true);
+  }
+  // Bank cards
+  if (mnProfile.bank_cards && mnProfile.bank_cards.length) { mnRenderCardTags(); mnSetCheck('bank', true); }
+  // Interests
+  if (mnProfile.interests && mnProfile.interests.length) {
+    document.querySelectorAll('#mn-interest-chips .mn-chip').forEach(c => {
+      const txt = c.textContent.replace(/^[^\w]+/, '').trim();
+      if (mnProfile.interests.some(i => c.textContent.includes(i))) c.classList.add('selected');
+    });
+    mnSetCheck('interests', true);
+  }
+  // Profile photo
+  if (mnProfile.profile_photo_b64) {
+    const ph = document.getElementById('mn-avatar-photo');
+    const em = document.getElementById('mn-avatar-emoji');
+    if (ph) { ph.src = mnProfile.profile_photo_b64; ph.style.display = 'block'; }
+    if (em) em.style.display = 'none';
+    mnSetCheck('photo', true);
+  }
+  // Closet
+  mnRenderCloset();
+  mnUpdateProgress();
+}
+
+// ── Profile photo upload handler ─────────────────────────
+function mnInitPhotoUpload() {
+  const wrap = document.getElementById('mn-avatar-wrap');
+  const inp = document.getElementById('mn-profile-photo-input');
+  const aiBtn = document.getElementById('mn-ai-photo-btn');
+  if (wrap && inp) {
+    wrap.addEventListener('click', () => inp.click());
+    inp.addEventListener('change', function() {
+      if (!this.files[0]) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        const dataUrl = e.target.result;
+        const rawB64 = dataUrl.replace(/^data:image\/\w+;base64,/, '');
+        // Show avatar
+        const ph = document.getElementById('mn-avatar-photo');
+        const em = document.getElementById('mn-avatar-emoji');
+        if (ph) { ph.src = dataUrl; ph.style.display = 'block'; }
+        if (em) em.style.display = 'none';
+        mnProfile.profile_photo_b64 = rawB64;
+        mnSetCheck('photo', true); mnUpdateProgress();
+        // Trigger AI auto-fill
+        mnAutoFillFromPhoto(rawB64);
+      };
+      reader.readAsDataURL(this.files[0]);
+    });
+  }
+  if (aiBtn && inp) {
+    aiBtn.addEventListener('click', e => { e.stopPropagation(); inp.click(); });
+  }
+}
+
+// ── Init ──────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+  mnLoadProfile();
+  mnInitPhotoUpload();
+  mnPriceChange(); // Init price fill bar
+  mnUpdateProgress();
+});
 </script>
 
 {% schema %}
 {
   "name": "User Dashboard",
-  "settings": [],
-  "presets": [
+  "settings": [
     {
-      "name": "User Dashboard"
+      "type": "text",
+      "id": "weather_api_key",
+      "label": "OpenWeather API Key",
+      "info": "Get a free key at openweathermap.org/api. Required for live weather lookup."
     }
+  ],
+  "presets": [
+    { "name": "User Dashboard" }
   ]
 }
 {% endschema %}
