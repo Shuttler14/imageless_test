@@ -58,9 +58,7 @@ const MNAIStylist = (() => {
     scanVisibleItems: 0,
   };
 
-  // ── DATA: AESTHETICS (50/50 Men/Women) ────────────────────────────────
-  // 4 Men (_m) + 4 Women (_f) — 8 distinct styles as per brief
-  const AESTHETICS = [
+  
   // DATA: AESTHETICS (50/50 Men/Women)
   // 8 Men (_m) + 8 Women (_f) — 16 total styles
   const AESTHETICS = [
