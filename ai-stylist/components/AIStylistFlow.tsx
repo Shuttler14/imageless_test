@@ -858,20 +858,26 @@ export default function AIStylistFlow() {
   }
 
   // ── Step 3: Call real Vercel pipeline ─────────────────────────────────────
-  // Field names match exactly what stylist_pipeline.py expects:
-  //   action, user_id, occasion, vibe_id, user_image (base64)
+  // Exact field names required by stylist_pipeline.py do_POST():
+  //   action    → "full_pipeline"
+  //   user_id   → required string (Shopify customer ID or guest token)
+  //   occasion  → one of: date_night | office | sangeet | airport_look
+  //   vibe_id   → one of: caffeine_survivor | sarcastic_rizzler | main_character | quiet_luxury
+  //   user_image → raw base64 string (NO data URI prefix)
   async function runPipeline(base64: string) {
     setError(null);
     try {
+      // Strip data URI prefix — backend expects raw base64 only
+      const rawBase64 = base64.replace(/^data:image\/\w+;base64,/, "");
+
       const payload = {
         action: "full_pipeline",
-        // user_id: use Shopify customer id if available, else guest token
+        // Use Shopify customer id injected by theme, fall back to guest token
         user_id: (window as unknown as Record<string, unknown>).__mn_customer_id as string
           ?? `guest_${Date.now()}`,
         occasion: selections.occasion ?? "date_night",
         vibe_id: selections.vibe_id ?? "caffeine_survivor",
-        user_image: base64,          // ← backend field name (not image_base64)
-        gender: selections.gender ?? "men",
+        user_image: rawBase64,   // ← exact field name from stylist_pipeline.py
       };
 
       const resp = await fetch(PIPELINE_ENDPOINT, {
@@ -882,7 +888,7 @@ export default function AIStylistFlow() {
 
       if (!resp.ok) {
         const errData = await resp.json().catch(() => ({}));
-        throw new Error(errData.error ?? errData.detail ?? `Server error ${resp.status}`);
+        throw new Error(errData.error ?? `Server error ${resp.status}`);
       }
 
       const data: GenerationResult = await resp.json();
@@ -901,19 +907,23 @@ export default function AIStylistFlow() {
   }
 
   // ── Step 5: OOTD upload ────────────────────────────────────────────────────
+  // The backend only supports: full_pipeline | get_vibes | get_occasions | get_gamification
+  // We treat OOTD as a full_pipeline run so it also updates the style graph
   async function handleOOTDUpload(file: File) {
     const reader = new FileReader();
     reader.onload = async (e) => {
-      const b64 = (e.target?.result as string).replace(/^data:image\/\w+;base64,/, "");
+      const rawBase64 = (e.target?.result as string).replace(/^data:image\/\w+;base64,/, "");
       try {
         await fetch(PIPELINE_ENDPOINT, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            action: "upload_ootd",
+            action: "full_pipeline",
             user_id: (window as unknown as Record<string, unknown>).__mn_customer_id as string
-              ?? `guest_${Date.now()}`,
-            user_image: b64,
+              ?? `guest_ootd_${Date.now()}`,
+            occasion: selections.occasion ?? "date_night",
+            vibe_id: selections.vibe_id ?? "caffeine_survivor",
+            user_image: rawBase64,
           }),
         });
       } catch (e) {
