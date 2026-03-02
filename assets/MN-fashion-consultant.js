@@ -855,3 +855,268 @@ if (document.readyState === 'loading') {
 } else {
   initWidget();
 }
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// MY NARRATIVE â€” Chatbot â†” Dashboard Bidirectional Sync Bridge
+// Every chatbot conversation that reveals user preferences
+// is automatically stored in the Style Dashboard.
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
+(function() {
+  'use strict';
+
+  const MN_STORE_KEY  = 'mn_identity';
+  const MN_CLOSET_KEY = 'mn_digital_closet';
+
+  // â”€â”€ Read/write profile â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  function getProfile() {
+    try { return JSON.parse(localStorage.getItem(MN_STORE_KEY) || '{}'); } catch(e) { return {}; }
+  }
+  function saveProfile(p) {
+    p.chatbot_synced_at = new Date().toISOString();
+    localStorage.setItem(MN_STORE_KEY, JSON.stringify(p));
+    // Fire event so the dashboard (if open in same tab) re-renders
+    window.dispatchEvent(new CustomEvent('mn-chatbot-save', { detail: p }));
+    window.dispatchEvent(new CustomEvent('mn-identity-updated', { detail: p }));
+  }
+
+  // â”€â”€ NLP extraction â€” parse user messages for style data â”€â”€â”€â”€
+  // Called on every user message sent to the chatbot
+  function mnExtractFromMessage(message) {
+    if (!message || typeof message !== 'string') return;
+    const p   = getProfile();
+    const msg = message.toLowerCase();
+    let changed = false;
+
+    // Height extraction (e.g. "I am 5'8" or "170cm" or "172 cm")
+    const htCm  = msg.match(/(\d{3})\s*cm/);
+    const htFt  = msg.match(/(\d)\s*[''']\s*(\d{1,2})/);
+    if (htCm) {
+      const cm = parseInt(htCm[1]);
+      if (cm >= 140 && cm <= 220) { p.height_cm = cm; changed = true; }
+    } else if (htFt) {
+      const cm = Math.round((parseInt(htFt[1]) * 12 + parseInt(htFt[2])) * 2.54);
+      if (cm >= 140 && cm <= 220) { p.height_cm = cm; changed = true; }
+    }
+
+    // Gender
+    if (/\b(i am a (man|guy|male)|i'm a (man|guy|male))\b/.test(msg)) { p.gender = 'men'; changed = true; }
+    if (/\b(i am a (woman|girl|female|lady)|i'm a (woman|girl|female|lady))\b/.test(msg)) { p.gender = 'women'; changed = true; }
+
+    // Skin tone keywords â†’ MST scale
+    const skinMap = { 'very fair':1,'fair skin':1,'light skin':2,'wheatish':4,'medium skin':5,'dusky':6,'dark skin':7,'deep skin':9 };
+    Object.entries(skinMap).forEach(([kw, mst]) => {
+      if (msg.includes(kw)) { p.skin_mst = mst; p.skin_label = kw; changed = true; }
+    });
+
+    // Preferred fit
+    const fitKeywords = ['slim','regular','oversized','baggy','tailored'];
+    fitKeywords.forEach(fit => {
+      if (msg.includes('prefer ' + fit) || msg.includes('like ' + fit) || msg.includes('wear ' + fit)) {
+        p.preferred_fit = fit.charAt(0).toUpperCase() + fit.slice(1); changed = true;
+      }
+    });
+
+    // Occasions
+    const occasionMap = {
+      'office':'Office','work':'Office','gym':'Gym','workout':'Gym','college':'College',
+      'cafe':'Cafe','coffee shop':'Cafe','club':'Club','temple':'Temple/Pooja',
+      'pooja':'Temple/Pooja','travel':'Travel','airport':'Travel','mall':'Mall','date':'Date Night'
+    };
+    if (!Array.isArray(p.occasions)) p.occasions = [];
+    Object.entries(occasionMap).forEach(([kw, val]) => {
+      if (msg.includes(kw) && !p.occasions.includes(val)) { p.occasions.push(val); changed = true; }
+    });
+
+    // Budget / price range
+    const budgetMatch = msg.match(/budget\s*(is|of|around|under|below|above|over)?\s*[â‚¹rs]?\s*(\d[\d,]*)/i);
+    if (budgetMatch) {
+      const amt = parseInt(budgetMatch[2].replace(/,/g, ''));
+      if (amt > 0) {
+        p.price_max = amt;
+        p.price_min = Math.max(500, Math.round(amt * 0.3));
+        changed = true;
+      }
+    }
+
+    // Style vibes
+    const vibeMap = {
+      'old money':'old_money','quiet luxury':'old_money','streetwear':'street_style','street style':'street_style',
+      'indo western':'indo_western','fusion':'indo_western','corporate':'corporate_core','formal':'corporate_core',
+      'minimalist':'minimalist','minimal':'minimalist','y2k':'y2k_chrome','cyberpunk':'cyberpunk',
+      'casual':'casual_essentials'
+    };
+    if (!Array.isArray(p.style_vibes)) p.style_vibes = [];
+    Object.entries(vibeMap).forEach(([kw, vibe]) => {
+      if (msg.includes(kw) && !p.style_vibes.includes(vibe)) { p.style_vibes.push(vibe); changed = true; }
+    });
+
+    // Hair style
+    const hairMap = { 'short hair':'Short','medium hair':'Medium','long hair':'Long','curly':'Curly',
+      'straight hair':'Straight','fade':'Fade','buzz cut':'Buzzcut','buzzcut':'Buzzcut','hijab':'Hijab/Covered','bald':'Bald' };
+    Object.entries(hairMap).forEach(([kw, val]) => {
+      if (msg.includes(kw)) { p.hair_style = val; changed = true; }
+    });
+
+    // Interests / narratives
+    const interestMap = {
+      'gym':'Gym & Fitness','fitness':'Gym & Fitness','coffee':'Surviving on Caffeine',
+      'tech':'Technologist on Toes','cars':'Mad About Cars','dance':'Live To Dance',
+      'sarcastic':'The Sarcastic Rizzler','ceo':'The CEO Edit','travel':'Wanderlust'
+    };
+    if (!Array.isArray(p.interests)) p.interests = [];
+    Object.entries(interestMap).forEach(([kw, val]) => {
+      if (msg.includes(kw) && !p.interests.includes(val)) { p.interests.push(val); changed = true; }
+    });
+
+    if (changed) saveProfile(p);
+    return changed;
+  }
+
+  // â”€â”€ Extract from AI response messages â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // When the AI recommends something, track what the user accepted
+  function mnExtractFromAIResponse(responseText, userAccepted) {
+    if (!userAccepted || !responseText) return;
+    const p   = getProfile();
+    const txt = responseText.toLowerCase();
+    let changed = false;
+
+    // If AI recommended a vibe and user said yes/love it/great
+    const positiveReply = /\b(yes|yep|love it|great|perfect|exactly|that'?s me|sounds good|agree)\b/i.test(userAccepted);
+    if (positiveReply) {
+      const vibeMap2 = {
+        'old money':'old_money','quiet luxury':'old_money','streetwear':'street_style',
+        'minimalist':'minimalist','corporate':'corporate_core','indo-western':'indo_western',
+        'y2k':'y2k_chrome','cyberpunk':'cyberpunk','casual':'casual_essentials'
+      };
+      if (!Array.isArray(p.style_vibes)) p.style_vibes = [];
+      Object.entries(vibeMap2).forEach(([kw, vibe]) => {
+        if (txt.includes(kw) && !p.style_vibes.includes(vibe)) { p.style_vibes.push(vibe); changed = true; }
+      });
+    }
+
+    // Track closet item if AI references a product the user liked
+    const productMatch = responseText.match(/[""]([^""]+)[""]/g);
+    if (productMatch && positiveReply) {
+      try {
+        const closet = JSON.parse(localStorage.getItem(MN_CLOSET_KEY) || '[]');
+        productMatch.forEach(match => {
+          const name = match.replace(/[""]/g, '').trim();
+          if (name.length > 3 && !closet.some(c => c.name === name)) {
+            closet.push({ name, ghost: true, emoji: 'ðŸ’¬', added_at: new Date().toISOString(), source: 'chatbot' });
+            changed = true;
+          }
+        });
+        if (changed) localStorage.setItem(MN_CLOSET_KEY, JSON.stringify(closet));
+      } catch(e) {}
+    }
+
+    if (changed) saveProfile(p);
+  }
+
+  // â”€â”€ Inject profile as system context into chatbot â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // Called when chatbot is initialized or profile updates
+  function mnBuildSystemContext() {
+    const p = getProfile();
+    const parts = [];
+    if (p.gender)        parts.push('Gender: ' + p.gender);
+    if (p.height_cm)     parts.push('Height: ' + p.height_cm + 'cm');
+    if (p.skin_label)    parts.push('Skin Tone: MST-' + (p.skin_mst||'?') + ' (' + p.skin_label + ')');
+    if (p.preferred_fit) parts.push('Preferred Fit: ' + p.preferred_fit);
+    if (p.hair_style)    parts.push('Hair Style: ' + p.hair_style);
+    if (Array.isArray(p.occasions) && p.occasions.length) parts.push('Go-to Places: ' + p.occasions.join(', '));
+    if (p.price_min && p.price_max) parts.push('Budget: â‚¹' + p.price_min.toLocaleString('en-IN') + 'â€“â‚¹' + p.price_max.toLocaleString('en-IN'));
+    if (Array.isArray(p.style_vibes) && p.style_vibes.length) parts.push('Style Preferences: ' + p.style_vibes.join(', '));
+    if (Array.isArray(p.interests) && p.interests.length) parts.push('Interests: ' + p.interests.join(', '));
+    if (Array.isArray(p.bank_cards) && p.bank_cards.length) parts.push('Bank Cards: ' + p.bank_cards.map(c => c.bank + ' ' + c.variant).join(', '));
+    if (p.weather && p.weather.city) parts.push('Location: ' + p.weather.city + (p.weather.temp ? ', ' + Math.round(p.weather.temp) + 'Â°C' : ''));
+
+    // AI biometrics (if available from Magic Upload)
+    if (p.ai_metrics && Object.keys(p.ai_metrics).length) {
+      const am = p.ai_metrics;
+      if (am.ai_silhouette_volume)    parts.push('Body Silhouette: ' + am.ai_silhouette_volume);
+      if (am.ai_undertone_temp)       parts.push('Colour Undertone: ' + am.ai_undertone_temp);
+      if (am.ai_formality_baseline)   parts.push('Formality Baseline: ' + am.ai_formality_baseline);
+      if (am.ai_trend_adoption_rate)  parts.push('Trend Adoption: ' + am.ai_trend_adoption_rate);
+    }
+
+    const closet = JSON.parse(localStorage.getItem(MN_CLOSET_KEY) || '[]');
+    if (closet.length) parts.push('Closet Items: ' + closet.length + ' items including ' + closet.slice(0,3).map(i => i.name).join(', '));
+
+    return parts.length ? '\n\n[USER PROFILE]\n' + parts.join('\n') + '\n[/USER PROFILE]\n' : '';
+  }
+
+  // â”€â”€ Hook into existing chatbot send mechanism â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // Intercept the message send so we can extract profile data
+  function mnPatchChatbot() {
+    // Wait for chatbot to initialize, then patch its send function
+    let attempts = 0;
+    const patchInterval = setInterval(() => {
+      attempts++;
+      if (attempts > 30) { clearInterval(patchInterval); return; }
+
+      // Patch the send button
+      const sendBtn = document.getElementById('mn-send-btn') ||
+                      document.querySelector('[id*="send"]') ||
+                      document.querySelector('.mn-send-btn, .mnw-send-btn');
+      const inputEl = document.getElementById('mn-user-input') ||
+                      document.getElementById('mnw-user-input') ||
+                      document.querySelector('.mn-user-input, .mnw-user-input');
+
+      if (sendBtn && inputEl && !sendBtn._mnPatched) {
+        sendBtn._mnPatched = true;
+
+        // Intercept clicks
+        sendBtn.addEventListener('click', function() {
+          const userMsg = (inputEl.value || inputEl.textContent || '').trim();
+          if (userMsg) mnExtractFromMessage(userMsg);
+        }, true); // capture phase â€” fires before the chatbot's own handler
+
+        // Also intercept Enter key
+        inputEl.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            const userMsg = (this.value || this.textContent || '').trim();
+            if (userMsg) mnExtractFromMessage(userMsg);
+          }
+        }, true);
+
+        clearInterval(patchInterval);
+      }
+    }, 500);
+  }
+
+  // â”€â”€ Listen for profile updates to inject into chatbot context
+  window.addEventListener('mn-identity-updated', function(e) {
+    // Update chatbot system context variable if it exists globally
+    const ctx = mnBuildSystemContext();
+    if (typeof window.mnChatbotSystemContext !== 'undefined') {
+      window.mnChatbotSystemContext = ctx;
+    }
+    // Also store for next chatbot session init
+    try { sessionStorage.setItem('mn_chatbot_context', ctx); } catch(e) {}
+  });
+
+  // â”€â”€ Expose public API for the chatbot to call â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  window.MNDashboardSync = {
+    // Call this with user's message text before sending to AI
+    onUserMessage: function(msg) { mnExtractFromMessage(msg); },
+    // Call this with AI response + user's reply to it
+    onAIResponse:  function(aiText, userReply) { mnExtractFromAIResponse(aiText, userReply); },
+    // Call this to get system context string to prepend to AI prompt
+    getSystemContext: function() { return mnBuildSystemContext(); },
+    // Call this to push arbitrary key-values into the dashboard
+    pushData: function(data) { window.dispatchEvent(new CustomEvent('mn-chatbot-save', { detail: data })); },
+    // Get full profile
+    getProfile: function() { return getProfile(); }
+  };
+
+  // â”€â”€ Init â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  document.addEventListener('DOMContentLoaded', function() {
+    mnPatchChatbot();
+    // Fire initial context build so chatbot has profile from page load
+    window.dispatchEvent(new CustomEvent('mn-identity-updated', { detail: getProfile() }));
+  });
+
+  console.log('[MN Dashboard Sync] Chatbot â†” Dashboard bridge initialized.');
+
+})();
