@@ -361,17 +361,18 @@
       position: absolute;
       top: 10px; right: 10px;
       display: inline-flex; align-items: center; gap: 5px;
-      background: rgba(57,165,150,0.10);
-      border: 1px solid rgba(57,165,150,0.25);
-      border-radius: 8px;
-      padding: 4px 10px;
-      font-size: 10px; font-weight: 700; letter-spacing: 0.06em;
-      color: rgba(57,165,150,0.8); cursor: pointer;
+      background: rgba(57,165,150,0.14);
+      border: 1px solid rgba(57,165,150,0.4);
+      border-radius: 20px;
+      padding: 5px 12px;
+      font-size: 9px; font-weight: 900; letter-spacing: 0.08em;
+      color: #39A596; cursor: pointer;
       transition: all 0.2s; white-space: nowrap;
       font-family: 'Montserrat', sans-serif;
       text-transform: uppercase;
-      opacity: 0;
-      pointer-events: none;
+      opacity: 1;
+      pointer-events: all;
+      z-index: 5;
     }
     .stat-card:hover .mn-card-edit-btn,
     .detail-card:hover .mn-card-edit-btn { opacity: 1; pointer-events: all; }
@@ -394,43 +395,86 @@
       gap: 10px;
       margin-bottom: 16px;
     }
+    /* ── Premium Tile Options ── */
     .mn-edit-option-tile {
       display: flex; flex-direction: column; align-items: center;
-      gap: 8px; padding: 14px 10px;
-      background: rgba(255,255,255,0.04);
-      border: 1.5px solid rgba(255,255,255,0.08);
-      border-radius: 14px; cursor: pointer;
-      transition: all 0.22s; text-align: center;
-      position: relative; overflow: hidden;
+      gap: 6px; padding: 14px 10px;
+      background: rgba(255,255,255,0.03);
+      border: 1.5px solid rgba(255,255,255,0.07);
+      border-radius: 16px; cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+      text-align: center; position: relative; overflow: hidden;
+      min-height: 90px; justify-content: center;
     }
     .mn-edit-option-tile:hover {
-      border-color: rgba(57,165,150,0.5);
-      background: rgba(57,165,150,0.07);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 16px rgba(57,165,150,0.12);
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      z-index: 1;
     }
     .mn-edit-option-tile.selected {
-      border-color: #39A596;
-      background: rgba(57,165,150,0.15);
-      box-shadow: 0 0 20px rgba(57,165,150,0.2);
+      box-shadow: 0 0 0 2px #39A596, 0 8px 24px rgba(57,165,150,0.25);
     }
     .mn-edit-option-tile.selected::after {
-      content: '✓';
-      position: absolute; top: 6px; right: 8px;
+      content: '\2713';
+      position: absolute; top: 7px; right: 8px;
       width: 18px; height: 18px; border-radius: 50%;
       background: #39A596; color: #000;
-      font-size: 10px; font-weight: 900;
-      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 900; line-height: 18px;
     }
-    .mn-edit-tile-svg { width: 44px; height: 44px; flex-shrink: 0; }
+    .mn-edit-tile-emoji {
+      font-size: 26px; line-height: 1;
+      display: flex; align-items: center; justify-content: center;
+      width: 44px; height: 44px; border-radius: 12px;
+      flex-shrink: 0; transition: transform 0.2s;
+    }
+    .mn-edit-option-tile:hover .mn-edit-tile-emoji { transform: scale(1.15); }
     .mn-edit-tile-label {
-      font-size: 11px; font-weight: 700; color: #fff;
+      font-size: 11px; font-weight: 800; color: #fff;
       line-height: 1.3; letter-spacing: 0.01em;
     }
     .mn-edit-tile-sub {
-      font-size: 9px; color: rgba(255,255,255,0.42);
+      font-size: 9px; color: rgba(255,255,255,0.4);
       line-height: 1.3;
     }
+
+    /* ── Skin tone MST row ── */
+    .mn-edit-mst-row {
+      display: flex; gap: 6px; flex-wrap: wrap;
+      justify-content: center; padding: 8px 0 28px;
+    }
+    .mn-edit-mst-swatch {
+      width: 42px; height: 42px; border-radius: 50%; cursor: pointer;
+      border: 3px solid transparent; transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; position: relative;
+    }
+    .mn-edit-mst-swatch:hover { transform: scale(1.2); z-index: 1; }
+    .mn-edit-mst-swatch.selected {
+      border-color: #fff;
+      box-shadow: 0 0 0 3px #39A596, 0 0 20px rgba(57,165,150,0.6);
+      transform: scale(1.25);
+    }
+
+    /* ── Color tile grid ── */
+    .mn-edit-color-tile {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 12px;
+      background: rgba(255,255,255,0.03);
+      border: 1.5px solid rgba(255,255,255,0.07);
+      border-radius: 10px; cursor: pointer;
+      transition: all 0.18s; text-align: left;
+    }
+    .mn-edit-color-tile:hover { border-color: rgba(255,255,255,0.2); transform: translateY(-1px); }
+    .mn-edit-color-tile.selected {
+      border-color: #39A596;
+      background: rgba(57,165,150,0.1);
+      box-shadow: 0 0 0 1px #39A596;
+    }
+    .mn-edit-color-swatch {
+      width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
+      border: 2px solid rgba(255,255,255,0.18);
+    }
+    .mn-edit-color-name { font-size: 11px; font-weight: 700; color: #fff; }
     /* Color swatch tile variant */
     .mn-edit-color-tile {
       display: flex; align-items: center; gap: 10px;
@@ -871,587 +915,96 @@
 
     // ─── Glass Edit Modal ─────────────────────────────────────
     const TILE_DATA = {
-      "height": {
-            "title": "Your Height",
-            "sub": "Select your height range",
-            "multi": false,
-            "type": "tiles",
-            "options": [
-                  {
-                        "val": "150-155 cm",
-                        "label": "150-155 cm",
-                        "sub": "4'11 – 5'1",
-                        "svg": "ruler"
-                  },
-                  {
-                        "val": "155-160 cm",
-                        "label": "155-160 cm",
-                        "sub": "5'1 – 5'3",
-                        "svg": "ruler"
-                  },
-                  {
-                        "val": "160-165 cm",
-                        "label": "160-165 cm",
-                        "sub": "5'3 – 5'5",
-                        "svg": "ruler"
-                  },
-                  {
-                        "val": "165-170 cm",
-                        "label": "165-170 cm",
-                        "sub": "5'5 – 5'7",
-                        "svg": "ruler"
-                  },
-                  {
-                        "val": "170-175 cm",
-                        "label": "170-175 cm",
-                        "sub": "5'7 – 5'9",
-                        "svg": "ruler"
-                  },
-                  {
-                        "val": "175-180 cm",
-                        "label": "175-180 cm",
-                        "sub": "5'9 – 5'11",
-                        "svg": "ruler"
-                  },
-                  {
-                        "val": "180-185 cm",
-                        "label": "180-185 cm",
-                        "sub": "5'11 – 6'1",
-                        "svg": "ruler"
-                  },
-                  {
-                        "val": "185+ cm",
-                        "label": "185+ cm",
-                        "sub": "6ft 1 and above",
-                        "svg": "ruler"
-                  }
-            ]
-      },
-      "build": {
-            "title": "Body Type",
-            "sub": "How would you describe your build?",
-            "multi": false,
-            "type": "tiles",
-            "options": [
-                  {
-                        "val": "Slim",
-                        "label": "Slim",
-                        "sub": "Lean, narrow frame",
-                        "svg": "slim"
-                  },
-                  {
-                        "val": "Athletic",
-                        "label": "Athletic",
-                        "sub": "Toned, active build",
-                        "svg": "athletic"
-                  },
-                  {
-                        "val": "Average",
-                        "label": "Average",
-                        "sub": "Balanced proportions",
-                        "svg": "slim"
-                  },
-                  {
-                        "val": "Muscular",
-                        "label": "Muscular",
-                        "sub": "Broad, defined muscles",
-                        "svg": "athletic"
-                  },
-                  {
-                        "val": "Broad",
-                        "label": "Broad",
-                        "sub": "Wide shoulders / frame",
-                        "svg": "athletic"
-                  },
-                  {
-                        "val": "Plus Size",
-                        "label": "Plus Size",
-                        "sub": "Fuller, curvy frame",
-                        "svg": "slim"
-                  },
-                  {
-                        "val": "Petite",
-                        "label": "Petite",
-                        "sub": "Small & compact",
-                        "svg": "slim"
-                  },
-                  {
-                        "val": "Tall & Lean",
-                        "label": "Tall & Lean",
-                        "sub": "Height with slim build",
-                        "svg": "slim"
-                  }
-            ]
-      },
-      "skinTone": {
-            "title": "Skin Tone",
-            "sub": "Select on the Monk Scale (MST)",
-            "multi": false,
-            "type": "mst",
-            "options": [
-                  {
-                        "val": "Very Light",
-                        "label": "Very Light",
-                        "mst": 1,
-                        "hex": "#f6ede4"
-                  },
-                  {
-                        "val": "Light",
-                        "label": "Light",
-                        "mst": 2,
-                        "hex": "#f3e7db"
-                  },
-                  {
-                        "val": "Light Medium",
-                        "label": "Light Medium",
-                        "mst": 3,
-                        "hex": "#f7ead0"
-                  },
-                  {
-                        "val": "Medium Light",
-                        "label": "Medium Light",
-                        "mst": 4,
-                        "hex": "#eadaba"
-                  },
-                  {
-                        "val": "Medium",
-                        "label": "Medium",
-                        "mst": 5,
-                        "hex": "#d7bd96"
-                  },
-                  {
-                        "val": "Medium Dark",
-                        "label": "Medium Dark",
-                        "mst": 6,
-                        "hex": "#a07850"
-                  },
-                  {
-                        "val": "Dark",
-                        "label": "Dark",
-                        "mst": 7,
-                        "hex": "#825c43"
-                  },
-                  {
-                        "val": "Very Dark",
-                        "label": "Very Dark",
-                        "mst": 8,
-                        "hex": "#604134"
-                  },
-                  {
-                        "val": "Deep",
-                        "label": "Deep",
-                        "mst": 9,
-                        "hex": "#3a312a"
-                  },
-                  {
-                        "val": "Deepest",
-                        "label": "Deepest",
-                        "mst": 10,
-                        "hex": "#292420"
-                  }
-            ]
-      },
-      "climate": {
-            "title": "Your Climate",
-            "sub": "What climate do you mostly dress for?",
-            "multi": false,
-            "type": "tiles",
-            "options": [
-                  {
-                        "val": "Hot & Humid",
-                        "label": "Hot & Humid",
-                        "sub": "Tropical summer heat",
-                        "svg": "sun"
-                  },
-                  {
-                        "val": "Tropical",
-                        "label": "Tropical",
-                        "sub": "Warm all year round",
-                        "svg": "sun"
-                  },
-                  {
-                        "val": "Dry Heat",
-                        "label": "Dry Heat",
-                        "sub": "Desert-like warmth",
-                        "svg": "sun"
-                  },
-                  {
-                        "val": "Mild",
-                        "label": "Mild",
-                        "sub": "Pleasant & moderate",
-                        "svg": "neutral"
-                  },
-                  {
-                        "val": "Cool",
-                        "label": "Cool",
-                        "sub": "Light jacket weather",
-                        "svg": "cold"
-                  },
-                  {
-                        "val": "Cold",
-                        "label": "Cold",
-                        "sub": "Winters & heavy layers",
-                        "svg": "cold"
-                  },
-                  {
-                        "val": "Monsoon",
-                        "label": "Monsoon",
-                        "sub": "Rainy season dressing",
-                        "svg": "rain"
-                  },
-                  {
-                        "val": "Mixed Seasons",
-                        "label": "Mixed Seasons",
-                        "sub": "All four seasons",
-                        "svg": "neutral"
-                  }
-            ]
-      },
-      "budget": {
-            "title": "Budget Range",
-            "sub": "Your typical outfit spend",
-            "multi": false,
-            "type": "tiles",
-            "options": [
-                  {
-                        "val": "Under Rs.1,000",
-                        "label": "Under Rs.1K",
-                        "sub": "Budget-friendly picks",
-                        "svg": "wallet"
-                  },
-                  {
-                        "val": "Rs.1,000-Rs.3,000",
-                        "label": "Rs.1K – 3K",
-                        "sub": "Everyday essentials",
-                        "svg": "wallet"
-                  },
-                  {
-                        "val": "Rs.3,000-Rs.7,000",
-                        "label": "Rs.3K – 7K",
-                        "sub": "Quality mid-range",
-                        "svg": "wallet"
-                  },
-                  {
-                        "val": "Rs.7,000-Rs.15,000",
-                        "label": "Rs.7K – 15K",
-                        "sub": "Premium selections",
-                        "svg": "wallet"
-                  },
-                  {
-                        "val": "Rs.15,000-Rs.30,000",
-                        "label": "Rs.15K – 30K",
-                        "sub": "Luxury tier",
-                        "svg": "wallet"
-                  },
-                  {
-                        "val": "Rs.30,000+",
-                        "label": "Rs.30K+",
-                        "sub": "No budget limit",
-                        "svg": "wallet"
-                  }
-            ]
-      },
-      "goals": {
-            "title": "Fashion Goals",
-            "sub": "What are you trying to achieve?",
-            "multi": false,
-            "type": "tiles",
-            "options": [
-                  {
-                        "val": "Look more confident",
-                        "label": "Look Confident",
-                        "sub": "Own every room you enter",
-                        "svg": "star"
-                  },
-                  {
-                        "val": "Dress for my body",
-                        "label": "Dress My Body",
-                        "sub": "Flatter my natural shape",
-                        "svg": "slim"
-                  },
-                  {
-                        "val": "Build a capsule wardrobe",
-                        "label": "Capsule Wardrobe",
-                        "sub": "Less but better pieces",
-                        "svg": "shirt"
-                  },
-                  {
-                        "val": "Stand out in a crowd",
-                        "label": "Stand Out",
-                        "sub": "Bold & memorable looks",
-                        "svg": "star"
-                  },
-                  {
-                        "val": "Look professional",
-                        "label": "Professional",
-                        "sub": "Sharp office-ready style",
-                        "svg": "shirt"
-                  },
-                  {
-                        "val": "Be more sustainable",
-                        "label": "Go Sustainable",
-                        "sub": "Mindful fashion choices",
-                        "svg": "target"
-                  },
-                  {
-                        "val": "Express my personality",
-                        "label": "Express Myself",
-                        "sub": "Wear my story loudly",
-                        "svg": "palette"
-                  },
-                  {
-                        "val": "Dress more traditionally",
-                        "label": "Traditional Style",
-                        "sub": "Ethnic & heritage looks",
-                        "svg": "shirt"
-                  }
-            ]
-      },
-      "favoriteColors": {
-            "title": "Favourite Colors",
-            "sub": "Pick all that apply",
-            "multi": true,
-            "type": "colors",
-            "options": [
-                  {
-                        "val": "Black",
-                        "label": "Black",
-                        "hex": "#111111"
-                  },
-                  {
-                        "val": "White",
-                        "label": "White",
-                        "hex": "#F0F0F0"
-                  },
-                  {
-                        "val": "Navy",
-                        "label": "Navy",
-                        "hex": "#1E3A5F"
-                  },
-                  {
-                        "val": "Beige",
-                        "label": "Beige",
-                        "hex": "#D4B896"
-                  },
-                  {
-                        "val": "Olive",
-                        "label": "Olive",
-                        "hex": "#6B7C32"
-                  },
-                  {
-                        "val": "Grey",
-                        "label": "Grey",
-                        "hex": "#9CA3AF"
-                  },
-                  {
-                        "val": "Brown",
-                        "label": "Brown",
-                        "hex": "#92400E"
-                  },
-                  {
-                        "val": "Maroon",
-                        "label": "Maroon",
-                        "hex": "#7F1D1D"
-                  },
-                  {
-                        "val": "Teal",
-                        "label": "Teal",
-                        "hex": "#0D9488"
-                  },
-                  {
-                        "val": "Mustard",
-                        "label": "Mustard",
-                        "hex": "#D97706"
-                  },
-                  {
-                        "val": "Rust",
-                        "label": "Rust",
-                        "hex": "#C2410C"
-                  },
-                  {
-                        "val": "Coral",
-                        "label": "Coral",
-                        "hex": "#F87171"
-                  },
-                  {
-                        "val": "Blush Pink",
-                        "label": "Blush Pink",
-                        "hex": "#FBCFE8"
-                  },
-                  {
-                        "val": "Lavender",
-                        "label": "Lavender",
-                        "hex": "#C4B5FD"
-                  },
-                  {
-                        "val": "Royal Blue",
-                        "label": "Royal Blue",
-                        "hex": "#1D4ED8"
-                  },
-                  {
-                        "val": "Emerald",
-                        "label": "Emerald Green",
-                        "hex": "#059669"
-                  }
-            ]
-      },
-      "coreExpression": {
-            "title": "Style Expression",
-            "sub": "How do you like to dress?",
-            "multi": false,
-            "type": "tiles",
-            "options": [
-                  {
-                        "val": "Minimalist & Clean",
-                        "label": "Minimalist",
-                        "sub": "Neutral tones, clean lines",
-                        "svg": "shirt"
-                  },
-                  {
-                        "val": "Bold & Expressive",
-                        "label": "Bold",
-                        "sub": "Colour, prints & statement",
-                        "svg": "palette"
-                  },
-                  {
-                        "val": "Traditional & Ethnic",
-                        "label": "Ethnic",
-                        "sub": "Kurtas, sarees & fusion",
-                        "svg": "shirt"
-                  },
-                  {
-                        "val": "Smart Casual",
-                        "label": "Smart Casual",
-                        "sub": "Effortless elevated basics",
-                        "svg": "shirt"
-                  },
-                  {
-                        "val": "Streetwear",
-                        "label": "Streetwear",
-                        "sub": "Hoodies, sneakers & graphics",
-                        "svg": "athletic"
-                  },
-                  {
-                        "val": "Business Formal",
-                        "label": "Formal",
-                        "sub": "Suits, blazers & sharp cuts",
-                        "svg": "shirt"
-                  },
-                  {
-                        "val": "Boho & Free",
-                        "label": "Boho",
-                        "sub": "Flowy, earthy & free-spirited",
-                        "svg": "palette"
-                  },
-                  {
-                        "val": "Dark & Edgy",
-                        "label": "Dark & Edgy",
-                        "sub": "All-black, leather & attitude",
-                        "svg": "star"
-                  }
-            ]
-      },
-      "occasion": {
-            "title": "Go-to Occasion",
-            "sub": "Where do you dress up most?",
-            "multi": false,
-            "type": "tiles",
-            "options": [
-                  {
-                        "val": "Daily Casual",
-                        "label": "Daily Casual",
-                        "sub": "Everyday comfort wear",
-                        "svg": "shirt"
-                  },
-                  {
-                        "val": "College / Campus",
-                        "label": "College",
-                        "sub": "Campus-ready looks",
-                        "svg": "target"
-                  },
-                  {
-                        "val": "Office / Workwear",
-                        "label": "Office",
-                        "sub": "Professional dressing",
-                        "svg": "shirt"
-                  },
-                  {
-                        "val": "Festive & Weddings",
-                        "label": "Festive",
-                        "sub": "Weddings & celebrations",
-                        "svg": "star"
-                  },
-                  {
-                        "val": "Date Night",
-                        "label": "Date Night",
-                        "sub": "Evening & romantic looks",
-                        "svg": "star"
-                  },
-                  {
-                        "val": "Party / Nightout",
-                        "label": "Party",
-                        "sub": "Club & nightlife looks",
-                        "svg": "palette"
-                  },
-                  {
-                        "val": "Outdoor / Travel",
-                        "label": "Travel",
-                        "sub": "Practical adventure wear",
-                        "svg": "map"
-                  },
-                  {
-                        "val": "Sports / Gym",
-                        "label": "Gym",
-                        "sub": "Performance activewear",
-                        "svg": "athletic"
-                  }
-            ]
-      },
-      "region": {
-            "title": "Region / City",
-            "sub": "Type your city or region",
-            "multi": false,
-            "type": "input",
-            "options": []
-      },
-      "undertone": {
-            "title": "Skin Undertone",
-            "sub": "Your undertone affects which colors suit you most",
-            "multi": false,
-            "type": "tiles",
-            "options": [
-                  {
-                        "val": "Warm (yellow/golden)",
-                        "label": "Warm",
-                        "sub": "Yellow & golden hues",
-                        "svg": "warm"
-                  },
-                  {
-                        "val": "Cool (pink/bluish)",
-                        "label": "Cool",
-                        "sub": "Pink & blue-ish hues",
-                        "svg": "cool"
-                  },
-                  {
-                        "val": "Neutral (balanced)",
-                        "label": "Neutral",
-                        "sub": "Mix of warm & cool",
-                        "svg": "neutral"
-                  },
-                  {
-                        "val": "Olive (green-ish)",
-                        "label": "Olive",
-                        "sub": "Green-ish undertones",
-                        "svg": "warm"
-                  },
-                  {
-                        "val": "Not sure",
-                        "label": "Not Sure",
-                        "sub": "Let the AI decide",
-                        "svg": "target"
-                  }
-            ]
-      }
+  height: { title:"Your Height", sub:"Drag the slider", multi:false, type:"height_slider", options:[] },
+  build: { title:"Body Type", sub:"How would you describe your build?", multi:false, type:"tiles", options:[
+    {val:"Slim",       label:"Slim",        sub:"Lean & narrow frame",    emoji:"🪶", color:"#60A5FA"},
+    {val:"Athletic",   label:"Athletic",    sub:"Toned & active build",   emoji:"⚡",    color:"#10B981"},
+    {val:"Average",    label:"Average",     sub:"Balanced proportions",   emoji:"⭐",    color:"#6366F1"},
+    {val:"Muscular",   label:"Muscular",    sub:"Broad & defined",        emoji:"🔥",    color:"#EF4444"},
+    {val:"Broad",      label:"Broad",       sub:"Wide shoulder frame",    emoji:"🏔️",color:"#F97316"},
+    {val:"Plus Size",  label:"Plus Size",   sub:"Fuller curvy frame",     emoji:"🌸", color:"#EC4899"},
+    {val:"Petite",     label:"Petite",      sub:"Small & compact",        emoji:"✨",color:"#8B5CF6"},
+    {val:"Tall & Lean",label:"Tall & Lean", sub:"Height + slim build",    emoji:"🗼",   color:"#14B8A6"}
+  ]},
+  skinTone: { title:"Skin Tone", sub:"Tap your shade — Monk Scale MST 1–10", multi:false, type:"mst", options:[
+    {val:"Very Light",  label:"Very Light",  mst:1,  hex:"#f6ede4"},
+    {val:"Light",       label:"Light",       mst:2,  hex:"#f3e7db"},
+    {val:"Light Medium",label:"Light Medium",mst:3,  hex:"#f7ead0"},
+    {val:"Medium Light",label:"Medium Light",mst:4,  hex:"#eadaba"},
+    {val:"Medium",      label:"Medium",      mst:5,  hex:"#d7bd96"},
+    {val:"Medium Dark", label:"Medium Dark", mst:6,  hex:"#a07850"},
+    {val:"Dark",        label:"Dark",        mst:7,  hex:"#825c43"},
+    {val:"Very Dark",   label:"Very Dark",   mst:8,  hex:"#604134"},
+    {val:"Deep",        label:"Deep",        mst:9,  hex:"#3a312a"},
+    {val:"Deepest",     label:"Deepest",     mst:10, hex:"#292420"}
+  ]},
+  climate: { title:"Your Climate", sub:"What weather do you mostly dress for?", multi:false, type:"tiles", options:[
+    {val:"Hot & Humid",   label:"Hot & Humid",  sub:"Tropical summer heat", emoji:"🌴",      color:"#F59E0B"},
+    {val:"Tropical",      label:"Tropical",      sub:"Warm all year round",  emoji:"☀️",       color:"#F97316"},
+    {val:"Dry Heat",      label:"Dry Heat",      sub:"Desert-like warmth",   emoji:"🏜️",    color:"#EF4444"},
+    {val:"Mild",          label:"Mild",          sub:"Pleasant & moderate",  emoji:"🌤️", color:"#10B981"},
+    {val:"Cool",          label:"Cool",          sub:"Light jacket weather", emoji:"🍂",    color:"#60A5FA"},
+    {val:"Cold",          label:"Cold",          sub:"Winters & layers",     emoji:"❄️", color:"#3B82F6"},
+    {val:"Monsoon",       label:"Monsoon",       sub:"Rainy season dressing",emoji:"🌧️",      color:"#6366F1"},
+    {val:"Mixed Seasons", label:"All Seasons",   sub:"Four seasons",         emoji:"🌈",   color:"#8B5CF6"}
+  ]},
+  budget: { title:"Budget Range", sub:"Drag to set your per-outfit sweet spot", multi:false, type:"budget_slider", options:[] },
+  goals: { title:"Fashion Goals", sub:"Pick all that resonate — multi-select", multi:true, type:"tiles", options:[
+    {val:"Look more confident",      label:"Confidence",      sub:"Own every room",        emoji:"👑",     color:"#F59E0B"},
+    {val:"Dress for my body",        label:"Body Flattering", sub:"Work with my shape",    emoji:"🪪",    color:"#EC4899"},
+    {val:"Build a capsule wardrobe", label:"Capsule Kit",     sub:"Less but better",       emoji:"🧳",       color:"#6366F1"},
+    {val:"Stand out in a crowd",     label:"Stand Out",       sub:"Bold & memorable",      emoji:"🎯",    color:"#EF4444"},
+    {val:"Look professional",        label:"Professional",    sub:"Sharp at work",         emoji:"💼", color:"#1D4ED8"},
+    {val:"Be more sustainable",      label:"Sustainable",     sub:"Mindful choices",       emoji:"🌿",      color:"#10B981"},
+    {val:"Express my personality",   label:"Self Expression", sub:"Wear my story",         emoji:"🎨",   color:"#8B5CF6"},
+    {val:"Dress more traditionally", label:"Heritage Style",  sub:"Ethnic & roots",        emoji:"🪴",      color:"#F97316"}
+  ]},
+  favoriteColors: { title:"Favourite Colors", sub:"Tap all you love — multi-select", multi:true, type:"colors", options:[
+    {val:"Black",      label:"Black",         hex:"#111111"},
+    {val:"White",      label:"White",         hex:"#E5E5E5"},
+    {val:"Navy",       label:"Navy",          hex:"#1E3A5F"},
+    {val:"Beige",      label:"Beige",         hex:"#D4B896"},
+    {val:"Olive",      label:"Olive",         hex:"#6B7C32"},
+    {val:"Grey",       label:"Grey",          hex:"#9CA3AF"},
+    {val:"Brown",      label:"Brown",         hex:"#92400E"},
+    {val:"Maroon",     label:"Maroon",        hex:"#7F1D1D"},
+    {val:"Teal",       label:"Teal",          hex:"#0D9488"},
+    {val:"Mustard",    label:"Mustard",       hex:"#D97706"},
+    {val:"Rust",       label:"Rust",          hex:"#C2410C"},
+    {val:"Coral",      label:"Coral",         hex:"#F87171"},
+    {val:"Blush Pink", label:"Blush Pink",    hex:"#FBCFE8"},
+    {val:"Lavender",   label:"Lavender",      hex:"#C4B5FD"},
+    {val:"Royal Blue", label:"Royal Blue",    hex:"#1D4ED8"},
+    {val:"Emerald",    label:"Emerald Green", hex:"#059669"}
+  ]},
+  coreExpression: { title:"Style Identities", sub:"Select all that define you — multi-select", multi:true, type:"tiles", options:[
+    {val:"Minimalist & Clean",   label:"Minimalist",    sub:"Neutral, clean lines",      emoji:"🤍", color:"#D1D5DB"},
+    {val:"Bold & Expressive",    label:"Bold",          sub:"Colour & statement",        emoji:"🎭",      color:"#EF4444"},
+    {val:"Traditional & Ethnic", label:"Ethnic",        sub:"Roots & culture",           emoji:"🪷",      color:"#F59E0B"},
+    {val:"Smart Casual",         label:"Smart Casual",  sub:"Elevated everyday",         emoji:"☕",     color:"#39A596"},
+    {val:"Streetwear",           label:"Streetwear",    sub:"Hoodies & sneakers",        emoji:"🛹",      color:"#6366F1"},
+    {val:"Business Formal",      label:"Formal",        sub:"Suits & blazers",           emoji:"💼",  color:"#1E40AF"},
+    {val:"Boho & Free",          label:"Boho",          sub:"Flowy & earthy",            emoji:"🌻",  color:"#D97706"},
+    {val:"Dark & Edgy",          label:"Dark & Edgy",   sub:"Black, leather, attitude",  emoji:"🖤", color:"#374151"}
+  ]},
+  occasion: { title:"Go-to Occasions", sub:"Select all that apply — multi-select", multi:true, type:"tiles", options:[
+    {val:"Daily Casual",       label:"Daily Casual",  sub:"Comfort every day",    emoji:"🏠",      color:"#39A596"},
+    {val:"College / Campus",   label:"College",       sub:"Campus-ready",         emoji:"🎓",    color:"#6366F1"},
+    {val:"Office / Workwear",  label:"Office",        sub:"Professional",         emoji:"💼", color:"#1E3A5F"},
+    {val:"Festive & Weddings", label:"Festive",       sub:"Celebrations",         emoji:"🎉",     color:"#F59E0B"},
+    {val:"Date Night",         label:"Date Night",    sub:"Evening looks",        emoji:"🌙",      color:"#EC4899"},
+    {val:"Party / Nightout",   label:"Party",         sub:"Nightlife vibes",      emoji:"🎶",     color:"#8B5CF6"},
+    {val:"Outdoor / Travel",   label:"Travel",        sub:"Adventure wear",       emoji:"✈️",     color:"#10B981"},
+    {val:"Sports / Gym",       label:"Gym",           sub:"Performance wear",     emoji:"🏋️",       color:"#EF4444"}
+  ]},
+  region: { title:"Region / City", sub:"Where are you based? Helps with weather & local trends.", multi:false, type:"input", options:[] },
+  undertone: { title:"Skin Undertone", sub:"This determines which colours flatter you most", multi:false, type:"tiles", options:[
+    {val:"Warm (yellow/golden)", label:"Warm",     sub:"Gold, orange & reds work best",     emoji:"🌅", color:"#F59E0B"},
+    {val:"Cool (pink/bluish)",   label:"Cool",     sub:"Blues, purples & silver work best", emoji:"🌊",    color:"#60A5FA"},
+    {val:"Neutral (balanced)",   label:"Neutral",  sub:"Most colours work well for you",    emoji:"⚖️",  color:"#9CA3AF"},
+    {val:"Olive (green-ish)",    label:"Olive",    sub:"Earth tones & greens work best",    emoji:"🌿",    color:"#6B7C32"},
+    {val:"Not sure",             label:"Not Sure", sub:"Let the AI decide",                 emoji:"🤖",   color:"#39A596"}
+  ]}
 };
 
     const MN_SVGS = {
@@ -1548,6 +1101,68 @@
         });
         document.getElementById('mnEditCustomInput').style.display = 'none';
 
+
+      } else if (cfg.type === 'height_slider') {
+        grid.style.gridTemplateColumns = '1fr';
+        document.getElementById('mnEditCustomInput').style.display = 'none';
+        const curH = parseInt(p['height']) || 170;
+        const toFt = cm => { const i = Math.round(cm/2.54); return Math.floor(i/12)+"'"+i%12+'"'; };
+        grid.innerHTML = '<div style="text-align:center;margin-bottom:20px">' +
+          '<div style="font-size:52px;font-weight:900;color:#fff;letter-spacing:-0.04em" id="mnHSliderVal">' + curH + '</div>' +
+          '<div style="font-size:14px;color:#39A596;font-weight:700" id="mnHSliderFt">' + toFt(curH) + '</div>' +
+          '<div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:4px">cm</div></div>' +
+          '<input type="range" id="mnHeightSlider" min="140" max="220" value="' + curH + '" step="1" style="width:100%;-webkit-appearance:none;height:6px;border-radius:99px;background:linear-gradient(90deg,#39A596 ' + Math.round(((curH-140)/80)*100) + '%,rgba(255,255,255,0.1) 0);outline:none;cursor:pointer;margin:10px 0"/>' +
+          '<div style="display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,0.35);margin-top:6px"><span>140cm</span><span>220cm</span></div>' +
+          '<style>#mnHeightSlider::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:#39A596;cursor:pointer;box-shadow:0 0 14px rgba(57,165,150,0.6);border:2px solid rgba(255,255,255,0.2)}</style>';
+        const sl = grid.querySelector('#mnHeightSlider');
+        const vd = grid.querySelector('#mnHSliderVal');
+        const fd = grid.querySelector('#mnHSliderFt');
+        if (sl) sl.addEventListener('input', function() {
+          const v = parseInt(this.value);
+          vd.textContent = v; fd.textContent = toFt(v);
+          this.style.background = 'linear-gradient(90deg,#39A596 ' + Math.round(((v-140)/80)*100) + '%,rgba(255,255,255,0.1) 0)';
+          _selectedValues = [v + ' cm'];
+        });
+        _selectedValues = [curH + ' cm'];
+
+      } else if (cfg.type === 'budget_slider') {
+        grid.style.gridTemplateColumns = '1fr';
+        document.getElementById('mnEditCustomInput').style.display = 'none';
+        const pStr = (p['budget'] || '').replace(/[^0-9,]/g,'').split(',');
+        let minV = parseInt(pStr[0]) || 1000, maxV = parseInt(pStr[1]) || 8000;
+        const toDisp = v => v >= 1000 ? '₹' + (v/1000).toFixed(v%1000===0?0:1) + 'K' : '₹' + v;
+        const presets = [{l:'Under ₹1K',mn:500,mx:1000},{l:'₹1K–3K',mn:1000,mx:3000},{l:'₹3K–7K',mn:3000,mx:7000},{l:'₹7K–15K',mn:7000,mx:15000},{l:'₹15K–30K',mn:15000,mx:30000},{l:'₹30K+',mn:30000,mx:50000}];
+        grid.innerHTML = '<div style="text-align:center;margin-bottom:16px">' +
+          '<div style="font-size:24px;font-weight:900;color:#39A596" id="mnBudgetDisp">' + toDisp(minV) + ' – ' + toDisp(maxV) + '</div>' +
+          '<div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px">per outfit</div></div>' +
+          '<div style="position:relative;height:6px;background:rgba(255,255,255,0.1);border-radius:99px;margin:24px 0 8px">' +
+          '<div id="mnBFill" style="position:absolute;height:100%;background:linear-gradient(90deg,#39A596,#2dd4bf);border-radius:99px"></div>' +
+          '<input type="range" id="mnBMin" min="500" max="50000" value="'+minV+'" step="500" style="position:absolute;width:100%;-webkit-appearance:none;background:transparent;height:6px;pointer-events:none;top:0;margin:0"/>' +
+          '<input type="range" id="mnBMax" min="500" max="50000" value="'+maxV+'" step="500" style="position:absolute;width:100%;-webkit-appearance:none;background:transparent;height:6px;pointer-events:none;top:0;margin:0"/>' +
+          '<style>#mnBMin::-webkit-slider-thumb,#mnBMax::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#39A596;cursor:pointer;pointer-events:all;box-shadow:0 0 10px rgba(57,165,150,0.5)}</style></div>' +
+          '<div style="display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,0.35);margin-bottom:20px"><span>₹500</span><span>₹50K+</span></div>' +
+          '<div style="display:flex;flex-wrap:wrap;gap:6px">' + presets.map(pr => '<button onclick="mnBPreset('+pr.mn+','+pr.mx+')" style="font-size:11px;font-weight:700;padding:6px 12px;border-radius:99px;border:1.5px solid rgba(255,255,255,0.1);background:transparent;color:rgba(255,255,255,0.5);cursor:pointer;font-family:Montserrat,sans-serif;transition:all 0.2s" onmouseover="this.style.borderColor='#39A596';this.style.color='#39A596'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='rgba(255,255,255,0.5)'">' + pr.l + '</button>').join('') + '</div>';
+        
+        window.mnBPreset = function(mn,mx) {
+          document.getElementById('mnBMin').value = mn;
+          document.getElementById('mnBMax').value = mx;
+          mnUpdateBudget();
+        };
+        function mnUpdateBudget() {
+          let mn = parseInt(document.getElementById('mnBMin').value);
+          let mx = parseInt(document.getElementById('mnBMax').value);
+          if (mn > mx) { const t=mn; mn=mx; mx=t; }
+          document.getElementById('mnBudgetDisp').textContent = toDisp(mn) + ' – ' + toDisp(mx);
+          const total = 50000-500;
+          const lp = ((mn-500)/total)*100, rp = ((mx-500)/total)*100;
+          const fill = document.getElementById('mnBFill');
+          if (fill) { fill.style.left=lp+'%'; fill.style.width=(rp-lp)+'%'; }
+          _selectedValues = ['₹'+mn.toLocaleString('en-IN')+'–₹'+mx.toLocaleString('en-IN')];
+        }
+        grid.querySelector('#mnBMin').addEventListener('input', mnUpdateBudget);
+        grid.querySelector('#mnBMax').addEventListener('input', mnUpdateBudget);
+        mnUpdateBudget();
+
       } else if (cfg.type !== 'input') {
         // SVG vector tiles — 2-column side-by-side
         grid.style.gridTemplateColumns = '1fr 1fr';
@@ -1555,10 +1170,11 @@
           const tile = document.createElement('div');
           const sel = _isMulti ? current.includes(opt.val) : current === opt.val;
           tile.className = 'mn-edit-option-tile' + (sel ? ' selected' : '');
-          const svgHtml = MN_SVGS[opt.svg] || '';
-          tile.innerHTML = svgHtml +
-            '<div class="mn-edit-tile-label">' + opt.label + '</div>' +
-            (opt.sub ? '<div class="mn-edit-tile-sub">' + opt.sub + '</div>' : '');
+          // Distinct emoji+color tile per category
+          const clr = opt.color || '#39A596'; const emo = opt.emoji || '◆';
+          tile.style.background = 'linear-gradient(135deg,' + clr + '18,' + clr + '06)';
+          tile.style.borderColor = clr + '45';
+          tile.innerHTML = '<div class="mn-edit-tile-emoji" style="background:' + clr + '25;color:' + clr + '">' + emo + '</div><div class="mn-edit-tile-label">' + opt.label + '</div>' + (opt.sub ? '<div class="mn-edit-tile-sub">' + opt.sub + '</div>' : '');
           if (_isMulti && sel) _selectedValues.push(opt.val);
           tile.addEventListener('click', () => {
             if (_isMulti) {
@@ -1605,6 +1221,12 @@ function closeEditModal() { document.getElementById('mnEditModalOverlay').classL
         }
         if (!val && selColor) { val = selColor.querySelector('.mn-edit-color-name')?.textContent || ''; }
         if (!val && selMST)   { val = document.getElementById('mnEditCustomInput').value.trim(); }
+        // Height slider
+        if (!val && _currentProfileKey === 'height' && document.getElementById('mnHeightSlider')) {
+          val = document.getElementById('mnHeightSlider').value + ' cm';
+        }
+        // Budget slider
+        if (!val && _currentProfileKey === 'budget' && _selectedValues.length) { val = _selectedValues[0]; }
         if (!val && selChip)  { val = selChip.textContent || ''; }
         p[_currentProfileKey] = val;
         const el = document.getElementById(_currentField);
