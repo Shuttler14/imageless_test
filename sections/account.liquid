@@ -356,7 +356,105 @@
     .stat-label { color: rgba(244,244,244,0.5) !important; }
     .profile-name { color: #fff !important; }
 
-    /* ── Edit Hint ── */
+    /* ── Edit Button (top-right of every card) ── */
+    .mn-card-edit-btn {
+      position: absolute;
+      top: 10px; right: 10px;
+      display: inline-flex; align-items: center; gap: 5px;
+      background: rgba(57,165,150,0.10);
+      border: 1px solid rgba(57,165,150,0.25);
+      border-radius: 8px;
+      padding: 4px 10px;
+      font-size: 10px; font-weight: 700; letter-spacing: 0.06em;
+      color: rgba(57,165,150,0.8); cursor: pointer;
+      transition: all 0.2s; white-space: nowrap;
+      font-family: 'Montserrat', sans-serif;
+      text-transform: uppercase;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .stat-card:hover .mn-card-edit-btn,
+    .detail-card:hover .mn-card-edit-btn { opacity: 1; pointer-events: all; }
+    .mn-card-edit-btn:hover {
+      background: rgba(57,165,150,0.22);
+      border-color: #39A596;
+      color: #39A596;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 10px rgba(57,165,150,0.25);
+    }
+    .mn-card-edit-btn svg { flex-shrink: 0; }
+    /* Cards need relative positioning */
+    .stat-card  { position: relative !important; }
+    .detail-card{ position: relative !important; }
+
+    /* ── Upgraded Edit Modal ── */
+    .mn-edit-option-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .mn-edit-option-tile {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 8px; padding: 14px 10px;
+      background: rgba(255,255,255,0.04);
+      border: 1.5px solid rgba(255,255,255,0.08);
+      border-radius: 14px; cursor: pointer;
+      transition: all 0.22s; text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .mn-edit-option-tile:hover {
+      border-color: rgba(57,165,150,0.5);
+      background: rgba(57,165,150,0.07);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(57,165,150,0.12);
+    }
+    .mn-edit-option-tile.selected {
+      border-color: #39A596;
+      background: rgba(57,165,150,0.15);
+      box-shadow: 0 0 20px rgba(57,165,150,0.2);
+    }
+    .mn-edit-option-tile.selected::after {
+      content: '✓';
+      position: absolute; top: 6px; right: 8px;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #39A596; color: #000;
+      font-size: 10px; font-weight: 900;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .mn-edit-tile-svg { width: 44px; height: 44px; flex-shrink: 0; }
+    .mn-edit-tile-label {
+      font-size: 11px; font-weight: 700; color: #fff;
+      line-height: 1.3; letter-spacing: 0.01em;
+    }
+    .mn-edit-tile-sub {
+      font-size: 9px; color: rgba(255,255,255,0.42);
+      line-height: 1.3;
+    }
+    /* Color swatch tile variant */
+    .mn-edit-color-tile {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1.5px solid rgba(255,255,255,0.08);
+      border-radius: 10px; cursor: pointer;
+      transition: all 0.2s; text-align: left;
+    }
+    .mn-edit-color-tile:hover { border-color: rgba(57,165,150,0.4); }
+    .mn-edit-color-tile.selected { border-color: #39A596; background: rgba(57,165,150,0.1); }
+    .mn-edit-color-swatch { width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0; border: 2px solid rgba(255,255,255,0.15); }
+    .mn-edit-color-name { font-size: 12px; font-weight: 600; color: #fff; }
+    /* Skin tone swatch row */
+    .mn-edit-mst-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; justify-content: center; }
+    .mn-edit-mst-swatch {
+      width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
+      border: 3px solid transparent; transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .mn-edit-mst-swatch:hover { transform: scale(1.18); }
+    .mn-edit-mst-swatch.selected { border-color: #fff; box-shadow: 0 0 0 3px #39A596, 0 0 16px rgba(57,165,150,0.5); transform: scale(1.22); }
+
+    /* ── legacy edit-hint hidden (replaced by mn-card-edit-btn) ── */
     .edit-hint {
       display: inline-block;
       font-size: 9px;
@@ -772,38 +870,612 @@
     });
 
     // ─── Glass Edit Modal ─────────────────────────────────────
-    const FIELD_OPTIONS = {
-      height:       { title: 'Your Height', sub: 'Choose or type your height in cm', multi: false,
-        options: ['150 cm','155 cm','160 cm','165 cm','170 cm','175 cm','180 cm','185 cm','190 cm'] },
-      build:        { title: 'Body Type', sub: 'How would you describe your build?', multi: false,
-        options: ['Slim','Athletic','Average','Muscular','Broad','Plus Size','Petite','Tall & Lean'] },
-      skinTone:     { title: 'Skin Tone', sub: 'Select your skin tone', multi: false,
-        options: ['Fair','Light','Wheatish','Medium','Olive','Tan','Brown','Dark Brown','Deep'] },
-      climate:      { title: 'Your Climate', sub: 'What climate do you mostly dress for?', multi: false,
-        options: ['Hot & Humid','Tropical','Dry Heat','Mild','Cool','Cold','Monsoon','Mixed Seasons'] },
-      budget:       { title: 'Budget Range', sub: 'Your typical outfit spend', multi: false,
-        options: ['Under ₹1,000','₹1,000–₹3,000','₹3,000–₹7,000','₹7,000–₹15,000','₹15,000+','No budget limit'] },
-      goals:        { title: 'Fashion Goals', sub: 'What are you trying to achieve?', multi: false,
-        options: ['Look more confident','Dress for my body','Build a capsule wardrobe','Stand out in a crowd',
-                  'Look professional','Dress more traditionally','Be more sustainable','Express my personality'] },
-      favoriteColors:{ title: 'Favourite Colors', sub: 'Pick all that apply', multi: true,
-        options: ['Black','White','Navy','Beige','Olive','Grey','Brown','Maroon','Teal','Mustard',
-                  'Rust','Coral','Blush Pink','Lavender','Royal Blue','Emerald Green'] },
-      coreExpression:{ title: 'Style Expression', sub: 'How do you like to dress?', multi: false,
-        options: ['Minimalist & Clean','Bold & Expressive','Traditional & Ethnic','Smart Casual',
-                  'Streetwear','Business Formal','Boho & Free','Dark & Edgy','Preppy','Sporty'] },
-      occasion:     { title: 'Go-to Occasion', sub: 'Where do you dress up most?', multi: false,
-        options: ['Daily Casual','College / Campus','Office / Workwear','Festive & Weddings',
-                  'Date Night','Party / Nightout','Outdoor / Travel','Sports / Gym'] },
-      region:       { title: 'Region / City', sub: 'Type your city or region', multi: false, options: [] },
-      undertone:    { title: 'Skin Undertone', sub: 'Your natural undertone', multi: false,
-        options: ['Warm (yellow/golden)','Cool (pink/bluish)','Neutral (balanced)','Olive (green-ish)','Not sure'] }
+    const TILE_DATA = {
+      "height": {
+            "title": "Your Height",
+            "sub": "Select your height range",
+            "multi": false,
+            "type": "tiles",
+            "options": [
+                  {
+                        "val": "150-155 cm",
+                        "label": "150-155 cm",
+                        "sub": "4'11 – 5'1",
+                        "svg": "ruler"
+                  },
+                  {
+                        "val": "155-160 cm",
+                        "label": "155-160 cm",
+                        "sub": "5'1 – 5'3",
+                        "svg": "ruler"
+                  },
+                  {
+                        "val": "160-165 cm",
+                        "label": "160-165 cm",
+                        "sub": "5'3 – 5'5",
+                        "svg": "ruler"
+                  },
+                  {
+                        "val": "165-170 cm",
+                        "label": "165-170 cm",
+                        "sub": "5'5 – 5'7",
+                        "svg": "ruler"
+                  },
+                  {
+                        "val": "170-175 cm",
+                        "label": "170-175 cm",
+                        "sub": "5'7 – 5'9",
+                        "svg": "ruler"
+                  },
+                  {
+                        "val": "175-180 cm",
+                        "label": "175-180 cm",
+                        "sub": "5'9 – 5'11",
+                        "svg": "ruler"
+                  },
+                  {
+                        "val": "180-185 cm",
+                        "label": "180-185 cm",
+                        "sub": "5'11 – 6'1",
+                        "svg": "ruler"
+                  },
+                  {
+                        "val": "185+ cm",
+                        "label": "185+ cm",
+                        "sub": "6ft 1 and above",
+                        "svg": "ruler"
+                  }
+            ]
+      },
+      "build": {
+            "title": "Body Type",
+            "sub": "How would you describe your build?",
+            "multi": false,
+            "type": "tiles",
+            "options": [
+                  {
+                        "val": "Slim",
+                        "label": "Slim",
+                        "sub": "Lean, narrow frame",
+                        "svg": "slim"
+                  },
+                  {
+                        "val": "Athletic",
+                        "label": "Athletic",
+                        "sub": "Toned, active build",
+                        "svg": "athletic"
+                  },
+                  {
+                        "val": "Average",
+                        "label": "Average",
+                        "sub": "Balanced proportions",
+                        "svg": "slim"
+                  },
+                  {
+                        "val": "Muscular",
+                        "label": "Muscular",
+                        "sub": "Broad, defined muscles",
+                        "svg": "athletic"
+                  },
+                  {
+                        "val": "Broad",
+                        "label": "Broad",
+                        "sub": "Wide shoulders / frame",
+                        "svg": "athletic"
+                  },
+                  {
+                        "val": "Plus Size",
+                        "label": "Plus Size",
+                        "sub": "Fuller, curvy frame",
+                        "svg": "slim"
+                  },
+                  {
+                        "val": "Petite",
+                        "label": "Petite",
+                        "sub": "Small & compact",
+                        "svg": "slim"
+                  },
+                  {
+                        "val": "Tall & Lean",
+                        "label": "Tall & Lean",
+                        "sub": "Height with slim build",
+                        "svg": "slim"
+                  }
+            ]
+      },
+      "skinTone": {
+            "title": "Skin Tone",
+            "sub": "Select on the Monk Scale (MST)",
+            "multi": false,
+            "type": "mst",
+            "options": [
+                  {
+                        "val": "Very Light",
+                        "label": "Very Light",
+                        "mst": 1,
+                        "hex": "#f6ede4"
+                  },
+                  {
+                        "val": "Light",
+                        "label": "Light",
+                        "mst": 2,
+                        "hex": "#f3e7db"
+                  },
+                  {
+                        "val": "Light Medium",
+                        "label": "Light Medium",
+                        "mst": 3,
+                        "hex": "#f7ead0"
+                  },
+                  {
+                        "val": "Medium Light",
+                        "label": "Medium Light",
+                        "mst": 4,
+                        "hex": "#eadaba"
+                  },
+                  {
+                        "val": "Medium",
+                        "label": "Medium",
+                        "mst": 5,
+                        "hex": "#d7bd96"
+                  },
+                  {
+                        "val": "Medium Dark",
+                        "label": "Medium Dark",
+                        "mst": 6,
+                        "hex": "#a07850"
+                  },
+                  {
+                        "val": "Dark",
+                        "label": "Dark",
+                        "mst": 7,
+                        "hex": "#825c43"
+                  },
+                  {
+                        "val": "Very Dark",
+                        "label": "Very Dark",
+                        "mst": 8,
+                        "hex": "#604134"
+                  },
+                  {
+                        "val": "Deep",
+                        "label": "Deep",
+                        "mst": 9,
+                        "hex": "#3a312a"
+                  },
+                  {
+                        "val": "Deepest",
+                        "label": "Deepest",
+                        "mst": 10,
+                        "hex": "#292420"
+                  }
+            ]
+      },
+      "climate": {
+            "title": "Your Climate",
+            "sub": "What climate do you mostly dress for?",
+            "multi": false,
+            "type": "tiles",
+            "options": [
+                  {
+                        "val": "Hot & Humid",
+                        "label": "Hot & Humid",
+                        "sub": "Tropical summer heat",
+                        "svg": "sun"
+                  },
+                  {
+                        "val": "Tropical",
+                        "label": "Tropical",
+                        "sub": "Warm all year round",
+                        "svg": "sun"
+                  },
+                  {
+                        "val": "Dry Heat",
+                        "label": "Dry Heat",
+                        "sub": "Desert-like warmth",
+                        "svg": "sun"
+                  },
+                  {
+                        "val": "Mild",
+                        "label": "Mild",
+                        "sub": "Pleasant & moderate",
+                        "svg": "neutral"
+                  },
+                  {
+                        "val": "Cool",
+                        "label": "Cool",
+                        "sub": "Light jacket weather",
+                        "svg": "cold"
+                  },
+                  {
+                        "val": "Cold",
+                        "label": "Cold",
+                        "sub": "Winters & heavy layers",
+                        "svg": "cold"
+                  },
+                  {
+                        "val": "Monsoon",
+                        "label": "Monsoon",
+                        "sub": "Rainy season dressing",
+                        "svg": "rain"
+                  },
+                  {
+                        "val": "Mixed Seasons",
+                        "label": "Mixed Seasons",
+                        "sub": "All four seasons",
+                        "svg": "neutral"
+                  }
+            ]
+      },
+      "budget": {
+            "title": "Budget Range",
+            "sub": "Your typical outfit spend",
+            "multi": false,
+            "type": "tiles",
+            "options": [
+                  {
+                        "val": "Under Rs.1,000",
+                        "label": "Under Rs.1K",
+                        "sub": "Budget-friendly picks",
+                        "svg": "wallet"
+                  },
+                  {
+                        "val": "Rs.1,000-Rs.3,000",
+                        "label": "Rs.1K – 3K",
+                        "sub": "Everyday essentials",
+                        "svg": "wallet"
+                  },
+                  {
+                        "val": "Rs.3,000-Rs.7,000",
+                        "label": "Rs.3K – 7K",
+                        "sub": "Quality mid-range",
+                        "svg": "wallet"
+                  },
+                  {
+                        "val": "Rs.7,000-Rs.15,000",
+                        "label": "Rs.7K – 15K",
+                        "sub": "Premium selections",
+                        "svg": "wallet"
+                  },
+                  {
+                        "val": "Rs.15,000-Rs.30,000",
+                        "label": "Rs.15K – 30K",
+                        "sub": "Luxury tier",
+                        "svg": "wallet"
+                  },
+                  {
+                        "val": "Rs.30,000+",
+                        "label": "Rs.30K+",
+                        "sub": "No budget limit",
+                        "svg": "wallet"
+                  }
+            ]
+      },
+      "goals": {
+            "title": "Fashion Goals",
+            "sub": "What are you trying to achieve?",
+            "multi": false,
+            "type": "tiles",
+            "options": [
+                  {
+                        "val": "Look more confident",
+                        "label": "Look Confident",
+                        "sub": "Own every room you enter",
+                        "svg": "star"
+                  },
+                  {
+                        "val": "Dress for my body",
+                        "label": "Dress My Body",
+                        "sub": "Flatter my natural shape",
+                        "svg": "slim"
+                  },
+                  {
+                        "val": "Build a capsule wardrobe",
+                        "label": "Capsule Wardrobe",
+                        "sub": "Less but better pieces",
+                        "svg": "shirt"
+                  },
+                  {
+                        "val": "Stand out in a crowd",
+                        "label": "Stand Out",
+                        "sub": "Bold & memorable looks",
+                        "svg": "star"
+                  },
+                  {
+                        "val": "Look professional",
+                        "label": "Professional",
+                        "sub": "Sharp office-ready style",
+                        "svg": "shirt"
+                  },
+                  {
+                        "val": "Be more sustainable",
+                        "label": "Go Sustainable",
+                        "sub": "Mindful fashion choices",
+                        "svg": "target"
+                  },
+                  {
+                        "val": "Express my personality",
+                        "label": "Express Myself",
+                        "sub": "Wear my story loudly",
+                        "svg": "palette"
+                  },
+                  {
+                        "val": "Dress more traditionally",
+                        "label": "Traditional Style",
+                        "sub": "Ethnic & heritage looks",
+                        "svg": "shirt"
+                  }
+            ]
+      },
+      "favoriteColors": {
+            "title": "Favourite Colors",
+            "sub": "Pick all that apply",
+            "multi": true,
+            "type": "colors",
+            "options": [
+                  {
+                        "val": "Black",
+                        "label": "Black",
+                        "hex": "#111111"
+                  },
+                  {
+                        "val": "White",
+                        "label": "White",
+                        "hex": "#F0F0F0"
+                  },
+                  {
+                        "val": "Navy",
+                        "label": "Navy",
+                        "hex": "#1E3A5F"
+                  },
+                  {
+                        "val": "Beige",
+                        "label": "Beige",
+                        "hex": "#D4B896"
+                  },
+                  {
+                        "val": "Olive",
+                        "label": "Olive",
+                        "hex": "#6B7C32"
+                  },
+                  {
+                        "val": "Grey",
+                        "label": "Grey",
+                        "hex": "#9CA3AF"
+                  },
+                  {
+                        "val": "Brown",
+                        "label": "Brown",
+                        "hex": "#92400E"
+                  },
+                  {
+                        "val": "Maroon",
+                        "label": "Maroon",
+                        "hex": "#7F1D1D"
+                  },
+                  {
+                        "val": "Teal",
+                        "label": "Teal",
+                        "hex": "#0D9488"
+                  },
+                  {
+                        "val": "Mustard",
+                        "label": "Mustard",
+                        "hex": "#D97706"
+                  },
+                  {
+                        "val": "Rust",
+                        "label": "Rust",
+                        "hex": "#C2410C"
+                  },
+                  {
+                        "val": "Coral",
+                        "label": "Coral",
+                        "hex": "#F87171"
+                  },
+                  {
+                        "val": "Blush Pink",
+                        "label": "Blush Pink",
+                        "hex": "#FBCFE8"
+                  },
+                  {
+                        "val": "Lavender",
+                        "label": "Lavender",
+                        "hex": "#C4B5FD"
+                  },
+                  {
+                        "val": "Royal Blue",
+                        "label": "Royal Blue",
+                        "hex": "#1D4ED8"
+                  },
+                  {
+                        "val": "Emerald",
+                        "label": "Emerald Green",
+                        "hex": "#059669"
+                  }
+            ]
+      },
+      "coreExpression": {
+            "title": "Style Expression",
+            "sub": "How do you like to dress?",
+            "multi": false,
+            "type": "tiles",
+            "options": [
+                  {
+                        "val": "Minimalist & Clean",
+                        "label": "Minimalist",
+                        "sub": "Neutral tones, clean lines",
+                        "svg": "shirt"
+                  },
+                  {
+                        "val": "Bold & Expressive",
+                        "label": "Bold",
+                        "sub": "Colour, prints & statement",
+                        "svg": "palette"
+                  },
+                  {
+                        "val": "Traditional & Ethnic",
+                        "label": "Ethnic",
+                        "sub": "Kurtas, sarees & fusion",
+                        "svg": "shirt"
+                  },
+                  {
+                        "val": "Smart Casual",
+                        "label": "Smart Casual",
+                        "sub": "Effortless elevated basics",
+                        "svg": "shirt"
+                  },
+                  {
+                        "val": "Streetwear",
+                        "label": "Streetwear",
+                        "sub": "Hoodies, sneakers & graphics",
+                        "svg": "athletic"
+                  },
+                  {
+                        "val": "Business Formal",
+                        "label": "Formal",
+                        "sub": "Suits, blazers & sharp cuts",
+                        "svg": "shirt"
+                  },
+                  {
+                        "val": "Boho & Free",
+                        "label": "Boho",
+                        "sub": "Flowy, earthy & free-spirited",
+                        "svg": "palette"
+                  },
+                  {
+                        "val": "Dark & Edgy",
+                        "label": "Dark & Edgy",
+                        "sub": "All-black, leather & attitude",
+                        "svg": "star"
+                  }
+            ]
+      },
+      "occasion": {
+            "title": "Go-to Occasion",
+            "sub": "Where do you dress up most?",
+            "multi": false,
+            "type": "tiles",
+            "options": [
+                  {
+                        "val": "Daily Casual",
+                        "label": "Daily Casual",
+                        "sub": "Everyday comfort wear",
+                        "svg": "shirt"
+                  },
+                  {
+                        "val": "College / Campus",
+                        "label": "College",
+                        "sub": "Campus-ready looks",
+                        "svg": "target"
+                  },
+                  {
+                        "val": "Office / Workwear",
+                        "label": "Office",
+                        "sub": "Professional dressing",
+                        "svg": "shirt"
+                  },
+                  {
+                        "val": "Festive & Weddings",
+                        "label": "Festive",
+                        "sub": "Weddings & celebrations",
+                        "svg": "star"
+                  },
+                  {
+                        "val": "Date Night",
+                        "label": "Date Night",
+                        "sub": "Evening & romantic looks",
+                        "svg": "star"
+                  },
+                  {
+                        "val": "Party / Nightout",
+                        "label": "Party",
+                        "sub": "Club & nightlife looks",
+                        "svg": "palette"
+                  },
+                  {
+                        "val": "Outdoor / Travel",
+                        "label": "Travel",
+                        "sub": "Practical adventure wear",
+                        "svg": "map"
+                  },
+                  {
+                        "val": "Sports / Gym",
+                        "label": "Gym",
+                        "sub": "Performance activewear",
+                        "svg": "athletic"
+                  }
+            ]
+      },
+      "region": {
+            "title": "Region / City",
+            "sub": "Type your city or region",
+            "multi": false,
+            "type": "input",
+            "options": []
+      },
+      "undertone": {
+            "title": "Skin Undertone",
+            "sub": "Your undertone affects which colors suit you most",
+            "multi": false,
+            "type": "tiles",
+            "options": [
+                  {
+                        "val": "Warm (yellow/golden)",
+                        "label": "Warm",
+                        "sub": "Yellow & golden hues",
+                        "svg": "warm"
+                  },
+                  {
+                        "val": "Cool (pink/bluish)",
+                        "label": "Cool",
+                        "sub": "Pink & blue-ish hues",
+                        "svg": "cool"
+                  },
+                  {
+                        "val": "Neutral (balanced)",
+                        "label": "Neutral",
+                        "sub": "Mix of warm & cool",
+                        "svg": "neutral"
+                  },
+                  {
+                        "val": "Olive (green-ish)",
+                        "label": "Olive",
+                        "sub": "Green-ish undertones",
+                        "svg": "warm"
+                  },
+                  {
+                        "val": "Not sure",
+                        "label": "Not Sure",
+                        "sub": "Let the AI decide",
+                        "svg": "target"
+                  }
+            ]
+      }
+};
+
+    const MN_SVGS = {
+      ruler: "<svg class=\"mn-edit-tile-svg\" viewBox=\"0 0 48 48\" fill=\"none\"><rect x=\"6\" y=\"18\" width=\"36\" height=\"12\" rx=\"3\" stroke=\"#39A596\" stroke-width=\"2\" fill=\"rgba(57,165,150,0.08)\"/><line x1=\"14\" y1=\"18\" x2=\"14\" y2=\"24\" stroke=\"#39A596\" stroke-width=\"1.5\"/><line x1=\"20\" y1=\"18\" x2=\"20\" y2=\"22\" stroke=\"#39A596\" stroke-width=\"1.5\"/><line x1=\"26\" y1=\"18\" x2=\"26\" y2=\"24\" stroke=\"#39A596\" stroke-width=\"1.5\"/><line x1=\"32\" y1=\"18\" x2=\"32\" y2=\"22\" stroke=\"#39A596\" stroke-width=\"1.5\"/></svg>",
+      slim: "<svg class=\"mn-edit-tile-svg\" viewBox=\"0 0 48 48\" fill=\"none\"><ellipse cx=\"24\" cy=\"10\" rx=\"5\" ry=\"5\" stroke=\"#39A596\" stroke-width=\"2\"/><path d=\"M19 16h10l3 20H16L19 16z\" stroke=\"#39A596\" stroke-width=\"2\" fill=\"rgba(57,165,150,0.08)\"/><path d=\"M16 36l-3 8M32 36l3 8\" stroke=\"#39A596\" stroke-width=\"2\" stroke-linecap=\"round\"/></svg>",
+      athletic: "<svg class=\"mn-edit-tile-svg\" viewBox=\"0 0 48 48\" fill=\"none\"><ellipse cx=\"24\" cy=\"9\" rx=\"5\" ry=\"5\" stroke=\"#39A596\" stroke-width=\"2\"/><path d=\"M15 16h18l4 20H11L15 16z\" stroke=\"#39A596\" stroke-width=\"2\" fill=\"rgba(57,165,150,0.08)\"/><path d=\"M11 36l-3 8M37 36l3 8\" stroke=\"#39A596\" stroke-width=\"2\" stroke-linecap=\"round\"/><line x1=\"15\" y1=\"24\" x2=\"33\" y2=\"24\" stroke=\"#39A596\" stroke-width=\"1.5\" stroke-dasharray=\"2 2\"/></svg>",
+      sun: "<svg class=\"mn-edit-tile-svg\" viewBox=\"0 0 48 48\" fill=\"none\"><circle cx=\"24\" cy=\"24\" r=\"8\" stroke=\"#F59E0B\" stroke-width=\"2\" fill=\"rgba(245,158,11,0.1)\"/><line x1=\"24\" y1=\"6\" x2=\"24\" y2=\"12\" stroke=\"#F59E0B\" stroke-width=\"2\" stroke-linecap=\"round\"/><line x1=\"24\" y1=\"36\" x2=\"24\" y2=\"42\" stroke=\"#F59E0B\" stroke-width=\"2\" stroke-linecap=\"round\"/><line x1=\"6\" y1=\"24\" x2=\"12\" y2=\"24\" stroke=\"#F59E0B\" stroke-width=\"2\" stroke-linecap=\"round\"/><line x1=\"36\" y1=\"24\" x2=\"42\" y2=\"24\" stroke=\"#F59E0B\" stroke-width=\"2\" stroke-linecap=\"round\"/><line x1=\"11\" y1=\"11\" x2=\"15\" y2=\"15\" stroke=\"#F59E0B\" stroke-width=\"2\" stroke-linecap=\"round\"/><line x1=\"33\" y1=\"33\" x2=\"37\" y2=\"37\" stroke=\"#F59E0B\" stroke-width=\"2\" stroke-linecap=\"round\"/></svg>",
+      cold: "<svg class=\"mn-edit-tile-svg\" viewBox=\"0 0 48 48\" fill=\"none\"><path d=\"M24 6v36M6 24h36M11 11l26 26M37 11L11 37\" stroke=\"#60A5FA\" stroke-width=\"2\" stroke-linecap=\"round\"/><circle cx=\"24\" cy=\"24\" r=\"4\" fill=\"#60A5FA\"/></svg>",
+      rain: "<svg class=\"mn-edit-tile-svg\" viewBox=\"0 0 48 48\" fill=\"none\"><path d=\"M10 26a12 12 0 1 1 22-4H34a7 7 0 0 1 0 14H12a8 8 0 0 1-2-10z\" stroke=\"#39A596\" stroke-width=\"2\" fill=\"rgba(57,165,150,0.06)\"/><line x1=\"16\" y1=\"38\" x2=\"14\" y2=\"44\" stroke=\"#60A5FA\" stroke-width=\"2\" stroke-linecap=\"round\"/><line x1=\"24\" y1=\"38\" x2=\"22\" y2=\"44\" stroke=\"#60A5FA\" stroke-width=\"2\" stroke-linecap=\"round\"/><line x1=\"32\" y1=\"38\" x2=\"30\" y2=\"44\" stroke=\"#60A5FA\" stroke-width=\"2\" stroke-linecap=\"round\"/></svg>",
+      neutral: "<svg class=\"mn-edit-tile-svg\" viewBox=\"0 0 48 48\" fill=\"none\"><circle cx=\"24\" cy=\"24\" r=\"14\" stroke=\"#9CA3AF\" stroke-width=\"2\" fill=\"rgba(156,163,175,0.08)\"/><line x1=\"17\" y1=\"30\" x2=\"31\" y2=\"30\" stroke=\"#9CA3AF\" stroke-width=\"2\" stroke-linecap=\"round\"/><circle cx=\"18\" cy=\"21\" r=\"2\" fill=\"#9CA3AF\"/><circle cx=\"30\" cy=\"21\" r=\"2\" fill=\"#9CA3AF\"/></svg>",
+      wallet: "<svg class=\"mn-edit-tile-svg\" viewBox=\"0 0 48 48\" fill=\"none\"><rect x=\"6\" y=\"14\" width=\"36\" height=\"24\" rx=\"4\" stroke=\"#39A596\" stroke-width=\"2\" fill=\"rgba(57,165,150,0.08)\"/><path d=\"M6 22h36\" stroke=\"#39A596\" stroke-width=\"2\"/><rect x=\"30\" y=\"26\" width=\"10\" height=\"6\" rx=\"2\" stroke=\"#39A596\" stroke-width=\"1.5\" fill=\"rgba(57,165,150,0.15)\"/><circle cx=\"35\" cy=\"29\" r=\"1.5\" fill=\"#39A596\"/></svg>",
+      target: "<svg class=\"mn-edit-tile-svg\" viewBox=\"0 0 48 48\" fill=\"none\"><circle cx=\"24\" cy=\"24\" r=\"16\" stroke=\"#39A596\" stroke-width=\"2\"/><circle cx=\"24\" cy=\"24\" r=\"9\" stroke=\"#39A596\" stroke-width=\"2\"/><circle cx=\"24\" cy=\"24\" r=\"3\" fill=\"#39A596\"/></svg>",
+      palette: "<svg class=\"mn-edit-tile-svg\" viewBox=\"0 0 48 48\" fill=\"none\"><path d=\"M24 8a16 16 0 1 0 11 27\" stroke=\"#EC4899\" stroke-width=\"2\"/><circle cx=\"16\" cy=\"26\" r=\"2.5\" fill=\"#EF4444\"/><circle cx=\"20\" cy=\"18\" r=\"2.5\" fill=\"#F59E0B\"/><circle cx=\"28\" cy=\"16\" r=\"2.5\" fill=\"#10B981\"/><circle cx=\"32\" cy=\"24\" r=\"2.5\" fill=\"#3B82F6\"/><circle cx=\"35\" cy=\"34\" r=\"5\" stroke=\"#EC4899\" stroke-width=\"2\" fill=\"rgba(236,72,153,0.1)\"/></svg>",
+      star: "<svg class=\"mn-edit-tile-svg\" viewBox=\"0 0 48 48\" fill=\"none\"><path d=\"M24 6l4.5 9 10 1.5-7.25 7 1.75 10L24 29.3l-8.75 4.2 1.75-10L9.5 16.5l10-1.5z\" stroke=\"#39A596\" stroke-width=\"2\" stroke-linejoin=\"round\" fill=\"rgba(57,165,150,0.1)\"/></svg>",
+      shirt: "<svg class=\"mn-edit-tile-svg\" viewBox=\"0 0 48 48\" fill=\"none\"><path d=\"M16 8L6 16l6 2v22h24V18l6-2L32 8c0 0-2 6-8 6S16 8 16 8z\" stroke=\"#39A596\" stroke-width=\"2\" stroke-linejoin=\"round\" fill=\"rgba(57,165,150,0.08)\"/></svg>",
+      map: "<svg class=\"mn-edit-tile-svg\" viewBox=\"0 0 48 48\" fill=\"none\"><path d=\"M24 6C17 6 12 12 12 18c0 9 12 24 12 24S36 27 36 18c0-6-5-12-12-12z\" stroke=\"#39A596\" stroke-width=\"2\" fill=\"rgba(57,165,150,0.08)\"/><circle cx=\"24\" cy=\"18\" r=\"4\" stroke=\"#39A596\" stroke-width=\"2\" fill=\"rgba(57,165,150,0.2)\"/></svg>",
+      warm: "<svg class=\"mn-edit-tile-svg\" viewBox=\"0 0 48 48\" fill=\"none\"><circle cx=\"24\" cy=\"24\" r=\"14\" stroke=\"#F59E0B\" stroke-width=\"2\" fill=\"rgba(245,158,11,0.08)\"/><circle cx=\"19\" cy=\"21\" r=\"2\" fill=\"#F59E0B\"/><circle cx=\"29\" cy=\"21\" r=\"2\" fill=\"#F59E0B\"/><path d=\"M18 30c2 3 10 3 12 0\" stroke=\"#F59E0B\" stroke-width=\"2\" stroke-linecap=\"round\"/></svg>",
+      cool: "<svg class=\"mn-edit-tile-svg\" viewBox=\"0 0 48 48\" fill=\"none\"><circle cx=\"24\" cy=\"24\" r=\"14\" stroke=\"#60A5FA\" stroke-width=\"2\" fill=\"rgba(96,165,250,0.08)\"/><circle cx=\"19\" cy=\"21\" r=\"2\" fill=\"#60A5FA\"/><circle cx=\"29\" cy=\"21\" r=\"2\" fill=\"#60A5FA\"/><path d=\"M18 32c2-3 10-3 12 0\" stroke=\"#60A5FA\" stroke-width=\"2\" stroke-linecap=\"round\"/></svg>"
     };
 
     let _currentField = null, _currentProfileKey = null, _isMulti = false, _selectedValues = [];
 
     function openEditModal(profileKey, displayElId) {
-      const cfg = FIELD_OPTIONS[profileKey];
+      const cfg = TILE_DATA[profileKey];
       if (!cfg) return;
       _currentField = displayElId; _currentProfileKey = profileKey;
       _isMulti = cfg.multi; _selectedValues = [];
@@ -815,38 +1487,96 @@
       document.getElementById('mnEditModalTitle').textContent = cfg.title;
       document.getElementById('mnEditModalSub').textContent   = cfg.sub;
       document.getElementById('mnEditCustomInput').value = _isMulti ? '' : (current || '');
-      document.getElementById('mnEditCustomInput').placeholder = _isMulti ? 'Or type a custom colour…' : 'Or type a custom value…';
+      document.getElementById('mnEditCustomInput').placeholder = cfg.type === 'input' ? 'Type your city or region...' : 'Or type a custom value...';
+      document.getElementById('mnEditCustomInput').style.display = (cfg.type === 'input' || cfg.options.length === 0) ? '' : 'none';
 
-      // Build chip grid
       const grid = document.getElementById('mnEditChipGrid');
       grid.innerHTML = '';
       _selectedValues = _isMulti ? [...current] : [];
-      cfg.options.forEach(opt => {
-        const chip = document.createElement('button');
-        chip.className = 'mn-edit-chip' + (cfg.options.length === 1 ? ' mn-edit-chip-single' : '');
-        chip.textContent = opt;
-        const isSelected = _isMulti ? current.includes(opt) : (current === opt);
-        if (isSelected) { chip.classList.add('selected'); if (_isMulti && !_selectedValues.includes(opt)) _selectedValues.push(opt); }
-        chip.addEventListener('click', () => {
-          if (_isMulti) {
-            chip.classList.toggle('selected');
-            if (chip.classList.contains('selected')) { if (!_selectedValues.includes(opt)) _selectedValues.push(opt); }
-            else { _selectedValues = _selectedValues.filter(v => v !== opt); }
-          } else {
-            grid.querySelectorAll('.mn-edit-chip').forEach(c => c.classList.remove('selected'));
-            chip.classList.add('selected');
-            document.getElementById('mnEditCustomInput').value = opt;
-          }
-        });
-        grid.appendChild(chip);
-      });
 
-      // Hide custom input for fields with no options OR keep for all
-      document.getElementById('mnEditCustomInput').style.display = cfg.options.length > 0 ? '' : '';
+      if (cfg.type === 'mst') {
+        // Skin tone: large swatch circles + MST number
+        grid.style.gridTemplateColumns = '1fr';
+        const row = document.createElement('div');
+        row.className = 'mn-edit-mst-row';
+        cfg.options.forEach(opt => {
+          const sw = document.createElement('div');
+          sw.className = 'mn-edit-mst-swatch' + (current === opt.val ? ' selected' : '');
+          sw.style.cssText = 'background:' + opt.hex + ';position:relative';
+          sw.title = 'MST ' + opt.mst + ' — ' + opt.label;
+          const num = document.createElement('span');
+          num.style.cssText = 'position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-size:8px;color:rgba(255,255,255,0.45);white-space:nowrap;font-weight:700';
+          num.textContent = opt.mst;
+          sw.appendChild(num);
+          sw.addEventListener('click', () => {
+            row.querySelectorAll('.mn-edit-mst-swatch').forEach(s => s.classList.remove('selected'));
+            sw.classList.add('selected');
+            document.getElementById('mnEditCustomInput').style.display = '';
+            document.getElementById('mnEditCustomInput').value = opt.val;
+          });
+          row.appendChild(sw);
+        });
+        grid.appendChild(row);
+        const swatchLabel = document.createElement('div');
+        swatchLabel.style.cssText = 'font-size:11px;color:rgba(255,255,255,0.4);text-align:center;margin-top:26px;margin-bottom:4px';
+        swatchLabel.textContent = 'Tap your skin tone above';
+        grid.appendChild(swatchLabel);
+        grid.style.gridTemplateColumns = '';
+        document.getElementById('mnEditCustomInput').style.display = 'none';
+
+      } else if (cfg.type === 'colors') {
+        // Colors: 2-column color swatch + name tiles
+        grid.style.gridTemplateColumns = '1fr 1fr';
+        cfg.options.forEach(opt => {
+          const tile = document.createElement('div');
+          const sel = _isMulti ? current.includes(opt.val) : current === opt.val;
+          tile.className = 'mn-edit-color-tile' + (sel ? ' selected' : '');
+          tile.innerHTML = '<div class="mn-edit-color-swatch" style="background:' + opt.hex + '"></div><span class="mn-edit-color-name">' + opt.label + '</span>';
+          if (_isMulti && sel) _selectedValues.push(opt.val);
+          tile.addEventListener('click', () => {
+            if (_isMulti) {
+              tile.classList.toggle('selected');
+              if (tile.classList.contains('selected')) { if (!_selectedValues.includes(opt.val)) _selectedValues.push(opt.val); }
+              else { _selectedValues = _selectedValues.filter(v => v !== opt.val); }
+            } else {
+              grid.querySelectorAll('.mn-edit-color-tile').forEach(t => t.classList.remove('selected'));
+              tile.classList.add('selected');
+              document.getElementById('mnEditCustomInput').value = opt.val;
+            }
+          });
+          grid.appendChild(tile);
+        });
+        document.getElementById('mnEditCustomInput').style.display = 'none';
+
+      } else if (cfg.type !== 'input') {
+        // SVG vector tiles — 2-column side-by-side
+        grid.style.gridTemplateColumns = '1fr 1fr';
+        cfg.options.forEach(opt => {
+          const tile = document.createElement('div');
+          const sel = _isMulti ? current.includes(opt.val) : current === opt.val;
+          tile.className = 'mn-edit-option-tile' + (sel ? ' selected' : '');
+          const svgHtml = MN_SVGS[opt.svg] || '';
+          tile.innerHTML = svgHtml +
+            '<div class="mn-edit-tile-label">' + opt.label + '</div>' +
+            (opt.sub ? '<div class="mn-edit-tile-sub">' + opt.sub + '</div>' : '');
+          if (_isMulti && sel) _selectedValues.push(opt.val);
+          tile.addEventListener('click', () => {
+            if (_isMulti) {
+              tile.classList.toggle('selected');
+              if (tile.classList.contains('selected')) { if (!_selectedValues.includes(opt.val)) _selectedValues.push(opt.val); }
+              else { _selectedValues = _selectedValues.filter(v => v !== opt.val); }
+            } else {
+              grid.querySelectorAll('.mn-edit-option-tile').forEach(t => t.classList.remove('selected'));
+              tile.classList.add('selected');
+            }
+          });
+          grid.appendChild(tile);
+        });
+      }
       document.getElementById('mnEditModalOverlay').classList.add('active');
     }
 
-    function closeEditModal() { document.getElementById('mnEditModalOverlay').classList.remove('active'); }
+function closeEditModal() { document.getElementById('mnEditModalOverlay').classList.remove('active'); }
 
     document.getElementById('mnEditCancelBtn').addEventListener('click', closeEditModal);
     document.getElementById('mnEditModalOverlay').addEventListener('click', function(e) { if (e.target === this) closeEditModal(); });
@@ -860,7 +1590,22 @@
         const el = document.getElementById(_currentField);
         if (el) el.textContent = _selectedValues.join(', ') || '-';
       } else {
-        const val = customVal || document.querySelector('#mnEditChipGrid .mn-edit-chip.selected')?.textContent || '';
+        // Get value from: custom input, or selected tile, or selected color tile, or selected mst swatch
+        const selTile  = document.querySelector('#mnEditChipGrid .mn-edit-option-tile.selected');
+        const selColor = document.querySelector('#mnEditChipGrid .mn-edit-color-tile.selected');
+        const selMST   = document.querySelector('#mnEditChipGrid .mn-edit-mst-swatch.selected');
+        const selChip  = document.querySelector('#mnEditChipGrid .mn-edit-chip.selected');
+        // For tiles, find the val from TILE_DATA by matching label
+        let val = customVal;
+        if (!val && selTile) {
+          const label = selTile.querySelector('.mn-edit-tile-label')?.textContent || '';
+          const cfg = TILE_DATA[_currentProfileKey];
+          const found = cfg && cfg.options.find(o => o.label === label);
+          val = found ? found.val : label;
+        }
+        if (!val && selColor) { val = selColor.querySelector('.mn-edit-color-name')?.textContent || ''; }
+        if (!val && selMST)   { val = document.getElementById('mnEditCustomInput').value.trim(); }
+        if (!val && selChip)  { val = selChip.textContent || ''; }
         p[_currentProfileKey] = val;
         const el = document.getElementById(_currentField);
         if (el) el.textContent = val || '-';
@@ -2007,38 +2752,58 @@
       <!-- Quick Stats -->
       <div class="quick-stats-grid">
         <div class="stat-card clickable">
-          <div class="stat-icon">📏</div>
-          <div class="stat-label">Height <span class="edit-hint">✏ edit</span></div>
+          <button class="mn-card-edit-btn" onclick="event.stopPropagation();openEditModal('height','statHeight')">
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M11.5 1.5l3 3L5 14H2v-3L11.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            Edit
+          </button>
+          <div class="stat-icon">&#x1F4CF;</div>
+          <div class="stat-label">Height</div>
           <div class="stat-value" id="statHeight">-</div>
         </div>
         <div class="stat-card clickable">
-          <div class="stat-icon">💪</div>
-          <div class="stat-label">Body Type <span class="edit-hint">✏ edit</span></div>
+          <button class="mn-card-edit-btn" onclick="event.stopPropagation();openEditModal('build','statBodyType')">
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M11.5 1.5l3 3L5 14H2v-3L11.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            Edit
+          </button>
+          <div class="stat-icon">&#x1F4AA;</div>
+          <div class="stat-label">Body Type</div>
           <div class="stat-value" id="statBodyType">-</div>
         </div>
         <div class="stat-card clickable">
-          <div class="stat-icon">🎨</div>
-          <div class="stat-label">Skin Tone <span class="edit-hint">✏ edit</span></div>
+          <button class="mn-card-edit-btn" onclick="event.stopPropagation();openEditModal('skinTone','statSkinTone')">
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M11.5 1.5l3 3L5 14H2v-3L11.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            Edit
+          </button>
+          <div class="stat-icon">&#x1F3A8;</div>
+          <div class="stat-label">Skin Tone</div>
           <div class="stat-value" id="statSkinTone">-</div>
         </div>
         <div class="stat-card clickable">
-          <div class="stat-icon">🌡️</div>
-          <div class="stat-label">Climate <span class="edit-hint">✏ edit</span></div>
+          <button class="mn-card-edit-btn" onclick="event.stopPropagation();openEditModal('climate','statTemperature')">
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M11.5 1.5l3 3L5 14H2v-3L11.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            Edit
+          </button>
+          <div class="stat-icon">&#x1F321;&#xFE0F;</div>
+          <div class="stat-label">Climate</div>
           <div class="stat-value" id="statTemperature">-</div>
         </div>
         <div class="stat-card clickable">
-          <div class="stat-icon">💰</div>
-          <div class="stat-label">Budget Range <span class="edit-hint">✏ edit</span></div>
+          <button class="mn-card-edit-btn" onclick="event.stopPropagation();openEditModal('budget','statPriceRange')">
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M11.5 1.5l3 3L5 14H2v-3L11.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            Edit
+          </button>
+          <div class="stat-icon">&#x1F4B0;</div>
+          <div class="stat-label">Budget Range</div>
           <div class="stat-value" id="statPriceRange">-</div>
         </div>
         <div class="stat-card" style="cursor:pointer;" title="Click to view your closet">
-          <div class="stat-icon">👗</div>
-          <div class="stat-label">Digital Closet <span class="edit-hint">👁 view</span></div>
+          <div class="stat-icon">&#x1F455;</div>
+          <div class="stat-label">Digital Closet</div>
           <div class="stat-value" id="statClosetItems" style="color:#39A596;">0 items</div>
         </div>
         <div class="stat-card" style="cursor:pointer;" title="Click to view past looks">
-          <div class="stat-icon">✨</div>
-          <div class="stat-label">Outfits Saved <span class="edit-hint">👁 view</span></div>
+          <div class="stat-icon">&#x2728;</div>
+          <div class="stat-label">Outfits Saved</div>
           <div class="stat-value" id="statOutfitsSaved" style="color:#a78bfa;">0 looks</div>
         </div>
       </div>
@@ -2046,35 +2811,59 @@
       <!-- Detailed Profile Information -->
       <div class="profile-details-grid">
         <div class="detail-card">
-          <div class="detail-label"><span class="detail-icon">🎯</span><span>Fashion Goals</span><span class="edit-hint">✏ edit</span></div>
+          <button class="mn-card-edit-btn" onclick="openEditModal('goals','detailGoals')">
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M11.5 1.5l3 3L5 14H2v-3L11.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            Edit
+          </button>
+          <div class="detail-label"><span class="detail-icon">&#x1F3AF;</span><span>Fashion Goals</span></div>
           <div class="detail-value" id="detailGoals">-</div>
         </div>
         <div class="detail-card">
-          <div class="detail-label"><span class="detail-icon">🎨</span><span>Favorite Colors</span><span class="edit-hint">✏ multi-select</span></div>
+          <button class="mn-card-edit-btn" onclick="openEditModal('favoriteColors','detailColors')">
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M11.5 1.5l3 3L5 14H2v-3L11.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            Edit
+          </button>
+          <div class="detail-label"><span class="detail-icon">&#x1F308;</span><span>Favorite Colors</span></div>
           <div class="detail-value" id="detailColors">-</div>
         </div>
         <div class="detail-card">
-          <div class="detail-label"><span class="detail-icon">🧠</span><span>Style Expression</span><span class="edit-hint">✏ edit</span></div>
+          <button class="mn-card-edit-btn" onclick="openEditModal('coreExpression','detailStyle')">
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M11.5 1.5l3 3L5 14H2v-3L11.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            Edit
+          </button>
+          <div class="detail-label"><span class="detail-icon">&#x2728;</span><span>Style Expression</span></div>
           <div class="detail-value" id="detailStyle">-</div>
         </div>
         <div class="detail-card">
-          <div class="detail-label"><span class="detail-icon">📅</span><span>Go-to Occasion</span><span class="edit-hint">✏ edit</span></div>
+          <button class="mn-card-edit-btn" onclick="openEditModal('occasion','detailOccasion')">
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M11.5 1.5l3 3L5 14H2v-3L11.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            Edit
+          </button>
+          <div class="detail-label"><span class="detail-icon">&#x1F4CD;</span><span>Go-to Occasion</span></div>
           <div class="detail-value" id="detailOccasion">-</div>
         </div>
         <div class="detail-card">
-          <div class="detail-label"><span class="detail-icon">🌍</span><span>Region / City</span><span class="edit-hint">✏ edit</span></div>
+          <button class="mn-card-edit-btn" onclick="openEditModal('region','detailRegion')">
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M11.5 1.5l3 3L5 14H2v-3L11.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            Edit
+          </button>
+          <div class="detail-label"><span class="detail-icon">&#x1F5FA;&#xFE0F;</span><span>Region / City</span></div>
           <div class="detail-value" id="detailRegion">-</div>
         </div>
         <div class="detail-card">
-          <div class="detail-label"><span class="detail-icon">🎭</span><span>Skin Undertone</span><span class="edit-hint">✏ edit</span></div>
+          <button class="mn-card-edit-btn" onclick="openEditModal('undertone','detailUndertone')">
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M11.5 1.5l3 3L5 14H2v-3L11.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            Edit
+          </button>
+          <div class="detail-label"><span class="detail-icon">&#x1F9E5;</span><span>Skin Undertone</span></div>
           <div class="detail-value" id="detailUndertone">-</div>
         </div>
         <div class="detail-card" style="grid-column: 1 / -1;">
-          <div class="detail-label"><span class="detail-icon">👔</span><span>Closet Breakdown</span></div>
+          <div class="detail-label"><span class="detail-icon">&#x1F454;</span><span>Closet Breakdown</span></div>
           <div class="detail-value" id="detailClosetBreakdown" style="font-size:12px; color:#aaa;">Upload clothing photos to see your closet breakdown</div>
         </div>
         <div class="detail-card" style="grid-column: 1 / -1;">
-          <div class="detail-label"><span class="detail-icon">✨</span><span>Most Recent AI Outfit</span></div>
+          <div class="detail-label"><span class="detail-icon">&#x1F457;</span><span>Most Recent AI Outfit</span></div>
           <div class="detail-value" id="detailLastOutfit" style="font-size:12px; font-style:italic; color:#aaa;">No outfits generated yet</div>
         </div>
       </div>
