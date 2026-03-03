@@ -1,4 +1,4 @@
-﻿<style>
+<style>
   /* Define the color once here */
 
   :root {
@@ -325,7 +325,7 @@
     
     #selfieUploadInput { display: none; }
 
-    /* â”€â”€ Black Glass UI (matches AI stylist exactly) â”€â”€ */
+    /* ── Black Glass UI (matches AI stylist exactly) ── */
     .user-profile-section {
       background: linear-gradient(135deg, rgba(5,5,5,0.98) 0%, rgba(15,15,15,0.95) 100%) !important;
       border: 1px solid rgba(57,165,150,0.3) !important;
@@ -356,7 +356,7 @@
     .stat-label { color: rgba(244,244,244,0.5) !important; }
     .profile-name { color: #fff !important; }
 
-    /* â”€â”€ Edit Hint â”€â”€ */
+    /* ── Edit Hint ── */
     .edit-hint {
       display: inline-block;
       font-size: 9px;
@@ -369,7 +369,7 @@
     }
     .stat-card:hover .edit-hint, .detail-card:hover .edit-hint { color: #39A596; }
 
-    /* â”€â”€ Glass Edit Modal â”€â”€ */
+    /* ── Glass Edit Modal ── */
     .mn-edit-modal-overlay {
       display: none;
       position: fixed;
@@ -474,7 +474,7 @@
     }
     .mn-edit-cancel-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
 
-    /* â”€â”€ Closet Panel (inline, below profile) â”€â”€ */
+    /* ── Closet Panel (inline, below profile) ── */
     .mn-dashboard-panel {
       display: none;
       margin-top: 20px;
@@ -567,32 +567,32 @@
       <div class="mn-edit-modal-title" id="mnEditModalTitle">Edit</div>
       <div class="mn-edit-modal-sub" id="mnEditModalSub">Choose an option or type a custom value</div>
       <div class="mn-edit-chip-grid" id="mnEditChipGrid"></div>
-      <input class="mn-edit-custom-input" id="mnEditCustomInput" type="text" placeholder="Or type a custom valueâ€¦">
+      <input class="mn-edit-custom-input" id="mnEditCustomInput" type="text" placeholder="Or type a custom value…">
       <div class="mn-edit-modal-actions">
         <button class="mn-edit-cancel-btn" id="mnEditCancelBtn">Cancel</button>
-        <button class="mn-edit-save-btn" id="mnEditSaveBtn">Save âœ“</button>
+        <button class="mn-edit-save-btn" id="mnEditSaveBtn">Save ✓</button>
       </div>
     </div>
   </div>
 
   <script>
-    // â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ─── Helpers ──────────────────────────────────────────────
     function getProfile()  { try { return JSON.parse(localStorage.getItem('mn_core_identity') || '{}'); } catch(e) { return {}; } }
     function saveProfile(p){ localStorage.setItem('mn_core_identity', JSON.stringify(p)); window.dispatchEvent(new CustomEvent('mn-identity-updated')); }
     function getCloset()   { try { return JSON.parse(localStorage.getItem('mn_digital_closet') || '[]'); } catch(e) { return []; } }
     function getHistory()  { try { return JSON.parse(localStorage.getItem('mn_outfit_history') || '[]'); } catch(e) { return []; } }
 
-    // â”€â”€â”€ Emoji Map (same as AI stylist) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ─── Emoji Map (same as AI stylist) ───────────────────────
     const GARMENT_EMOJI_MAP = {
-      'T-Shirt':'ðŸ‘•','Tshirt':'ðŸ‘•','Tee':'ðŸ‘•','Shirt':'ðŸ‘”','Formal Shirt':'ðŸ‘”','Kurta':'ðŸ‘˜','Kurti':'ðŸ‘˜',
-      'Dress':'ðŸ‘—','Saree':'ðŸ¥»','Lehenga':'ðŸ‘—','Salwar':'ðŸ‘˜','Dupatta':'ðŸ§£','Top':'ðŸ‘š','Blouse':'ðŸ‘š',
-      'Jeans':'ðŸ‘–','Trousers':'ðŸ‘–','Chinos':'ðŸ‘–','Pants':'ðŸ‘–','Shorts':'ðŸ©³','Skirt':'ðŸ‘—','Leggings':'ðŸ©±',
-      'Jacket':'ðŸ§¥','Blazer':'ðŸ§¥','Coat':'ðŸ§¥','Hoodie':'ðŸ§¥','Sweater':'ðŸ§¥','Sherwani':'ðŸ¤µ','Suit':'ðŸ¤µ',
-      'Sneakers':'ðŸ‘Ÿ','Shoes':'ðŸ‘Ÿ','Loafers':'ðŸ‘ž','Boots':'ðŸ‘¢','Heels':'ðŸ‘ ','Sandals':'ðŸ©´','Juttis':'ðŸ‘¡','Flats':'ðŸ‘¡',
-      'Watch':'âŒš','Belt':'ðŸª¡','Sunglasses':'ðŸ•¶ï¸','Cap':'ðŸ§¢','Hat':'ðŸŽ©','Scarf':'ðŸ§£',
-      'Bag':'ðŸ‘œ','Backpack':'ðŸŽ’','Wallet':'ðŸ‘›','Earrings':'ðŸ’Ž','Necklace':'ðŸ“¿','Ring':'ðŸ’',
-      'Topwear':'ðŸ‘•','Bottomwear':'ðŸ‘–','Footwear':'ðŸ‘Ÿ','Outerwear':'ðŸ§¥',
-      'Ethnic Wear':'ðŸ‘˜','Accessories':'âŒš','Innerwear':'ðŸ©²','Sportswear':'ðŸƒ','Bags':'ðŸ‘œ'
+      'T-Shirt':'👕','Tshirt':'👕','Tee':'👕','Shirt':'👔','Formal Shirt':'👔','Kurta':'👘','Kurti':'👘',
+      'Dress':'👗','Saree':'🥻','Lehenga':'👗','Salwar':'👘','Dupatta':'🧣','Top':'👚','Blouse':'👚',
+      'Jeans':'👖','Trousers':'👖','Chinos':'👖','Pants':'👖','Shorts':'🩳','Skirt':'👗','Leggings':'🩱',
+      'Jacket':'🧥','Blazer':'🧥','Coat':'🧥','Hoodie':'🧥','Sweater':'🧥','Sherwani':'🤵','Suit':'🤵',
+      'Sneakers':'👟','Shoes':'👟','Loafers':'👞','Boots':'👢','Heels':'👠','Sandals':'🩴','Juttis':'👡','Flats':'👡',
+      'Watch':'⌚','Belt':'🪡','Sunglasses':'🕶️','Cap':'🧢','Hat':'🎩','Scarf':'🧣',
+      'Bag':'👜','Backpack':'🎒','Wallet':'👛','Earrings':'💎','Necklace':'📿','Ring':'💍',
+      'Topwear':'👕','Bottomwear':'👖','Footwear':'👟','Outerwear':'🧥',
+      'Ethnic Wear':'👘','Accessories':'⌚','Innerwear':'🩲','Sportswear':'🏃','Bags':'👜'
     };
     function getItemEmoji(item) {
       const name = (item.original_name || item.name || item.type || '').trim();
@@ -600,11 +600,11 @@
       const direct = lookup(name); if (direct) return GARMENT_EMOJI_MAP[direct];
       for (const word of name.split(/\s+/)) { const m = lookup(word); if (m) return GARMENT_EMOJI_MAP[m]; }
       const section = item.closet_section || item.category || '';
-      return GARMENT_EMOJI_MAP[section] || 'ðŸ‘”';
+      return GARMENT_EMOJI_MAP[section] || '👔';
     }
 
-    // â”€â”€â”€ Selfie Upload â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    // ── Magic Upload: POST to AI API, auto-fill all stat/detail cards ──
+    // ─── Selfie Upload ────────────────────────────────────────
+    // -- Magic Upload: POST to AI API, auto-fill all stat/detail cards --
     async function handleSelfieUpload(input) {
       if (!input.files || !input.files[0]) return;
       const file = input.files[0];
@@ -622,7 +622,7 @@
         const avatar      = document.getElementById('profileAvatar');
         const uploadPrompt = document.querySelector('.profile-upload-prompt');
         if (avatar)       { avatar.style.opacity = '0.6'; avatar.style.pointerEvents = 'none'; }
-        if (uploadPrompt)  uploadPrompt.textContent = '✨ AI is analysing your style...';
+        if (uploadPrompt)  uploadPrompt.textContent = '? AI is analysing your style...';
 
         try {
           const res = await fetch('https://api.mynarrative.store/v1/analyze-user', {
@@ -637,7 +637,7 @@
           let data = {};
           if (res.ok) data = await res.json();
 
-          // Map API response → mn_core_identity fields
+          // Map API response ? mn_core_identity fields
           const p = getProfile();
           p.uploadedImage  = imageData;
           p.selfieUploaded = true;
@@ -660,16 +660,16 @@
           mnRefreshStatCards(p);
           saveProfile(p);
 
-          if (uploadPrompt) uploadPrompt.textContent = '✓ Profile auto-filled by AI!';
-          setTimeout(() => { if (uploadPrompt) uploadPrompt.textContent = '📸 Click to update photo'; }, 3500);
+          if (uploadPrompt) uploadPrompt.textContent = '? Profile auto-filled by AI!';
+          setTimeout(() => { if (uploadPrompt) uploadPrompt.textContent = '?? Click to update photo'; }, 3500);
 
         } catch(err) {
-          console.warn('MN AI API unavailable — photo stored locally:', err);
+          console.warn('MN AI API unavailable � photo stored locally:', err);
           const p = getProfile();
           p.uploadedImage  = imageData;
           p.selfieUploaded = true;
           saveProfile(p);
-          if (uploadPrompt) uploadPrompt.textContent = 'Photo saved — fill details manually';
+          if (uploadPrompt) uploadPrompt.textContent = 'Photo saved � fill details manually';
         } finally {
           if (avatar) { avatar.style.opacity = '1'; avatar.style.pointerEvents = ''; }
           input.value = '';
@@ -678,7 +678,7 @@
       reader.readAsDataURL(file);
     }
 
-    // ── Refresh all stat/detail card DOM values from profile object ──
+    // -- Refresh all stat/detail card DOM values from profile object --
     function mnRefreshStatCards(profile) {
       const set = (id, val) => { const el = document.getElementById(id); if (el && val) el.textContent = val; };
       set('statHeight',      profile.height    || '-');
@@ -695,7 +695,7 @@
       set('detailColors', Array.isArray(colors) ? colors.join(', ') : (colors || '-'));
     }
 
-    // ── Handle arrival from widget profile ring click ──
+    // -- Handle arrival from widget profile ring click --
     function mnHandleWidgetArrival() {
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get('mn_focus') !== 'profile') return;
@@ -716,7 +716,7 @@
             avatar.style.border    = '2.5px solid #39A596';
           }
           if (uploadPrompt) {
-            uploadPrompt.textContent  = '📸 Upload photo — AI fills everything!';
+            uploadPrompt.textContent  = '?? Upload photo � AI fills everything!';
             uploadPrompt.style.color  = '#39A596';
             uploadPrompt.style.fontWeight = '800';
           }
@@ -724,13 +724,13 @@
           setTimeout(() => document.getElementById('selfieUploadInput').click(), 1500);
           setTimeout(() => {
             if (avatar) avatar.style.animation = '';
-            if (uploadPrompt) { uploadPrompt.textContent = '📸 Click to update photo'; uploadPrompt.style.fontWeight = ''; }
+            if (uploadPrompt) { uploadPrompt.textContent = '?? Click to update photo'; uploadPrompt.style.fontWeight = ''; }
           }, 5500);
         }, 600);
       }
     }
 
-    // ── Chatbot → Dashboard live sync ──
+    // -- Chatbot ? Dashboard live sync --
     window.addEventListener('mn-chatbot-save', function(e) {
       if (!e.detail) return;
       const updates = e.detail;
@@ -740,8 +740,8 @@
       if (updates.skin_label)    p.skinTone       = updates.skin_label;
       if (updates.hair_style)    p.hairStyle      = updates.hair_style;
       if (updates.gender)        p.gender         = updates.gender;
-      if (updates.weather && updates.weather.city) p.climate = updates.weather.city + (updates.weather.temp ? ' ' + Math.round(updates.weather.temp) + '°C' : '');
-      if (updates.price_min && updates.price_max)  p.budget  = '₹' + Number(updates.price_min).toLocaleString('en-IN') + '–₹' + Number(updates.price_max).toLocaleString('en-IN');
+      if (updates.weather && updates.weather.city) p.climate = updates.weather.city + (updates.weather.temp ? ' ' + Math.round(updates.weather.temp) + '�C' : '');
+      if (updates.price_min && updates.price_max)  p.budget  = '?' + Number(updates.price_min).toLocaleString('en-IN') + '�?' + Number(updates.price_max).toLocaleString('en-IN');
       if (updates.style_vibes && updates.style_vibes.length) p.coreExpression = updates.style_vibes.join(', ');
       if (updates.occasions   && updates.occasions.length)   p.occasion       = updates.occasions.join(', ');
       if (updates.ai_metrics)    p.ai_metrics = Object.assign(p.ai_metrics || {}, updates.ai_metrics);
@@ -750,7 +750,7 @@
       saveProfile(p);
     });
 
-    // ── Cross-tab storage sync (chatbot widget open in another tab) ──
+    // -- Cross-tab storage sync (chatbot widget open in another tab) --
     window.addEventListener('storage', function(e) {
       if (e.key === 'mn_identity' && e.newValue) {
         try {
@@ -761,7 +761,7 @@
           if (src.skin_label)    p.skinTone       = src.skin_label;
           if (src.style_vibes && src.style_vibes.length) p.coreExpression = src.style_vibes.join(', ');
           if (src.occasions   && src.occasions.length)   p.occasion       = src.occasions.join(', ');
-          if (src.price_min && src.price_max) p.budget = '₹' + Number(src.price_min).toLocaleString('en-IN') + '–₹' + Number(src.price_max).toLocaleString('en-IN');
+          if (src.price_min && src.price_max) p.budget = '?' + Number(src.price_min).toLocaleString('en-IN') + '�?' + Number(src.price_max).toLocaleString('en-IN');
           mnRefreshStatCards(p);
           localStorage.setItem('mn_core_identity', JSON.stringify(p));
         } catch(err) {}
@@ -771,7 +771,7 @@
       }
     });
 
-    // â”€â”€â”€ Glass Edit Modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ─── Glass Edit Modal ─────────────────────────────────────
     const FIELD_OPTIONS = {
       height:       { title: 'Your Height', sub: 'Choose or type your height in cm', multi: false,
         options: ['150 cm','155 cm','160 cm','165 cm','170 cm','175 cm','180 cm','185 cm','190 cm'] },
@@ -782,7 +782,7 @@
       climate:      { title: 'Your Climate', sub: 'What climate do you mostly dress for?', multi: false,
         options: ['Hot & Humid','Tropical','Dry Heat','Mild','Cool','Cold','Monsoon','Mixed Seasons'] },
       budget:       { title: 'Budget Range', sub: 'Your typical outfit spend', multi: false,
-        options: ['Under â‚¹1,000','â‚¹1,000â€“â‚¹3,000','â‚¹3,000â€“â‚¹7,000','â‚¹7,000â€“â‚¹15,000','â‚¹15,000+','No budget limit'] },
+        options: ['Under ₹1,000','₹1,000–₹3,000','₹3,000–₹7,000','₹7,000–₹15,000','₹15,000+','No budget limit'] },
       goals:        { title: 'Fashion Goals', sub: 'What are you trying to achieve?', multi: false,
         options: ['Look more confident','Dress for my body','Build a capsule wardrobe','Stand out in a crowd',
                   'Look professional','Dress more traditionally','Be more sustainable','Express my personality'] },
@@ -815,7 +815,7 @@
       document.getElementById('mnEditModalTitle').textContent = cfg.title;
       document.getElementById('mnEditModalSub').textContent   = cfg.sub;
       document.getElementById('mnEditCustomInput').value = _isMulti ? '' : (current || '');
-      document.getElementById('mnEditCustomInput').placeholder = _isMulti ? 'Or type a custom colourâ€¦' : 'Or type a custom valueâ€¦';
+      document.getElementById('mnEditCustomInput').placeholder = _isMulti ? 'Or type a custom colour…' : 'Or type a custom value…';
 
       // Build chip grid
       const grid = document.getElementById('mnEditChipGrid');
@@ -869,7 +869,7 @@
       closeEditModal();
     });
 
-    // â”€â”€â”€ Closet Panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ─── Closet Panel ─────────────────────────────────────────
     function togglePanel(panelId) {
       const panel = document.getElementById(panelId);
       if (!panel) return;
@@ -883,7 +883,7 @@
       const container = document.getElementById('mnClosetPanelContent');
       if (!container) return;
       if (closet.length === 0) {
-        container.innerHTML = '<p style="color:rgba(255,255,255,0.4);font-size:13px;text-align:center;padding:20px;">No items yet â€” upload clothing photos in the AI Stylist</p>';
+        container.innerHTML = '<p style="color:rgba(255,255,255,0.4);font-size:13px;text-align:center;padding:20px;">No items yet — upload clothing photos in the AI Stylist</p>';
         return;
       }
       // Group by section
@@ -900,7 +900,7 @@
         items.forEach(item => {
           const emoji = getItemEmoji(item);
           const name  = item.original_name || item.name || 'Item';
-          const meta  = [item.color, item.fabric].filter(Boolean).join(' Â· ');
+          const meta  = [item.color, item.fabric].filter(Boolean).join(' · ');
           html += `<div class="mn-panel-closet-card">
             <div class="mn-panel-closet-emoji">${emoji}</div>
             <div class="mn-panel-closet-name">${name}</div>
@@ -917,7 +917,7 @@
       const container = document.getElementById('mnHistoryPanelContent');
       if (!container) return;
       if (history.length === 0) {
-        container.innerHTML = '<p style="color:rgba(255,255,255,0.4);font-size:13px;text-align:center;padding:20px;">No outfits generated yet â€” open the AI Stylist to create your first look</p>';
+        container.innerHTML = '<p style="color:rgba(255,255,255,0.4);font-size:13px;text-align:center;padding:20px;">No outfits generated yet — open the AI Stylist to create your first look</p>';
         return;
       }
       let html = '';
@@ -935,7 +935,7 @@
       container.innerHTML = html;
     }
 
-    // â”€â”€â”€ Load & Render â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ─── Load & Render ────────────────────────────────────────
     document.addEventListener('DOMContentLoaded', function() {
       try {
         const profile = getProfile();
@@ -978,7 +978,7 @@
         if (closet.length > 0) {
           const sections = {};
           closet.forEach(i => { const s = i.closet_section || i.category || 'Other'; sections[s] = (sections[s]||0)+1; });
-          document.getElementById('detailClosetBreakdown').textContent = Object.entries(sections).map(([s,n])=>n+' '+s).join(' Â· ') || '-';
+          document.getElementById('detailClosetBreakdown').textContent = Object.entries(sections).map(([s,n])=>n+' '+s).join(' · ') || '-';
         }
 
         // Most recent outfit
@@ -1007,7 +1007,7 @@
           if (el) el.addEventListener('click', () => openEditModal(key, elId));
         });
 
-        // Wire Digital Closet stat card â†’ show closet panel
+        // Wire Digital Closet stat card → show closet panel
         const closetStatCard = document.getElementById('statClosetItems');
         if (closetStatCard) {
           closetStatCard.parentElement.addEventListener('click', () => {
@@ -1016,7 +1016,7 @@
           });
         }
 
-        // Wire Outfits Saved stat card â†’ show history panel
+        // Wire Outfits Saved stat card → show history panel
         const histStatCard = document.getElementById('statOutfitsSaved');
         if (histStatCard) {
           histStatCard.parentElement.addEventListener('click', () => {
@@ -1029,7 +1029,7 @@
         console.error('Error loading AI Stylist profile:', error);
       }
 
-      // Handle arrival from widget profile ring → /account?mn_focus=profile
+      // Handle arrival from widget profile ring ? /account?mn_focus=profile
       mnHandleWidgetArrival();
     });
 
@@ -1062,7 +1062,7 @@
           <h2 class="heading-font text-2xl md:text-3xl font-bold text-white mb-1">ORDER {{ latest_order.name }}</h2>
 
           <p class="text-gray-400 text-sm">
-            {{ latest_order.created_at | date: '%B %d, %Y' }} â€¢ {{ latest_order.financial_status_label }}
+            {{ latest_order.created_at | date: '%B %d, %Y' }} • {{ latest_order.financial_status_label }}
           </p>
 
           <div class="flex flex-wrap gap-3 mt-4 justify-center md:justify-start">
@@ -1820,7 +1820,7 @@
                     <img src="{{ hist_img }}" class="w-full h-full object-contain p-1 relative z-2">
 
                   {% else %}
-                    <span style="font-size:20px;">âœ…</span>
+                    <span style="font-size:20px;">✅</span>
                   {% endif %}
                 </div>
               {% endfor %}
@@ -1862,7 +1862,7 @@
             </h2>
 
             <h3 class="text-[#39A596] font-bold text-sm uppercase mb-0" style="font-family: 'Montserrat', sans-serif;">
-              ðŸ¥³Congratulations! You have unlocked your free product
+              🥳Congratulations! You have unlocked your free product
             </h3>
 
             <p class="text-gray-400 text-[10px]" style="font-family: 'Montserrat', sans-serif;">
@@ -1959,8 +1959,8 @@
   <!-- Closet Panel (shown inline below profile on click) -->
   <div class="mn-dashboard-panel" id="mnClosetPanel">
     <div class="mn-panel-title">
-      <span>ðŸ‘— My Digital Closet</span>
-      <button class="mn-panel-close" onclick="togglePanel('mnClosetPanel')">âœ•</button>
+      <span>👗 My Digital Closet</span>
+      <button class="mn-panel-close" onclick="togglePanel('mnClosetPanel')">✕</button>
     </div>
     <div id="mnClosetPanelContent"></div>
   </div>
@@ -1968,8 +1968,8 @@
   <!-- Past Looks Panel -->
   <div class="mn-dashboard-panel" id="mnHistoryPanel" style="border-color:rgba(139,92,246,0.25);">
     <div class="mn-panel-title" style="color:#a78bfa;">
-      <span>âœ¨ Past AI Looks</span>
-      <button class="mn-panel-close" onclick="togglePanel('mnHistoryPanel')">âœ•</button>
+      <span>✨ Past AI Looks</span>
+      <button class="mn-panel-close" onclick="togglePanel('mnHistoryPanel')">✕</button>
     </div>
     <div id="mnHistoryPanelContent"></div>
   </div>
@@ -1981,10 +1981,10 @@
       <div class="profile-top-row">
         <div class="profile-avatar-section">
           <div class="profile-avatar" id="profileAvatar" onclick="document.getElementById('selfieUploadInput').click()">
-            <span class="profile-avatar-placeholder" id="avatarPlaceholder">ðŸ‘¤</span>
+            <span class="profile-avatar-placeholder" id="avatarPlaceholder">👤</span>
             <img id="avatarImage" src="" alt="Profile" style="display: none;">
           </div>
-          <p class="profile-upload-prompt">Upload photo — AI auto-fills your profile</p>
+          <p class="profile-upload-prompt">Upload photo � AI auto-fills your profile</p>
           <input type="file" id="selfieUploadInput" accept="image/*" onchange="handleSelfieUpload(this)">
         </div>
 
@@ -1995,10 +1995,10 @@
           </div>
           <div style="margin-top: 1rem; display:flex; gap:10px; flex-wrap:wrap;">
             <button onclick="renderClosetPanel(); togglePanel('mnClosetPanel');" class="digital-closet-btn">
-              <span>ðŸ‘—</span><span>My Closet</span>
+              <span>👗</span><span>My Closet</span>
             </button>
             <button onclick="renderHistoryPanel(); togglePanel('mnHistoryPanel');" class="digital-closet-btn" style="background:linear-gradient(135deg,#7c3aed,#a78bfa);">
-              <span>âœ¨</span><span>Past Looks</span>
+              <span>✨</span><span>Past Looks</span>
             </button>
           </div>
         </div>
@@ -2007,38 +2007,38 @@
       <!-- Quick Stats -->
       <div class="quick-stats-grid">
         <div class="stat-card clickable">
-          <div class="stat-icon">ðŸ“</div>
-          <div class="stat-label">Height <span class="edit-hint">âœ edit</span></div>
+          <div class="stat-icon">📏</div>
+          <div class="stat-label">Height <span class="edit-hint">✏ edit</span></div>
           <div class="stat-value" id="statHeight">-</div>
         </div>
         <div class="stat-card clickable">
-          <div class="stat-icon">ðŸ’ª</div>
-          <div class="stat-label">Body Type <span class="edit-hint">âœ edit</span></div>
+          <div class="stat-icon">💪</div>
+          <div class="stat-label">Body Type <span class="edit-hint">✏ edit</span></div>
           <div class="stat-value" id="statBodyType">-</div>
         </div>
         <div class="stat-card clickable">
-          <div class="stat-icon">ðŸŽ¨</div>
-          <div class="stat-label">Skin Tone <span class="edit-hint">âœ edit</span></div>
+          <div class="stat-icon">🎨</div>
+          <div class="stat-label">Skin Tone <span class="edit-hint">✏ edit</span></div>
           <div class="stat-value" id="statSkinTone">-</div>
         </div>
         <div class="stat-card clickable">
-          <div class="stat-icon">ðŸŒ¡ï¸</div>
-          <div class="stat-label">Climate <span class="edit-hint">âœ edit</span></div>
+          <div class="stat-icon">🌡️</div>
+          <div class="stat-label">Climate <span class="edit-hint">✏ edit</span></div>
           <div class="stat-value" id="statTemperature">-</div>
         </div>
         <div class="stat-card clickable">
-          <div class="stat-icon">ðŸ’°</div>
-          <div class="stat-label">Budget Range <span class="edit-hint">âœ edit</span></div>
+          <div class="stat-icon">💰</div>
+          <div class="stat-label">Budget Range <span class="edit-hint">✏ edit</span></div>
           <div class="stat-value" id="statPriceRange">-</div>
         </div>
         <div class="stat-card" style="cursor:pointer;" title="Click to view your closet">
-          <div class="stat-icon">ðŸ‘—</div>
-          <div class="stat-label">Digital Closet <span class="edit-hint">ðŸ‘ view</span></div>
+          <div class="stat-icon">👗</div>
+          <div class="stat-label">Digital Closet <span class="edit-hint">👁 view</span></div>
           <div class="stat-value" id="statClosetItems" style="color:#39A596;">0 items</div>
         </div>
         <div class="stat-card" style="cursor:pointer;" title="Click to view past looks">
-          <div class="stat-icon">âœ¨</div>
-          <div class="stat-label">Outfits Saved <span class="edit-hint">ðŸ‘ view</span></div>
+          <div class="stat-icon">✨</div>
+          <div class="stat-label">Outfits Saved <span class="edit-hint">👁 view</span></div>
           <div class="stat-value" id="statOutfitsSaved" style="color:#a78bfa;">0 looks</div>
         </div>
       </div>
@@ -2046,35 +2046,35 @@
       <!-- Detailed Profile Information -->
       <div class="profile-details-grid">
         <div class="detail-card">
-          <div class="detail-label"><span class="detail-icon">ðŸŽ¯</span><span>Fashion Goals</span><span class="edit-hint">âœ edit</span></div>
+          <div class="detail-label"><span class="detail-icon">🎯</span><span>Fashion Goals</span><span class="edit-hint">✏ edit</span></div>
           <div class="detail-value" id="detailGoals">-</div>
         </div>
         <div class="detail-card">
-          <div class="detail-label"><span class="detail-icon">ðŸŽ¨</span><span>Favorite Colors</span><span class="edit-hint">âœ multi-select</span></div>
+          <div class="detail-label"><span class="detail-icon">🎨</span><span>Favorite Colors</span><span class="edit-hint">✏ multi-select</span></div>
           <div class="detail-value" id="detailColors">-</div>
         </div>
         <div class="detail-card">
-          <div class="detail-label"><span class="detail-icon">ðŸ§ </span><span>Style Expression</span><span class="edit-hint">âœ edit</span></div>
+          <div class="detail-label"><span class="detail-icon">🧠</span><span>Style Expression</span><span class="edit-hint">✏ edit</span></div>
           <div class="detail-value" id="detailStyle">-</div>
         </div>
         <div class="detail-card">
-          <div class="detail-label"><span class="detail-icon">ðŸ“…</span><span>Go-to Occasion</span><span class="edit-hint">âœ edit</span></div>
+          <div class="detail-label"><span class="detail-icon">📅</span><span>Go-to Occasion</span><span class="edit-hint">✏ edit</span></div>
           <div class="detail-value" id="detailOccasion">-</div>
         </div>
         <div class="detail-card">
-          <div class="detail-label"><span class="detail-icon">ðŸŒ</span><span>Region / City</span><span class="edit-hint">âœ edit</span></div>
+          <div class="detail-label"><span class="detail-icon">🌍</span><span>Region / City</span><span class="edit-hint">✏ edit</span></div>
           <div class="detail-value" id="detailRegion">-</div>
         </div>
         <div class="detail-card">
-          <div class="detail-label"><span class="detail-icon">ðŸŽ­</span><span>Skin Undertone</span><span class="edit-hint">âœ edit</span></div>
+          <div class="detail-label"><span class="detail-icon">🎭</span><span>Skin Undertone</span><span class="edit-hint">✏ edit</span></div>
           <div class="detail-value" id="detailUndertone">-</div>
         </div>
         <div class="detail-card" style="grid-column: 1 / -1;">
-          <div class="detail-label"><span class="detail-icon">ðŸ‘”</span><span>Closet Breakdown</span></div>
+          <div class="detail-label"><span class="detail-icon">👔</span><span>Closet Breakdown</span></div>
           <div class="detail-value" id="detailClosetBreakdown" style="font-size:12px; color:#aaa;">Upload clothing photos to see your closet breakdown</div>
         </div>
         <div class="detail-card" style="grid-column: 1 / -1;">
-          <div class="detail-label"><span class="detail-icon">âœ¨</span><span>Most Recent AI Outfit</span></div>
+          <div class="detail-label"><span class="detail-icon">✨</span><span>Most Recent AI Outfit</span></div>
           <div class="detail-value" id="detailLastOutfit" style="font-size:12px; font-style:italic; color:#aaa;">No outfits generated yet</div>
         </div>
       </div>
@@ -2083,7 +2083,7 @@
 
   <div class="artifact-modal" id="artifactModal">
     <div class="modal-content">
-      <button class="modal-close" onclick="closeArtifactModal()">Ã—</button>
+      <button class="modal-close" onclick="closeArtifactModal()">×</button>
 
       <h3 class="modal-title" id="modalTitle" style="font-family: 'Montserrat', sans-serif;">Collection Name</h3>
 
@@ -2319,7 +2319,7 @@
 </style>
 
 <div id="vault-overlay">
-  <button class="close-vault" onclick="closeVault()">Ã—</button>
+  <button class="close-vault" onclick="closeVault()">×</button>
 
   <div id="loading-state" style="text-align: center;">
     <h2 style="letter-spacing: 3px; color: white; margin-bottom: 10px;">NEURAL LINK ESTABLISHED</h2>
@@ -2338,10 +2338,10 @@
 
     <img id="final-card-img" src="" alt="Identity Card">
 
-    <button class="cyber-btn insta-btn" onclick="shareToInstagram()">SHARE TO STORY ðŸ“¸</button>
+    <button class="cyber-btn insta-btn" onclick="shareToInstagram()">SHARE TO STORY 📸</button>
 
     <a id="download-link" href="#" download class="cyber-btn" style="background:transparent; color:#888; border:none;"
-      >â¬‡ Download Image</a
+      >⬇ Download Image</a
     >
   </div>
 </div>
@@ -2483,13 +2483,13 @@ async function uploadTwin(input) {
       imgEl.src = data.url;
       imgEl.style.display = 'block';
       document.getElementById('mn-twin-loading').style.display = 'none';
-      alert('âœ… Digital Twin Updated! Now you can try on products in 1 click.');
+      alert('✅ Digital Twin Updated! Now you can try on products in 1 click.');
     } else {
       throw new Error(data.error || 'Upload failed');
     }
   } catch (error) {
     console.error('Upload error:', error);
-    alert('âŒ Upload failed: ' + error.message);
+    alert('❌ Upload failed: ' + error.message);
     document.getElementById('mn-twin-loading').style.display = 'none';
     document.getElementById('mn-twin-placeholder').style.display = 'flex';
   }
