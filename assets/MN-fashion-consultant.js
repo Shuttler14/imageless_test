@@ -767,10 +767,22 @@ function initPersistentNav() {
   const slider   = document.getElementById('mnw-height-slider');
   const sliderVal = document.getElementById('mnw-height-val');
 
-  if (ringBtn && modal) {
-    ringBtn.addEventListener('click', () => { modal.style.display = 'flex'; });
-    if (modalClose) modalClose.addEventListener('click', () => { modal.style.display = 'none'; });
-    modal.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+  if (ringBtn) {
+    ringBtn.addEventListener('click', () => {
+      // Read stored profile to check if photo has been uploaded
+      let hasPhoto = false;
+      try {
+        const saved = JSON.parse(localStorage.getItem('mn_identity') || '{}');
+        hasPhoto = !!(saved.profile_photo_b64 || saved.profile_photo_url);
+      } catch(e) {}
+      // Redirect to the full Style Dashboard — ?mn_focus=profile tells dashboard to highlight upload
+      window.location.href = '/account?mn_focus=profile#style-profile';
+    });
+    // Keep modal close handlers in case modal is triggered elsewhere
+    if (modal && modalClose) {
+      modalClose.addEventListener('click', () => { modal.style.display = 'none'; });
+      modal.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+    }
   }
   if (slider && sliderVal) {
     slider.addEventListener('input', () => { state.profileHeight = slider.value; sliderVal.textContent = slider.value + ' cm'; });
@@ -1120,3 +1132,4 @@ if (document.readyState === 'loading') {
   console.log('[MN Dashboard Sync] Chatbot â†” Dashboard bridge initialized.');
 
 })();
+

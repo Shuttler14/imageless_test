@@ -485,7 +485,136 @@
 <div class="mn-dashboard">
 
   <!-- HERO -->
-  <div class="mn-hero">
+  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+     PROFILE INCOMPLETE BANNER
+     Shown when user arrives from widget profile ring click
+     AND has not uploaded a photo yet. Auto-hides once filled.
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<div id="mn-welcome-banner" style="display:none">
+  <div class="mn-welcome-banner-inner">
+    <div class="mn-wb-left">
+      <div class="mn-wb-pulse"></div>
+      <div>
+        <div class="mn-wb-title">ðŸ‘‹ Welcome to your Style Dashboard</div>
+        <div class="mn-wb-sub">Your AI stylist needs a few details to personalise your looks. Upload a photo below â€” AI fills everything automatically in seconds.</div>
+      </div>
+    </div>
+    <button class="mn-wb-cta" onclick="document.getElementById('mn-magic-upload-input').click();document.getElementById('mn-welcome-banner').style.display='none'">
+      ðŸ“¸ Upload Photo Now
+    </button>
+    <button class="mn-wb-close" onclick="document.getElementById('mn-welcome-banner').style.display='none'" title="Dismiss">âœ•</button>
+  </div>
+</div>
+
+<style>
+/* Welcome banner */
+#mn-welcome-banner {
+  position: sticky;
+  top: 0;
+  z-index: 900;
+  padding: 0 20px;
+  animation: mn-slide-down 0.45s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes mn-slide-down {
+  from { transform: translateY(-100%); opacity: 0; }
+  to   { transform: translateY(0);     opacity: 1; }
+}
+.mn-welcome-banner-inner {
+  max-width: 760px;
+  margin: 0 auto;
+  background: linear-gradient(135deg, rgba(57,165,150,0.18), rgba(57,165,150,0.06));
+  border: 1px solid rgba(57,165,150,0.45);
+  border-top: none;
+  border-radius: 0 0 16px 16px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  box-shadow: 0 8px 32px rgba(57,165,150,0.2);
+}
+.mn-wb-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex: 1;
+  min-width: 200px;
+}
+.mn-wb-pulse {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--mn-accent);
+  flex-shrink: 0;
+  margin-top: 4px;
+  box-shadow: 0 0 0 0 rgba(57,165,150,0.6);
+  animation: mn-wb-pulse 1.8s ease-in-out infinite;
+}
+@keyframes mn-wb-pulse {
+  0%   { box-shadow: 0 0 0 0   rgba(57,165,150,0.7); }
+  70%  { box-shadow: 0 0 0 12px rgba(57,165,150,0);   }
+  100% { box-shadow: 0 0 0 0   rgba(57,165,150,0);    }
+}
+.mn-wb-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 4px;
+}
+.mn-wb-sub {
+  font-size: 11px;
+  color: rgba(255,255,255,0.65);
+  line-height: 1.5;
+}
+.mn-wb-cta {
+  background: var(--mn-accent);
+  color: #000;
+  font-family: var(--mn-font);
+  font-size: 12px;
+  font-weight: 900;
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.mn-wb-cta:hover { background: var(--mn-accent-dark); transform: translateY(-1px); }
+.mn-wb-close {
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.35);
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px;
+  flex-shrink: 0;
+  line-height: 1;
+  transition: color 0.2s;
+}
+.mn-wb-close:hover { color: #fff; }
+
+/* Dropzone highlight pulse when focused from widget */
+.mn-dropzone-focused {
+  border-color: var(--mn-accent) !important;
+  box-shadow: 0 0 0 4px rgba(57,165,150,0.25), 0 0 40px rgba(57,165,150,0.3) !important;
+  animation: mn-focus-pulse 1.5s ease-in-out 3 !important;
+}
+@keyframes mn-focus-pulse {
+  0%,100% { box-shadow: 0 0 0 4px rgba(57,165,150,0.25), 0 0 40px rgba(57,165,150,0.3); }
+  50%      { box-shadow: 0 0 0 8px rgba(57,165,150,0.45), 0 0 60px rgba(57,165,150,0.5); }
+}
+
+/* Avatar ring glow when focused */
+.mn-ring-focused .mn-ring-fill {
+  filter: drop-shadow(0 0 16px rgba(57,165,150,1)) !important;
+  animation: mn-ring-glow 1s ease-in-out 4 !important;
+}
+@keyframes mn-ring-glow {
+  0%,100% { stroke: #39A596; }
+  50%      { stroke: #2dd4bf; }
+}
+</style><div id="style-profile" class="mn-hero">
     <div class="mn-hero-inner">
       <div class="mn-avatar-wrap" id="mn-avatar-wrap" title="Click to upload photo â€” AI will auto-fill your profile">
         <div class="mn-avatar-img" id="mn-avatar-img">
@@ -1685,6 +1814,76 @@ document.addEventListener('DOMContentLoaded', function() {
   mnInitPhotoUpload();
   mnPriceChange();   // initialise price fill bar
   mnUpdateProgress();
+
+  // â”€â”€ Handle arrival from widget profile ring click â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // Detect ?mn_focus=profile in URL or #style-profile hash
+  const urlParams  = new URLSearchParams(window.location.search);
+  const hashTarget = window.location.hash === '#style-profile';
+  const fromWidget = urlParams.get('mn_focus') === 'profile' || hashTarget;
+
+  if (fromWidget) {
+    // Check if profile photo is missing
+    const hasPhoto = !!(mnProfile.profile_photo_b64 || mnProfile.profile_photo_url);
+    const pct      = mnCalcCompletion();
+
+    // Scroll to top of dashboard smoothly
+    setTimeout(() => {
+      const hero = document.getElementById('style-profile');
+      if (hero) hero.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 120);
+
+    // If no photo â€” show the welcome banner + pulse the dropzone
+    if (!hasPhoto || pct < 30) {
+      const banner = document.getElementById('mn-welcome-banner');
+      if (banner) banner.style.display = 'block';
+
+      // Highlight the Magic Upload dropzone after scroll settles
+      setTimeout(() => {
+        const dropzone = document.getElementById('mn-magic-dropzone');
+        if (dropzone) {
+          dropzone.classList.add('mn-dropzone-focused');
+          dropzone.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          // Remove focus class after animation finishes (3 cycles Ã— 1.5s)
+          setTimeout(() => dropzone.classList.remove('mn-dropzone-focused'), 5000);
+        }
+        // Also pulse the avatar ring
+        const avatarWrap = document.getElementById('mn-avatar-wrap');
+        if (avatarWrap) {
+          avatarWrap.classList.add('mn-ring-focused');
+          setTimeout(() => avatarWrap.classList.remove('mn-ring-focused'), 4500);
+        }
+      }, 600);
+
+    } else {
+      // Profile partially/fully filled â€” just scroll to hero, no banner
+      // Highlight the first empty section instead
+      const sectionIds = [
+        { id: 'mn-sec-gender',    filled: !!mnProfile.gender },
+        { id: 'mn-sec-skin',      filled: !!mnProfile.skin_mst },
+        { id: 'mn-sec-fit',       filled: !!mnProfile.preferred_fit },
+        { id: 'mn-sec-occasions', filled: !!(mnProfile.occasions && mnProfile.occasions.length) },
+        { id: 'mn-sec-vibes',     filled: !!(mnProfile.style_vibes && mnProfile.style_vibes.length) },
+        { id: 'mn-sec-bank',      filled: !!(mnProfile.bank_cards && mnProfile.bank_cards.length) },
+      ];
+      const firstEmpty = sectionIds.find(s => !s.filled);
+      if (firstEmpty) {
+        setTimeout(() => {
+          const sec = document.getElementById(firstEmpty.id);
+          if (sec) {
+            sec.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            sec.classList.add('mn-ai-flash');
+            setTimeout(() => sec.classList.remove('mn-ai-flash'), 1200);
+          }
+        }, 600);
+      }
+    }
+
+    // Clean up URL param without page reload
+    if (urlParams.get('mn_focus')) {
+      const cleanUrl = window.location.pathname + window.location.hash;
+      window.history.replaceState({}, '', cleanUrl);
+    }
+  }
 });
 </script>
 
@@ -1704,3 +1903,4 @@ document.addEventListener('DOMContentLoaded', function() {
   ]
 }
 {% endschema %}
+
