@@ -724,25 +724,20 @@
     function getCloset()   { try { return JSON.parse(localStorage.getItem('mn_digital_closet') || '[]'); } catch(e) { return []; } }
     function getHistory()  { try { return JSON.parse(localStorage.getItem('mn_outfit_history') || '[]'); } catch(e) { return []; } }
 
-    // ─── Emoji Map (same as AI stylist) ───────────────────────
+    // --- Garment Emoji Map + Helper ---
     const GARMENT_EMOJI_MAP = {
-      'T-Shirt':'👕','Tshirt':'👕','Tee':'👕','Shirt':'👔','Formal Shirt':'👔','Kurta':'👘','Kurti':'👘',
-      'Dress':'👗','Saree':'🥻','Lehenga':'👗','Salwar':'👘','Dupatta':'🧣','Top':'👚','Blouse':'👚',
-      'Jeans':'👖','Trousers':'👖','Chinos':'👖','Pants':'👖','Shorts':'🩳','Skirt':'👗','Leggings':'🩱',
-      'Jacket':'🧥','Blazer':'🧥','Coat':'🧥','Hoodie':'🧥','Sweater':'🧥','Sherwani':'🤵','Suit':'🤵',
-      'Sneakers':'👟','Shoes':'👟','Loafers':'👞','Boots':'👢','Heels':'👠','Sandals':'🩴','Juttis':'👡','Flats':'👡',
-      'Watch':'⌚','Belt':'🪡','Sunglasses':'🕶️','Cap':'🧢','Hat':'🎩','Scarf':'🧣',
-      'Bag':'👜','Backpack':'🎒','Wallet':'👛','Earrings':'💎','Necklace':'📿','Ring':'💍',
-      'Topwear':'👕','Bottomwear':'👖','Footwear':'👟','Outerwear':'🧥',
-      'Ethnic Wear':'👘','Accessories':'⌚','Innerwear':'🩲','Sportswear':'🏃','Bags':'👜'
+      'T-Shirt':'\uD83D\uDC55','Shirt':'\uD83D\uDC54','Kurta':'\uD83D\uDC58','Dress':'\uD83D\uDC57',
+      'Saree':'\uD83E\uDD7B','Jeans':'\uD83D\uDC56','Shorts':'\uD83E\uDE73','Jacket':'\uD83E\uDDE5',
+      'Sneakers':'\uD83D\uDC5F','Shoes':'\uD83D\uDC5E','Boots':'\uD83E\uDD7E','Bag':'\uD83D\uDC5C',
+      'Watch':'\u231A','Cap':'\uD83E\uDDE2','Hat':'\uD83C\uDFA9','Scarf':'\uD83E\uDDE3','default':'\uD83D\uDC55'
     };
     function getItemEmoji(item) {
-      const name = (item.original_name || item.name || item.type || '').trim();
-      const lookup = (k) => { const kl = k.toLowerCase(); return Object.keys(GARMENT_EMOJI_MAP).find(g => g.toLowerCase() === kl); };
+      const name = (item.name||item.original_name||item.label||'').trim();
+      const lookup = k => Object.keys(GARMENT_EMOJI_MAP).find(key => key.toLowerCase() === k.toLowerCase());
       const direct = lookup(name); if (direct) return GARMENT_EMOJI_MAP[direct];
       for (const word of name.split(/\s+/)) { const m = lookup(word); if (m) return GARMENT_EMOJI_MAP[m]; }
       const section = item.closet_section || item.category || '';
-      return GARMENT_EMOJI_MAP[section] || '👔';
+      return GARMENT_EMOJI_MAP[section] || GARMENT_EMOJI_MAP.default;
     }
 
     // ─── Selfie Upload ────────────────────────────────────────
@@ -1007,23 +1002,8 @@
   ]}
 };
 
-    const MN_SVGS = {
-      ruler: "<svg class=\"mn-edit-tile-svg\" viewBox=\"0 0 48 48\" fill=\"none\"><rect x=\"6\" y=\"18\" width=\"36\" height=\"12\" rx=\"3\" stroke=\"#39A596\" stroke-width=\"2\" fill=\"rgba(57,165,150,0.08)\"/><line x1=\"14\" y1=\"18\" x2=\"14\" y2=\"24\" stroke=\"#39A596\" stroke-width=\"1.5\"/><line x1=\"20\" y1=\"18\" x2=\"20\" y2=\"22\" stroke=\"#39A596\" stroke-width=\"1.5\"/><line x1=\"26\" y1=\"18\" x2=\"26\" y2=\"24\" stroke=\"#39A596\" stroke-width=\"1.5\"/><line x1=\"32\" y1=\"18\" x2=\"32\" y2=\"22\" stroke=\"#39A596\" stroke-width=\"1.5\"/></svg>",
-      slim: "<svg class=\"mn-edit-tile-svg\" viewBox=\"0 0 48 48\" fill=\"none\"><ellipse cx=\"24\" cy=\"10\" rx=\"5\" ry=\"5\" stroke=\"#39A596\" stroke-width=\"2\"/><path d=\"M19 16h10l3 20H16L19 16z\" stroke=\"#39A596\" stroke-width=\"2\" fill=\"rgba(57,165,150,0.08)\"/><path d=\"M16 36l-3 8M32 36l3 8\" stroke=\"#39A596\" stroke-width=\"2\" stroke-linecap=\"round\"/></svg>",
-      athletic: "<svg class=\"mn-edit-tile-svg\" viewBox=\"0 0 48 48\" fill=\"none\"><ellipse cx=\"24\" cy=\"9\" rx=\"5\" ry=\"5\" stroke=\"#39A596\" stroke-width=\"2\"/><path d=\"M15 16h18l4 20H11L15 16z\" stroke=\"#39A596\" stroke-width=\"2\" fill=\"rgba(57,165,150,0.08)\"/><path d=\"M11 36l-3 8M37 36l3 8\" stroke=\"#39A596\" stroke-width=\"2\" stroke-linecap=\"round\"/><line x1=\"15\" y1=\"24\" x2=\"33\" y2=\"24\" stroke=\"#39A596\" stroke-width=\"1.5\" stroke-dasharray=\"2 2\"/></svg>",
-      sun: "<svg class=\"mn-edit-tile-svg\" viewBox=\"0 0 48 48\" fill=\"none\"><circle cx=\"24\" cy=\"24\" r=\"8\" stroke=\"#F59E0B\" stroke-width=\"2\" fill=\"rgba(245,158,11,0.1)\"/><line x1=\"24\" y1=\"6\" x2=\"24\" y2=\"12\" stroke=\"#F59E0B\" stroke-width=\"2\" stroke-linecap=\"round\"/><line x1=\"24\" y1=\"36\" x2=\"24\" y2=\"42\" stroke=\"#F59E0B\" stroke-width=\"2\" stroke-linecap=\"round\"/><line x1=\"6\" y1=\"24\" x2=\"12\" y2=\"24\" stroke=\"#F59E0B\" stroke-width=\"2\" stroke-linecap=\"round\"/><line x1=\"36\" y1=\"24\" x2=\"42\" y2=\"24\" stroke=\"#F59E0B\" stroke-width=\"2\" stroke-linecap=\"round\"/><line x1=\"11\" y1=\"11\" x2=\"15\" y2=\"15\" stroke=\"#F59E0B\" stroke-width=\"2\" stroke-linecap=\"round\"/><line x1=\"33\" y1=\"33\" x2=\"37\" y2=\"37\" stroke=\"#F59E0B\" stroke-width=\"2\" stroke-linecap=\"round\"/></svg>",
-      cold: "<svg class=\"mn-edit-tile-svg\" viewBox=\"0 0 48 48\" fill=\"none\"><path d=\"M24 6v36M6 24h36M11 11l26 26M37 11L11 37\" stroke=\"#60A5FA\" stroke-width=\"2\" stroke-linecap=\"round\"/><circle cx=\"24\" cy=\"24\" r=\"4\" fill=\"#60A5FA\"/></svg>",
-      rain: "<svg class=\"mn-edit-tile-svg\" viewBox=\"0 0 48 48\" fill=\"none\"><path d=\"M10 26a12 12 0 1 1 22-4H34a7 7 0 0 1 0 14H12a8 8 0 0 1-2-10z\" stroke=\"#39A596\" stroke-width=\"2\" fill=\"rgba(57,165,150,0.06)\"/><line x1=\"16\" y1=\"38\" x2=\"14\" y2=\"44\" stroke=\"#60A5FA\" stroke-width=\"2\" stroke-linecap=\"round\"/><line x1=\"24\" y1=\"38\" x2=\"22\" y2=\"44\" stroke=\"#60A5FA\" stroke-width=\"2\" stroke-linecap=\"round\"/><line x1=\"32\" y1=\"38\" x2=\"30\" y2=\"44\" stroke=\"#60A5FA\" stroke-width=\"2\" stroke-linecap=\"round\"/></svg>",
-      neutral: "<svg class=\"mn-edit-tile-svg\" viewBox=\"0 0 48 48\" fill=\"none\"><circle cx=\"24\" cy=\"24\" r=\"14\" stroke=\"#9CA3AF\" stroke-width=\"2\" fill=\"rgba(156,163,175,0.08)\"/><line x1=\"17\" y1=\"30\" x2=\"31\" y2=\"30\" stroke=\"#9CA3AF\" stroke-width=\"2\" stroke-linecap=\"round\"/><circle cx=\"18\" cy=\"21\" r=\"2\" fill=\"#9CA3AF\"/><circle cx=\"30\" cy=\"21\" r=\"2\" fill=\"#9CA3AF\"/></svg>",
-      wallet: "<svg class=\"mn-edit-tile-svg\" viewBox=\"0 0 48 48\" fill=\"none\"><rect x=\"6\" y=\"14\" width=\"36\" height=\"24\" rx=\"4\" stroke=\"#39A596\" stroke-width=\"2\" fill=\"rgba(57,165,150,0.08)\"/><path d=\"M6 22h36\" stroke=\"#39A596\" stroke-width=\"2\"/><rect x=\"30\" y=\"26\" width=\"10\" height=\"6\" rx=\"2\" stroke=\"#39A596\" stroke-width=\"1.5\" fill=\"rgba(57,165,150,0.15)\"/><circle cx=\"35\" cy=\"29\" r=\"1.5\" fill=\"#39A596\"/></svg>",
-      target: "<svg class=\"mn-edit-tile-svg\" viewBox=\"0 0 48 48\" fill=\"none\"><circle cx=\"24\" cy=\"24\" r=\"16\" stroke=\"#39A596\" stroke-width=\"2\"/><circle cx=\"24\" cy=\"24\" r=\"9\" stroke=\"#39A596\" stroke-width=\"2\"/><circle cx=\"24\" cy=\"24\" r=\"3\" fill=\"#39A596\"/></svg>",
-      palette: "<svg class=\"mn-edit-tile-svg\" viewBox=\"0 0 48 48\" fill=\"none\"><path d=\"M24 8a16 16 0 1 0 11 27\" stroke=\"#EC4899\" stroke-width=\"2\"/><circle cx=\"16\" cy=\"26\" r=\"2.5\" fill=\"#EF4444\"/><circle cx=\"20\" cy=\"18\" r=\"2.5\" fill=\"#F59E0B\"/><circle cx=\"28\" cy=\"16\" r=\"2.5\" fill=\"#10B981\"/><circle cx=\"32\" cy=\"24\" r=\"2.5\" fill=\"#3B82F6\"/><circle cx=\"35\" cy=\"34\" r=\"5\" stroke=\"#EC4899\" stroke-width=\"2\" fill=\"rgba(236,72,153,0.1)\"/></svg>",
-      star: "<svg class=\"mn-edit-tile-svg\" viewBox=\"0 0 48 48\" fill=\"none\"><path d=\"M24 6l4.5 9 10 1.5-7.25 7 1.75 10L24 29.3l-8.75 4.2 1.75-10L9.5 16.5l10-1.5z\" stroke=\"#39A596\" stroke-width=\"2\" stroke-linejoin=\"round\" fill=\"rgba(57,165,150,0.1)\"/></svg>",
-      shirt: "<svg class=\"mn-edit-tile-svg\" viewBox=\"0 0 48 48\" fill=\"none\"><path d=\"M16 8L6 16l6 2v22h24V18l6-2L32 8c0 0-2 6-8 6S16 8 16 8z\" stroke=\"#39A596\" stroke-width=\"2\" stroke-linejoin=\"round\" fill=\"rgba(57,165,150,0.08)\"/></svg>",
-      map: "<svg class=\"mn-edit-tile-svg\" viewBox=\"0 0 48 48\" fill=\"none\"><path d=\"M24 6C17 6 12 12 12 18c0 9 12 24 12 24S36 27 36 18c0-6-5-12-12-12z\" stroke=\"#39A596\" stroke-width=\"2\" fill=\"rgba(57,165,150,0.08)\"/><circle cx=\"24\" cy=\"18\" r=\"4\" stroke=\"#39A596\" stroke-width=\"2\" fill=\"rgba(57,165,150,0.2)\"/></svg>",
-      warm: "<svg class=\"mn-edit-tile-svg\" viewBox=\"0 0 48 48\" fill=\"none\"><circle cx=\"24\" cy=\"24\" r=\"14\" stroke=\"#F59E0B\" stroke-width=\"2\" fill=\"rgba(245,158,11,0.08)\"/><circle cx=\"19\" cy=\"21\" r=\"2\" fill=\"#F59E0B\"/><circle cx=\"29\" cy=\"21\" r=\"2\" fill=\"#F59E0B\"/><path d=\"M18 30c2 3 10 3 12 0\" stroke=\"#F59E0B\" stroke-width=\"2\" stroke-linecap=\"round\"/></svg>",
-      cool: "<svg class=\"mn-edit-tile-svg\" viewBox=\"0 0 48 48\" fill=\"none\"><circle cx=\"24\" cy=\"24\" r=\"14\" stroke=\"#60A5FA\" stroke-width=\"2\" fill=\"rgba(96,165,250,0.08)\"/><circle cx=\"19\" cy=\"21\" r=\"2\" fill=\"#60A5FA\"/><circle cx=\"29\" cy=\"21\" r=\"2\" fill=\"#60A5FA\"/><path d=\"M18 32c2-3 10-3 12 0\" stroke=\"#60A5FA\" stroke-width=\"2\" stroke-linecap=\"round\"/></svg>"
-    };
+    // SVG icons replaced with emoji tiles
+
 
     let _currentField = null, _currentProfileKey = null, _isMulti = false, _selectedValues = [];
 
@@ -1141,7 +1121,7 @@
           '<input type="range" id="mnBMax" min="500" max="50000" value="'+maxV+'" step="500" style="position:absolute;width:100%;-webkit-appearance:none;background:transparent;height:6px;pointer-events:none;top:0;margin:0"/>' +
           '<style>#mnBMin::-webkit-slider-thumb,#mnBMax::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#39A596;cursor:pointer;pointer-events:all;box-shadow:0 0 10px rgba(57,165,150,0.5)}</style></div>' +
           '<div style="display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,0.35);margin-bottom:20px"><span>₹500</span><span>₹50K+</span></div>' +
-          '<div style="display:flex;flex-wrap:wrap;gap:6px">' + presets.map(pr => '<button onclick="mnBPreset('+pr.mn+','+pr.mx+')" style="font-size:11px;font-weight:700;padding:6px 12px;border-radius:99px;border:1.5px solid rgba(255,255,255,0.1);background:transparent;color:rgba(255,255,255,0.5);cursor:pointer;font-family:Montserrat,sans-serif;transition:all 0.2s" onmouseover="this.style.borderColor='#39A596';this.style.color='#39A596'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='rgba(255,255,255,0.5)'">' + pr.l + '</button>').join('') + '</div>';
+          '<div style="display:flex;flex-wrap:wrap;gap:6px">' + presets.map(function(pr){ return '<button onclick="mnBPreset(' + pr.mn + ',' + pr.mx + ')" style="font-size:11px;font-weight:700;padding:6px 12px;border-radius:99px;border:1.5px solid rgba(255,255,255,0.1);background:transparent;color:rgba(255,255,255,0.5);cursor:pointer;font-family:Montserrat,sans-serif">' + pr.l + '</button>'; }).join('') + '</div>';
         
         window.mnBPreset = function(mn,mx) {
           document.getElementById('mnBMin').value = mn;
@@ -2341,8 +2321,8 @@ function closeEditModal() { document.getElementById('mnEditModalOverlay').classL
     <div id="mnHistoryPanelContent"></div>
   </div>
 
-  <!-- User Profile Section - Positioned AFTER Vibe Cards -->
-  <div class="user-profile-section" id="userProfileSection" style="display: none;">
+  <!-- User Profile Section -->
+  <div class="user-profile-section" id="userProfileSection">
     <div class="profile-hero">
       <!-- Top Row: Avatar + Name + Digital Closet Button -->
       <div class="profile-top-row">
