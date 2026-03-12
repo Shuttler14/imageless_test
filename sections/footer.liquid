@@ -1,0 +1,231 @@
+<section class="w-full z-10 top-0 bg-[#1F1F1F] px-3 md:px-6 pt-10 pb-[80px] md:py-12 flex flex-col gap-7 md:gap-9 lg:gap-11">
+  {% for block in section.blocks %}
+    {% if block.type == 'newslatter' %}
+      <div class="container max-w-screen-xl mx-auto ">
+        {%- form 'customer', class: 'max-w-sm mx-auto' -%}
+          <div
+            data-aos="fade-up"
+            class="flex flex-col gap-3 md:gap-4 justify-center items-center text-center text-balance"
+          >
+            {%- if form.posted_successfully? -%}
+              <p class="text-xl md:text-2xl normal-font">Thank you for subscribing our emails</p>
+            {% else %}
+              <p class="text-2xl md:text-3xl font-bold uppercase heading-font">{{ block.settings.block_title }}</p>
+              <p class="text-xl md:text-2xl normal-font">{{ block.settings.block_text }}</p>
+              <div class="w-full">
+                <input type="hidden" name="contact[tags]" value="newsletter">
+                <div class="flex border-b text-[#7A7A7A]">
+                  <input
+                    type="email"
+                    name="contact[email]"
+                    class="bg-transparent flex-1 p-2 focus:outline-none text-sm md:text-base text-white normal-font"
+                    value="{{ form.email }}"
+                    autocomplete="email"
+                    {% if form.errors %}
+                      autofocus
+                    {% endif %}
+                    placeholder="Enter Your Email"
+                    required
+                  >
+
+                  <button type="submit" class="bg-transparent uppercase p-2 px-3" name="commit">
+                    <i class="bi bi-chevron-right"></i>
+                  </button>
+                </div>
+                <div>
+                  {%- if form.errors -%}
+                    {{- form.errors.translated_fields.email | capitalize }}
+                    {{ form.errors.messages.email -}}
+                  {%- endif -%}
+                </div>
+              </div>
+            {%- endif -%}
+          </div>
+        {%- endform -%}
+      </div>
+    {% endif %}
+  {% endfor %}
+
+  <div class="container max-w-screen-xl mx-auto grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-8 md:gap-6 lg:gap-8">
+    {% for block in section.blocks %}
+      {% if block.type == 'company' %}
+        <div class="flex flex-col gap-1 md:gap-2">
+          {%- if block.settings.show_company_logo -%}
+            <figure class="">
+              {{
+                settings.footerLogo
+                | image_url: width: 500
+                | image_tag: loading: 'lazy', alt: settings.navlogo.alt, class: 'max-w-28 h-full object-contain'
+              }}
+            </figure>
+          {%- endif -%}
+          {% if block.settings.show_about_company or block.settings.show_phone_number or block.settings.show_email %}
+          <div class="flex flex-col gap-1 md:gap-2 text-sm md:text-base normal-font">
+            {%- if block.settings.show_about_company and block.settings.about_company != blank  -%}
+              <p class="mb-2 md:mb-4">{{ block.settings.about_company }}</p>
+            {% endif %}
+            {%- if block.settings.show_phone_number -%}
+              <div class="flex gap-2 items-center">
+                <span>{% render 'icons', icon: 'phone' %}</span>
+                <a href="tel:+91{{ shop.phone }}" class="transition-all hover:pl-1">{{ shop.phone }}</a>
+              </div>
+            {%- endif -%}
+            {%- if block.settings.show_email -%}
+              <div class="flex gap-2 items-center">
+                <span>{% render 'icons', icon: 'email' %}</span>
+                <a href="mailto:{{ shop.email }}" class="transition-all hover:pl-1">{{ shop.email }}</a>
+              </div>
+            {% endif %}
+          </div>
+          {% endif %}
+        </div>
+
+      {% elsif block.type == 'menu' %}
+        <div class="flex flex-col gap-3 md:gap-4">
+          <p class="text-xl md:text-2xl uppercase heading-font">{{ block.settings.menu_links.title }}</p>
+          <div class="flex flex-col gap-1 md:gap-2 text-sm md:text-base normal-font">
+            {% for link in block.settings.menu_links.links %}
+              <a href="{{ link.url }}" class="transition-all hover:pl-1">{{ link.title }}</a>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+  {% comment %}
+    {% elsif block.type == 'contact' %}
+    <div data-aos="fade-up" class="flex-1">
+      <p class="text-4xl md:text-5xl mb-4 md:mb-5">{{ block.settings.block_title }}</p>
+      <div class="text-2xl md:text-3xl flex flex-col gap-3 md:gap-4">
+        <a href="tel:{{ shop.phone }}" class="flex items-center gap-2">
+          {% render 'icons', icon: 'phone' %}
+          {{ shop.phone }}
+        </a>
+        <a href="mailto:{{ shop.email }}" class="flex items-center gap-2">
+          {% render 'icons', icon: 'email' %}
+          {{ shop.email }}
+        </a>
+      </div>
+    </div>
+  {% endcomment %}
+  <div class="container max-w-screen-xl mx-auto">
+    {% for block in section.blocks %}
+      {% if block.type == 'social' %}
+        <div data-aos="fade-up" class="flex flex-col gap-3 md:gap-4">
+          <p class="text-2xl md:text-3xl uppercase heading-font">{{ block.settings.block_title }}</p>
+          <div class="flex gap-3 md:gap-4 text-3xl">
+            {% if settings.facebook != blank %}
+              <a href="{{ settings.facebook }}" target="_blank"><i class="bi bi-facebook"></i></a>
+            {% endif %}
+            {% if settings.instagram != blank %}
+              <a href="{{ settings.instagram }}" target="_blank"><i class="bi bi-instagram"></i></a>
+            {% endif %}
+            {% if settings.twitter != blank %}
+              <a href="{{ settings.twitter }}" target="_blank"><i class="bi bi-twitter-x"></i></a>
+            {% endif %}
+            {% if settings.linkedin != blank %}
+              <a href="{{ settings.linkedin }}" target="_blank"><i class="bi bi-linkedin"></i></a>
+            {% endif %}
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+</section>
+{% schema %}
+{
+  "name": "Footer",
+  "tag": "footer",
+  "max_blocks": 6,
+  "settings": [],
+  "blocks": [
+    {
+      "type": "company",
+      "name": "company",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "label": "About Company",
+          "id": "about_company"
+        },
+        {
+          "type": "checkbox",
+          "label": "Show Company Logo",
+          "id": "show_company_logo",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "label": "Show About Company",
+          "id": "show_about_company",
+          "default": true
+        },
+
+        {
+          "type": "checkbox",
+          "label": "Show Phone Number",
+          "id": "show_phone_number",
+          "default": true
+        },
+
+        {
+          "type": "checkbox",
+          "label": "Show Email",
+          "id": "show_email",
+          "default": true
+        }
+      ]
+    },
+    {
+      "type": "menu",
+      "name": "Menu",
+      "limit": 3,
+      "settings": [
+        {
+          "type": "link_list",
+          "label": "Choose Link List",
+          "id": "menu_links"
+        }
+      ]
+    },
+    {
+      "type": "newslatter",
+      "name": "Newslatter",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "block_title",
+          "label": "Add Block Title",
+          "default": "Subscribe"
+        },
+        {
+          "type": "text",
+          "id": "block_text",
+          "label": "Add Block Text",
+          "default": "Subscribe to receive updates, access to exclusive deals, and more."
+        }
+      ]
+    },
+    {
+      "type": "social",
+      "name": "Social Media",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "block_title",
+          "label": "Add Block Title",
+          "default": "Follow Us On"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Footer"
+    }
+  ]
+}
+{% endschema %}

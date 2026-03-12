@@ -1,0 +1,727 @@
+{% comment %}
+  Narrative Stories - "Neon Morph" Edition
+  - Interaction: Click morphs icon to Circle -> Glowing Neon Spin -> Opens.
+  - Speed: First 4 badges Eager/Low Priority.
+  - Logic: 700ms delay masks the data fetch time.
+{% endcomment %}
+{% if request.page_type == 'index' or request.page_type == 'collection' %}
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
+
+<style>
+  @supports (padding-top: env(safe-area-inset-top)) {
+  :root { --safe-top: env(safe-area-inset-top); }
+  } 
+  @supports not (padding-top: env(safe-area-inset-top)) {
+  :root { --safe-top: 20px; }
+  }
+  :root{
+    --premium-accent: #39A596;
+    --premium-bg: {{ section.settings.bg_color }};
+    --premium-text: {{ section.settings.text_color }};
+    --badge-radius: 20px; /* The Squircle Shape */
+    --top-offset: calc(env(safe-area-inset-top) + 8px);
+  }
+
+  /* Section wrapper */
+  #narrative-stories-section{
+    padding:10px 0 0;
+    background:var(--premium-bg);
+    overflow:hidden;
+  }
+
+  .narrative-stories-inner{ max-width: 1200px; margin: 0 auto; }
+
+  .narrative-stories-heading{
+    margin: 0 0 8px;
+    font-family:'Montserrat', sans-serif;
+    font-size:20px;
+    font-weight:400;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--premium-text);
+    text-align:center;
+  }
+
+  #stories-wrapper{
+    display:flex;
+    gap:15px;
+    padding:10px 0;
+    padding-top:4px;
+    overflow-x:auto;
+    scrollbar-width:none;
+    -ms-overflow-style:none;
+    scroll-behavior:smooth;
+  }
+  #stories-wrapper::-webkit-scrollbar{ display:none; }
+
+  .story-trigger{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    cursor:pointer;
+    min-width:22vw;
+    max-width:90px;
+    transition:transform .26s;
+    position: relative;
+  }
+  @media (min-width:768px){ .story-trigger{ min-width:90px; } }
+  .story-trigger:hover{ transform:scale(1.04); }
+
+  .story-ring {
+    width:76px;
+    height:76px;
+    border-radius:var(--badge-radius);
+    padding:3px;
+    border:2px solid var(--premium-accent);
+    position:relative;
+    box-sizing:border-box;
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:transparent;
+    /* Smoothly animate shape changes */
+    transition: border-color 0.2s, border-radius 0.3s cubic-bezier(0.25, 1, 0.5, 1), transform 0.2s;
+  }
+
+  /* --- NEON GLOW ANIMATION --- */
+  @keyframes spinLoad { 
+    0% { transform: rotate(0deg); } 
+    100% { transform: rotate(360deg); } 
+  }
+
+  /* 1. When Loading: Hide the static square border */
+  .story-trigger.is-loading .story-ring {
+    border-color: transparent; 
+    border-radius: 50%; /* MORPH TO CIRCLE */
+    transform: scale(0.92); /* Slight press effect */
+  }
+
+  /* 2. When Loading: The Glowing Light appears */
+  .story-trigger.is-loading .story-ring::after {
+    content: '';
+    position: absolute;
+    inset: -4px; /* Sits outside the ring */
+    border-radius: 50%;
+    border: 3px solid transparent; /* Invisible base */
+    
+    /* The Glowing Arc */
+    border-top-color: var(--premium-accent);
+    border-right-color: var(--premium-accent);
+    
+    /* The Neon Effect */
+    box-shadow: 0 0 10px 1px var(--premium-accent), inset 0 0 4px var(--premium-accent);
+    filter: drop-shadow(0 0 5px var(--premium-accent));
+    
+    animation: spinLoad 0.7s linear infinite;
+    z-index: 10;
+  }
+  
+  .story-trigger.is-loading { pointer-events: none; } 
+
+  .story-img {
+    width:100%;
+    height:100%;
+    border-radius:calc(var(--badge-radius) - 4px);
+    object-fit:cover;
+    display:block;
+    transition: border-radius 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+  
+  /* Also morph the inner image to circle so it matches the ring */
+  .story-trigger.is-loading .story-img {
+    border-radius: 50%;
+  }
+
+  .story-title {
+    margin-top:8px;
+    font-family:'Montserrat', sans-serif;
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    color:var(--premium-text);
+    text-align:center;
+    width:100%;
+    line-height:1.2;
+    display:-webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+
+  .view-all-trigger .story-ring {
+    position: relative;
+    border: 2px solid var(--premium-text);
+    background: #1a1a1a;
+    overflow: hidden;
+  }
+
+  .view-all-trigger .story-ring::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 0;
+    height: 0;
+    border-left: 18px solid #39A596;
+    border-top: 12px solid transparent;
+    border-bottom: 12px solid transparent;
+    z-index: 2;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+  }
+
+  /* Sidebar */
+  #sidebar-overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(5px); z-index:99998; opacity:0; visibility:hidden; transition:opacity .3s ease; }
+  #sidebar-overlay.active{ opacity:1; visibility:visible; }
+  
+  #all-narratives-sidebar{ position:fixed; top:0; right:-100%; width:100%; max-width:450px; height:100vh; background:#0a0a0a; z-index:99999; transition:right .36s cubic-bezier(.77,0,.175,1); box-shadow:-10px 0 30px rgba(0,0,0,0.8); }
+  #all-narratives-sidebar.active{ right:0; }
+  
+  .sidebar-header{ padding:20px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #333; }
+  .sidebar-title{ color:#fff; font-size:14px; letter-spacing:2px; text-transform:uppercase; font-weight:600; }
+  
+  .sidebar-grid{ padding:20px; display:grid; grid-template-columns:repeat(3,1fr); gap:20px; max-height:calc(100vh - 80px); overflow-y:auto; scrollbar-width:none; -ms-overflow-style:none; }
+  .sidebar-grid::-webkit-scrollbar{ display:none; }
+
+  .sidebar-grid .grid-item{ text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; }
+  .sidebar-grid .grid-item img{ width:85px; height:85px; border-radius:16px; border:1px solid #444; object-fit:cover; display:block; margin-bottom:6px; }
+  .sidebar-grid .grid-item span{ color:#ddd; font-size:11px; text-align:center; line-height:1.15; max-width:90%; }
+
+  /* Fullscreen viewer */
+  .ns-modal{ position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:2147483647; display:none; align-items:center; justify-content:center; }
+  .ns-modal.active{ display:flex; }
+
+  .ns-stage{ width:100vw; height:100vh; position:relative; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+
+  .ns-progress-wrap { position: absolute; top: 0; left: 8px; right: 8px; padding-top: max(40px, var(--safe-top, 20px)) !important; display: flex; gap: 6px; z-index: 130; pointer-events: none; box-sizing: border-box; }
+  .ns-progress-seg{ flex:1; height:3px; background:rgba(255,255,255,0.12); border-radius:2px; overflow:hidden; }
+  .ns-progress-fill{ height:100%; width:0%; background:var(--premium-accent); transition:width linear; transform-origin:left; }
+
+  .ns-top-left { position: absolute; left: 12px; top: max(46px, var(--safe-top, 20px)) !important; z-index: 125; display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.35); padding: 8px 12px; border-radius: 999px; backdrop-filter: blur(8px); transform: translateY(calc(var(--safe-top, 20px) * 0.3)); }
+  .ns-top-left .thumb { width:36px; height:36px; border-radius:calc(var(--badge-radius) - 8px); overflow:hidden; flex-shrink:0; border:1px solid rgba(255,255,255,0.06); }
+  .ns-top-left .thumb img{ width:100%; height:100%; object-fit:cover; display:block; border-radius:calc(var(--badge-radius) - 8px); }
+  .ns-top-left .title { color:#fff; font-weight:700; font-family:'Montserrat',sans-serif; font-size:12px; text-transform:uppercase; letter-spacing:0.5px; }
+
+  .ns-media{ position:relative; width:100%; height:100%; display:flex; align-items:center; justify-content:center; z-index:50; }
+  .ns-media-inner { aspect-ratio: 9 / 16; width: min(56.25vh, 100vw); max-height: 100vh; display:flex; align-items:center; justify-content:center; overflow:hidden; border-radius:8px; background:#000; }
+  @media (max-aspect-ratio: 9/16) { .ns-media-inner { width:100vw; height: min(177.78vw, 100vh); } }
+
+  .ns-media-inner img, .ns-media-inner video { width:100%; height:100%; object-fit:cover; display:block; pointer-events: none; }
+
+  .ns-cta{ position:absolute; left:50%; transform:translateX(-50%); bottom:15vh; z-index:140; background:#fff; color:#000; padding:12px 20px; border-radius:10px; font-weight:700; text-decoration:none; min-width:140px; display:flex; align-items:center; justify-content:center; }
+  .ns-interact{ position:absolute; inset:0; z-index:120; touch-action:pan-y; -webkit-tap-highlight-color: transparent; }
+  .ns-prev, .ns-next, .ns-close { display:none !important; }
+
+  @media (max-width:520px){
+    :root { --top-offset: calc(env(safe-area-inset-top) + 10px); }
+    .story-ring{ width:72px; height:72px; border-radius:calc(var(--badge-radius) - 4px); }
+    .ns-top-left .thumb { width:34px; height:34px; }
+    .ns-cta{ bottom:12vh; min-width:120px; padding:10px 16px; }
+    .ns-progress-wrap{ left:6px; right:6px; }
+    .ns-top-left { top: calc(var(--top-offset) + 6px); padding:4px 8px; gap:6px; }
+  }
+  @media (max-width: 749px){ #stories-wrapper{ padding-left:12px; padding-right:12px; } }
+  @media (max-width: 1023px){ .story-trigger--extra{ display:none; } }
+  @media (min-width: 1024px){ .story-trigger{ min-width:110px; max-width:110px; } .story-ring{ width:96px; height:96px; } .view-all-trigger{ display:none; } }
+</style>
+
+<div id="narrative-stories-section">
+  <div class="page-width narrative-stories-inner">
+    <h2 class="narrative-stories-heading">CHOOSE YOUR NARRATIVE</h2>
+
+    {% comment %} NARRATIVE STORIES - PRIORITY 1 {% endcomment %}
+{% comment %} ... (Keep your existing CSS/Script setup unchanged, just replacing the loop below) ... {% endcomment %}
+
+    <div id="stories-wrapper" aria-hidden="false">
+      {% for block in section.blocks %}
+        {% assign collection = collections[block.settings.narrative_collection] %}
+        {% if collection %}
+          {% assign thumb_image = collection.image %}
+          {% if block.settings.custom_thumbnail != blank %}
+            {% assign thumb_image = block.settings.custom_thumbnail %}
+          {% endif %}
+          
+          <div class="story-trigger{% if forloop.index > 8 %} story-trigger--extra{% endif %}" data-handle="{{ collection.handle }}">
+            <div class="story-ring" data-handle="{{ collection.handle }}">
+              
+              {% comment %} PRIORITY 1: Top 4 Icons get HIGH priority {% endcomment %}
+              {% if forloop.index <= 4 %}
+                <img src="{{ thumb_image | img_url: '200x200', crop: 'center' }}" 
+                     class="story-img" 
+                     alt="{{ collection.title }}" 
+                     loading="eager" 
+                     fetchpriority="high" 
+                     width="200" height="200">
+              {% else %}
+                {% comment %} The rest wait for the page to settle {% endcomment %}
+                <img src="{{ thumb_image | img_url: '200x200', crop: 'center' }}" 
+                     class="story-img" 
+                     alt="{{ collection.title }}" 
+                     loading="lazy" 
+                     width="200" height="200" 
+                     data-post-load="true">
+              {% endif %}
+
+            </div>
+            <span class="story-title">{{ collection.title }}</span>
+          </div>
+        {% endif %}
+      {% endfor %}
+      
+      {% comment %} ... (Keep View All button) ... {% endcomment %}
+    </div>
+  </div>
+</div>
+
+<div id="sidebar-overlay" onclick="toggleSidebar()"></div>
+<div id="all-narratives-sidebar">
+  <div class="sidebar-header">
+    <span class="sidebar-title">Select Narrative</span>
+    <button class="close-sidebar" onclick="toggleSidebar()">&times;</button>
+  </div>
+  <div class="sidebar-grid">
+    {% for block in section.blocks %}
+      {% assign collection = collections[block.settings.narrative_collection] %}
+      {% if collection %}
+        {% assign thumb_image = collection.image %}
+        {% if block.settings.custom_thumbnail != blank %}
+          {% assign thumb_image = block.settings.custom_thumbnail %}
+        {% endif %}
+        <div class="grid-item" data-handle="{{ collection.handle }}">
+          <img src="{{ thumb_image | img_url: '250x250', crop: 'center' }}" alt="{{ collection.title }}" loading="lazy" width="250" height="250">
+          <span>{{ collection.title }}</span>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>
+
+<div class="ns-modal" id="ns-modal" aria-hidden="true" role="dialog" aria-label="Stories viewer">
+  <div class="ns-stage" id="ns-stage">
+    <div class="ns-progress-wrap" id="ns-progress-wrap"></div>
+    <div class="ns-top-left" id="ns-top-left" style="display:none;">
+      <div class="thumb"><img src="" alt="thumb"></div>
+      <div class="title"></div>
+    </div>
+    <div class="ns-media" id="ns-media" aria-live="polite">
+      <div class="ns-media-inner" id="ns-media-inner"></div>
+    </div>
+    <div class="ns-interact" id="ns-interact" title="Tap left/right; swipe left/right to change narratives"></div>
+    <a href="#" target="_blank" rel="noopener" class="ns-cta" id="ns-cta" style="display:none;"></a>
+  </div>
+</div>
+
+<script>
+  window.__nsModalOpen = false;
+
+  const STORIES = [
+    {% for block in section.blocks %}
+      {% assign collection = collections[block.settings.narrative_collection] %}
+      {% if collection %}
+        {% assign thumb_image = collection.image %}
+        {% if block.settings.custom_thumbnail != blank %}
+          {% assign thumb_image = block.settings.custom_thumbnail %}
+        {% endif %}
+        {% assign btn_text = block.settings.cta_text | default: "SHOP THE VIBE" %}
+        {% assign cta_mode = block.settings.cta_link_mode | default: "collection" %}
+        {% assign cta_custom_url = block.settings.cta_custom_url | default: "" %}
+
+        {% assign vid1 = "" %}{% assign vid2 = "" %}{% assign vid3 = "" %}
+        {% if block.settings.story_video_1 != blank %}
+          {% for source in block.settings.story_video_1.sources %}
+            {% if source.format == 'mp4' %}{% assign vid1 = source.url %}{% break %}{% endif %}
+          {% endfor %}
+        {% endif %}
+        {% if block.settings.story_video_2 != blank %}
+          {% for source in block.settings.story_video_2.sources %}
+            {% if source.format == 'mp4' %}{% assign vid2 = source.url %}{% break %}{% endif %}
+          {% endfor %}
+        {% endif %}
+        {% if block.settings.story_video_3 != blank %}
+          {% for source in block.settings.story_video_3.sources %}
+            {% if source.format == 'mp4' %}{% assign vid3 = source.url %}{% break %}{% endif %}
+          {% endfor %}
+        {% endif %}
+
+        {% assign img1 = block.settings.story_image_1 %}
+        {% assign img2 = block.settings.story_image_2 %}
+        {% assign img3 = block.settings.story_image_3 %}
+
+      {
+        id: "{{ collection.handle }}",
+        title: {{ collection.title | json }},
+        url: "{{ collection.url }}",
+        thumb: "{{ thumb_image | img_url: '400x400', crop: 'center' }}",
+        cta_text: {{ btn_text | json }},
+        cta_mode: "{{ cta_mode }}",
+        cta_custom_url: "{{ cta_custom_url }}",
+        items: [
+          {
+            id: "{{ collection.handle }}-1",
+            type: "{% if vid1 != blank %}video{% elsif img1 != blank %}image{% else %}image{% endif %}",
+            src: "{% if vid1 != blank %}{{ vid1 }}{% elsif img1 != blank %}{{ img1 | img_url: '1200x1200' }}{% else %}{{ collection.image | img_url: '1200x1200' }}{% endif %}",
+            preview: "{{ thumb_image | img_url: '400x400', crop: 'center' }}"
+          }
+          {% if vid2 != blank or img2 != blank %}
+          ,{
+            id: "{{ collection.handle }}-2",
+            type: "{% if vid2 != blank %}video{% else %}image{% endif %}",
+            src: "{% if vid2 != blank %}{{ vid2 }}{% else %}{{ img2 | img_url: '1200x1200' }}{% endif %}",
+            preview: "{{ thumb_image | img_url: '400x400', crop: 'center' }}"
+          }
+          {% endif %}
+          {% if vid3 != blank or img3 != blank %}
+          ,{
+            id: "{{ collection.handle }}-3",
+            type: "{% if vid3 != blank %}video{% else %}image{% endif %}",
+            src: "{% if vid3 != blank %}{{ vid3 }}{% else %}{{ img3 | img_url: '1200x1200' }}{% endif %}",
+            preview: "{{ thumb_image | img_url: '400x400', crop: 'center' }}"
+          }
+          {% endif %}
+        ]
+      }{% unless forloop.last %},{% endunless %}
+      {% endif %}
+    {% endfor %}
+  ];
+
+  if(!STORIES || STORIES.length === 0){ STORIES.push({id:'demo',title:'Demo Narrative',url:'#',thumb:'',cta_text:'',cta_mode:'none',items:[{id:'demo-1',type:'image',src:'',preview:''}]}); }
+
+  function isVideo(item){ return item && (item.type === 'video' || (/\.mp4($|\?)/i).test(item.src || '')); }
+
+  const modal = document.getElementById('ns-modal');
+  const mediaInner = document.getElementById('ns-media-inner');
+  const progressWrap = document.getElementById('ns-progress-wrap');
+  const ctaBtn = document.getElementById('ns-cta');
+  const interact = document.getElementById('ns-interact');
+  const topLeft = document.getElementById('ns-top-left');
+
+  let currentStory = 0, currentItem = 0, progressFills = [], rafId = null, segStart = 0;
+
+  /* --- ULTIMATE PRELOADER (Now Buffers Videos Too) --- */
+  function preloadNextItems() {
+    const story = STORIES[currentStory];
+    let nextItem = null;
+    
+    // 1. Check for the Next Slide in the SAME story
+    if(currentItem + 1 < story.items.length) {
+      nextItem = story.items[currentItem + 1];
+    } 
+    // 2. If current story is over, check First Slide of NEXT story
+    else if(currentStory + 1 < STORIES.length) {
+      nextItem = STORIES[currentStory + 1].items[0];
+      
+      // Also preload the ICON (thumb) for the next story
+      const nextStory = STORIES[currentStory + 1];
+      if (nextStory && !nextStory.thumbPreloaded) {
+        const icon = new Image();
+        icon.src = nextStory.thumb;
+        nextStory.thumbPreloaded = true;
+      }
+    }
+
+    // 3. Execute the Preload (Image OR Video)
+    if(nextItem && !nextItem.preloaded) {
+      console.log("Preloading next item:", nextItem.type); // Debug check
+      
+      if(nextItem.type === 'video') {
+        // Create a ghost video element to start buffering bytes
+        const v = document.createElement('video');
+        v.src = nextItem.src;
+        v.preload = 'auto'; 
+        v.muted = true; // Required to allow background buffering
+        v.load(); // Trigger the network request immediately
+      } else {
+        // Standard image fetch
+        const img = new Image();
+        img.src = nextItem.src;
+      }
+      
+      nextItem.preloaded = true; // Mark as done to avoid duplicate requests
+    }
+  }
+
+  function renderProgressBars(storyIndex){
+    progressWrap.innerHTML = '';
+    progressFills = [];
+    const items = (STORIES[storyIndex] && STORIES[storyIndex].items) || [];
+    items.forEach(()=>{
+      const seg = document.createElement('div'); seg.className='ns-progress-seg';
+      const fill = document.createElement('div'); fill.className='ns-progress-fill';
+      seg.appendChild(fill); progressWrap.appendChild(seg); progressFills.push(fill);
+    });
+  }
+
+  function showCurrent(){
+    cancelRAF();
+    mediaInner.innerHTML='';
+    topLeft.style.display='none';
+
+    const story = STORIES[currentStory];
+    if(!story) return closeModal();
+    const item = story.items[currentItem];
+    if(!item) return closeModal();
+
+    preloadNextItems();
+
+    let ctaHref = '#';
+    if(story.cta_mode === 'collection') ctaHref = story.url || '#';
+    else if(story.cta_mode === 'custom') ctaHref = story.cta_custom_url || '#';
+
+    if(story.cta_mode !== 'none' && ctaHref && ctaHref !== '#'){
+      ctaBtn.style.display='flex'; ctaBtn.href = ctaHref; ctaBtn.innerText = story.cta_text || 'SHOP THE VIBE';
+    } else { ctaBtn.style.display='none'; }
+
+    const thumbEl = topLeft.querySelector('.thumb img');
+    thumbEl.src = story.thumb || '';
+    topLeft.querySelector('.title').innerText = story.title || '';
+    topLeft.style.display = 'flex';
+
+    progressFills.forEach((f,i)=> f.style.width = i < currentItem ? '100%' : '0%');
+
+    const displayBox = document.createElement('div');
+    displayBox.style.width = 'min(56.25vh,100vw)';
+    displayBox.style.height = 'auto';
+    displayBox.style.maxHeight = '100vh';
+    displayBox.style.aspectRatio = '9 / 16';
+    displayBox.style.overflow = 'hidden';
+    displayBox.style.display = 'flex';
+    displayBox.style.alignItems = 'center';
+    displayBox.style.justifyContent = 'center';
+    displayBox.style.background = '#000';
+
+    if(isVideo(item)){
+      const v = document.createElement('video');
+      v.src = item.src; v.autoplay = true; v.playsInline = true;
+      v.setAttribute('playsinline', ''); v.setAttribute('webkit-playsinline', '');
+      v.muted = false; v.controls = false;
+      v.style.width = '100%'; v.style.height = '100%'; v.style.objectFit = 'cover'; v.style.pointerEvents = 'none';
+
+      displayBox.appendChild(v); mediaInner.appendChild(displayBox);
+
+      v.addEventListener('loadedmetadata', ()=> {
+        const durMs = (isFinite(v.duration) && v.duration > 0) ? v.duration * 1000 : 7000;
+        startSegment(durMs, ()=> nextItemOrStory());
+      });
+      v.addEventListener('ended', ()=> nextItemOrStory());
+      setTimeout(()=> { if(!v.duration || v.duration === Infinity){ startSegment(7000, ()=> nextItemOrStory()); } }, 800);
+    } else {
+      const img = document.createElement('img');
+      img.src = item.src || item.preview || story.thumb; img.alt = story.title || '';
+      img.style.width = '100%'; img.style.height = '100%'; img.style.objectFit = 'cover'; img.style.pointerEvents = 'none';
+      displayBox.appendChild(img); mediaInner.appendChild(displayBox);
+      startSegment(5000, ()=> nextItemOrStory());
+    }
+  }
+
+  function startSegment(durationMs, onFinish){
+    cancelRAF();
+    segStart = performance.now();
+    const fill = progressFills[currentItem];
+    if(!fill){ if(typeof onFinish === 'function') onFinish(); return; }
+    fill.style.transition = 'none';
+    function tick(now){
+      const elapsed = now - segStart;
+      const pct = Math.min(100, (elapsed / durationMs) * 100);
+      fill.style.width = pct + '%';
+      if(elapsed < durationMs) rafId = requestAnimationFrame(tick);
+      else { fill.style.width = '100%'; if(typeof onFinish === 'function') onFinish(); }
+    }
+    rafId = requestAnimationFrame(tick);
+  }
+
+  function cancelRAF(){ try{ if(rafId) cancelAnimationFrame(rafId); } catch(e){} rafId = null; }
+
+  function nextItemOrStory(){
+    const story = STORIES[currentStory];
+    if(currentItem < (story.items.length - 1)){ currentItem++; showCurrent(); }
+    else if(currentStory < (STORIES.length - 1)){ currentStory++; currentItem = 0; renderProgressBars(currentStory); showCurrent(); }
+    else { closeModal(); }
+  }
+
+  function prevItemOrStory(){
+    if(currentItem > 0){ currentItem--; showCurrent(); }
+    else if(currentStory > 0){ currentStory--; currentItem = STORIES[currentStory].items.length - 1; renderProgressBars(currentStory); showCurrent(); }
+    else { currentItem = 0; showCurrent(); }
+  }
+
+  function nextNarrative(){
+    if(currentStory < STORIES.length - 1){ currentStory++; currentItem = 0; renderProgressBars(currentStory); showCurrent(); }
+    else { closeModal(); }
+  }
+
+  function prevNarrative(){
+    if(currentStory > 0){ currentStory--; currentItem = 0; renderProgressBars(currentStory); showCurrent(); }
+  }
+
+  function openStory(handle){
+    const idx = STORIES.findIndex(s => s.id === handle);
+    if(idx < 0) return;
+    currentStory = idx; currentItem = 0; renderProgressBars(currentStory); showCurrent();
+    document.body.style.overflow = 'hidden'; modal.classList.add('active'); modal.setAttribute('aria-hidden','false');
+    try{ if(!window.__nsModalOpen){ window.history.pushState({ nsModal:true }, '', window.location.href); } }catch(e){}
+    window.__nsModalOpen = true;
+  }
+
+  function closeModal(){
+    modal.classList.remove('active'); modal.setAttribute('aria-hidden','true');
+    cancelRAF(); mediaInner.innerHTML=''; topLeft.style.display='none'; document.body.style.overflow = '';
+    window.__nsModalOpen = false;
+  }
+
+  function attachTriggers(){
+    document.querySelectorAll('.story-trigger').forEach(el => {
+      el.removeEventListener('click', triggerClick); el.addEventListener('click', triggerClick);
+    });
+  }
+
+  /* --- MODIFIED TRIGGER CLICK (With 700ms Delay + Preload) --- */
+  function triggerClick(){
+    if(this.classList && this.classList.contains('view-all-trigger')) return;
+    if(this.classList.contains('is-loading')) return; 
+
+    const handle = this.querySelector('.story-ring')?.dataset?.handle || this.dataset?.handle;
+    if(!handle) return;
+
+    // 1. Start Animation (Visual)
+    this.classList.add('is-loading');
+
+    // 2. Secretly Preload First Item (Performance)
+    const story = STORIES.find(s => s.id === handle);
+    if(story && story.items[0]){
+       const firstItem = story.items[0];
+       if(firstItem.type === 'video'){
+         const v = document.createElement('video');
+         v.src = firstItem.src;
+         v.preload = 'auto'; // Start buffering
+       } else {
+         const img = new Image();
+         img.src = firstItem.src;
+       }
+    }
+
+    // 3. Wait 700ms, Then Open (UX)
+    setTimeout(() => {
+       this.classList.remove('is-loading');
+       openStory(handle);
+    }, 700);
+  }
+
+  attachTriggers();
+
+  document.querySelectorAll('.grid-item').forEach(el => {
+    el.addEventListener('click', function(){
+      const h = this.dataset.handle;
+      if(h){ openStory(h); toggleSidebar(); }
+    });
+  });
+
+  window.toggleSidebar = function(){
+    document.getElementById('all-narratives-sidebar').classList.toggle('active');
+    document.getElementById('sidebar-overlay').classList.toggle('active');
+  };
+
+  (function attachZoneAndTouch(){
+    const overlay = interact;
+    let startX = 0, startY = 0, startT = 0, moved = false;
+    const threshold = 50; const leftPct = 0.4;
+
+    overlay.addEventListener('touchstart', function(e){
+      if(!e.touches || e.touches.length === 0) return;
+      startX = e.touches[0].clientX; startY = e.touches[0].clientY; startT = Date.now(); moved = false;
+    }, {passive:false});
+
+    overlay.addEventListener('touchmove', function(){ moved = true; }, {passive:true});
+
+    overlay.addEventListener('touchend', function(e){
+      const endT = Date.now(); const dt = endT - startT;
+      const touch = (e.changedTouches && e.changedTouches[0]) || {};
+      const dx = (touch.clientX || startX) - startX; const dy = (touch.clientY || startY) - startY;
+
+      if(Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > threshold){
+        if(dx < 0) nextNarrative(); else prevNarrative();
+        return;
+      }
+      if(!moved && dt < 350){
+        const rect = overlay.getBoundingClientRect(); const x = touch.clientX || startX; const rel = (x - rect.left) / rect.width;
+        if(rel <= leftPct) prevItemOrStory(); else nextItemOrStory();
+      }
+    }, {passive:false, capture:true});
+
+    overlay.addEventListener('pointerdown', function(e){ if(e.pointerType === 'mouse' && e.button !== 0) return; startX = e.clientX; startY = e.clientY; startT = Date.now(); moved = false; });
+    overlay.addEventListener('pointermove', function(){ moved = true; });
+    overlay.addEventListener('pointerup', function(e){
+      const dt = Date.now() - startT; const dx = e.clientX - startX; const dy = e.clientY - startY;
+      if(Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > threshold){ if(dx < 0) nextNarrative(); else prevNarrative(); return; }
+      if(!moved && dt < 350){ const rect = overlay.getBoundingClientRect(); const rel = (e.clientX - rect.left) / rect.width; if(rel <= leftPct) prevItemOrStory(); else nextItemOrStory(); }
+    });
+    overlay.addEventListener('click', function(e){
+      const rect = overlay.getBoundingClientRect(); const x = (e.changedTouches && e.changedTouches[0] && e.changedTouches[0].clientX) || e.clientX; const rel = (x - rect.left) / rect.width;
+      if(rel <= leftPct) prevItemOrStory(); else nextItemOrStory();
+    });
+  })();
+
+  (function protectCTA(){
+    if(!ctaBtn) return;
+    const stop = function(e){ e.stopPropagation(); };
+    ctaBtn.addEventListener('click', stop, {passive:false});
+    ctaBtn.addEventListener('pointerdown', stop, {passive:false});
+    ctaBtn.addEventListener('touchend', stop, {passive:false});
+  })();
+
+  document.addEventListener('keydown', function(e){
+    if(!modal.classList.contains('active')) return;
+    if(e.key === 'ArrowRight') nextNarrative(); if(e.key === 'ArrowLeft') prevNarrative(); if(e.key === 'Escape') closeModal();
+  });
+
+  document.getElementById('ns-modal').addEventListener('click', function(e){ if(e.target === this) closeModal(); });
+  window.addEventListener('popstate', function(){ if(window.__nsModalOpen){ closeModal(); } });
+  
+  window.openStory = openStory;
+
+  /* --- 2. POST-LOAD PRELOADER (Bubbles 5+) --- */
+  window.addEventListener('load', function() {
+    // Wait 2s for critical content to settle, then download hidden badges
+    setTimeout(() => {
+      const hiddenBadges = document.querySelectorAll('#stories-wrapper img[data-post-load="true"]');
+      hiddenBadges.forEach(img => {
+        img.setAttribute('loading', 'eager');
+        img.removeAttribute('data-post-load');
+      });
+    }, 2000);
+  });
+
+</script>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Narrative Stories",
+  "max_blocks": 20,
+  "settings": [
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#000000" },
+    { "type": "color", "id": "text_color", "label": "Text Color", "default": "#ffffff" }
+  ],
+  "blocks": [
+    {
+      "type": "narrative",
+      "name": "Narrative Block",
+      "settings": [
+        { "type": "collection", "id": "narrative_collection", "label": "Select Narrative Collection" },
+        { "type": "image_picker", "id": "custom_thumbnail", "label": "Custom Thumbnail" },
+        { "type": "text", "id": "cta_text", "label": "Button Text", "default": "SHOP THE VIBE" },
+        { "type": "select", "id": "cta_link_mode", "label": "CTA Link Mode", "options": [{ "value": "collection", "label": "Use collection URL" }, { "value": "custom", "label": "Custom URL" }, { "value": "none", "label": "No CTA" }], "default": "collection" },
+        { "type": "text", "id": "cta_custom_url", "label": "Custom CTA URL" },
+        { "type": "video", "id": "story_video_1", "label": "Video 1 (Optional)" },
+        { "type": "image_picker", "id": "story_image_1", "label": "Image 1 (Optional)" },
+        { "type": "video", "id": "story_video_2", "label": "Video 2 (Optional)" },
+        { "type": "image_picker", "id": "story_image_2", "label": "Image 2 (Optional)" },
+        { "type": "video", "id": "story_video_3", "label": "Video 3 (Optional)" },
+        { "type": "image_picker", "id": "story_image_3", "label": "Image 3 (Optional)" }
+      ]
+    }
+  ],
+  "presets": [ { "name": "Narrative Stories" } ]
+}
+{% endschema %}

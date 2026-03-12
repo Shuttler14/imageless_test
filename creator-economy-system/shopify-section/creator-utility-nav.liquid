@@ -1,0 +1,135 @@
+{% comment %}
+=================================================================================
+MY NARRATIVE - CREATOR UTILITY NAVIGATION
+=================================================================================
+Subtle "Earn with Us" or "Creator Login" link in utility bar (top or footer)
+
+INTEGRATION:
+Add to your theme.liquid inside the utility/top-bar section:
+{% section 'creator-utility-nav' %}
+
+Or render in header/footer:
+{% render 'creator-utility-nav' %}
+
+PLACEMENT OPTIONS:
+- Top utility bar (above main header)
+- Footer links
+- Both
+
+=================================================================================
+{% endcomment %}
+
+{% assign customer = shop.customer %}
+
+<style>
+  .mn-creator-utility-nav {
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  .mn-creator-utility-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 12px;
+    transition: all 0.3s ease;
+    border-radius: 4px;
+  }
+
+  .mn-creator-utility-link:hover {
+    color: #fbbf24;
+    background: rgba(251, 191, 36, 0.1);
+  }
+
+  .mn-creator-utility-link .icon {
+    font-size: 14px;
+  }
+
+  /* Style variants */
+  .mn-creator-utility-nav.inline .mn-creator-utility-link {
+    padding: 0;
+    border-radius: 0;
+  }
+
+  .mn-creator-utility-nav.inline .mn-creator-utility-link:hover {
+    background: transparent;
+  }
+
+  .mn-creator-utility-nav.button-style .mn-creator-utility-link {
+    background: linear-gradient(135deg, rgba(57, 165, 150, 0.2), rgba(57, 165, 150, 0.1));
+    border: 1px solid rgba(57, 165, 150, 0.3);
+    border-radius: 6px;
+    padding: 8px 14px;
+  }
+
+  .mn-creator-utility-nav.button-style .mn-creator-utility-link:hover {
+    border-color: #39A596;
+    color: #39A596;
+  }
+</style>
+
+<div class="mn-creator-utility-nav {{ section.settings.style }}">
+  {% comment %} Show different links based on login status {% endcomment %}
+
+  {% if customer %}
+    {% comment %} Logged in - show Creator Dashboard link {% endcomment %}
+    <a href="/account#creator-dashboard" class="mn-creator-utility-link">
+      <span class="icon">💼</span>
+      <span>Creator Studio</span>
+    </a>
+  {% else %}
+    {% comment %} Not logged in - show "Earn with Us" {% endcomment %}
+
+    {% if section.settings.show_login_button %}
+      <a href="/account/login?return_url=/account#creator-dashboard" class="mn-creator-utility-link">
+        <span class="icon">✨</span>
+        <span>Creator Login</span>
+      </a>
+    {% else %}
+      <a href="/pages/become-creator" class="mn-creator-utility-link">
+        <span class="icon">💰</span>
+        <span>Earn with Us</span>
+      </a>
+    {% endif %}
+
+  {% endif %}
+</div>
+
+{% schema %}
+{
+  "name": "Creator Utility Nav",
+  "settings": [
+    {
+      "type": "select",
+      "id": "style",
+      "label": "Style",
+      "options": [
+        {
+          "value": "inline",
+          "label": "Inline (minimal)"
+        },
+        {
+          "value": "button-style",
+          "label": "Button Style"
+        }
+      ],
+      "default": "inline"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_login_button",
+      "label": "Show 'Creator Login' instead of 'Earn with Us'",
+      "default": false,
+      "info": "When checked, shows login link for existing creators"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Creator Utility Nav"
+    }
+  ]
+}
+{% endschema %}

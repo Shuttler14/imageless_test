@@ -1,0 +1,114 @@
+<a
+  href="{{ product.url | within: collection }}"
+  class="border-white/50 flex flex-col gap-3 md:gap-4 border p-2 bg-black group"
+>
+  <figure class="overflow-hidden relative aspect-[5/6]">
+    {% if wishlist %}
+      <button
+        type="button"
+        onclick="this.classList.toggle('active'); event.preventDefault(); event.stopPropagation();"
+        class="absolute top-3 right-3 z-10 flex items-center justify-center w-11 h-11 rounded-full bg-black/20 backdrop-blur-sm border border-white/30 text-white transition-all hover:scale-110 focus:outline-none wishlist-btn"
+        data-for="product-card-wishlist"
+        data-product-handle="{{ product.handle }}"
+      >
+        <i class="bi bi-heart text-lg group-[.active]:hidden group-hover:hidden"></i>
+        <i class="bi bi-heart-fill text-lg hidden group-[.active]:block group-hover:block text-[#39A596]"></i>
+      </button>
+    {% endif %}
+
+    <div class="product-card-image-wrapper h-full w-full bg-gray-900">
+      
+      {% comment %} 
+        -------------------------------------------------------
+        LOGIC BRANCH: RADAR vs. PRIORITY 3 vs. STANDARD
+        -------------------------------------------------------
+      {% endcomment %}
+      
+      {% if super_lazy %}
+        {% comment %} 1. RADAR MODE: 1x1 Pixel Placeholder + IntersectionObserver {% endcomment %}
+        <img
+          src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxIiBoZWlnaHQ9IjEiPjwvc3ZnPg=="
+          data-src="{{ product.featured_image | image_url: width: 600 }}"
+          alt="{{ product.featured_image.alt | escape }}"
+          class="object-cover h-full w-full transition-opacity duration-500 opacity-0 reveal-on-radar {{ radar_class }}"
+          width="600"
+          height="750"
+          loading="lazy"
+        >
+      {% else %}
+        {% comment %} 2. IMMEDIATE LOADING MODES {% endcomment %}
+        
+        {% assign loading_attr = 'lazy' %}
+        {% assign fetch_priority = 'auto' %}
+        
+        {% if super_lazy == false %}
+           {% comment %} 
+             PRIORITY 3 STRATEGY (First Slider, Images 1-2):
+             - Load immediately (Eager) so user sees them.
+             - Low Priority so they don't slow down the Hero Banner.
+           {% endcomment %}
+           {% assign loading_attr = 'eager' %}
+           {% assign fetch_priority = 'low' %}
+        
+        {% elsif lazy_load == false %}
+           {% comment %} 
+             STANDARD LCP (e.g. Product Page Main Image):
+             - Load immediately (Eager).
+             - High Priority (Max Speed).
+           {% endcomment %}
+           {% assign loading_attr = 'eager' %}
+           {% assign fetch_priority = 'high' %}
+        {% endif %}
+        
+        {{
+          product.featured_image
+          | image_url: width: 600
+          | image_tag: 
+            loading: loading_attr, 
+            fetchpriority: fetch_priority,
+            alt: product.featured_image.alt, 
+            class: 'object-cover h-full w-full', 
+            decoding: 'async'
+        }}
+      {% endif %}
+    </div>
+  </figure>
+
+  <div class="normal-font mt-3 flex flex-col gap-1 text-left">
+    {% assign product_collection = product.collections | first %}
+    {% for col in product.collections %}
+      {% assign col_title_down = col.title | downcase %}
+      {% unless col_title_down contains 'reward' or col_title_down contains 'eligible' %}
+         {% assign product_collection = col %}
+         {% break %}
+      {% endunless %}
+    {% endfor %}
+
+    <p style="color: #39A596;" class="text-[8px] font-normal uppercase tracking-[0.08em] leading-none opacity-90">
+      {{ product_collection.title | default: 'My Narrative' }}
+    </p>
+
+    <h3 class="text-sm md:text-base font-medium text-white leading-snug line-clamp-1">
+      {{ product.title }}
+    </h3>
+
+    <div class="flex items-baseline gap-2 mt-1">
+      <span class="text-sm md:text-base font-bold text-white">
+        {{ product.price | money_without_trailing_zeros }}
+      </span>
+
+      {% if product.compare_at_price > product.price %}
+        <span class="text-xs text-gray-500 line-through decoration-1 opacity-70">
+          {{ product.compare_at_price | money_without_trailing_zeros }}
+        </span>
+        {% assign original_price = product.compare_at_price %}
+        {% assign discounted_price = product.price %}
+        {% assign discount_amount = original_price | minus: discounted_price %}
+        {% assign discount_percentage = discount_amount | times: 100 | divided_by: original_price | round %}
+        <span style="color: #39A596;" class="text-[6px] font-bold uppercase tracking-wide">
+          {{ discount_percentage }}% OFF
+        </span>
+      {% endif %}
+    </div>
+  </div>
+</a>

@@ -1,0 +1,44 @@
+<div>
+    {% if section.settings.title != blank %}
+        <h1 class="px-4 md:px-6 container max-w-screen-xl mx-auto text-center text-2xl md:text-4xl my-6 md:my-12 heading-font">{{ section.settings.title }}</h1>
+    {% endif %}
+    {% if section.settings.subtitle != blank %}
+        <p class="text-center text-xl md:text-2xl lg:text-3xl my-4 md:my-5 text-[#019973]">{{ section.settings.subtitle  }}</p>
+    {% endif %}
+    
+    {% if section.settings.description != blank %}
+        <p class="text-center">{{ section.settings.description  }}</p>
+    {% endif %}
+</div>
+
+{% schema %}
+{
+  "name": "Title",
+  "class": "mt-6 md:mt-12 px-4 md:px-6 container max-w-screen-xl mx-auto",
+  "settings": [
+{
+    "type": "text",
+    "id": "title",
+    "label": "Title",
+    "default": "Title"
+  },
+  {
+    "type": "text",
+    "id": "subtitle",
+    "label": "Subtitle",
+    "default": "This is a subtitle for the title section."
+  },
+  {
+    "type": "text",
+    "id": "description",
+    "label": "Description",
+    "default": "This is a description for the title section."
+  }
+  ],
+  "presets": [
+    {
+      "name": "Title"
+    }
+  ]
+}
+{% endschema %}

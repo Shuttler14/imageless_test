@@ -1,0 +1,388 @@
+{% comment %}
+  Hero Slider - LCP Optimized & Fixed
+  - Design: Green Dotted Line Pagination.
+  - Stability: Based on your last working code (Guaranteed Image Rendering).
+  - Speed: 
+      * Slide 1: Eager Load + High Priority (Max Speed).
+      * Slides 2,3 & End: Eager Load + Auto Priority (No Lag).
+      * Rest: Lazy Load.
+{% endcomment %}
+
+{% capture slider_attributes %}
+  data-autoplay="{{ section.settings.enable_autoplay }}"
+  data-autoplay-duration="{{ section.settings.autoplay_duration }}"
+  data-loop="{{ section.settings.enable_loop }}"
+{% endcapture %}
+
+<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&display=swap" media="print" onload="this.media='all'">
+<noscript>
+  <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&display=swap">
+</noscript>
+
+<section class="stacked-slider w-full overflow-hidden" style="margin-top: -30px; padding-top: 0px; padding-bottom: 40px;" aria-label="Stacked image slider">
+  
+  {% if section.settings.section_title != blank %}
+    <div class="container max-w-screen-xl mx-auto px-4 md:px-6">
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="text-2xl md:text-4xl font-bold" style="color: {{ section.settings.title_color }}">
+          {{ section.settings.section_title }}
+        </h2>
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="stacked-slider-wrapper relative w-full group" {{ slider_attributes }}>
+    
+    <button class="swiper-prev absolute left-4 md:left-8 top-1/2 z-50 -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white shadow-lg transition-all hover:bg-white/20 hover:scale-110 focus:outline-none hidden md:flex" aria-label="Previous slide">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+
+    <button class="swiper-next absolute right-4 md:right-8 top-1/2 z-50 -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white shadow-lg transition-all hover:bg-white/20 hover:scale-110 focus:outline-none hidden md:flex" aria-label="Next slide">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+
+    <div class="overflow-visible js-stacked-swiper h-full py-8">
+      <div class="swiper-wrapper">
+        
+        {% assign total_blocks = section.blocks | size %}
+        {% assign left_load_threshold = total_blocks | minus: 2 %}
+
+        {% for block in section.blocks %}
+          {%- assign target_link = block.settings.collection_link | default: block.settings.cta_link -%}
+          
+          <div class="swiper-slide" role="group" aria-roledescription="slide" aria-label="Slide {{ forloop.index }} of {{ section.blocks | size }}">
+            <a href="{{ target_link | escape }}" class="slide-inner js-slide-link mx-auto group block focus:outline-none" tabindex="0">
+
+              <div class="slide-transform-wrapper w-full flex flex-col items-center">
+
+                <div class="narrative-label w-full flex flex-col items-center justify-center mb-6 -translate-y-2 relative z-10">
+                  
+                  {% comment %} 
+                    PRIORITY LOGIC:
+                    1. First Slide = Eager + High Priority (LCP Winner).
+                    2. Slides 2 & Last = Eager + Low Priority (Ready for swipe, but polite).
+                    3. Rest = Lazy.
+                  {% endcomment %}
+                  {% assign loading_attr = 'lazy' %}
+                  {% assign priority_attr = 'auto' %}
+
+                  {% if forloop.index == 1 %}
+                    {% assign loading_attr = 'eager' %}
+                    {% assign priority_attr = 'high' %}
+                  {% elsif forloop.index == 2 or forloop.index == total_blocks %}
+                    {% assign loading_attr = 'eager' %}
+                    {% assign priority_attr = 'low' %}
+                  {% endif %}
+
+                  {% if block.settings.thumbnail_icon %}
+                    <div class="icon-frame mb-2 p-1 bg-white/10 backdrop-blur-sm border border-white/20 shadow-lg transition-transform duration-300 group-hover:-translate-y-1" 
+                           style="width: 65px; height: 65px; border-radius: 16px;"> 
+                      <img src="{{ block.settings.thumbnail_icon | image_url: width: 120 }}" 
+                           alt="{{ block.settings.thumbnail_icon.alt | escape }}" 
+                           class="w-full h-full object-cover" 
+                           style="border-radius: 12px;" 
+                           loading="{{ loading_attr }}" 
+                           fetchpriority="{{ priority_attr }}"
+                           width="65" height="65" />
+                    </div>
+                  {% endif %}
+
+                  <div class="label-pill inline-flex items-center justify-center px-6 py-2.5 rounded-full shadow-sm backdrop-blur-md border border-white/10" 
+                         style="background: {{ section.settings.label_bg }}; color: {{ section.settings.label_text }};">
+                    <span class="label-text modern-font leading-none text-center">{{ block.settings.narrative_name }}</span>
+                  </div>
+                </div>
+
+                <div class="poster-frame relative rounded-2xl overflow-hidden shadow-2xl">
+                  <div class="stack-edge pointer-events-none"></div>
+                  
+                  <img
+                    srcset="{{ block.settings.image | image_url: width: 400 }} 400w, {{ block.settings.image | image_url: width: 800 }} 800w, {{ block.settings.image | image_url: width: 1080 }} 1080w"
+                    sizes="(max-width: 768px) 80vw, 400px"
+                    src="{{ block.settings.image | image_url: width: 1080 }}"
+                    alt="{{ block.settings.image.alt | escape }}"
+                    loading="{{ loading_attr }}"
+                    fetchpriority="{{ priority_attr }}"
+                    class="poster-image w-full h-full object-cover"
+                  />
+
+                  {% if block.settings.cta_text != blank %}
+                    <span class="poster-cta absolute left-1/2 -translate-x-1/2 bottom-8 px-8 py-3 rounded-full font-bold shadow-lg tracking-wide uppercase text-xs" style="background: {{ section.settings.cta_bg }}; color: {{ section.settings.cta_text_color }};">
+                      {{ block.settings.cta_text }}
+                    </span>
+                  {% endif %}
+                </div>
+
+                {% if block.settings.micro_tag != blank %}
+                  <div class="mt-4 text-[10px] uppercase tracking-widest text-center opacity-60 font-bold font-sans">{{ block.settings.micro_tag }}</div>
+                {% endif %}
+
+              </div> 
+
+            </a>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="swiper-pagination !bottom-0"></div>
+
+  </div>
+</section>
+
+<style>
+/* Scoped Styles */
+.stacked-slider .swiper-wrapper { align-items: center; }
+.stacked-slider .swiper-slide { display:flex; justify-content:center; align-items:flex-start; opacity:1; }
+.slide-inner { width: 100%; display:flex; flex-direction:column; align-items:center; }
+
+.slide-transform-wrapper {
+    transform-origin: center;
+    transition: transform 400ms cubic-bezier(.16,1,.3,1), opacity 400ms;
+    will-change: transform;
+}
+
+/* Sizing Logic */
+.poster-frame { 
+    border-radius: 6px; 
+    overflow: hidden; 
+    background: #000;
+    width: calc(100vw - 60px); 
+    max-width: 400px; 
+    aspect-ratio: 9 / 16;
+}
+
+@media (min-width: 768px) {
+  .poster-frame {
+    height: 55vh; 
+    width: auto; 
+    aspect-ratio: 9 / 16;
+    max-width: none; 
+  }
+}
+
+@media (min-width: 1400px) {
+  .poster-frame {
+    height: 60vh;
+  }
+}
+
+.poster-frame .stack-edge { position: absolute; right: -20px; top: 0; bottom: 0; width: 24px; background: linear-gradient(90deg, rgba(255,255,255,0.05), rgba(0,0,0,0.1)); transform: skewX(-8deg); border-left: 1px solid rgba(255,255,255,0.1); z-index: 2; }
+
+/* Font Styles */
+.label-text.modern-font { 
+    font-family: 'Montserrat', sans-serif; 
+    font-size: 14px; 
+    font-style: italic; 
+    font-weight: 700; 
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    position: relative; 
+    color: var(--label-text, {{ section.settings.label_text }});
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Neon Green Underline */
+.label-text.modern-font::after {
+  content: '';
+  display: block;
+  height: 2px;
+  width: 100%;
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  background: rgb(0, 255, 191); 
+  opacity: 0;
+  transform: scaleX(0);
+  transition: opacity 300ms ease, transform 450ms cubic-bezier(.16,1,.3,1);
+}
+
+/* Icon Border Animation */
+.icon-frame {
+    transition: border-color 450ms cubic-bezier(.16,1,.3,1), transform 300ms, box-shadow 450ms;
+}
+
+/* Neon Green Border + Glow */
+.swiper-slide.in-focus .icon-frame {
+    border-color: rgb(0, 255, 191) !important; 
+    box-shadow: 0 4px 20px rgba(0, 255, 191, 0.35); 
+}
+
+.swiper-slide.in-focus .label-text.modern-font::after { opacity: 0.6; transform: scaleX(1); }
+
+.slide-transform-wrapper:hover .poster-frame { 
+    box-shadow: 0 30px 80px rgba(0,0,0,0.3); 
+}
+.slide-transform-wrapper:hover {
+    transform: translateY(-4px) !important; 
+}
+
+@media (max-width: 767px) { 
+    .poster-frame { border-radius: 8px; } 
+    .narrative-label { margin-bottom: 4px; }
+}
+
+/* --- CUSTOM PAGINATION (Green Dotted Line) --- */
+.stacked-slider .swiper-pagination {
+  bottom: 20px !important;
+}
+
+.stacked-slider .swiper-pagination-bullet {
+  width: 16px !important; 
+  height: 3px !important; 
+  border-radius: 2px !important;
+  background: #39A596 !important; 
+  opacity: 0.4 !important; 
+  margin: 0 3px !important; 
+  transition: all 0.3s ease;
+}
+
+.stacked-slider .swiper-pagination-bullet-active {
+  opacity: 1 !important; 
+  width: 24px !important; 
+}
+
+.poster-frame:focus { outline: 2px solid {{ section.settings.accent_color }}; outline-offset: 4px; }
+</style>
+
+<script>
+(function(){
+  // Load Swiper JS Asynchronously
+  var script = document.createElement('script');
+  script.src = 'https://unpkg.com/swiper/swiper-bundle.min.js';
+  script.async = true;
+  script.onload = function() {
+      initAllSliders();
+  };
+  document.head.appendChild(script);
+
+  function initAllSliders() {
+      document.querySelectorAll('.stacked-slider-wrapper').forEach(function(el){ initStackedSlider(el); });
+  }
+
+  function initStackedSlider(container) {
+    if (!window.Swiper) return;
+
+    var autoplay = container.dataset.autoplay === 'true';
+    var autoplayDelay = parseInt(container.dataset.autoplayDuration || 3500);
+    var swiperEl = container.querySelector('.js-stacked-swiper');
+
+    var swiper = new Swiper(swiperEl, {
+      slidesPerView: 1.25,
+      centeredSlides: true,
+      spaceBetween: -30, 
+      grabCursor: true,
+      slideToClickedSlide: true, 
+      keyboard: {
+        enabled: true,
+        onlyInViewport: true,
+      },
+      freeMode: true,
+      freeModeMomentumRatio: 0.8,
+      resistanceRatio: 0.6,
+      threshold: 5,
+      loop: container.dataset.loop === 'true',
+      watchSlidesProgress: true,
+      speed: 600, 
+      effect: 'coverflow',
+      coverflowEffect: { 
+          rotate: 0, 
+          stretch: -20, 
+          depth: 180, 
+          modifier: 1, 
+          slideShadows: false 
+      },
+      pagination: { el: container.querySelector('.swiper-pagination'), clickable: true },
+      navigation: { nextEl: container.querySelector('.swiper-next'), prevEl: container.querySelector('.swiper-prev') },
+      breakpoints: { 
+          768: { slidesPerView: 2.5, spaceBetween: -50 }, 
+          1024: { 
+              slidesPerView: 5, 
+              spaceBetween: -80 
+          },
+          1400: {
+              slidesPerView: 5, 
+              spaceBetween: -100 
+          }
+      },
+      on: {
+        progress: function() {
+          this.slides.forEach((slide) => {
+            const progress = slide.progress;
+            const inner = slide.querySelector('.slide-transform-wrapper');
+            if (!inner) return;
+            
+            const scale = 1 - Math.min(Math.abs(progress) * 0.15, 0.3);
+            const translateY = Math.min(Math.abs(progress) * 10, 20); 
+            
+            inner.style.transform = `translateY(${translateY}px) scale(${scale})`;
+            inner.style.zIndex = Math.round(100 - Math.abs(progress)*10);
+            inner.style.opacity = 1 - Math.min(Math.abs(progress)*0.4, 0.7); 
+
+            if (Math.abs(progress) < 0.3) slide.classList.add('in-focus'); else slide.classList.remove('in-focus');
+          });
+        },
+        setTransition: function(duration) {
+          this.slides.forEach((slide) => {
+            const inner = slide.querySelector('.slide-transform-wrapper');
+            if (inner) inner.style.transition = `transform ${duration}ms cubic-bezier(.16,1,.3,1), opacity ${duration}ms`;
+          });
+        }
+      }
+    });
+
+    if (autoplay && swiper.autoplay) {
+      swiper.params.autoplay = { delay: autoplayDelay, disableOnInteraction: false };
+      container.addEventListener('mouseenter', ()=> swiper.autoplay.pause());
+      container.addEventListener('mouseleave', ()=> swiper.autoplay.resume());
+    }
+
+    var links = container.querySelectorAll('.js-slide-link');
+    links.forEach(function(link){
+      link.addEventListener('click', function(e){
+        var slide = link.closest('.swiper-slide');
+        if (!slide.classList.contains('swiper-slide-active') && !slide.classList.contains('swiper-slide-duplicate-active')) {
+          e.preventDefault();
+        }
+      });
+    });
+  }
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Hero Slider",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "section_title", "label": "Section Title", "default": "Narratives" },
+    { "type": "color", "id": "title_color", "label": "Title Color", "default": "#111111" },
+    { "type": "color", "id": "accent_color", "label": "Accent Color", "default": "#39A596" },
+    { "type": "color", "id": "label_bg", "label": "Narrative label background", "default": "rgba(0,0,0,0.85)" },
+    { "type": "color", "id": "label_text", "label": "Narrative label text", "default": "#ffffff" },
+    { "type": "color", "id": "cta_bg", "label": "CTA background", "default": "#ffffff" },
+    { "type": "color", "id": "cta_text_color", "label": "CTA text color", "default": "#000000" },
+    { "type": "checkbox", "id": "enable_autoplay", "label": "Enable Autoplay", "default": false },
+    { "type": "range", "id": "autoplay_duration", "label": "Autoplay Speed (ms)", "min": 1000, "max": 8000, "step": 500, "default": 3500 },
+    { "type": "checkbox", "id": "enable_loop", "label": "Enable Loop", "default": true }
+  ],
+  "blocks": [
+    {
+      "type": "image",
+      "name": "Poster",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Upload poster (1080x1920)" },
+        { "type": "image_picker", "id": "thumbnail_icon", "label": "Thumbnail icon (48x48)" },
+        { "type": "text", "id": "narrative_name", "label": "Narrative Name", "default": "The Collection" },
+        { "type": "text", "id": "micro_tag", "label": "Micro tag (Below card)", "default": "FW/24" },
+        { "type": "text", "id": "cta_text", "label": "CTA text (Inside Card)", "default": "Shop" },
+        { "type": "url", "id": "cta_link", "label": "CTA link" },
+        { "type": "url", "id": "collection_link", "label": "Collection link", "default": "/collections/all" }
+      ]
+    }
+  ],
+  "presets": [ { "name": "Hero Slider", "category": "Image Slider" } ]
+}
+{% endschema %}

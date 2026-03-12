@@ -1,0 +1,790 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "placeholder": {
+      "type": "placeholder",
+      "disabled": true,
+      "settings": {}
+    },
+    "badges_navigation_iYRimA": {
+      "type": "badges-navigation",
+      "blocks": {
+        "collections_PdC47x": {
+          "type": "collections",
+          "settings": {
+            "collection": "bumbling-my-life",
+            "collection_img": "shopify://shop_images/bumbling_my_life.webp"
+          }
+        },
+        "collections_Qjk3Q7": {
+          "type": "collections",
+          "settings": {
+            "collection": "friday-night-beer",
+            "collection_img": "shopify://shop_images/friday_night_beer.webp"
+          }
+        },
+        "collections_KiWa3z": {
+          "type": "collections",
+          "settings": {
+            "collection": "gamer-by-profession",
+            "collection_img": "shopify://shop_images/gamer_by_profession.webp"
+          }
+        },
+        "collections_fhBYt6": {
+          "type": "collections",
+          "settings": {
+            "collection": "gym-fitness-freak",
+            "collection_img": "shopify://shop_images/gym_and_fitness_freak.webp"
+          }
+        },
+        "collections_7QhMnC": {
+          "type": "collections",
+          "settings": {
+            "collection": "live-to-dance",
+            "collection_img": "shopify://shop_images/caffeine_addict.webp"
+          }
+        },
+        "collections_PkQNPH": {
+          "type": "collections",
+          "settings": {
+            "collection": "mysterious-hot",
+            "collection_img": "shopify://shop_images/mysterious_and_hot.webp"
+          }
+        },
+        "collections_VAAyeP": {
+          "type": "collections",
+          "settings": {
+            "collection": "road-royalty",
+            "collection_img": "shopify://shop_images/road_royalty.webp"
+          }
+        },
+        "collections_a6t4r9": {
+          "type": "collections",
+          "settings": {
+            "collection": "shuttlers-arena",
+            "collection_img": "shopify://shop_images/Keep_calm_and_chai_on.png"
+          }
+        },
+        "collections_p7BKj6": {
+          "type": "collections",
+          "settings": {
+            "collection": "surviving-on-caffeine",
+            "collection_img": "shopify://shop_images/road_royalty.webp"
+          }
+        },
+        "collections_amLFD7": {
+          "type": "collections",
+          "settings": {
+            "collection": "technologist-on-toes",
+            "collection_img": "shopify://shop_images/technologist_on_toes.webp"
+          }
+        },
+        "collections_Ahn4mh": {
+          "type": "collections",
+          "settings": {
+            "collection": "the-ultimate-husband-material",
+            "collection_img": "shopify://shop_images/the_ultimate_husband_material.webp"
+          }
+        },
+        "collections_AEikgR": {
+          "type": "collections",
+          "settings": {
+            "collection": "the-mindful-adventurer",
+            "collection_img": "shopify://shop_images/the_mindful_adventurer.webp"
+          }
+        },
+        "collections_JzryaQ": {
+          "type": "collections",
+          "settings": {
+            "collection": "the-modern-influencer",
+            "collection_img": "shopify://shop_images/the_modern_infleuncer.webp"
+          }
+        },
+        "collections_cx4MFW": {
+          "type": "collections",
+          "settings": {
+            "collection": "the-sarcastic-rizzler",
+            "collection_img": "shopify://shop_images/the_sarcastic_rizzler.webp"
+          }
+        },
+        "collections_kgQEQb": {
+          "type": "collections",
+          "settings": {
+            "collection": "wanna-be-unicorn",
+            "collection_img": "shopify://shop_images/Wanna_Be_unicorn.webp"
+          }
+        }
+      },
+      "block_order": [
+        "collections_PdC47x",
+        "collections_Qjk3Q7",
+        "collections_KiWa3z",
+        "collections_fhBYt6",
+        "collections_7QhMnC",
+        "collections_PkQNPH",
+        "collections_VAAyeP",
+        "collections_a6t4r9",
+        "collections_p7BKj6",
+        "collections_amLFD7",
+        "collections_Ahn4mh",
+        "collections_AEikgR",
+        "collections_JzryaQ",
+        "collections_cx4MFW",
+        "collections_kgQEQb"
+      ],
+      "disabled": true,
+      "name": "Badges Navigation",
+      "settings": {
+        "url_1": "/",
+        "url_title_1": "Hoodies",
+        "url_2": "shopify://pages/t-shirts",
+        "url_title_2": "T-Shirts"
+      }
+    },
+    "title_6FpJAn": {
+      "type": "title",
+      "name": "Title",
+      "settings": {
+        "title": "PICK YOUR VIBE CARD",
+        "subtitle": "",
+        "description": ""
+      }
+    },
+    "hero_slider_pH9c9D": {
+      "type": "hero-slider",
+      "blocks": {
+        "image_dRCKJ4": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/19.png",
+            "thumbnail_icon": "shopify://shop_images/9.png",
+            "narrative_name": "SURVIVING ON CAFFEINE",
+            "micro_tag": "BREW YOUR PERSONALITY",
+            "cta_text": "Shop",
+            "cta_link": "",
+            "collection_link": "shopify://collections/surviving-on-caffeine"
+          }
+        },
+        "image_B6FUWw": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/14.png",
+            "thumbnail_icon": "shopify://shop_images/MN_bike_badge_icon_3911cb05-3617-4ebb-a374-6c02ef476a38.png",
+            "narrative_name": "ROAD ROYALTY",
+            "micro_tag": "REV UP YOUR PASSION",
+            "cta_text": "Shop",
+            "cta_link": "",
+            "collection_link": "shopify://collections/road-royalty"
+          }
+        },
+        "image_UmyVGj": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/My_Narrative_party_Hero_Poster3_1fa82fed-e3d0-47f0-aff5-00a00f05536b.png",
+            "thumbnail_icon": "shopify://shop_images/MN_tech_badge_icon_1ce20759-db5d-40a2-82b4-aa2a414c2de9.svg",
+            "narrative_name": "TECHNOLOGIST ON TOES",
+            "micro_tag": "\"PAST\" COMPILATION ERROR",
+            "cta_text": "Shop",
+            "cta_link": "",
+            "collection_link": "shopify://collections/technologist-on-toes"
+          }
+        },
+        "image_DdNMtg": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/31.png",
+            "thumbnail_icon": "shopify://shop_images/MN_rizz_badge_icon_afff7ceb-c448-4ad8-bb1f-9dae6651cabf.png",
+            "narrative_name": "THE SARCASTIC RIZZLER",
+            "micro_tag": "RIZZ UP THE GAME",
+            "cta_text": "Shop",
+            "cta_link": "",
+            "collection_link": "shopify://collections/the-sarcastic-rizzler"
+          }
+        },
+        "image_76ViYB": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/25.png",
+            "thumbnail_icon": "shopify://shop_images/MN_hubby_badge_icon_2b35d469-7adc-4f58-b7e0-49a4cfbb4af8.png",
+            "narrative_name": "THE HUSBAND MATERIAL",
+            "micro_tag": "SMELL \"RISHTA-READY\"",
+            "cta_text": "Shop",
+            "cta_link": "",
+            "collection_link": "shopify://collections/the-ultimate-husband-material"
+          }
+        },
+        "image_wxxErk": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/33.png",
+            "thumbnail_icon": "shopify://shop_images/MN_startup_badge_icon_3aecbda9-3b09-404e-8efd-a0e9a68ea804.png",
+            "narrative_name": "WANNA BE UNICORN",
+            "micro_tag": "OMW TO THE $1B PROJECT",
+            "cta_text": "Shop",
+            "cta_link": "",
+            "collection_link": "shopify://collections/wanna-be-unicorn"
+          }
+        },
+        "image_HDa6Yf": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/10.png",
+            "thumbnail_icon": "shopify://shop_images/MN_dance_badge_icon_284a6385-c359-4911-a6b6-5c3c09b99377.png",
+            "narrative_name": "LIVE TO DANCE",
+            "micro_tag": "MOVING THE STAGE MY WAY",
+            "cta_text": "Shop",
+            "cta_link": "",
+            "collection_link": "shopify://collections/live-to-dance"
+          }
+        },
+        "image_DtJ8eq": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/16.png",
+            "thumbnail_icon": "shopify://shop_images/MN_badminton_badge_icon_a15f7c44-b9d8-471a-a624-e43a71c0c5c4.png",
+            "narrative_name": "SHUTTLER'S ARENA",
+            "micro_tag": "FUELING MY SMASHES",
+            "cta_text": "Shop",
+            "cta_link": "",
+            "collection_link": "shopify://collections/shuttlers-arena"
+          }
+        },
+        "image_qMWCbA": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/My_Narrative_dating_Hero_Poster1.png",
+            "thumbnail_icon": "shopify://shop_images/MN_breakup_badge_icon_35add0c4-88c4-4cc8-9e47-2f74ea3ad542.png",
+            "narrative_name": "BUMBLING MY LIFE",
+            "micro_tag": "STILL CAN'T SETTLE FOR LESS",
+            "cta_text": "Shop",
+            "cta_link": "",
+            "collection_link": "shopify://collections/bumbling-my-life"
+          }
+        },
+        "image_3KMBL9": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/1.png",
+            "thumbnail_icon": "shopify://shop_images/MN_car_badge_icon_f72b4f3a-53c4-4a53-ba52-f4b48e205e47.png",
+            "narrative_name": "MAD ABOUT CARS",
+            "micro_tag": "DRIFTING HER MY WAY",
+            "cta_text": "Shop",
+            "cta_link": "",
+            "collection_link": "shopify://collections/mad-about-cars"
+          }
+        },
+        "image_F8amaj": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/23.png",
+            "thumbnail_icon": "shopify://shop_images/MN_adv_badge_icon_64e9e50f-aa57-4fda-a68b-247f29f63dc5.png",
+            "narrative_name": "THE MINDFUL ADVENTURER",
+            "micro_tag": "TOOK MY INSTINCTIVE GPS SERIOUSLY",
+            "cta_text": "Shop",
+            "cta_link": "",
+            "collection_link": "shopify://collections/the-mindful-adventurer"
+          }
+        },
+        "image_iPJH78": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/6.png",
+            "thumbnail_icon": "shopify://shop_images/MN_gym_badge_icon_28031004-5036-45d4-87a3-1bdec392cd38.png",
+            "narrative_name": "GYM & FITNESS FREAK",
+            "micro_tag": "UNLOCKING THAT CUT",
+            "cta_text": "Shop",
+            "cta_link": "",
+            "collection_link": "shopify://collections/gym-fitness-freak"
+          }
+        }
+      },
+      "block_order": [
+        "image_dRCKJ4",
+        "image_B6FUWw",
+        "image_UmyVGj",
+        "image_DdNMtg",
+        "image_76ViYB",
+        "image_wxxErk",
+        "image_HDa6Yf",
+        "image_DtJ8eq",
+        "image_qMWCbA",
+        "image_3KMBL9",
+        "image_F8amaj",
+        "image_iPJH78"
+      ],
+      "name": "Hero Slider",
+      "settings": {
+        "section_title": "",
+        "title_color": "#111111",
+        "accent_color": "#111111",
+        "label_bg": "#000000d9",
+        "label_text": "#ffffff",
+        "cta_bg": "#ffffff",
+        "cta_text_color": "#000000",
+        "enable_autoplay": false,
+        "autoplay_duration": 3500,
+        "enable_loop": true
+      }
+    },
+    "image_slider_AhQykK": {
+      "type": "image-slider",
+      "blocks": {
+        "image_YH3J4i": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/Mad_about_cars_hero.svg",
+            "image_link": "shopify://collections/mad-about-cars"
+          }
+        },
+        "image_4kKhP4": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/2.webp",
+            "image_link": "shopify://collections/the-mindful-adventurer"
+          }
+        },
+        "image_MRBD8z": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/4.webp",
+            "image_link": "shopify://collections/the-sarcastic-rizzler"
+          }
+        },
+        "image_9EdztN": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/Wanna_be_unicirn_Herorn.svg",
+            "image_link": "shopify://collections/wanna-be-unicorn"
+          }
+        },
+        "image_C8gqQm": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/3.webp",
+            "image_link": "shopify://collections/surviving-on-caffeine"
+          }
+        },
+        "image_WJrG8z": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/WANNA_BE_UNICORN_3_x_4_in.svg",
+            "image_link": "shopify://collections/mysterious-hot"
+          }
+        },
+        "image_4gktRb": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/Tech_2bcaad78-2d9b-463b-8742-580099ea7e0a.svg",
+            "image_link": "shopify://collections/technologist-on-toes"
+          }
+        },
+        "image_AJgWf8": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/Rebel_mode_174202c2-45b2-43b2-a72f-88132f98e195.svg",
+            "image_link": "shopify://collections/the-sarcastic-rizzler"
+          }
+        },
+        "image_D4k7hj": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/1.webp",
+            "image_link": "shopify://collections/gamer-by-profession"
+          }
+        }
+      },
+      "block_order": [
+        "image_YH3J4i",
+        "image_4kKhP4",
+        "image_MRBD8z",
+        "image_9EdztN",
+        "image_C8gqQm",
+        "image_WJrG8z",
+        "image_4gktRb",
+        "image_AJgWf8",
+        "image_D4k7hj"
+      ],
+      "name": "Image Slider",
+      "settings": {
+        "section_title": "",
+        "enable_autoplay": true,
+        "autoplay_duration": 3000,
+        "enable_navigation": false,
+        "enable_pagination": true,
+        "enable_loop": true
+      }
+    },
+    "product_slider_Y6QtMQ": {
+      "type": "product-slider",
+      "settings": {
+        "section_title": "",
+        "section_sub_heading": "Because your daily brew deserves a matching attitude.",
+        "section_bg_image": "shopify://shop_images/SURVIVING_ON_CAFFEINE.webp",
+        "collection_for": "Hoodies",
+        "collection": "surviving-on-caffeine",
+        "enable_autoplay": false,
+        "autoplay_duration": 3000,
+        "enable_navigation": true,
+        "enable_pagination": true,
+        "enable_loop": true,
+        "button_text": "Brew IT All"
+      }
+    },
+    "product_slider_6TeD4h": {
+      "type": "product-slider",
+      "settings": {
+        "section_title": "",
+        "section_sub_heading": "For the ones who hear engines the way others hear music.",
+        "section_bg_image": "shopify://shop_images/MAD_ABOUT_CARS.webp",
+        "collection_for": "Hoodies",
+        "collection": "mad-about-cars",
+        "enable_autoplay": false,
+        "autoplay_duration": 3000,
+        "enable_navigation": true,
+        "enable_pagination": true,
+        "enable_loop": false,
+        "button_text": "DRIFT & DUSTED"
+      }
+    },
+    "product_slider_9wKiV9": {
+      "type": "product-slider",
+      "settings": {
+        "section_title": "",
+        "section_sub_heading": "For the ones whose humor enters the room before they do.",
+        "section_bg_image": "shopify://shop_images/Gemini_Generated_Image_yb7su6yb7su6yb7s.png",
+        "collection_for": "Hoodies",
+        "collection": "the-sarcastic-rizzler",
+        "enable_autoplay": false,
+        "autoplay_duration": 3000,
+        "enable_navigation": true,
+        "enable_pagination": true,
+        "enable_loop": true,
+        "button_text": "RIZZ IT UP"
+      }
+    },
+    "product_slider_bPPdJF": {
+      "type": "product-slider",
+      "name": "Product Slider",
+      "settings": {
+        "section_title": "",
+        "section_sub_heading": "Crafted for those whose silence says more than words.",
+        "section_bg_image": "shopify://shop_images/Gemini_Generated_Image_idl3e9idl3e9idl3_1.png",
+        "collection_for": "Hoodies",
+        "collection": "mysterious-hot",
+        "enable_autoplay": false,
+        "autoplay_duration": 3000,
+        "enable_navigation": true,
+        "enable_pagination": true,
+        "enable_loop": true,
+        "button_text": "LIVE LIKE REBEL"
+      }
+    },
+    "product_slider_q9FUry": {
+      "type": "product-slider",
+      "settings": {
+        "section_title": "",
+        "section_sub_heading": "Because your hunger for discovery deserves a look to match.",
+        "section_bg_image": "shopify://shop_images/Gemini_Generated_Image_xsom6txsom6txsom.png",
+        "collection_for": "Hoodies",
+        "collection": "the-mindful-adventurer",
+        "enable_autoplay": false,
+        "autoplay_duration": 3000,
+        "enable_navigation": true,
+        "enable_pagination": true,
+        "enable_loop": true,
+        "button_text": "ESCAPE THE MAP"
+      }
+    },
+    "product_slider_H6eMJw": {
+      "type": "product-slider",
+      "settings": {
+        "section_title": "",
+        "section_sub_heading": "Let your look carry the same intensity as your game-day passion.",
+        "section_bg_image": "shopify://shop_images/Gemini_Generated_Image_n3s5ynn3s5ynn3s5.png",
+        "collection_for": "Hoodies",
+        "collection": "its-football",
+        "enable_autoplay": false,
+        "autoplay_duration": 3000,
+        "enable_navigation": true,
+        "enable_pagination": true,
+        "enable_loop": false,
+        "button_text": "IT'S OFFSIDE"
+      }
+    },
+    "product_slider_bgtUBr": {
+      "type": "product-slider",
+      "settings": {
+        "section_title": "",
+        "section_sub_heading": "Where your look syncs perfectly with your personal playlist.",
+        "section_bg_image": "shopify://shop_images/Music.webp",
+        "collection_for": "Hoodies",
+        "collection": "music-therapy",
+        "enable_autoplay": false,
+        "autoplay_duration": 3000,
+        "enable_navigation": true,
+        "enable_pagination": true,
+        "enable_loop": false,
+        "button_text": "Play That Funk"
+      }
+    },
+    "collection_list_Bj4wzP": {
+      "type": "collection-list",
+      "settings": {
+        "section_title": "Choose Your Narratives",
+        "collection_list": [
+          "wanna-be-unicorn",
+          "the-sarcastic-rizzler",
+          "the-modern-influencer",
+          "the-mindful-adventurer",
+          "the-ultimate-husband-material",
+          "technologist-on-toes",
+          "surviving-on-caffeine",
+          "road-royalty",
+          "mysterious-hot",
+          "gamer-by-profession",
+          "friday-night-beer",
+          "gym-fitness-freak",
+          "live-to-dance",
+          "shuttlers-arena",
+          "its-football",
+          "music-therapy",
+          "bumbling-my-life",
+          "cricket-fever",
+          "mad-about-cars"
+        ]
+      }
+    },
+    "product_slider_NMDJMH": {
+      "type": "product-slider",
+      "name": "Product Slider",
+      "settings": {
+        "section_title": "",
+        "section_sub_heading": "Because innovation deserves an aesthetic as bold as your code.",
+        "section_bg_image": "shopify://shop_images/tech.webp",
+        "collection_for": "Hoodies",
+        "collection": "technologist-on-toes",
+        "enable_autoplay": false,
+        "autoplay_duration": 3000,
+        "enable_navigation": true,
+        "enable_pagination": true,
+        "enable_loop": true,
+        "button_text": "Compile & Wear"
+      }
+    },
+    "product_slider_wYJcG4": {
+      "type": "product-slider",
+      "settings": {
+        "section_title": "",
+        "section_sub_heading": "Dress in a vibe that hits harder than the bass drop.",
+        "section_bg_image": "shopify://shop_images/Gemini_Generated_Image_ph4qbmph4qbmph4q.png",
+        "collection_for": "Hoodies",
+        "collection": "live-to-dance",
+        "enable_autoplay": false,
+        "autoplay_duration": 3000,
+        "enable_navigation": true,
+        "enable_pagination": true,
+        "enable_loop": false,
+        "button_text": "OWN THE FLOOR"
+      }
+    },
+    "product_slider_kQQ7wf": {
+      "type": "product-slider",
+      "name": "Product Slider",
+      "settings": {
+        "section_title": "",
+        "section_sub_heading": "Your current chaotic status needs an outfit. Choose your perfect date OOTD!",
+        "section_bg_image": "shopify://shop_images/Gemini_Generated_Image_3ne19w3ne19w3ne1.png",
+        "collection_for": "Hoodies",
+        "collection": "bumbling-my-life",
+        "enable_autoplay": false,
+        "autoplay_duration": 3000,
+        "enable_navigation": true,
+        "enable_pagination": true,
+        "enable_loop": true,
+        "button_text": "IT'S A MATCH"
+      }
+    },
+    "product_slider_A4bXUC": {
+      "type": "product-slider",
+      "settings": {
+        "section_title": "",
+        "section_sub_heading": "Dress in a vibe that feels like your favorite kind of downtime.",
+        "section_bg_image": "shopify://shop_images/Gemini_Generated_Image_qfteaxqfteaxqfte.png",
+        "collection_for": "Hoodies",
+        "collection": "friday-night-beer",
+        "enable_autoplay": false,
+        "autoplay_duration": 3000,
+        "enable_navigation": true,
+        "enable_pagination": true,
+        "enable_loop": true,
+        "button_text": "IT'S SHOW TIME"
+      }
+    },
+    "product_slider_QhExTB": {
+      "type": "product-slider",
+      "name": "Product Slider",
+      "settings": {
+        "section_title": "",
+        "section_sub_heading": "Let your outfit flex your premium husband-material credentials.",
+        "section_bg_image": "shopify://shop_images/husband.webp",
+        "collection_for": "Hoodies",
+        "collection": "the-ultimate-husband-material",
+        "enable_autoplay": false,
+        "autoplay_duration": 3000,
+        "enable_navigation": true,
+        "enable_pagination": true,
+        "enable_loop": true,
+        "button_text": "Say I Do"
+      }
+    },
+    "product_slider_BQJGPe": {
+      "type": "product-slider",
+      "settings": {
+        "section_title": "",
+        "section_sub_heading": "Where your style plays with the same precision as your game.",
+        "section_bg_image": "shopify://shop_images/arena.webp",
+        "collection_for": "Hoodies",
+        "collection": "shuttlers-arena",
+        "enable_autoplay": false,
+        "autoplay_duration": 3000,
+        "enable_navigation": true,
+        "enable_pagination": true,
+        "enable_loop": false,
+        "button_text": "LOVE ALL"
+      }
+    },
+    "product_slider_dbJA8P": {
+      "type": "product-slider",
+      "settings": {
+        "section_title": "",
+        "section_sub_heading": "Because your ‘Gram energy deserves its own signature look.",
+        "section_bg_image": "shopify://shop_images/influencer.webp",
+        "collection_for": "Hoodies",
+        "collection": "the-modern-influencer",
+        "enable_autoplay": false,
+        "autoplay_duration": 3000,
+        "enable_navigation": true,
+        "enable_pagination": true,
+        "enable_loop": true,
+        "button_text": "THAT'S UNFILTERED ME"
+      }
+    },
+    "product_slider_YURVcT": {
+      "type": "product-slider",
+      "settings": {
+        "section_title": "",
+        "section_sub_heading": "Let your look echo the same magic that keeps your startup alive at 3 AM.",
+        "section_bg_image": "shopify://shop_images/Gemini_Generated_Image_c44z6nc44z6nc44z_a3596678-a6e5-4ac5-928d-e58419c539c0.png",
+        "collection_for": "Hoodies",
+        "collection": "wanna-be-unicorn",
+        "enable_autoplay": false,
+        "autoplay_duration": 3000,
+        "enable_navigation": true,
+        "enable_pagination": true,
+        "enable_loop": true,
+        "button_text": "CALCULATE YOUR EBIDTA"
+      }
+    },
+    "product_slider_Gb4jah": {
+      "type": "product-slider",
+      "name": "Product Slider",
+      "settings": {
+        "section_title": "",
+        "section_sub_heading": "Outfits made for those who lead the lane, not follow it.",
+        "section_bg_image": "shopify://shop_images/ROAD_ROYALTY_c395abc1-8a92-4d04-b1ed-6e204e994b45.webp",
+        "collection_for": "hoodies",
+        "collection": "road-royalty",
+        "enable_autoplay": true,
+        "autoplay_duration": 3000,
+        "enable_navigation": true,
+        "enable_pagination": true,
+        "enable_loop": true,
+        "button_text": "REV IT UP"
+      }
+    },
+    "product_slider_K7AJh7": {
+      "type": "product-slider",
+      "disabled": true,
+      "settings": {
+        "section_title": "",
+        "section_sub_heading": "",
+        "collection_for": "Hoodies",
+        "collection": "gym-fitness-freak",
+        "enable_autoplay": false,
+        "autoplay_duration": 3000,
+        "enable_navigation": true,
+        "enable_pagination": true,
+        "enable_loop": true,
+        "button_text": "View All"
+      }
+    },
+    "product_slider_TPHEkB": {
+      "type": "product-slider",
+      "name": "Product Slider",
+      "settings": {
+        "section_title": "",
+        "section_sub_heading": "Your commitment to the console needs an outfit. Shop the collection and get your stream on.",
+        "section_bg_image": "shopify://shop_images/gamer.webp",
+        "collection_for": "Hoodies",
+        "collection": "gamer-by-profession",
+        "enable_autoplay": true,
+        "autoplay_duration": 3000,
+        "enable_navigation": true,
+        "enable_pagination": true,
+        "enable_loop": true,
+        "button_text": "TAKE THE HEAD SHOT"
+      }
+    },
+    "product_slider_bWrJVR": {
+      "type": "product-slider",
+      "settings": {
+        "section_title": "",
+        "section_sub_heading": "For the ones who live between batting drills, fitness sessions, and big dreams.",
+        "section_bg_image": "shopify://shop_images/Gemini_Generated_Image_7vunob7vunob7vun.png",
+        "collection_for": "Hoodies",
+        "collection": "cricket-fever",
+        "enable_autoplay": false,
+        "autoplay_duration": 3000,
+        "enable_navigation": true,
+        "enable_pagination": true,
+        "enable_loop": false,
+        "button_text": "IT'S A HAT-TRICK"
+      }
+    }
+  },
+  "order": [
+    "placeholder",
+    "badges_navigation_iYRimA",
+    "title_6FpJAn",
+    "hero_slider_pH9c9D",
+    "image_slider_AhQykK",
+    "product_slider_Y6QtMQ",
+    "product_slider_6TeD4h",
+    "product_slider_9wKiV9",
+    "product_slider_bPPdJF",
+    "product_slider_q9FUry",
+    "product_slider_H6eMJw",
+    "product_slider_bgtUBr",
+    "collection_list_Bj4wzP",
+    "product_slider_NMDJMH",
+    "product_slider_wYJcG4",
+    "product_slider_kQQ7wf",
+    "product_slider_A4bXUC",
+    "product_slider_QhExTB",
+    "product_slider_BQJGPe",
+    "product_slider_dbJA8P",
+    "product_slider_YURVcT",
+    "product_slider_Gb4jah",
+    "product_slider_K7AJh7",
+    "product_slider_TPHEkB",
+    "product_slider_bWrJVR"
+  ]
+}

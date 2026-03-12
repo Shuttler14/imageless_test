@@ -1,0 +1,21 @@
+.collabs-page__cta-main.collabs-page__corner-square{
+    border:1px solid #fff;
+    transition: all 0.3s ease-in-out;
+}
+.collabs-page__cta-main.collabs-page__corner-square:hover{
+    border:1px solid #000;
+    background-color: #fff;
+    color: #000;
+}
+
+.collabs-page__cta-login-link{
+    color: #7ed957;
+    text-decoration: none;
+    transition: all 0.3s ease-in-out;
+}
+.collabs-page__cta-login-link:hover{
+    text-decoration: underline;
+}
+.collabs-page__header, .collabs-page__intro p{
+    display: none !important;
+}

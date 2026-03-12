@@ -1,0 +1,150 @@
+<!-- AI Design Studio Page — header/footer isolation fix -->
+<style>
+  /* Prevent the design studio content from breaking the theme header/footer */
+  .mn-ai-studio-wrapper {
+    position: relative;
+    width: 100%;
+    overflow-x: hidden;
+    /* Reset any inherited fixed/absolute positioning from page content */
+    isolation: isolate;
+  }
+  /* Ensure the header stays on top of any z-index from studio content */
+  #shopify-section-header,
+  .site-header,
+  header[role="banner"],
+  .header-wrapper,
+  #shopify-section-group-header-group {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 9999 !important;
+  }
+  /* Ensure footer renders normally below studio content */
+  #shopify-section-footer,
+  footer[role="contentinfo"],
+  .site-footer {
+    position: relative !important;
+    z-index: 1 !important;
+  }
+  /* Fix any full-bleed containers inside page content */
+  .mn-ai-studio-wrapper > * {
+    max-width: 100vw;
+    box-sizing: border-box;
+  }
+  /* Prevent any rogue body margin/padding from page content injecting styles */
+  .mn-ai-studio-wrapper [style*="position: fixed"],
+  .mn-ai-studio-wrapper [style*="position:fixed"] {
+    position: absolute !important;
+  }
+</style>
+
+<div class="mn-ai-studio-wrapper">
+  {{ page.content }}
+</div>
+
+<!-- 🎁 GIFT MODE RECEIVER SCRIPT (Enhanced with Psychological UX) -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const pendingDesign = localStorage.getItem('mn_pending_design');
+  
+  if (pendingDesign) {
+    try {
+      const data = JSON.parse(pendingDesign);
+      
+      // Check if data is valid and recent (< 1 hour)
+      if (data.slogan && (Date.now() - data.timestamp) < 3600000) {
+        
+        console.log("🎁 Gift Mode Activated");
+
+        // 1. Inject Data into State
+        if (typeof state !== 'undefined') {
+          state.isGiftMode = true; // flag for other functions
+          state.giftContext = data.context; // save the full context (recipient, occasion, etc)
+          state.selectedQuote = data.slogan;
+          state.topic = `Gift for ${data.context.recipient}`;
+          
+          console.log("✅ Gift Mode State Set:", {
+            slogan: state.selectedQuote,
+            topic: state.topic,
+            context: state.giftContext
+          });
+          
+          // 2. PSYCHOLOGICAL HEADER CHANGE
+          setTimeout(() => {
+            const titleEl = document.querySelector('#step-3 .cinematic-title');
+            const subEl = document.querySelector('#step-3 .cinematic-subtitle');
+            
+            if (titleEl) {
+              titleEl.innerText = "How Should The Design Look?";
+              console.log("✅ Header updated: Step 3 title");
+            }
+            if (subEl) {
+              subEl.innerText = `Perfect! We have your message for ${data.context.recipient}. Now let's bring it to life.`;
+              console.log("✅ Header updated: Step 3 subtitle");
+            }
+          }, 150);
+
+          // 3. MODIFY AI OVERLAY FOR GIFT MODE - Remove Vibe Question
+          setTimeout(() => {
+            if (state.isGiftMode) {
+              const vibeQuestion = document.querySelector('.ai-question:last-child');
+              if (vibeQuestion && vibeQuestion.innerHTML.includes('feels most like you')) {
+                vibeQuestion.style.display = 'none';
+                console.log("✅ Removed vibe question for gift mode");
+                
+                // Auto-set vibe based on occasion
+                const occasionMap = {
+                  'Birthday': 'bold',
+                  'Anniversary': 'calm',
+                  'New Job': 'disciplined',
+                  'Breakup Support': 'healing',
+                  'First Date': 'light',
+                  'Motivation Gift': 'disciplined',
+                  'Inside Joke': 'free',
+                  'Everyday Wear': 'calm'
+                };
+                state.aiVibe = occasionMap[data.context.occasion] || 'calm';
+                console.log(`✅ Auto-set vibe to: ${state.aiVibe} (based on ${data.context.occasion})`);
+              }
+              
+              // Update AI generate button check to not require vibe in gift mode
+              const originalCheckAIReady = window.checkAIReady;
+              window.checkAIReady = function() {
+                if (state.isGiftMode) {
+                  if(state.aiColor && state.aiPlacement) {
+                    document.getElementById('ai-generate-btn').classList.add('ready');
+                  }
+                } else {
+                  if (originalCheckAIReady) originalCheckAIReady();
+                }
+              };
+            }
+          }, 200);
+
+          // 4. Auto-Skip to Step 3 - Wait for function to be ready
+          const jumpToStep3 = () => {
+            if (typeof goToStep === 'function') {
+              console.log("🚀 Jumping to Step 3...");
+              goToStep(3);
+            } else {
+              console.log("⏳ Waiting for goToStep function...");
+              setTimeout(jumpToStep3, 200);
+            }
+          };
+          setTimeout(jumpToStep3, 300);
+        } else {
+          console.warn("⚠️ State object not found");
+        }
+      }
+      
+      // Clear data so it doesn't persist forever
+      localStorage.removeItem('mn_pending_design');
+      console.log("🗑️ Cleared localStorage");
+      
+    } catch (e) {
+      console.error("❌ Error loading gift context:", e);
+    }
+  } else {
+    console.log("ℹ️ No gift mode data. Normal page load.");
+  }
+});
+</script>

@@ -1,0 +1,12 @@
+
+
+  [data-for='size-chart-overlay'] {
+  }
+
+  [data-for='size-chart'] {
+    transform: translate(-50%, -50%) scale(0);
+  }
+
+  [data-for='size-chart'].active {
+    transform: translate(-50%, -50%) scale(1);
+  }

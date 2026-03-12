@@ -1,0 +1,66 @@
+{% if request.page_type == 'index' or request.path contains '/pages/t-shirts' or request.path contains '/pages/hoodies' %}
+<div class="mx-4 md:mx-6 my-6 flex flex-col gap-2 md:gap-3">
+  {% if section.settings.section_title != blank %}
+    <p class="text-xl md:text-2xl text-center uppercase heading-font">
+      {{ section.settings.section_title }}
+    </p>
+  {% endif %}
+
+  <div class="flex gap-2 md:gap-4 justify-center items-center">
+    {% for block in section.blocks %}
+    {% if block.settings.url_img != blank and block.settings.url != blank %}
+    <a href="{{ block.settings.url }}"
+      class="flex flex-col items-center rounded-2xl border md:border-2 flex-1 hover:scale-105 duration-500 max-w-fit overflow-hidden bg-[#111] border-gray-700">
+      <figure>
+        <img src="{{ block.settings.url_img | image_url: width:400, height:400 }}" height="240" width="240" class="object-cover ">
+      </figure>
+      <p class="leading-none line-clamp-2 text-base md:text-xl normal-font text-center px-2 py-3 md:px-3 md:py-4 whitespace-nowrap">
+        {{ block.settings.url_title }}
+      </p>
+    </a>
+    {% endif %}
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+{% schema %}
+  {
+    "name": "Card Grid",
+    "tag": "section",
+    "class": "container max-w-screen-xl mx-auto",
+    "settings": [
+      {
+        "type": "text",
+        "id": "section_title",
+        "label": "Add section Title"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "url",
+        "name": "URL",
+        "settings": [
+          {
+            "type": "url",
+            "id": "url",
+            "label": "Add URL"
+          }, {
+            "type": "image_picker",
+            "id": "url_img",
+            "label": "Choose Image"
+          }, {
+            "type": "text",
+            "id": "url_title",
+            "label": "Add Title"
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+        "name": "Card Grid"
+      }
+    ]
+  }
+{% endschema %}

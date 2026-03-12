@@ -1,0 +1,347 @@
+{% comment %}
+  MY NARRATIVE - VIRTUAL TRY ON WIDGET (FIXED FOR PRODUCTION)
+  Handles multiple instances on the same page via unique IDs.
+{% endcomment %}
+
+{% assign unique_id = 'vton-' | append: product.id | append: '-' | append: section.id %}
+
+<style>
+  /* Floating Trigger Button */
+  .mn-vton-trigger {
+    width: 100%;
+    margin-top: 15px;
+    padding: 16px;
+    background: linear-gradient(135deg, rgba(57, 165, 150, 0.2), rgba(0, 0, 0, 0.4));
+    border: 1px solid #39A596;
+    border-radius: 8px;
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(57, 165, 150, 0.15);
+  }
+  
+  .mn-vton-trigger:hover {
+    background: #39A596;
+    color: #000;
+    box-shadow: 0 0 25px rgba(57, 165, 150, 0.6);
+  }
+
+  /* Modal Overlay */
+  .mn-vton-modal {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.92);
+    backdrop-filter: blur(10px);
+    z-index: 99999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .mn-vton-modal.active {
+    display: flex;
+    opacity: 1;
+  }
+
+  /* Modal Content */
+  .mn-vton-card {
+    background: rgba(20, 20, 20, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    padding: 30px;
+    width: 90%;
+    max-width: 450px;
+    position: relative;
+    box-shadow: 0 0 50px rgba(57, 165, 150, 0.1);
+    text-align: center;
+  }
+
+  .mn-vton-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+  }
+
+  /* Steps UI */
+  .mn-upload-area {
+    border: 2px dashed #39A596;
+    border-radius: 12px;
+    padding: 40px 20px;
+    margin: 20px 0;
+    cursor: pointer;
+    background: rgba(57, 165, 150, 0.05);
+    transition: 0.3s;
+  }
+  
+  .mn-upload-area:hover {
+    background: rgba(57, 165, 150, 0.15);
+  }
+
+  .mn-vton-image-preview {
+    width: 100%;
+    border-radius: 12px;
+    display: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  }
+
+  /* Loading Animation */
+  .mn-loader-bar {
+    width: 100%;
+    height: 4px;
+    background: #333;
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 15px;
+    display: none;
+  }
+  .mn-loader-fill {
+    height: 100%;
+    background: #39A596;
+    width: 0%;
+    transition: width 0.3s;
+    animation: loading 25s linear forwards; /* Increased for VTON */
+  }
+  @keyframes loading { to { width: 95%; } }
+</style>
+
+<button type="button" class="mn-vton-trigger" onclick="MNTryOn.open('{{ unique_id }}')">
+  <span style="font-size: 18px;">✨</span> TRY ON YOURSELF
+</button>
+
+<div id="modal-{{ unique_id }}" class="mn-vton-modal">
+  <div class="mn-vton-card">
+    <button class="mn-vton-close" onclick="MNTryOn.close('{{ unique_id }}')">×</button>
+    
+    <h3 style="font-family:'Montserrat'; color:#fff; margin-bottom:5px;">Virtual Fitting Room</h3>
+    <p style="font-size:12px; color:#aaa; margin-bottom:20px;">
+      See how <span style="color:#39A596;">{{ product.title }}</span> looks on you.
+    </p>
+
+    <div id="step-upload-{{ unique_id }}">
+      <!-- Digital Twin Option (if available) -->
+      <div id="twin-option-{{ unique_id }}" style="display:none; margin-bottom:15px;">
+        <button type="button" class="mn-vton-trigger" onclick="MNTryOn.useTwin('{{ unique_id }}')" style="background: linear-gradient(135deg, #39A596, #2d7a6e); color: #fff; margin-top: 0;">
+          🤖 Use My Digital Twin (1-Click)
+        </button>
+        <p style="font-size:10px; color:#666; margin-top:8px;">Or upload a different photo below</p>
+      </div>
+      
+      <div class="mn-upload-area" onclick="document.getElementById('input-{{ unique_id }}').click()">
+        <div style="font-size:32px; margin-bottom:10px;">📸</div>
+        <div style="font-weight:700; color:#fff; font-size:14px;">Upload Your Photo</div>
+        <div style="font-size:11px; color:#888; margin-top:5px;">Best results: Good lighting, standing pose</div>
+      </div>
+      <input type="file" id="input-{{ unique_id }}" 
+             accept="image/*" style="display:none" 
+             onchange="MNTryOn.process(this, '{{ unique_id }}')">
+    </div>
+
+    <div id="step-loading-{{ unique_id }}" style="display:none; padding:40px 0;">
+      <div style="font-size:14px; color:#fff; font-weight:700; letter-spacing:1px;">WEAVING REALITY...</div>
+      <div class="mn-loader-bar" style="display:block;"><div class="mn-loader-fill"></div></div>
+      <p style="font-size:11px; color:#666; margin-top:10px;">This takes about 15-25 seconds.</p>
+    </div>
+
+    <div id="step-error-{{ unique_id }}" style="display:none; padding:20px 0; text-align:center;">
+      <div style="font-size:32px; margin-bottom:12px;">⚠️</div>
+      <p id="error-msg-{{ unique_id }}" style="color:#ff6b6b; font-size:13px; line-height:1.5; margin-bottom:16px;"></p>
+      <button type="button" class="mn-vton-trigger" onclick="MNTryOn.reset('{{ unique_id }}')" style="margin-top:0;">🔄 Try Again</button>
+    </div>
+
+    <div id="step-result-{{ unique_id }}" style="display:none;">
+      <img id="img-result-{{ unique_id }}" class="mn-vton-image-preview">
+      <button type="button" class="mn-vton-trigger" onclick="MNTryOn.reset('{{ unique_id }}')" style="margin-top:20px;">🔄 Try Another Photo</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // SINGLETON PATTERN: Ensure MNTryOn is only defined once
+  if (!window.MNTryOn) {
+    window.MNTryOn = {
+      api: "https://mynarrative-ai.vercel.app/api/virtual_try_on",
+      savedTwinUrl: null, // Cache Digital Twin URL
+
+      open: async (id) => {
+        document.getElementById(`modal-${id}`).classList.add('active');
+        
+        // Check for Digital Twin on modal open
+        {% if customer %}
+        if (!MNTryOn.savedTwinUrl) {
+          try {
+            const res = await fetch('https://mynarrative-ai.vercel.app/api/profile_manager', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                action: 'get_twin',
+                user_id: '{{ customer.id }}'
+              })
+            });
+            const data = await res.json();
+            if (data.success && data.url) {
+              MNTryOn.savedTwinUrl = data.url;
+              document.getElementById(`twin-option-${id}`).style.display = 'block';
+            }
+          } catch (e) {
+            console.log('No Digital Twin found');
+          }
+        } else {
+          document.getElementById(`twin-option-${id}`).style.display = 'block';
+        }
+        {% endif %}
+      },
+      
+      close: (id) => document.getElementById(`modal-${id}`).classList.remove('active'),
+      
+      showError: (id, msg) => {
+        document.getElementById(`step-upload-${id}`).style.display = 'none';
+        document.getElementById(`step-loading-${id}`).style.display = 'none';
+        document.getElementById(`step-result-${id}`).style.display = 'none';
+        document.getElementById(`error-msg-${id}`).textContent = msg;
+        document.getElementById(`step-error-${id}`).style.display = 'block';
+      },
+
+      reset: (id) => {
+        document.getElementById(`step-upload-${id}`).style.display = 'block';
+        document.getElementById(`step-result-${id}`).style.display = 'none';
+        document.getElementById(`step-loading-${id}`).style.display = 'none';
+        document.getElementById(`step-error-${id}`).style.display = 'none';
+        document.getElementById(`input-${id}`).value = '';
+      },
+
+      useTwin: async (id) => {
+        if (!MNTryOn.savedTwinUrl) return;
+        
+        // Use Digital Twin directly without upload
+        document.getElementById(`step-upload-${id}`).style.display = 'none';
+        document.getElementById(`step-loading-${id}`).style.display = 'block';
+
+        const productImgUrl = "{{ product.featured_image | image_url: width: 1024 }}";
+        
+        try {
+          const response = await fetch(MNTryOn.api, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              mode: 'vton',
+              user_image: MNTryOn.savedTwinUrl, // Use saved Digital Twin URL
+              garment_image: productImgUrl,
+              category: "{% if product.type contains 'Pant' or product.tags contains 'bottom' %}lower_body{% else %}upper_body{% endif %}",
+              description: "{{ product.title }}"
+            })
+          });
+
+          const data = await response.json();
+          
+          if (data.success) {
+            const img = document.getElementById(`img-result-${id}`);
+            img.src = data.image;
+            img.style.display = 'block';
+            document.getElementById(`step-loading-${id}`).style.display = 'none';
+            document.getElementById(`step-result-${id}`).style.display = 'block';
+          } else {
+            MNTryOn.showError(id, data.error || 'AI error. Please try again.');
+          }
+        } catch (err) {
+          MNTryOn.showError(id, 'Connection failed: ' + err.message);
+        }
+      },
+
+      process: async (input, id) => {
+        if (!input.files || !input.files[0]) return;
+        const file = input.files[0];
+
+        // UI Switch
+        document.getElementById(`step-upload-${id}`).style.display = 'none';
+        document.getElementById(`step-loading-${id}`).style.display = 'block';
+
+        // HELPER: Resize Image (Crucial for Vercel/Replicate limits)
+        const resizeImage = (file) => {
+          return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              const img = new Image();
+              img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 1024; // Limit width to 1024px
+                const scale = MAX_WIDTH / img.width;
+                canvas.width = MAX_WIDTH;
+                canvas.height = img.height * scale;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                resolve(canvas.toDataURL('image/jpeg', 0.8)); // Compress to 80% JPEG
+              };
+              img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+          });
+        };
+
+        try {
+          const compressedBase64 = await resizeImage(file);
+          
+          // Get current product image URL dynamically
+          const productImgUrl = "{{ product.featured_image | image_url: width: 1024 }}";
+          
+          console.log("🚀 Sending VTON Request...");
+
+          const response = await fetch(MNTryOn.api, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              mode: 'vton',
+              user_image: compressedBase64,
+              garment_image: productImgUrl,
+              // Simple logic to detect category
+              category: "{% if product.type contains 'Pant' or product.tags contains 'bottom' %}lower_body{% else %}upper_body{% endif %}",
+              description: "{{ product.title }}"
+            })
+          });
+
+          console.log("📡 Response Status:", response.status, response.statusText);
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error("❌ Server Error:", errorText);
+            let errMsg = `Server Error (${response.status})`;
+            try { const j = JSON.parse(errorText); errMsg = j.error || errMsg; } catch(e) {}
+            MNTryOn.showError(id, errMsg);
+            return;
+          }
+
+          const data = await response.json();
+          console.log("✅ API Response:", data);
+
+          if (data.success) {
+            const img = document.getElementById(`img-result-${id}`);
+            img.src = data.image;
+            img.style.display = 'block';
+            document.getElementById(`step-loading-${id}`).style.display = 'none';
+            document.getElementById(`step-result-${id}`).style.display = 'block';
+          } else {
+            console.error("❌ API Error:", data.error);
+            MNTryOn.showError(id, data.error || 'AI error. Please try again.');
+          }
+        } catch (err) {
+          console.error("❌ Network Error:", err);
+          MNTryOn.showError(id, 'Connection failed: ' + err.message);
+        }
+      }
+    };
+  }
+</script>

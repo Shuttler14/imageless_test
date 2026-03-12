@@ -1,0 +1,1906 @@
+﻿{% assign customer_name = customer.first_name | default: "Stylist" %}
+{% assign customer_id = customer.id | default: "guest" %}
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap');
+
+:root {
+  --mn-accent: #39A596;
+  --mn-accent-dark: #2d8578;
+  --mn-accent-dim: rgba(57,165,150,0.12);
+  --mn-accent-glow: rgba(57,165,150,0.4);
+  --mn-bg: #080808;
+  --mn-card: rgba(255,255,255,0.035);
+  --mn-card-hover: rgba(255,255,255,0.06);
+  --mn-border: rgba(255,255,255,0.08);
+  --mn-border-accent: rgba(57,165,150,0.3);
+  --mn-text: #ffffff;
+  --mn-muted: rgba(255,255,255,0.42);
+  --mn-radius: 18px;
+  --mn-radius-sm: 12px;
+  --mn-font: 'Montserrat', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+.mn-dashboard {
+  background: var(--mn-bg);
+  font-family: var(--mn-font);
+  color: var(--mn-text);
+  padding-bottom: 100px;
+  position: relative;
+}
+
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   HERO â€” circular SVG ring + linear bar
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+.mn-hero {
+  background: linear-gradient(180deg, rgba(57,165,150,0.07) 0%, transparent 100%);
+  border-bottom: 1px solid var(--mn-border);
+  padding: 32px 20px 28px;
+}
+.mn-hero-inner {
+  max-width: 760px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+/* Circular avatar + SVG ring */
+.mn-avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+  width: 114px;
+  height: 114px;
+  cursor: pointer;
+}
+.mn-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  background: rgba(57,165,150,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 38px;
+  border: 2.5px solid rgba(57,165,150,0.25);
+  overflow: hidden;
+  position: relative;
+}
+.mn-ring-svg {
+  position: absolute;
+  top: -7px; left: -7px;
+  width: 128px; height: 128px;
+  transform: rotate(-90deg);
+  pointer-events: none;
+}
+.mn-ring-bg  { fill:none; stroke:rgba(255,255,255,0.06); stroke-width:4.5; }
+.mn-ring-fill{
+  fill:none; stroke:var(--mn-accent); stroke-width:4.5; stroke-linecap:round;
+  stroke-dasharray: 352; stroke-dashoffset: 352;
+  transition: stroke-dashoffset 1s cubic-bezier(0.4,0,0.2,1);
+  filter: drop-shadow(0 0 8px rgba(57,165,150,0.7));
+}
+.mn-avatar-overlay {
+  position: absolute; inset: 0; border-radius: 50%;
+  background: rgba(0,0,0,0.5); display:flex; align-items:center;
+  justify-content:center; opacity:0; transition:opacity 0.2s; font-size:22px;
+  pointer-events:none;
+}
+.mn-avatar-wrap:hover .mn-avatar-overlay { opacity:1; }
+/* Completion % badge on ring */
+.mn-ring-pct {
+  position:absolute; bottom:-4px; left:50%; transform:translateX(-50%);
+  background:var(--mn-accent); color:#000; font-size:10px; font-weight:900;
+  padding:2px 8px; border-radius:99px; white-space:nowrap;
+  box-shadow:0 2px 8px rgba(57,165,150,0.5);
+}
+
+.mn-hero-info { flex:1; min-width:220px; }
+.mn-hero-name { font-size:24px; font-weight:900; letter-spacing:-0.02em; margin-bottom:3px; }
+.mn-hero-sub  { font-size:11px; color:var(--mn-muted); margin-bottom:14px; line-height:1.5; }
+
+/* Linear progress bar */
+.mn-linear-bar-wrap { margin-bottom:14px; }
+.mn-linear-label { display:flex; justify-content:space-between; font-size:10px; color:var(--mn-muted); font-weight:700; margin-bottom:6px; letter-spacing:0.06em; text-transform:uppercase; }
+.mn-linear-track { height:7px; background:rgba(255,255,255,0.07); border-radius:99px; overflow:hidden; }
+.mn-linear-fill {
+  height:100%;
+  background: linear-gradient(90deg, var(--mn-accent), #2dd4bf, #7dd3fc);
+  border-radius:99px; width:0%;
+  transition: width 1s cubic-bezier(0.4,0,0.2,1);
+  box-shadow: 0 0 12px rgba(57,165,150,0.5);
+}
+
+/* Hero badges */
+.mn-hero-badges { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; }
+.mn-hero-badge {
+  font-size:9px; font-weight:800; padding:4px 10px; border-radius:99px;
+  border:1px solid var(--mn-border); color:var(--mn-muted);
+  text-transform:uppercase; letter-spacing:0.08em; transition:all 0.3s;
+}
+.mn-hero-badge.active { border-color:var(--mn-accent); color:var(--mn-accent); background:var(--mn-accent-dim); }
+
+/* AI auto-fill button */
+.mn-ai-fill-btn {
+  display:inline-flex; align-items:center; gap:8px;
+  background: linear-gradient(135deg, var(--mn-accent), var(--mn-accent-dark));
+  color:#000; font-size:12px; font-weight:900;
+  padding:10px 20px; border-radius:12px; border:none; cursor:pointer;
+  letter-spacing:0.04em; transition:all 0.25s;
+  box-shadow: 0 4px 16px rgba(57,165,150,0.35);
+}
+.mn-ai-fill-btn:hover { transform:translateY(-2px); box-shadow:0 6px 24px rgba(57,165,150,0.5); }
+
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   MAGIC UPLOAD DROPZONE
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+.mn-magic-dropzone {
+  max-width:760px; margin:20px auto 0; padding:0 20px;
+}
+.mn-dropzone-inner {
+  border:2px dashed rgba(57,165,150,0.35);
+  border-radius:var(--mn-radius);
+  padding:32px 24px;
+  text-align:center;
+  background: linear-gradient(135deg, rgba(57,165,150,0.04), rgba(57,165,150,0.01));
+  cursor:pointer;
+  transition:all 0.3s;
+  position:relative;
+  overflow:hidden;
+}
+.mn-dropzone-inner:hover, .mn-dropzone-inner.dragover {
+  border-color:var(--mn-accent);
+  background:rgba(57,165,150,0.08);
+  box-shadow:0 0 30px rgba(57,165,150,0.15);
+}
+.mn-dropzone-icon { font-size:40px; margin-bottom:10px; }
+.mn-dropzone-title { font-size:15px; font-weight:800; margin-bottom:6px; letter-spacing:-0.01em; }
+.mn-dropzone-sub { font-size:11px; color:var(--mn-muted); line-height:1.5; }
+.mn-dropzone-tag {
+  display:inline-block; margin-top:12px;
+  background:var(--mn-accent-dim); border:1px solid var(--mn-border-accent);
+  color:var(--mn-accent); font-size:10px; font-weight:800;
+  padding:4px 12px; border-radius:99px; letter-spacing:0.06em; text-transform:uppercase;
+}
+
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   SECTIONS
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+.mn-sections {
+  max-width:760px; margin:0 auto;
+  padding:24px 20px; display:flex; flex-direction:column; gap:16px;
+}
+.mn-section {
+  background:var(--mn-card);
+  border:1px solid var(--mn-border);
+  border-radius:var(--mn-radius);
+  padding:22px;
+  border-left:3px solid var(--mn-accent);
+  transition:all 0.25s;
+  position:relative;
+}
+.mn-section:hover { background:var(--mn-card-hover); box-shadow:0 8px 40px rgba(57,165,150,0.07); }
+.mn-section-title {
+  font-size:13px; font-weight:900; text-transform:uppercase;
+  letter-spacing:0.1em; color:var(--mn-accent); margin-bottom:18px;
+  display:flex; align-items:center; gap:8px;
+}
+.mn-filled-check {
+  width:18px; height:18px; border-radius:50%; background:var(--mn-accent);
+  display:inline-flex; align-items:center; justify-content:center;
+  font-size:10px; color:#000; font-weight:900; margin-left:auto;
+  opacity:0; transition:opacity 0.3s; flex-shrink:0;
+}
+.mn-filled-check.show { opacity:1; }
+
+/* Chips */
+.mn-chips { display:flex; flex-wrap:wrap; gap:8px; }
+.mn-chip {
+  font-size:12px; font-weight:600; padding:8px 16px; border-radius:99px;
+  border:1.5px solid var(--mn-border); background:transparent; color:#fff;
+  cursor:pointer; transition:all 0.2s; user-select:none;
+}
+.mn-chip:hover { border-color:rgba(57,165,150,0.5); background:rgba(57,165,150,0.07); }
+.mn-chip.selected { border-color:var(--mn-accent); background:var(--mn-accent-dim); color:var(--mn-accent); }
+
+/* Height */
+.mn-height-display { text-align:center; margin-bottom:20px; }
+.mn-height-cm { font-size:52px; font-weight:900; line-height:1; letter-spacing:-0.04em; }
+.mn-height-ft { font-size:16px; color:var(--mn-muted); font-weight:600; margin-top:4px; }
+.mn-height-wrap { display:flex; align-items:flex-end; gap:24px; }
+.mn-body-svg-wrap { flex-shrink:0; display:flex; align-items:flex-end; }
+.mn-slider-wrap { flex:1; }
+.mn-range {
+  -webkit-appearance:none; width:100%; height:6px;
+  border-radius:99px; background:rgba(255,255,255,0.1); outline:none; cursor:pointer;
+}
+.mn-range::-webkit-slider-thumb {
+  -webkit-appearance:none; width:24px; height:24px; border-radius:50%;
+  background:var(--mn-accent); cursor:pointer; box-shadow:0 0 14px rgba(57,165,150,0.6);
+  border:2px solid rgba(255,255,255,0.2);
+}
+.mn-range::-moz-range-thumb { width:24px; height:24px; border-radius:50%; background:var(--mn-accent); cursor:pointer; border:none; }
+.mn-range-labels { display:flex; justify-content:space-between; font-size:10px; color:var(--mn-muted); margin-top:8px; }
+
+/* Skin tone swatches */
+.mn-mst-row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.mn-mst-swatch {
+  width:38px; height:38px; border-radius:50%; cursor:pointer;
+  border:3px solid transparent; transition:all 0.2s; flex-shrink:0; position:relative;
+}
+.mn-mst-swatch:hover { transform:scale(1.18); }
+.mn-mst-swatch.selected {
+  border-color:#fff; box-shadow:0 0 0 3px var(--mn-accent), 0 0 16px rgba(57,165,150,0.5);
+  transform:scale(1.22);
+}
+.mn-mst-label { font-size:11px; color:var(--mn-muted); margin-top:10px; font-weight:600; min-height:16px; }
+
+/* Price dual range */
+.mn-price-display { font-size:22px; font-weight:900; margin-bottom:14px; color:var(--mn-accent); }
+.mn-dual-range { position:relative; height:6px; background:rgba(255,255,255,0.1); border-radius:99px; margin:24px 0 8px; }
+.mn-dual-range-fill { position:absolute; height:100%; background:linear-gradient(90deg,var(--mn-accent),#2dd4bf); border-radius:99px; }
+.mn-dual-range input[type=range] { position:absolute; width:100%; -webkit-appearance:none; background:transparent; height:6px; pointer-events:none; top:0; margin:0; }
+.mn-dual-range input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:22px; height:22px; border-radius:50%; background:var(--mn-accent); cursor:pointer; pointer-events:all; box-shadow:0 0 10px rgba(57,165,150,0.5); }
+.mn-price-presets { display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
+.mn-preset-btn {
+  font-size:11px; font-weight:700; padding:6px 14px; border-radius:99px;
+  border:1.5px solid var(--mn-border); background:transparent; color:var(--mn-muted); cursor:pointer; transition:all 0.2s;
+}
+.mn-preset-btn:hover,.mn-preset-btn.active { border-color:var(--mn-accent); color:var(--mn-accent); background:var(--mn-accent-dim); }
+
+/* Weather */
+.mn-weather-display {
+  display:flex; align-items:center; gap:16px; padding:16px 20px;
+  background:rgba(255,255,255,0.04); border-radius:14px; margin-bottom:14px;
+  border:1px solid var(--mn-border);
+}
+.mn-weather-emoji { font-size:38px; }
+.mn-weather-info { flex:1; }
+.mn-weather-city { font-size:14px; font-weight:800; }
+.mn-weather-temp { font-size:30px; font-weight:900; color:var(--mn-accent); }
+.mn-weather-cond { font-size:11px; color:var(--mn-muted); margin-top:2px; }
+.mn-weather-row { display:flex; gap:8px; flex-wrap:wrap; }
+.mn-city-input {
+  flex:1; min-width:140px; background:rgba(255,255,255,0.06);
+  border:1.5px solid var(--mn-border); border-radius:12px;
+  padding:10px 14px; color:#fff; font-size:13px; font-family:var(--mn-font); outline:none; transition:border-color 0.2s;
+}
+.mn-city-input:focus { border-color:var(--mn-accent); }
+.mn-btn-teal {
+  background:var(--mn-accent); color:#000; font-size:12px; font-weight:800;
+  padding:10px 16px; border-radius:12px; border:none; cursor:pointer; white-space:nowrap;
+  transition:all 0.2s; font-family:var(--mn-font);
+}
+.mn-btn-teal:hover { background:var(--mn-accent-dark); transform:translateY(-1px); }
+.mn-locate-btn {
+  background:rgba(255,255,255,0.07); color:#fff; font-size:12px; font-weight:700;
+  padding:10px 14px; border-radius:12px; border:1px solid var(--mn-border); cursor:pointer; transition:all 0.2s;
+}
+.mn-locate-btn:hover { background:rgba(255,255,255,0.12); }
+
+/* Vibe grid */
+.mn-vibe-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.mn-vibe-card {
+  border:1.5px solid var(--mn-border); border-radius:14px; padding:14px 12px;
+  cursor:pointer; transition:all 0.2s; background:transparent; text-align:left; width:100%;
+}
+.mn-vibe-card:hover { border-color:rgba(57,165,150,0.45); background:rgba(57,165,150,0.05); }
+.mn-vibe-card.selected { border-color:var(--mn-accent); background:var(--mn-accent-dim); box-shadow:0 0 20px rgba(57,165,150,0.15); }
+.mn-vibe-emoji { font-size:24px; margin-bottom:6px; }
+.mn-vibe-name  { font-size:12px; font-weight:800; color:#fff; margin-bottom:3px; }
+.mn-vibe-desc  { font-size:10px; color:var(--mn-muted); line-height:1.45; }
+
+/* Bank cards */
+.mn-bank-row { display:flex; gap:10px; margin-bottom:12px; flex-wrap:wrap; }
+.mn-select {
+  flex:1; min-width:120px; background:rgba(255,255,255,0.06);
+  border:1.5px solid var(--mn-border); border-radius:12px;
+  padding:10px 14px; color:#fff; font-size:13px; font-family:var(--mn-font);
+  outline:none; transition:border-color 0.2s; cursor:pointer; -webkit-appearance:none;
+}
+.mn-select:focus { border-color:var(--mn-accent); }
+.mn-select option { background:#111; color:#fff; }
+.mn-add-btn {
+  background:var(--mn-accent); color:#000; font-size:20px; font-weight:900;
+  width:44px; height:44px; border-radius:12px; border:none; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all 0.2s;
+}
+.mn-add-btn:hover { background:var(--mn-accent-dark); }
+.mn-card-tags { display:flex; flex-wrap:wrap; gap:8px; }
+.mn-card-tag {
+  display:flex; align-items:center; gap:6px; padding:6px 12px;
+  background:rgba(57,165,150,0.1); border:1px solid rgba(57,165,150,0.3);
+  border-radius:99px; font-size:11px; font-weight:700; color:var(--mn-accent);
+}
+.mn-card-tag-remove { cursor:pointer; color:var(--mn-muted); font-size:16px; line-height:1; }
+.mn-card-tag-remove:hover { color:#ef4444; }
+
+/* Interests */
+.mn-interest-row { display:flex; gap:8px; margin-top:14px; }
+.mn-interest-input {
+  flex:1; background:rgba(255,255,255,0.06); border:1.5px solid var(--mn-border);
+  border-radius:12px; padding:10px 14px; color:#fff; font-size:13px; font-family:var(--mn-font); outline:none;
+  transition:border-color 0.2s;
+}
+.mn-interest-input:focus { border-color:var(--mn-accent); }
+
+/* Digital Closet */
+.mn-closet-actions { display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap; }
+.mn-closet-btn {
+  flex:1; min-width:130px; padding:14px; border-radius:14px; font-size:13px; font-weight:800;
+  border:1.5px solid var(--mn-border); background:rgba(255,255,255,0.04);
+  color:#fff; cursor:pointer; transition:all 0.2s; text-align:center; font-family:var(--mn-font);
+}
+.mn-closet-btn.primary { background:var(--mn-accent); color:#000; border-color:var(--mn-accent); }
+.mn-closet-btn:hover { opacity:0.85; transform:translateY(-2px); box-shadow:0 6px 20px rgba(57,165,150,0.2); }
+.mn-closet-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.mn-closet-thumb {
+  border-radius:12px; overflow:hidden; aspect-ratio:3/4;
+  background:rgba(255,255,255,0.04); border:1px solid var(--mn-border);
+  position:relative; transition:all 0.25s;
+}
+.mn-closet-thumb:hover { border-color:var(--mn-border-accent); transform:scale(1.02); }
+.mn-closet-thumb img { width:100%; height:100%; object-fit:cover; }
+.mn-closet-thumb-label {
+  position:absolute; bottom:0; left:0; right:0;
+  padding:8px 6px 6px;
+  background:linear-gradient(0deg,rgba(0,0,0,0.85),transparent);
+  font-size:9px; font-weight:700; color:#fff; line-height:1.3;
+}
+.mn-closet-empty { text-align:center; padding:40px 20px; color:var(--mn-muted); }
+.mn-closet-empty-icon { font-size:52px; margin-bottom:14px; }
+
+/* Switzerland Fintech */
+.mn-bank-discount-chips { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+.mn-discount-chip {
+  padding:8px 14px; border-radius:99px; font-size:11px; font-weight:700;
+  background:rgba(255,215,0,0.08); border:1px solid rgba(255,215,0,0.25);
+  color:#ffd700; display:flex; align-items:center; gap:5px;
+}
+
+/* Chatbot sync indicator */
+.mn-chatbot-sync-bar {
+  display:flex; align-items:center; gap:10px; padding:12px 16px;
+  background:rgba(57,165,150,0.06); border:1px solid rgba(57,165,150,0.2);
+  border-radius:12px; margin-bottom:14px; font-size:12px; color:var(--mn-muted);
+}
+.mn-chatbot-sync-dot {
+  width:8px; height:8px; border-radius:50%; background:var(--mn-accent);
+  box-shadow:0 0 8px var(--mn-accent); flex-shrink:0;
+  animation:mn-pulse 2s ease-in-out infinite;
+}
+@keyframes mn-pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.85)} }
+.mn-chatbot-last-sync { font-size:10px; color:rgba(57,165,150,0.7); margin-left:auto; font-weight:700; }
+
+/* AI Loading Overlay */
+.mn-ai-overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,0.88); backdrop-filter:blur(10px);
+  display:none; align-items:center; justify-content:center; z-index:9999; flex-direction:column; gap:20px;
+}
+.mn-ai-overlay.active { display:flex; }
+.mn-ai-spinner { width:60px; height:60px; border:5px solid rgba(57,165,150,0.15); border-top-color:var(--mn-accent); border-radius:50%; animation:mn-spin 0.9s linear infinite; }
+.mn-ai-msg { font-size:16px; font-weight:800; color:#fff; text-align:center; max-width:280px; line-height:1.5; }
+.mn-ai-sub { font-size:12px; color:var(--mn-muted); }
+
+/* Ghost Mode Modal */
+.mn-modal-overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,0.88); backdrop-filter:blur(8px);
+  display:none; align-items:center; justify-content:center; z-index:9998; padding:20px;
+}
+.mn-modal-overlay.active { display:flex; }
+.mn-modal-box {
+  background:linear-gradient(135deg,#0a0a0a,#111);
+  border:1px solid rgba(57,165,150,0.4); border-radius:20px;
+  padding:28px; max-width:440px; width:100%;
+  box-shadow:0 0 60px rgba(57,165,150,0.25), 0 20px 60px rgba(0,0,0,0.8);
+  animation:mn-pop-in 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+.mn-modal-title { font-size:16px; font-weight:800; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:6px; }
+.mn-modal-sub   { font-size:12px; color:var(--mn-muted); margin-bottom:18px; }
+.mn-modal-actions { display:flex; gap:10px; margin-top:18px; }
+.mn-modal-cancel {
+  padding:12px 20px; background:rgba(255,255,255,0.05); border:1px solid var(--mn-border);
+  border-radius:10px; color:var(--mn-muted); font-family:var(--mn-font); font-size:13px; cursor:pointer;
+}
+.mn-modal-cancel:hover { background:rgba(255,255,255,0.1); color:#fff; }
+
+/* Sticky save bar */
+.mn-save-bar {
+  position:fixed; bottom:0; left:0; right:0; z-index:1000;
+  padding:14px 20px; background:rgba(8,8,8,0.96); backdrop-filter:blur(14px);
+  border-top:1px solid var(--mn-border); display:flex; justify-content:center;
+}
+.mn-save-btn {
+  background:linear-gradient(135deg,var(--mn-accent),var(--mn-accent-dark));
+  color:#000; font-size:14px; font-weight:900; padding:14px 40px;
+  border-radius:14px; border:none; cursor:pointer; letter-spacing:0.05em;
+  transition:all 0.25s; display:flex; align-items:center; gap:8px;
+  max-width:440px; width:100%; justify-content:center; font-family:var(--mn-font);
+  box-shadow:0 4px 20px rgba(57,165,150,0.35);
+}
+.mn-save-btn:hover { transform:translateY(-2px); box-shadow:0 8px 30px rgba(57,165,150,0.5); }
+.mn-save-btn.saved { background:linear-gradient(135deg,#16a34a,#15803d); }
+
+/* Animations */
+@keyframes mn-spin    { to { transform:rotate(360deg); } }
+@keyframes mn-pop-in  { from{opacity:0;transform:scale(0.85)} to{opacity:1;transform:scale(1)} }
+@keyframes mn-flash   { 0%,100%{background:var(--mn-card)} 50%{background:rgba(57,165,150,0.14)} }
+.mn-ai-flash { animation:mn-flash 0.6s ease 2; }
+.mn-pop-in   { animation:mn-pop-in 0.3s ease forwards; }
+
+/* Responsive */
+@media(max-width:600px) {
+  .mn-hero-inner { flex-direction:column; text-align:center; }
+  .mn-vibe-grid  { grid-template-columns:1fr 1fr; }
+  .mn-height-wrap { flex-direction:column; align-items:center; }
+  .mn-closet-grid { grid-template-columns:repeat(2,1fr); }
+  .mn-bank-row  { flex-direction:column; }
+}
+</style>
+
+<!-- AI Loading Overlay -->
+<div class="mn-ai-overlay" id="mn-ai-overlay">
+  <div class="mn-ai-spinner"></div>
+  <div class="mn-ai-msg" id="mn-ai-msg">AI is reading your style DNA...</div>
+  <div class="mn-ai-sub">Scanning skin tone, body type, hair &amp; more</div>
+</div>
+
+<!-- Ghost Mode Modal -->
+<div class="mn-modal-overlay" id="mn-ghost-modal">
+  <div class="mn-modal-box">
+    <div class="mn-modal-title">ðŸ‘» Ghost Mode</div>
+    <div class="mn-modal-sub">Describe a clothing item â€” AI generates an embedding without a photo.</div>
+    <input type="text" class="mn-city-input" id="mn-ghost-input" style="width:100%;margin-bottom:10px" placeholder="E.g. Black Levis 501 Jeans, size 32..." />
+    <select class="mn-select" id="mn-ghost-category" style="width:100%;margin-bottom:10px">
+      <option value="">Category (optional)</option>
+      <option>Topwear</option><option>Bottomwear</option><option>Outerwear</option>
+      <option>Footwear</option><option>Ethnic Wear</option><option>Accessories</option>
+    </select>
+    <div class="mn-modal-actions">
+      <button class="mn-modal-cancel" onclick="document.getElementById('mn-ghost-modal').classList.remove('active')">Cancel</button>
+      <button class="mn-btn-teal" style="flex:1;border-radius:10px;font-family:var(--mn-font);font-size:13px" onclick="mnSubmitGhost()">Add to Closet ðŸ‘»</button>
+    </div>
+  </div>
+</div>
+
+<!-- Closet Upload Modal -->
+<div class="mn-modal-overlay" id="mn-closet-modal">
+  <div class="mn-modal-box">
+    <div class="mn-modal-title">ðŸ“· Upload to Closet</div>
+    <div class="mn-modal-sub">AI will segment and catalog your clothing item automatically.</div>
+    <div id="mn-closet-preview" style="display:none;margin-bottom:14px;text-align:center">
+      <img id="mn-closet-preview-img" style="max-width:100%;max-height:200px;border-radius:12px;border:1px solid rgba(57,165,150,0.3)" />
+    </div>
+    <input type="file" id="mn-closet-file-input" accept="image/*" multiple style="display:none" onchange="mnHandleClosetUpload(this)" />
+    <button class="mn-btn-teal" style="width:100%;border-radius:10px;font-family:var(--mn-font);font-size:13px;margin-bottom:10px" onclick="document.getElementById('mn-closet-file-input').click()">Choose Photo(s)</button>
+    <div class="mn-modal-actions">
+      <button class="mn-modal-cancel" style="flex:1" onclick="document.getElementById('mn-closet-modal').classList.remove('active')">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="mn-dashboard">
+
+  <!-- HERO -->
+  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+     PROFILE INCOMPLETE BANNER
+     Shown when user arrives from widget profile ring click
+     AND has not uploaded a photo yet. Auto-hides once filled.
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<div id="mn-welcome-banner" style="display:none">
+  <div class="mn-welcome-banner-inner">
+    <div class="mn-wb-left">
+      <div class="mn-wb-pulse"></div>
+      <div>
+        <div class="mn-wb-title">ðŸ‘‹ Welcome to your Style Dashboard</div>
+        <div class="mn-wb-sub">Your AI stylist needs a few details to personalise your looks. Upload a photo below â€” AI fills everything automatically in seconds.</div>
+      </div>
+    </div>
+    <button class="mn-wb-cta" onclick="document.getElementById('mn-magic-upload-input').click();document.getElementById('mn-welcome-banner').style.display='none'">
+      ðŸ“¸ Upload Photo Now
+    </button>
+    <button class="mn-wb-close" onclick="document.getElementById('mn-welcome-banner').style.display='none'" title="Dismiss">âœ•</button>
+  </div>
+</div>
+
+<style>
+/* Welcome banner */
+#mn-welcome-banner {
+  position: sticky;
+  top: 0;
+  z-index: 900;
+  padding: 0 20px;
+  animation: mn-slide-down 0.45s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes mn-slide-down {
+  from { transform: translateY(-100%); opacity: 0; }
+  to   { transform: translateY(0);     opacity: 1; }
+}
+.mn-welcome-banner-inner {
+  max-width: 760px;
+  margin: 0 auto;
+  background: linear-gradient(135deg, rgba(57,165,150,0.18), rgba(57,165,150,0.06));
+  border: 1px solid rgba(57,165,150,0.45);
+  border-top: none;
+  border-radius: 0 0 16px 16px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  box-shadow: 0 8px 32px rgba(57,165,150,0.2);
+}
+.mn-wb-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex: 1;
+  min-width: 200px;
+}
+.mn-wb-pulse {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--mn-accent);
+  flex-shrink: 0;
+  margin-top: 4px;
+  box-shadow: 0 0 0 0 rgba(57,165,150,0.6);
+  animation: mn-wb-pulse 1.8s ease-in-out infinite;
+}
+@keyframes mn-wb-pulse {
+  0%   { box-shadow: 0 0 0 0   rgba(57,165,150,0.7); }
+  70%  { box-shadow: 0 0 0 12px rgba(57,165,150,0);   }
+  100% { box-shadow: 0 0 0 0   rgba(57,165,150,0);    }
+}
+.mn-wb-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 4px;
+}
+.mn-wb-sub {
+  font-size: 11px;
+  color: rgba(255,255,255,0.65);
+  line-height: 1.5;
+}
+.mn-wb-cta {
+  background: var(--mn-accent);
+  color: #000;
+  font-family: var(--mn-font);
+  font-size: 12px;
+  font-weight: 900;
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.mn-wb-cta:hover { background: var(--mn-accent-dark); transform: translateY(-1px); }
+.mn-wb-close {
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.35);
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px;
+  flex-shrink: 0;
+  line-height: 1;
+  transition: color 0.2s;
+}
+.mn-wb-close:hover { color: #fff; }
+
+/* Dropzone highlight pulse when focused from widget */
+.mn-dropzone-focused {
+  border-color: var(--mn-accent) !important;
+  box-shadow: 0 0 0 4px rgba(57,165,150,0.25), 0 0 40px rgba(57,165,150,0.3) !important;
+  animation: mn-focus-pulse 1.5s ease-in-out 3 !important;
+}
+@keyframes mn-focus-pulse {
+  0%,100% { box-shadow: 0 0 0 4px rgba(57,165,150,0.25), 0 0 40px rgba(57,165,150,0.3); }
+  50%      { box-shadow: 0 0 0 8px rgba(57,165,150,0.45), 0 0 60px rgba(57,165,150,0.5); }
+}
+
+/* Avatar ring glow when focused */
+.mn-ring-focused .mn-ring-fill {
+  filter: drop-shadow(0 0 16px rgba(57,165,150,1)) !important;
+  animation: mn-ring-glow 1s ease-in-out 4 !important;
+}
+@keyframes mn-ring-glow {
+  0%,100% { stroke: #39A596; }
+  50%      { stroke: #2dd4bf; }
+}
+</style><div id="style-profile" class="mn-hero">
+    <div class="mn-hero-inner">
+      <div class="mn-avatar-wrap" id="mn-avatar-wrap" title="Click to upload photo â€” AI will auto-fill your profile">
+        <div class="mn-avatar-img" id="mn-avatar-img">
+          <span id="mn-avatar-emoji">ðŸ‘¤</span>
+          <img id="mn-avatar-photo" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:50%;position:absolute;inset:0;" />
+        </div>
+        <svg class="mn-ring-svg" viewBox="0 0 128 128">
+          <circle class="mn-ring-bg" cx="64" cy="64" r="56"/>
+          <circle class="mn-ring-fill" id="mn-ring-fill" cx="64" cy="64" r="56"/>
+        </svg>
+        <div class="mn-avatar-overlay">ðŸ“·</div>
+        <div class="mn-ring-pct" id="mn-ring-pct">0%</div>
+        <input type="file" id="mn-profile-photo-input" accept="image/*" style="display:none" />
+      </div>
+      <div class="mn-hero-info">
+        <div class="mn-hero-name">{{ customer_name }}&apos;s Style OS</div>
+        <div class="mn-hero-sub" id="mn-hero-sub-text">Profile 0% Complete â€” Feed the AI to unlock hyper-personalized styles.</div>
+        <div class="mn-linear-bar-wrap">
+          <div class="mn-linear-label">
+            <span>Profile Completion</span>
+            <span id="mn-pct-label">0%</span>
+          </div>
+          <div class="mn-linear-track">
+            <div class="mn-linear-fill" id="mn-linear-fill"></div>
+          </div>
+        </div>
+        <div class="mn-hero-badges">
+          <span class="mn-hero-badge" id="badge-gender">Gender</span>
+          <span class="mn-hero-badge" id="badge-height">Height</span>
+          <span class="mn-hero-badge" id="badge-skin">Skin</span>
+          <span class="mn-hero-badge" id="badge-style">Styles</span>
+          <span class="mn-hero-badge" id="badge-closet">Closet</span>
+          <span class="mn-hero-badge" id="badge-bank">Bank</span>
+        </div>
+        <button class="mn-ai-fill-btn" id="mn-ai-photo-btn">âœ¨ Auto-Fill from Photo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAGIC UPLOAD DROPZONE -->
+  <div class="mn-magic-dropzone">
+    <div class="mn-dropzone-inner" id="mn-magic-dropzone"
+         ondragover="event.preventDefault();this.classList.add('dragover')"
+         ondragleave="this.classList.remove('dragover')"
+         ondrop="event.preventDefault();this.classList.remove('dragover');mnHandleMagicDrop(event)"
+         onclick="document.getElementById('mn-magic-upload-input').click()">
+      <div class="mn-dropzone-icon">ðŸª„</div>
+      <div class="mn-dropzone-title">Upload an Outfit Pic â€” Let our AI auto-fill your style profile</div>
+      <div class="mn-dropzone-sub">Drop a full-body photo or outfit flat-lay. Our AI reads skin tone, body type, hair style, preferred fit and more â€” filling all fields instantly.</div>
+      <div class="mn-dropzone-tag">âš¡ Powered by My Narrative AI Â· api.mynarrative.store</div>
+    </div>
+    <input type="file" id="mn-magic-upload-input" accept="image/*" style="display:none" onchange="mnHandleMagicUpload(this.files[0])" />
+  </div>
+
+  <!-- CHATBOT SYNC BAR -->
+  <div class="mn-sections" style="padding-bottom:0;gap:0">
+    <div class="mn-chatbot-sync-bar" id="mn-chatbot-sync-bar">
+      <div class="mn-chatbot-sync-dot"></div>
+      <span>AI Stylist chatbot is <strong style="color:#fff">live-syncing</strong> data here â€” every preference you share is stored automatically.</span>
+      <span class="mn-chatbot-last-sync" id="mn-chatbot-last-sync">Never synced</span>
+    </div>
+  </div>
+
+  <div class="mn-sections">
+    <!-- SECTION 1: GENDER -->
+    <div class="mn-section" id="mn-sec-gender">
+      <div class="mn-section-title">ðŸ‘¤ Gender <span class="mn-filled-check" id="chk-gender">âœ“</span></div>
+      <div class="mn-chips">
+        <button class="mn-chip" data-field="gender" data-val="men" onclick="mnSelectSingle(this,'gender')">ðŸ‘” Men</button>
+        <button class="mn-chip" data-field="gender" data-val="women" onclick="mnSelectSingle(this,'gender')">ðŸ‘— Women</button>
+        <button class="mn-chip" data-field="gender" data-val="non-binary" onclick="mnSelectSingle(this,'gender')">ðŸŒˆ Non-Binary</button>
+        <button class="mn-chip" data-field="gender" data-val="prefer-not" onclick="mnSelectSingle(this,'gender')">ðŸ¤ Prefer Not to Say</button>
+      </div>
+    </div>
+
+    <!-- SECTION 2: HEIGHT with SVG body silhouette -->
+    <div class="mn-section" id="mn-sec-height">
+      <div class="mn-section-title">ðŸ“ Height <span class="mn-filled-check" id="chk-height">âœ“</span></div>
+      <div class="mn-height-display">
+        <div class="mn-height-cm" id="mn-height-cm">172 cm</div>
+        <div class="mn-height-ft" id="mn-height-ft">5 ft 7 in</div>
+      </div>
+      <div class="mn-height-wrap">
+        <div class="mn-body-svg-wrap">
+          <svg id="mn-body-svg" width="54" height="160" viewBox="0 0 60 200" fill="none" xmlns="http://www.w3.org/2000/svg" style="transition:height 0.35s ease,opacity 0.3s">
+            <circle cx="30" cy="18" r="14" stroke="#39A596" stroke-width="2.5" fill="rgba(57,165,150,0.1)"/>
+            <rect x="26" y="32" width="8" height="10" rx="3" fill="rgba(57,165,150,0.12)" stroke="#39A596" stroke-width="2"/>
+            <path d="M8 44 Q30 40 52 44 L48 100 Q30 106 12 100 Z" stroke="#39A596" stroke-width="2.5" fill="rgba(57,165,150,0.08)"/>
+            <path d="M8 46 L2 90 Q1 95 5 96 L10 96 L14 52" stroke="#39A596" stroke-width="2" fill="rgba(57,165,150,0.05)"/>
+            <path d="M52 46 L58 90 Q59 95 55 96 L50 96 L46 52" stroke="#39A596" stroke-width="2" fill="rgba(57,165,150,0.05)"/>
+            <path d="M12 100 L8 170 Q8 178 14 178 L22 178 L24 100" stroke="#39A596" stroke-width="2.5" fill="rgba(57,165,150,0.08)"/>
+            <path d="M48 100 L52 170 Q52 178 46 178 L38 178 L36 100" stroke="#39A596" stroke-width="2.5" fill="rgba(57,165,150,0.08)"/>
+          </svg>
+        </div>
+        <div class="mn-slider-wrap">
+          <input type="range" class="mn-range" id="mn-height-slider" min="140" max="220" value="172" oninput="mnHeightChange(this.value)"/>
+          <div class="mn-range-labels"><span>140 cm (4&apos;7&quot;)</span><span>220 cm (7&apos;2&quot;)</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 3: SKIN TONE (Monk Scale 1-10) -->
+    <div class="mn-section" id="mn-sec-skin">
+      <div class="mn-section-title">ðŸŽ¨ Skin Tone <span style="font-size:10px;font-weight:600;color:rgba(57,165,150,0.6);text-transform:none;letter-spacing:0">(Monk Scale)</span> <span class="mn-filled-check" id="chk-skin">âœ“</span></div>
+      <div class="mn-mst-row" id="mn-mst-row">
+        <div class="mn-mst-swatch" data-mst="1"  style="background:#f6ede4" onclick="mnSelectMST(1,'Very Light','#f6ede4')"   title="MST 1 â€” Very Light"></div>
+        <div class="mn-mst-swatch" data-mst="2"  style="background:#f3e7db" onclick="mnSelectMST(2,'Light','#f3e7db')"         title="MST 2 â€” Light"></div>
+        <div class="mn-mst-swatch" data-mst="3"  style="background:#f7ead0" onclick="mnSelectMST(3,'Light Medium','#f7ead0')"  title="MST 3 â€” Light Medium"></div>
+        <div class="mn-mst-swatch" data-mst="4"  style="background:#eadaba" onclick="mnSelectMST(4,'Medium Light','#eadaba')"  title="MST 4 â€” Medium Light"></div>
+        <div class="mn-mst-swatch" data-mst="5"  style="background:#d7bd96" onclick="mnSelectMST(5,'Medium','#d7bd96')"        title="MST 5 â€” Medium"></div>
+        <div class="mn-mst-swatch" data-mst="6"  style="background:#a07850" onclick="mnSelectMST(6,'Medium Dark','#a07850')"   title="MST 6 â€” Medium Dark"></div>
+        <div class="mn-mst-swatch" data-mst="7"  style="background:#825c43" onclick="mnSelectMST(7,'Dark','#825c43')"          title="MST 7 â€” Dark"></div>
+        <div class="mn-mst-swatch" data-mst="8"  style="background:#604134" onclick="mnSelectMST(8,'Very Dark','#604134')"     title="MST 8 â€” Very Dark"></div>
+        <div class="mn-mst-swatch" data-mst="9"  style="background:#3a312a" onclick="mnSelectMST(9,'Deep','#3a312a')"          title="MST 9 â€” Deep"></div>
+        <div class="mn-mst-swatch" data-mst="10" style="background:#292420" onclick="mnSelectMST(10,'Deepest','#292420')"      title="MST 10 â€” Deepest"></div>
+      </div>
+      <div class="mn-mst-label" id="mn-mst-label">Select your skin tone on the Monk Scale</div>
+    </div>
+
+    <!-- SECTION 4: PREFERRED FIT -->
+    <div class="mn-section" id="mn-sec-fit">
+      <div class="mn-section-title">ðŸ‘• Preferred Fit <span class="mn-filled-check" id="chk-fit">âœ“</span></div>
+      <div class="mn-chips">
+        <button class="mn-chip" data-field="fit" data-val="Slim"      onclick="mnSelectSingle(this,'fit')">âš¡ Slim</button>
+        <button class="mn-chip" data-field="fit" data-val="Regular"   onclick="mnSelectSingle(this,'fit')">âœ… Regular</button>
+        <button class="mn-chip" data-field="fit" data-val="Oversized" onclick="mnSelectSingle(this,'fit')">ðŸ”ï¸ Oversized</button>
+        <button class="mn-chip" data-field="fit" data-val="Baggy"     onclick="mnSelectSingle(this,'fit')">ðŸŒŠ Baggy</button>
+        <button class="mn-chip" data-field="fit" data-val="Tailored"  onclick="mnSelectSingle(this,'fit')">ðŸŽ¯ Tailored</button>
+      </div>
+    </div>
+
+    <!-- SECTION 5: FREQUENT LOCATIONS -->
+    <div class="mn-section" id="mn-sec-occasions">
+      <div class="mn-section-title">ðŸ“ Frequent Locations <span class="mn-filled-check" id="chk-occasions">âœ“</span></div>
+      <div class="mn-chips" id="mn-occasions-chips">
+        <button class="mn-chip" data-field="occasions" data-val="Office"        onclick="mnToggleMulti(this,'occasions')">ðŸ’¼ Office</button>
+        <button class="mn-chip" data-field="occasions" data-val="Gym"           onclick="mnToggleMulti(this,'occasions')">ðŸ‹ï¸ Gym</button>
+        <button class="mn-chip" data-field="occasions" data-val="College"       onclick="mnToggleMulti(this,'occasions')">ðŸŽ“ College</button>
+        <button class="mn-chip" data-field="occasions" data-val="Cafe"          onclick="mnToggleMulti(this,'occasions')">â˜• CafÃ©</button>
+        <button class="mn-chip" data-field="occasions" data-val="Club"          onclick="mnToggleMulti(this,'occasions')">ðŸŽ¶ Club</button>
+        <button class="mn-chip" data-field="occasions" data-val="Temple/Pooja"  onclick="mnToggleMulti(this,'occasions')">ðŸª” Temple/Pooja</button>
+        <button class="mn-chip" data-field="occasions" data-val="Travel"        onclick="mnToggleMulti(this,'occasions')">âœˆï¸ Travel</button>
+        <button class="mn-chip" data-field="occasions" data-val="Mall"          onclick="mnToggleMulti(this,'occasions')">ðŸ›ï¸ Mall</button>
+        <button class="mn-chip" data-field="occasions" data-val="Date Night"    onclick="mnToggleMulti(this,'occasions')">ðŸŒ™ Date Night</button>
+      </div>
+    </div>
+
+    <!-- SECTION 6: HAIR STYLE -->
+    <div class="mn-section" id="mn-sec-hair">
+      <div class="mn-section-title">ðŸ’‡ Hair Style <span class="mn-filled-check" id="chk-hair">âœ“</span></div>
+      <div class="mn-chips">
+        <button class="mn-chip" data-field="hair" data-val="Short"         onclick="mnSelectSingle(this,'hair')">âœ‚ï¸ Short</button>
+        <button class="mn-chip" data-field="hair" data-val="Medium"        onclick="mnSelectSingle(this,'hair')">ðŸŒŠ Medium</button>
+        <button class="mn-chip" data-field="hair" data-val="Long"          onclick="mnSelectSingle(this,'hair')">ðŸ’ Long</button>
+        <button class="mn-chip" data-field="hair" data-val="Curly"         onclick="mnSelectSingle(this,'hair')">ðŸŒ€ Curly</button>
+        <button class="mn-chip" data-field="hair" data-val="Straight"      onclick="mnSelectSingle(this,'hair')">âž– Straight</button>
+        <button class="mn-chip" data-field="hair" data-val="Fade"          onclick="mnSelectSingle(this,'hair')">âš¡ Fade</button>
+        <button class="mn-chip" data-field="hair" data-val="Buzzcut"       onclick="mnSelectSingle(this,'hair')">ðŸ”¹ Buzzcut</button>
+        <button class="mn-chip" data-field="hair" data-val="Hijab/Covered" onclick="mnSelectSingle(this,'hair')">ðŸ§• Hijab/Covered</button>
+        <button class="mn-chip" data-field="hair" data-val="Bald"          onclick="mnSelectSingle(this,'hair')">ðŸ˜Ž Bald</button>
+      </div>
+    </div>
+
+    <!-- SECTION 7: PRICE RANGE -->
+    <div class="mn-section" id="mn-sec-price">
+      <div class="mn-section-title">ðŸ’° Price Range <span class="mn-filled-check" id="chk-price">âœ“</span></div>
+      <div class="mn-price-display" id="mn-price-display">â‚¹2,000 â€“ â‚¹8,000</div>
+      <div class="mn-dual-range">
+        <div class="mn-dual-range-fill" id="mn-price-fill"></div>
+        <input type="range" id="mn-price-min" min="500" max="50000" value="2000" step="500" oninput="mnPriceChange()"/>
+        <input type="range" id="mn-price-max" min="500" max="50000" value="8000" step="500" oninput="mnPriceChange()"/>
+      </div>
+      <div class="mn-range-labels"><span>â‚¹500</span><span>â‚¹50,000+</span></div>
+      <div class="mn-price-presets">
+        <button class="mn-preset-btn" onclick="mnSetPreset(500,2000,this)">ðŸª™ Under â‚¹2K</button>
+        <button class="mn-preset-btn" onclick="mnSetPreset(2000,8000,this)">ðŸ’³ â‚¹2Kâ€“8K</button>
+        <button class="mn-preset-btn" onclick="mnSetPreset(8000,20000,this)">ðŸ’Ž â‚¹8Kâ€“20K</button>
+        <button class="mn-preset-btn" onclick="mnSetPreset(20000,50000,this)">ðŸ‘‘ â‚¹20K+</button>
+      </div>
+    </div>
+
+    <!-- SECTION 8: CURRENT WEATHER (Geolocation) -->
+    <div class="mn-section" id="mn-sec-weather">
+      <div class="mn-section-title">ðŸŒ¤ï¸ Current Weather <span class="mn-filled-check" id="chk-weather">âœ“</span></div>
+      <div class="mn-weather-display" id="mn-weather-display" style="display:none">
+        <div class="mn-weather-emoji" id="mn-weather-emoji">ðŸŒ¤ï¸</div>
+        <div class="mn-weather-info">
+          <div class="mn-weather-city" id="mn-weather-city">â€”</div>
+          <div class="mn-weather-temp" id="mn-weather-temp">â€”Â°C</div>
+          <div class="mn-weather-cond" id="mn-weather-cond">â€”</div>
+        </div>
+      </div>
+      <div class="mn-weather-row">
+        <input type="text" class="mn-city-input" id="mn-city-input" placeholder="City (e.g. Mumbai, Delhi, Bengaluru)"/>
+        <button class="mn-btn-teal" onclick="mnFetchWeatherByCity()">Get Weather</button>
+        <button class="mn-locate-btn" onclick="mnAutoLocate()" title="Auto-detect my location">ðŸ“ Locate</button>
+      </div>
+    </div>
+
+    <!-- SECTION 9: STYLE PREFERENCES â€” 8 Aesthetic Cards -->
+    <div class="mn-section" id="mn-sec-vibes">
+      <div class="mn-section-title">âœ¨ Style Preferences <span class="mn-filled-check" id="chk-vibes">âœ“</span></div>
+      <p style="font-size:11px;color:var(--mn-muted);margin-bottom:16px;line-height:1.5">Select all that resonate â€” multi-select allowed.</p>
+      <div class="mn-vibe-grid" id="mn-vibe-grid">
+        <button class="mn-vibe-card" data-vibe="old_money" onclick="mnToggleVibe(this)">
+          <div class="mn-vibe-emoji">ðŸ¤«</div>
+          <div class="mn-vibe-name">Old Money</div>
+          <div class="mn-vibe-desc">Quiet luxury. Let the fabric speak. Timeless, minimal, elevated.</div>
+        </button>
+        <button class="mn-vibe-card" data-vibe="street_style" onclick="mnToggleVibe(this)">
+          <div class="mn-vibe-emoji">ðŸ›¹</div>
+          <div class="mn-vibe-name">Street Style</div>
+          <div class="mn-vibe-desc">Bold fits, zero apologies. Sneakers, hoodies, graphic tees.</div>
+        </button>
+        <button class="mn-vibe-card" data-vibe="indo_western" onclick="mnToggleVibe(this)">
+          <div class="mn-vibe-emoji">ðŸª·</div>
+          <div class="mn-vibe-name">Indo-Western Fusion</div>
+          <div class="mn-vibe-desc">Best of both worlds. Kurtas with denim, sarees with boots.</div>
+        </button>
+        <button class="mn-vibe-card" data-vibe="corporate_core" onclick="mnToggleVibe(this)">
+          <div class="mn-vibe-emoji">ðŸ’¼</div>
+          <div class="mn-vibe-name">Corporate Core</div>
+          <div class="mn-vibe-desc">Boardroom to bar. Power dressing with razor-sharp tailoring.</div>
+        </button>
+        <button class="mn-vibe-card" data-vibe="minimalist" onclick="mnToggleVibe(this)">
+          <div class="mn-vibe-emoji">ðŸ¤</div>
+          <div class="mn-vibe-name">Minimalist</div>
+          <div class="mn-vibe-desc">Less is more. Neutral palette, clean silhouettes, intentional.</div>
+        </button>
+        <button class="mn-vibe-card" data-vibe="y2k_chrome" onclick="mnToggleVibe(this)">
+          <div class="mn-vibe-emoji">ðŸª©</div>
+          <div class="mn-vibe-name">Y2K Chrome</div>
+          <div class="mn-vibe-desc">2000s revival. Metallics, baby tees, low-rise, butterfly clips.</div>
+        </button>
+        <button class="mn-vibe-card" data-vibe="cyberpunk" onclick="mnToggleVibe(this)">
+          <div class="mn-vibe-emoji">âš¡</div>
+          <div class="mn-vibe-name">Cyberpunk</div>
+          <div class="mn-vibe-desc">Neon accents, techwear, utility pockets, dystopian edge.</div>
+        </button>
+        <button class="mn-vibe-card" data-vibe="casual_essentials" onclick="mnToggleVibe(this)">
+          <div class="mn-vibe-emoji">â˜•</div>
+          <div class="mn-vibe-name">Casual Essentials</div>
+          <div class="mn-vibe-desc">Effortless everyday. Jeans, tees, sneakers â€” done right.</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- SECTION 10: CORE INTERESTS (Narratives) -->
+    <div class="mn-section" id="mn-sec-interests">
+      <div class="mn-section-title">ðŸŽ¯ Core Interests &amp; Narratives <span class="mn-filled-check" id="chk-interests">âœ“</span></div>
+      <p style="font-size:11px;color:var(--mn-muted);margin-bottom:16px">Choose your narrative identity â€” or type your own.</p>
+      <div class="mn-chips" id="mn-interest-chips">
+        <button class="mn-chip" onclick="mnToggleInterest(this,'Gym &amp; Fitness')">ðŸ’ª Gym &amp; Fitness</button>
+        <button class="mn-chip" onclick="mnToggleInterest(this,'Surviving on Caffeine')">â˜• Surviving on Caffeine</button>
+        <button class="mn-chip" onclick="mnToggleInterest(this,'Technologist on Toes')">ðŸ’» Technologist on Toes</button>
+        <button class="mn-chip" onclick="mnToggleInterest(this,'Mad About Cars')">ðŸŽï¸ Mad About Cars</button>
+        <button class="mn-chip" onclick="mnToggleInterest(this,'Bumbling My Life')">ðŸŒ€ Bumbling My Life</button>
+        <button class="mn-chip" onclick="mnToggleInterest(this,'Live To Dance')">ðŸ’ƒ Live To Dance</button>
+        <button class="mn-chip" onclick="mnToggleInterest(this,'The Sarcastic Rizzler')">ðŸ˜ The Sarcastic Rizzler</button>
+        <button class="mn-chip" onclick="mnToggleInterest(this,'The CEO Edit')">ðŸ‘” The CEO Edit</button>
+        <button class="mn-chip" onclick="mnToggleInterest(this,'Wanderlust')">âœˆï¸ Wanderlust</button>
+        <button class="mn-chip" onclick="mnToggleInterest(this,'Heritage Craft')">ðŸº Heritage Craft</button>
+      </div>
+      <div class="mn-interest-row">
+        <input type="text" class="mn-interest-input" id="mn-interest-custom" placeholder="Other interest (e.g. Vintage Denim)..." onkeydown="if(event.key==='Enter')mnAddCustomInterest()"/>
+        <button class="mn-btn-teal" onclick="mnAddCustomInterest()">Add</button>
+      </div>
+      <div class="mn-chips" id="mn-custom-interests" style="margin-top:10px"></div>
+    </div>
+
+    <!-- SECTION 11: SWITZERLAND STRATEGY â€” Fintech Hub -->
+    <div class="mn-section" id="mn-sec-bank">
+      <div class="mn-section-title">ðŸ¦ Unlock Hidden Discounts <span class="mn-filled-check" id="chk-bank">âœ“</span></div>
+      <p style="font-size:11px;color:var(--mn-muted);margin-bottom:16px;line-height:1.5">The Switzerland Strategy â€” we surface the best bank card offers on your style picks. Add your cards to unlock hidden discounts automatically.</p>
+      <div class="mn-bank-row">
+        <select class="mn-select" id="mn-bank-select" onchange="mnPopulateCardVariants()">
+          <option value="">Select Bank</option>
+          <option value="HDFC">HDFC Bank</option>
+          <option value="SBI">SBI</option>
+          <option value="ICICI">ICICI Bank</option>
+          <option value="Axis">Axis Bank</option>
+          <option value="Kotak">Kotak Mahindra</option>
+          <option value="IndusInd">IndusInd Bank</option>
+          <option value="Standard Chartered">Standard Chartered</option>
+          <option value="Yes Bank">Yes Bank</option>
+          <option value="RBL">RBL Bank</option>
+          <option value="IDFC First">IDFC First Bank</option>
+        </select>
+        <select class="mn-select" id="mn-card-variant-select">
+          <option value="">Select Card Variant</option>
+        </select>
+        <button class="mn-add-btn" onclick="mnAddBankCard()" title="Add card">+</button>
+      </div>
+      <div class="mn-card-tags" id="mn-card-tags"></div>
+      <div class="mn-bank-discount-chips" id="mn-discount-chips"></div>
+    </div>
+
+    <!-- SECTION 12: DIGITAL CLOSET DASHBOARD -->
+    <div class="mn-section" id="mn-sec-closet">
+      <div class="mn-section-title">ðŸ‘— My Digital Closet <span class="mn-filled-check" id="chk-closet">âœ“</span></div>
+      <div class="mn-closet-actions">
+        <button class="mn-closet-btn primary" onclick="window.location.href='/pages/my-closet'">
+          ðŸ“· + Upload Item
+        </button>
+        <button class="mn-closet-btn" onclick="window.location.href='/pages/my-closet#ghost-mode'">
+          ðŸ‘» + Ghost Mode
+        </button>
+      </div>
+      <div class="mn-closet-grid" id="mn-closet-grid"></div>
+      <div class="mn-closet-empty" id="mn-closet-empty">
+        <div class="mn-closet-empty-icon">ðŸ—‚ï¸</div>
+        <p style="font-weight:800;margin-bottom:6px">Your Digital Closet is empty</p>
+        <p style="font-size:12px;line-height:1.6">Upload photos to auto-catalog your wardrobe, or use Ghost Mode to add items by description.</p>
+      </div>
+    </div>
+
+  </div><!-- end .mn-sections -->
+
+</div><!-- end .mn-dashboard -->
+
+<!-- 30 HIDDEN AI DATA POINTS â€” populated by Magic Upload API -->
+<div id="ai-hidden-metrics" style="display:none" aria-hidden="true">
+  <input type="hidden" id="ai_facial_symmetry"          name="ai_facial_symmetry" />
+  <input type="hidden" id="ai_undertone_temp"           name="ai_undertone_temp" />
+  <input type="hidden" id="ai_shoulder_width_ratio"     name="ai_shoulder_width_ratio" />
+  <input type="hidden" id="ai_torso_leg_ratio"          name="ai_torso_leg_ratio" />
+  <input type="hidden" id="ai_color_contrast_level"     name="ai_color_contrast_level" />
+  <input type="hidden" id="ai_neck_length"              name="ai_neck_length" />
+  <input type="hidden" id="ai_jawline_angularity"       name="ai_jawline_angularity" />
+  <input type="hidden" id="ai_posture_type"             name="ai_posture_type" />
+  <input type="hidden" id="ai_fabric_drape_preference"  name="ai_fabric_drape_preference" />
+  <input type="hidden" id="ai_pattern_density_tolerance" name="ai_pattern_density_tolerance" />
+  <input type="hidden" id="ai_saturation_preference"    name="ai_saturation_preference" />
+  <input type="hidden" id="ai_wardrobe_base_color"      name="ai_wardrobe_base_color" />
+  <input type="hidden" id="ai_footwear_style_index"     name="ai_footwear_style_index" />
+  <input type="hidden" id="ai_accessory_density"        name="ai_accessory_density" />
+  <input type="hidden" id="ai_silhouette_volume"        name="ai_silhouette_volume" />
+  <input type="hidden" id="ai_visual_weight_distribution" name="ai_visual_weight_distribution" />
+  <input type="hidden" id="ai_texture_complexity"       name="ai_texture_complexity" />
+  <input type="hidden" id="ai_trend_adoption_rate"      name="ai_trend_adoption_rate" />
+  <input type="hidden" id="ai_modesty_index"            name="ai_modesty_index" />
+  <input type="hidden" id="ai_climate_adaptability"     name="ai_climate_adaptability" />
+  <input type="hidden" id="ai_formality_baseline"       name="ai_formality_baseline" />
+  <input type="hidden" id="ai_brand_affinity_score"     name="ai_brand_affinity_score" />
+  <input type="hidden" id="ai_vintage_affinity"         name="ai_vintage_affinity" />
+  <input type="hidden" id="ai_athletic_build_index"     name="ai_athletic_build_index" />
+  <input type="hidden" id="ai_curvilinear_index"        name="ai_curvilinear_index" />
+  <input type="hidden" id="ai_gait_mobility_needs"      name="ai_gait_mobility_needs" />
+  <input type="hidden" id="ai_layering_propensity"      name="ai_layering_propensity" />
+  <input type="hidden" id="ai_color_blocking_tendency"  name="ai_color_blocking_tendency" />
+  <input type="hidden" id="ai_metallic_hardware_pref"   name="ai_metallic_hardware_pref" />
+  <input type="hidden" id="ai_print_scale_pref"         name="ai_print_scale_pref" />
+</div>
+
+<!-- STICKY SAVE BAR -->
+<div class="mn-save-bar">
+  <button class="mn-save-btn" id="mn-save-btn" onclick="mnSaveProfile()">
+    <span id="mn-save-label">ðŸ’¾ Save Style Profile</span>
+  </button>
+</div>
+<script>
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// MY NARRATIVE â€” Style Dashboard v3.0
+// Chatbot â†” Dashboard bidirectional sync
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
+const MN_STORE_KEY  = 'mn_identity';
+const MN_CLOSET_KEY = 'mn_digital_closet';
+const MN_HIST_KEY   = 'mn_outfit_history';
+const MN_AI_API     = 'https://api.mynarrative.store/v1/analyze-user';
+const MN_CLOSET_API = 'https://api.mynarrative.store/v1/closet-segment';
+const MN_GHOST_API  = 'https://api.mynarrative.store/v1/ghost-embed';
+const WEATHER_KEY   = '{{ section.settings.weather_api_key | escape }}';
+const MN_CUSTOMER   = '{{ customer.id | default: "guest" }}';
+
+// â”€â”€ Storage helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function mnGet(k)     { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch(e) { return null; } }
+function mnSet(k,v)   { localStorage.setItem(k, JSON.stringify(v)); }
+function getProfile() { return mnGet(MN_STORE_KEY) || {}; }
+function getCloset()  { return mnGet(MN_CLOSET_KEY) || []; }
+
+// â”€â”€ Profile state object â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+let mnProfile = {
+  gender: null, height_cm: 172,
+  skin_mst: null, skin_label: null, skin_hex: null,
+  preferred_fit: null, occasions: [], hair_style: null,
+  price_min: 2000, price_max: 8000,
+  weather: null, style_vibes: [],
+  bank_cards: [], interests: [],
+  profile_photo_b64: null, closet: [],
+  hidden_biometrics: {}, completion_pct: 0,
+  chatbot_synced_at: null,
+  // 30 hidden AI fields
+  ai_metrics: {}
+};
+
+// â”€â”€ Weight map â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+const WEIGHTS = {
+  gender:8, height:8, skin:8, fit:8, occasions:8,
+  hair:8, price:5, weather:5, vibes:10, bank:8,
+  interests:8, photo:10, closet:10
+};
+
+// Bank card variants
+const BANK_CARDS = {
+  'HDFC':              ['Regalia','Millennia','Diners Club Black','Infinia Metal','MoneyBack+','Tata Neu Infinity','Swiggy HDFC','Business Regalia','Diners Club Privilege','Freedom'],
+  'SBI':               ['SimplyCLICK','SimplyMOVE','Prime Advantage','Elite','Pulse','Cashback SBI','Club Vistara SBI','IRCTC Platinum','Unnati','Aurum'],
+  'ICICI':             ['Amazon Pay ICICI','Coral','Sapphiro','Rubyx','Platinum Chip','Emeralde','HPCL Super Saver','MakeMyTrip Signature','MakeMyTrip Platinum','Business Advantage'],
+  'Axis':              ['Flipkart Axis','Magnus','Neo','MY Zone','Privilege','Vistara Infinite','Atlas','Reserve','Olympus','ACE'],
+  'Kotak':             ['811 Kotak','Royale Signature','Zen Signature','White Reserve','League Platinum','Essentia','Corporate Platinum','Delight','6E Rewards XL','PVR Kotak'],
+  'IndusInd':          ['Legend','Pinnacle','Celesta','Tiger','Platinum Aura','Club Vistara IndusInd','Nexxt','EazyDiner','Duo Signature','Avios IndusInd'],
+  'Standard Chartered':['Unlimited Cashback','Super Value Titanium','Rewards+','Smart','Journey','DigiSmart','Platinum Rewards','Ultimate','Smart Credit','EaseMyTrip'],
+  'Yes Bank':          ['Yes First Preferred','Marquee','YES POP','Prosperity Rewards Plus','Business Prime','YES Travel','YES Wellness','YES ACE','RuPay Select Yes','Yes Premia'],
+  'RBL':               ['Shoprite','Popcorn+','Practo Plus','Titanium Delight','Monthly Treats','World Safari','Bank Plus','Fun+','Play','Icon'],
+  'IDFC First':        ['Wealth IDFC','Select IDFC','Classic IDFC','Millennia IDFC','HPCL Power+ IDFC','WoW IDFC','Mayura','Ashva','LTF Millennia','Club Vistara IDFC']
+};
+
+const BANK_OFFERS = {
+  'HDFC':              ['10% off on Myntra','5% off on Amazon','Up to 15% off on Nykaa Fashion'],
+  'SBI':               ['10% cashback on Flipkart','5% off on Ajio','EMI offers on lifestyle brands'],
+  'ICICI':             ['Flat 10% off on Amazon Pay','5% off on fashion categories','Reward points on apparel'],
+  'Axis':              ['Flat 10% off on Flipkart','Extra 5% on Myntra','Cashback on style purchases'],
+  'Kotak':             ['Up to 15% on Ajio','Extra 10% on Meesho','Style rewards on 811 card'],
+  'IndusInd':          ['Premium lifestyle offers','Up to 20% on partner brands','Style concierge access'],
+  'Standard Chartered':['Unlimited cashback on fashion','5x reward points on apparel','Partner brand discounts'],
+  'Yes Bank':          ['5% cashback on online fashion','Extra rewards on Myntra','Lifestyle milestone bonuses'],
+  'RBL':               ['Shoprite cashback offers','Pop culture fashion deals','Weekend style bonuses'],
+  'IDFC First':        ['Zero fee + rewards','Cashback on all purchases','Lifestyle milestone rewards']
+};
+
+// Weather emoji map
+const W_EMOJI = { Clear:'â˜€ï¸', Clouds:'â›…', Rain:'ðŸŒ§ï¸', Drizzle:'ðŸŒ¦ï¸', Thunderstorm:'â›ˆï¸', Snow:'â„ï¸', Mist:'ðŸŒ«ï¸', Haze:'ðŸŒ«ï¸', Fog:'ðŸŒ«ï¸', Smoke:'ðŸ’¨' };
+
+// â”€â”€ Load profile from storage â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function mnLoadProfile() {
+  try {
+    const saved = mnGet(MN_STORE_KEY);
+    if (saved) { Object.assign(mnProfile, saved); mnRestoreUI(); }
+  } catch(e) { console.warn('MN load error', e); }
+}
+
+// â”€â”€ Save to localStorage + fire update event â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function mnSaveToStorage() {
+  mnProfile.completion_pct = mnCalcCompletion();
+  mnSet(MN_STORE_KEY, mnProfile);
+  // Fire event so chatbot + any listeners know profile changed
+  window.dispatchEvent(new CustomEvent('mn-identity-updated', { detail: { ...mnProfile } }));
+  // Also mirror into the legacy key used by account.liquid stat cards
+  try {
+    const legacy = mnGet('mn_core_identity') || {};
+    legacy.height        = mnProfile.height_cm + ' cm';
+    legacy.build         = mnProfile.preferred_fit;
+    legacy.skinTone      = mnProfile.skin_label;
+    legacy.climate       = mnProfile.weather ? mnProfile.weather.condition : null;
+    legacy.budget        = 'â‚¹' + (mnProfile.price_min||0).toLocaleString('en-IN') + 'â€“â‚¹' + (mnProfile.price_max||0).toLocaleString('en-IN');
+    legacy.coreExpression= (mnProfile.style_vibes||[]).join(', ');
+    legacy.occasion      = (mnProfile.occasions||[]).join(', ');
+    mnSet('mn_core_identity', legacy);
+  } catch(e) {}
+}
+
+// â”€â”€ Completion calculation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function mnCalcCompletion() {
+  let p = 0;
+  if (mnProfile.gender)                                   p += WEIGHTS.gender;
+  if (mnProfile.height_cm && mnProfile.height_cm !== 172) p += WEIGHTS.height;
+  if (mnProfile.skin_mst)                                 p += WEIGHTS.skin;
+  if (mnProfile.preferred_fit)                            p += WEIGHTS.fit;
+  if (mnProfile.occasions && mnProfile.occasions.length)  p += WEIGHTS.occasions;
+  if (mnProfile.hair_style)                               p += WEIGHTS.hair;
+  if (mnProfile.price_min !== 2000 || mnProfile.price_max !== 8000) p += WEIGHTS.price;
+  if (mnProfile.weather && mnProfile.weather.city)        p += WEIGHTS.weather;
+  if (mnProfile.style_vibes && mnProfile.style_vibes.length) p += WEIGHTS.vibes;
+  if (mnProfile.bank_cards && mnProfile.bank_cards.length)   p += WEIGHTS.bank;
+  if (mnProfile.interests && mnProfile.interests.length)     p += WEIGHTS.interests;
+  if (mnProfile.profile_photo_b64)                        p += WEIGHTS.photo;
+  if (mnProfile.closet && mnProfile.closet.length)        p += WEIGHTS.closet;
+  return Math.min(100, p);
+}
+
+// â”€â”€ Update SVG ring + linear bar + badges â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function mnUpdateProgress() {
+  const pct = mnCalcCompletion();
+  // Circular ring â€” circumference for r=56: 2*PI*56 = 351.86
+  const circ = 351.86;
+  const ring = document.getElementById('mn-ring-fill');
+  if (ring) ring.style.strokeDashoffset = circ - (pct / 100) * circ;
+  // Badge ring pct
+  const rp = document.getElementById('mn-ring-pct');
+  if (rp) rp.textContent = pct + '%';
+  // Linear fill
+  const fill = document.getElementById('mn-linear-fill');
+  if (fill) fill.style.width = pct + '%';
+  const lbl = document.getElementById('mn-pct-label');
+  if (lbl) lbl.textContent = pct + '%';
+  // Sub text
+  const sub = document.getElementById('mn-hero-sub-text');
+  if (sub) {
+    if (pct < 30)       sub.textContent = 'Profile ' + pct + '% Complete â€” Feed the AI to unlock hyper-personalized styles.';
+    else if (pct < 70)  sub.textContent = 'Profile ' + pct + '% Complete â€” Great start! Add more data for precision styling.';
+    else if (pct < 100) sub.textContent = 'Profile ' + pct + '% Complete â€” Almost there! Your AI stylist is getting smarter.';
+    else                sub.textContent = 'Profile 100% Complete â€” Your AI stylist has everything it needs. ðŸŽ‰';
+  }
+  // Badges
+  const bd = (id, active) => { const b = document.getElementById(id); if (b) b.classList.toggle('active', active); };
+  bd('badge-gender',  !!mnProfile.gender);
+  bd('badge-height',  mnProfile.height_cm !== 172);
+  bd('badge-skin',    !!mnProfile.skin_mst);
+  bd('badge-style',   !!(mnProfile.style_vibes && mnProfile.style_vibes.length));
+  bd('badge-closet',  !!(mnProfile.closet && mnProfile.closet.length));
+  bd('badge-bank',    !!(mnProfile.bank_cards && mnProfile.bank_cards.length));
+}
+
+function mnSetCheck(id, val) {
+  const el = document.getElementById('chk-' + id);
+  if (el) el.classList.toggle('show', !!val);
+}
+
+// â”€â”€ Height â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function mnHeightChange(val) {
+  val = parseInt(val);
+  mnProfile.height_cm = val;
+  const totalIn = Math.round(val / 2.54);
+  document.getElementById('mn-height-cm').textContent = val + ' cm';
+  document.getElementById('mn-height-ft').textContent = Math.floor(totalIn/12) + ' ft ' + (totalIn%12) + ' in';
+  // Scale SVG: 140cmâ†’100px, 220cmâ†’220px
+  const svgH = Math.round(100 + ((val - 140) / 80) * 120);
+  const svg = document.getElementById('mn-body-svg');
+  if (svg) svg.setAttribute('height', svgH);
+  mnSetCheck('height', val !== 172);
+  mnUpdateProgress(); mnSaveToStorage();
+}
+
+// â”€â”€ Skin tone â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function mnSelectMST(mst, label, hex) {
+  document.querySelectorAll('.mn-mst-swatch').forEach(s => s.classList.remove('selected'));
+  const sw = document.querySelector('.mn-mst-swatch[data-mst="' + mst + '"]');
+  if (sw) sw.classList.add('selected');
+  document.getElementById('mn-mst-label').textContent = 'MST ' + mst + ' â€” ' + label;
+  mnProfile.skin_mst = mst; mnProfile.skin_label = label; mnProfile.skin_hex = hex;
+  mnSetCheck('skin', true); mnUpdateProgress(); mnSaveToStorage();
+}
+
+// â”€â”€ Single-select chips (gender, fit, hair) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function mnSelectSingle(btn, field) {
+  document.querySelectorAll('.mn-chip[data-field="' + field + '"]').forEach(c => c.classList.remove('selected'));
+  btn.classList.add('selected');
+  const val = btn.dataset.val;
+  if      (field === 'gender') { mnProfile.gender = val;         mnSetCheck('gender', true); }
+  else if (field === 'fit')    { mnProfile.preferred_fit = val;  mnSetCheck('fit', true); }
+  else if (field === 'hair')   { mnProfile.hair_style = val;     mnSetCheck('hair', true); }
+  mnUpdateProgress(); mnSaveToStorage();
+}
+
+// â”€â”€ Multi-select chips (occasions) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function mnToggleMulti(btn, field) {
+  btn.classList.toggle('selected');
+  const val = btn.dataset.val;
+  if (!Array.isArray(mnProfile[field])) mnProfile[field] = [];
+  if (btn.classList.contains('selected')) {
+    if (!mnProfile[field].includes(val)) mnProfile[field].push(val);
+  } else {
+    mnProfile[field] = mnProfile[field].filter(v => v !== val);
+  }
+  mnSetCheck(field, mnProfile[field].length > 0);
+  mnUpdateProgress(); mnSaveToStorage();
+}
+
+// â”€â”€ Style vibe cards â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function mnToggleVibe(card) {
+  card.classList.toggle('selected');
+  const vibe = card.dataset.vibe;
+  if (!Array.isArray(mnProfile.style_vibes)) mnProfile.style_vibes = [];
+  if (card.classList.contains('selected')) {
+    if (!mnProfile.style_vibes.includes(vibe)) mnProfile.style_vibes.push(vibe);
+  } else {
+    mnProfile.style_vibes = mnProfile.style_vibes.filter(v => v !== vibe);
+  }
+  mnSetCheck('vibes', mnProfile.style_vibes.length > 0);
+  mnUpdateProgress(); mnSaveToStorage();
+}
+
+// â”€â”€ Price range â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function mnPriceChange() {
+  let minV = parseInt(document.getElementById('mn-price-min').value);
+  let maxV = parseInt(document.getElementById('mn-price-max').value);
+  if (minV > maxV) { [minV, maxV] = [maxV, minV]; }
+  mnProfile.price_min = minV; mnProfile.price_max = maxV;
+  document.getElementById('mn-price-display').textContent = 'â‚¹' + minV.toLocaleString('en-IN') + ' â€“ â‚¹' + maxV.toLocaleString('en-IN');
+  const total = 50000 - 500;
+  const lp = ((minV-500)/total)*100, rp = ((maxV-500)/total)*100;
+  const fill = document.getElementById('mn-price-fill');
+  if (fill) { fill.style.left = lp + '%'; fill.style.width = (rp-lp) + '%'; }
+  mnSetCheck('price', true); mnUpdateProgress(); mnSaveToStorage();
+}
+function mnSetPreset(min, max, btn) {
+  document.querySelectorAll('.mn-preset-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('mn-price-min').value = min;
+  document.getElementById('mn-price-max').value = max;
+  mnPriceChange();
+}
+</script>
+<script>
+// â”€â”€ Weather â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function mnShowWeather(city, temp, cond, humidity) {
+  document.getElementById('mn-weather-display').style.display = 'flex';
+  document.getElementById('mn-weather-city').textContent = city;
+  document.getElementById('mn-weather-temp').textContent = (temp !== null ? Math.round(temp) : '--') + '\u00b0C';
+  document.getElementById('mn-weather-cond').textContent = cond + (humidity ? ' \u00b7 ' + humidity + '% humidity' : '');
+  document.getElementById('mn-weather-emoji').textContent = W_EMOJI[cond] || 'ðŸŒ¡ï¸';
+  mnProfile.weather = { city, temp, condition: cond, humidity };
+  mnSetCheck('weather', true); mnUpdateProgress(); mnSaveToStorage();
+}
+
+function mnFetchWeatherByCity() {
+  const city = (document.getElementById('mn-city-input').value || '').trim();
+  if (!city) return;
+  const key = WEATHER_KEY && WEATHER_KEY.length > 5 ? WEATHER_KEY : null;
+  if (!key) {
+    // No key â€” store city only
+    mnProfile.weather = { city, temp: null, condition: 'Manual', humidity: null };
+    document.getElementById('mn-weather-display').style.display = 'flex';
+    document.getElementById('mn-weather-city').textContent = city;
+    document.getElementById('mn-weather-temp').textContent = 'City saved';
+    document.getElementById('mn-weather-cond').textContent = 'Add OpenWeather key in Shopify Theme Settings for live data';
+    document.getElementById('mn-weather-emoji').textContent = 'ðŸ™ï¸';
+    mnSetCheck('weather', true); mnUpdateProgress(); mnSaveToStorage();
+    return;
+  }
+  fetch('https://api.openweathermap.org/data/2.5/weather?q=' + encodeURIComponent(city) + '&appid=' + key + '&units=metric')
+    .then(r => r.json())
+    .then(d => {
+      if (d.cod !== 200) throw new Error(d.message || 'City not found');
+      mnShowWeather(d.name, d.main.temp, d.weather[0].main, d.main.humidity);
+    })
+    .catch(e => alert('Weather lookup failed: ' + e.message));
+}
+
+function mnAutoLocate() {
+  if (!navigator.geolocation) { alert('Geolocation not supported in this browser.'); return; }
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      const key = WEATHER_KEY && WEATHER_KEY.length > 5 ? WEATHER_KEY : null;
+      if (!key) { alert('Add your OpenWeather API key in Shopify Theme Settings to use auto-locate.'); return; }
+      fetch('https://api.openweathermap.org/data/2.5/weather?lat=' + pos.coords.latitude + '&lon=' + pos.coords.longitude + '&appid=' + key + '&units=metric')
+        .then(r => r.json())
+        .then(d => mnShowWeather(d.name, d.main.temp, d.weather[0].main, d.main.humidity))
+        .catch(e => alert('Location weather failed: ' + e.message));
+    },
+    () => alert('Location access denied. Please enter your city manually.')
+  );
+}
+
+// â”€â”€ Bank cards â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function mnPopulateCardVariants() {
+  const bank = document.getElementById('mn-bank-select').value;
+  const sel  = document.getElementById('mn-card-variant-select');
+  sel.innerHTML = '<option value="">Select Card Variant</option>';
+  if (bank && BANK_CARDS[bank]) {
+    BANK_CARDS[bank].forEach(c => {
+      const o = document.createElement('option'); o.value = c; o.textContent = c; sel.appendChild(o);
+    });
+  }
+}
+
+function mnAddBankCard() {
+  const bank    = document.getElementById('mn-bank-select').value;
+  const variant = document.getElementById('mn-card-variant-select').value;
+  if (!bank || !variant) return;
+  if (!Array.isArray(mnProfile.bank_cards)) mnProfile.bank_cards = [];
+  if (mnProfile.bank_cards.some(c => c.bank === bank && c.variant === variant)) return;
+  mnProfile.bank_cards.push({ bank, variant });
+  mnRenderCardTags();
+  mnSetCheck('bank', true); mnUpdateProgress(); mnSaveToStorage();
+  document.getElementById('mn-bank-select').value = '';
+  document.getElementById('mn-card-variant-select').innerHTML = '<option value="">Select Card Variant</option>';
+}
+
+function mnRenderCardTags() {
+  const container = document.getElementById('mn-card-tags');
+  if (!container) return;
+  container.innerHTML = '';
+  (mnProfile.bank_cards || []).forEach((c, i) => {
+    const tag = document.createElement('div');
+    tag.className = 'mn-card-tag mn-pop-in';
+    tag.innerHTML = '<span>ðŸ’³ ' + c.bank + ' ' + c.variant + '</span><span class="mn-card-tag-remove" onclick="mnRemoveCard(' + i + ')">&times;</span>';
+    container.appendChild(tag);
+  });
+  // Show discount chips for all saved banks
+  const dc = document.getElementById('mn-discount-chips');
+  if (dc) {
+    dc.innerHTML = '';
+    const seen = new Set();
+    (mnProfile.bank_cards || []).forEach(c => {
+      if (!seen.has(c.bank) && BANK_OFFERS[c.bank]) {
+        seen.add(c.bank);
+        BANK_OFFERS[c.bank].forEach(offer => {
+          const chip = document.createElement('div');
+          chip.className = 'mn-discount-chip';
+          chip.innerHTML = 'ðŸŽ ' + offer + ' <span style="font-size:9px;opacity:0.6">(' + c.bank + ')</span>';
+          dc.appendChild(chip);
+        });
+      }
+    });
+  }
+}
+
+function mnRemoveCard(i) {
+  mnProfile.bank_cards.splice(i, 1);
+  mnRenderCardTags();
+  mnSetCheck('bank', (mnProfile.bank_cards||[]).length > 0);
+  mnUpdateProgress(); mnSaveToStorage();
+}
+
+// â”€â”€ Interests â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function mnToggleInterest(btn, label) {
+  btn.classList.toggle('selected');
+  if (!Array.isArray(mnProfile.interests)) mnProfile.interests = [];
+  if (btn.classList.contains('selected')) {
+    if (!mnProfile.interests.includes(label)) mnProfile.interests.push(label);
+  } else {
+    mnProfile.interests = mnProfile.interests.filter(i => i !== label);
+  }
+  mnSetCheck('interests', mnProfile.interests.length > 0);
+  mnUpdateProgress(); mnSaveToStorage();
+}
+
+function mnAddCustomInterest() {
+  const input = document.getElementById('mn-interest-custom');
+  const val = (input.value || '').trim();
+  if (!val) return;
+  if (!Array.isArray(mnProfile.interests)) mnProfile.interests = [];
+  if (!mnProfile.interests.includes(val)) {
+    mnProfile.interests.push(val);
+    const chip = document.createElement('button');
+    chip.className = 'mn-chip selected mn-pop-in';
+    chip.textContent = val;
+    chip.onclick = function() { this.classList.toggle('selected'); mnProfile.interests = mnProfile.interests.filter(i => i !== val); mnUpdateProgress(); mnSaveToStorage(); };
+    document.getElementById('mn-custom-interests').appendChild(chip);
+  }
+  input.value = '';
+  mnSetCheck('interests', true); mnUpdateProgress(); mnSaveToStorage();
+}
+
+// â”€â”€ Digital Closet â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function mnRenderCloset() {
+  const closet  = mnGet(MN_CLOSET_KEY) || mnProfile.closet || [];
+  const grid    = document.getElementById('mn-closet-grid');
+  const empty   = document.getElementById('mn-closet-empty');
+  if (!grid) return;
+  if (!closet.length) { grid.innerHTML = ''; if(empty) empty.style.display='block'; return; }
+  if (empty) empty.style.display = 'none';
+  grid.innerHTML = closet.map((item, i) => {
+    const thumb = item.thumbnail_url || item.image_url || '';
+    const name  = item.original_name || item.name || 'Item';
+    const color = item.color || '';
+    return '<div class="mn-closet-thumb">' +
+      (thumb ? '<img src="' + thumb + '" alt="' + name + '" loading="lazy"/>' : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:36px">' + (item.emoji || 'ðŸ‘”') + '</div>') +
+      '<div class="mn-closet-thumb-label">' + name + (color ? '<br><span style="opacity:0.6">' + color + '</span>' : '') + '</div>' +
+    '</div>';
+  }).join('');
+  mnSetCheck('closet', true);
+}
+
+async function mnHandleClosetUpload(input) {
+  if (!input.files || !input.files.length) return;
+  const overlay = document.getElementById('mn-ai-overlay');
+  const msg     = document.getElementById('mn-ai-msg');
+  overlay.classList.add('active');
+  for (const file of Array.from(input.files)) {
+    msg.textContent = 'Segmenting "' + file.name + '"...';
+    try {
+      const b64 = await mnToBase64(file);
+      const raw = b64.replace(/^data:image\/\w+;base64,/, '');
+      // Show preview
+      const prev = document.getElementById('mn-closet-preview');
+      const pimg = document.getElementById('mn-closet-preview-img');
+      if (prev && pimg) { pimg.src = b64; prev.style.display = 'block'; }
+      let item = { name: file.name.split('.')[0], emoji: 'ðŸ‘”', image_url: b64, original_name: file.name.split('.')[0], added_at: new Date().toISOString() };
+      try {
+        const res = await fetch(MN_CLOSET_API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user_id: MN_CUSTOMER, image_b64: raw, filename: file.name })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          item = Object.assign(item, data.item || data);
+        }
+      } catch(e) { console.warn('Closet API unavailable, storing locally', e); }
+      if (!Array.isArray(mnProfile.closet)) mnProfile.closet = [];
+      mnProfile.closet.push(item);
+      // Mirror to shared closet key
+      const shared = mnGet(MN_CLOSET_KEY) || [];
+      shared.push(item);
+      mnSet(MN_CLOSET_KEY, shared);
+      mnSaveToStorage();
+    } catch(e) { console.error(e); }
+  }
+  overlay.classList.remove('active');
+  document.getElementById('mn-closet-modal').classList.remove('active');
+  mnRenderCloset(); mnUpdateProgress();
+  input.value = '';
+}
+
+function mnHandleMagicDrop(event) {
+  const file = event.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) mnHandleMagicUpload(file);
+}
+
+// â”€â”€ Ghost Mode â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+async function mnSubmitGhost() {
+  const desc = (document.getElementById('mn-ghost-input').value || '').trim();
+  const cat  = document.getElementById('mn-ghost-category').value;
+  if (!desc) return;
+  const overlay = document.getElementById('mn-ai-overlay');
+  const msg     = document.getElementById('mn-ai-msg');
+  overlay.classList.add('active');
+  msg.textContent = 'Generating AI embedding for "' + desc + '"...';
+  let item = { name: desc, original_name: desc, category: cat || 'Other', emoji: 'ðŸ‘»', ghost: true, added_at: new Date().toISOString() };
+  try {
+    const res = await fetch(MN_GHOST_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: MN_CUSTOMER, description: desc, category: cat })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      item = Object.assign(item, data.item || data);
+    }
+  } catch(e) { console.warn('Ghost API unavailable, storing locally', e); }
+  if (!Array.isArray(mnProfile.closet)) mnProfile.closet = [];
+  mnProfile.closet.push(item);
+  const shared = mnGet(MN_CLOSET_KEY) || [];
+  shared.push(item);
+  mnSet(MN_CLOSET_KEY, shared);
+  mnSaveToStorage();
+  overlay.classList.remove('active');
+  document.getElementById('mn-ghost-modal').classList.remove('active');
+  document.getElementById('mn-ghost-input').value = '';
+  mnRenderCloset(); mnUpdateProgress();
+}
+</script>
+<script>
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// MAGIC UPLOAD â€” The AI Data Engine
+// POST image to api.mynarrative.store/v1/analyze-user
+// Response auto-populates visible fields AND all 30 hidden fields
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+async function mnHandleMagicUpload(file) {
+  if (!file || !file.type.startsWith('image/')) return;
+  const overlay = document.getElementById('mn-ai-overlay');
+  const msg     = document.getElementById('mn-ai-msg');
+  overlay.classList.add('active');
+  msg.textContent = 'AI is reading your style DNA...';
+
+  try {
+    const dataUrl = await mnToBase64(file);
+    const raw_b64 = dataUrl.replace(/^data:image\/\w+;base64,/, '');
+
+    // Show avatar immediately
+    const ph = document.getElementById('mn-avatar-photo');
+    const em = document.getElementById('mn-avatar-emoji');
+    if (ph) { ph.src = dataUrl; ph.style.display = 'block'; }
+    if (em) em.style.display = 'none';
+    mnProfile.profile_photo_b64 = raw_b64;
+    mnSetCheck('photo', true);
+
+    msg.textContent = 'Analyzing body metrics & style signals...';
+
+    // POST to API
+    const res = await fetch(MN_AI_API, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id:   MN_CUSTOMER,
+        image_b64: raw_b64,
+        context:   'style_profile'
+      })
+    });
+
+    if (!res.ok) throw new Error('API returned ' + res.status);
+    const data = await res.json();
+
+    msg.textContent = 'Auto-filling your profile...';
+
+    // â”€â”€ Map visible fields from API response â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // Gender
+    if (data.gender) {
+      const gBtn = document.querySelector('.mn-chip[data-field="gender"][data-val="' + data.gender + '"]');
+      if (gBtn) mnSelectSingle(gBtn, 'gender');
+    }
+    // Height
+    if (data.height_cm) {
+      const hSlider = document.getElementById('mn-height-slider');
+      if (hSlider) { hSlider.value = data.height_cm; mnHeightChange(data.height_cm); }
+    }
+    // Skin tone (MST 1-10)
+    if (data.skin_mst) {
+      mnSelectMST(data.skin_mst, data.skin_label || ('MST '+data.skin_mst), data.skin_hex || '#d7bd96');
+    }
+    // Preferred fit
+    if (data.preferred_fit) {
+      const fBtn = document.querySelector('.mn-chip[data-field="fit"][data-val="' + data.preferred_fit + '"]');
+      if (fBtn) mnSelectSingle(fBtn, 'fit');
+    }
+    // Hair style
+    if (data.hair_style) {
+      const hBtn = document.querySelector('.mn-chip[data-field="hair"][data-val="' + data.hair_style + '"]');
+      if (hBtn) mnSelectSingle(hBtn, 'hair');
+    }
+    // Occasions (array)
+    if (Array.isArray(data.occasions)) {
+      data.occasions.forEach(occ => {
+        const btn = document.querySelector('.mn-chip[data-field="occasions"][data-val="' + occ + '"]');
+        if (btn && !btn.classList.contains('selected')) mnToggleMulti(btn, 'occasions');
+      });
+    }
+    // Style vibes (array)
+    if (Array.isArray(data.style_vibes)) {
+      data.style_vibes.forEach(vibe => {
+        const card = document.querySelector('.mn-vibe-card[data-vibe="' + vibe + '"]');
+        if (card && !card.classList.contains('selected')) mnToggleVibe(card);
+      });
+    }
+    // Price range
+    if (data.price_min || data.price_max) {
+      if (data.price_min) document.getElementById('mn-price-min').value = data.price_min;
+      if (data.price_max) document.getElementById('mn-price-max').value = data.price_max;
+      mnPriceChange();
+    }
+
+    // â”€â”€ Map ALL 30 hidden AI biometric fields â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    const AI_FIELD_MAP = {
+      ai_facial_symmetry:          data.ai_facial_symmetry,
+      ai_undertone_temp:           data.ai_undertone_temp,
+      ai_shoulder_width_ratio:     data.ai_shoulder_width_ratio,
+      ai_torso_leg_ratio:          data.ai_torso_leg_ratio,
+      ai_color_contrast_level:     data.ai_color_contrast_level,
+      ai_neck_length:              data.ai_neck_length,
+      ai_jawline_angularity:       data.ai_jawline_angularity,
+      ai_posture_type:             data.ai_posture_type,
+      ai_fabric_drape_preference:  data.ai_fabric_drape_preference,
+      ai_pattern_density_tolerance:data.ai_pattern_density_tolerance,
+      ai_saturation_preference:    data.ai_saturation_preference,
+      ai_wardrobe_base_color:      data.ai_wardrobe_base_color,
+      ai_footwear_style_index:     data.ai_footwear_style_index,
+      ai_accessory_density:        data.ai_accessory_density,
+      ai_silhouette_volume:        data.ai_silhouette_volume,
+      ai_visual_weight_distribution:data.ai_visual_weight_distribution,
+      ai_texture_complexity:       data.ai_texture_complexity,
+      ai_trend_adoption_rate:      data.ai_trend_adoption_rate,
+      ai_modesty_index:            data.ai_modesty_index,
+      ai_climate_adaptability:     data.ai_climate_adaptability,
+      ai_formality_baseline:       data.ai_formality_baseline,
+      ai_brand_affinity_score:     data.ai_brand_affinity_score,
+      ai_vintage_affinity:         data.ai_vintage_affinity,
+      ai_athletic_build_index:     data.ai_athletic_build_index,
+      ai_curvilinear_index:        data.ai_curvilinear_index,
+      ai_gait_mobility_needs:      data.ai_gait_mobility_needs,
+      ai_layering_propensity:      data.ai_layering_propensity,
+      ai_color_blocking_tendency:  data.ai_color_blocking_tendency,
+      ai_metallic_hardware_pref:   data.ai_metallic_hardware_pref,
+      ai_print_scale_pref:         data.ai_print_scale_pref
+    };
+
+    // Write to hidden input fields + store in profile
+    mnProfile.ai_metrics = {};
+    Object.entries(AI_FIELD_MAP).forEach(([id, val]) => {
+      const el = document.getElementById(id);
+      if (el && val !== undefined && val !== null) el.value = val;
+      if (val !== undefined && val !== null) mnProfile.ai_metrics[id] = val;
+    });
+
+    // Flash sections to show AI fill
+    ['mn-sec-gender','mn-sec-height','mn-sec-skin','mn-sec-fit','mn-sec-hair','mn-sec-vibes'].forEach(id => {
+      const sec = document.getElementById(id);
+      if (sec) { sec.classList.add('mn-ai-flash'); setTimeout(() => sec.classList.remove('mn-ai-flash'), 1200); }
+    });
+
+    mnUpdateProgress();
+    mnSaveToStorage();
+
+  } catch (err) {
+    console.error('Magic Upload error:', err);
+    // On API failure still save the photo locally
+    mnSaveToStorage();
+  } finally {
+    overlay.classList.remove('active');
+  }
+}
+
+// Helper: file to base64 data URL
+function mnToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload  = () => resolve(reader.result);
+    reader.onerror = e  => reject(e);
+  });
+}
+
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// CHATBOT â†” DASHBOARD BIDIRECTIONAL SYNC
+//
+// DIRECTION 1: Dashboard â†’ Chatbot
+//   When profile updates, fire 'mn-identity-updated' event.
+//   The chatbot (MN-fashion-consultant) listens and injects
+//   profile as system context automatically.
+//
+// DIRECTION 2: Chatbot â†’ Dashboard
+//   The chatbot fires 'mn-chatbot-save' CustomEvent with
+//   extracted key-value pairs from conversation. Dashboard
+//   listens and merges them into mnProfile instantly.
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
+// Listen for chatbot pushing data INTO the dashboard
+window.addEventListener('mn-chatbot-save', function(e) {
+  if (!e.detail || typeof e.detail !== 'object') return;
+  const updates = e.detail;
+
+  // Merge every key from the chatbot into mnProfile
+  Object.entries(updates).forEach(([key, value]) => {
+    if (key === 'occasions' || key === 'style_vibes' || key === 'interests' || key === 'bank_cards') {
+      // Arrays â€” merge without duplicates
+      if (!Array.isArray(mnProfile[key])) mnProfile[key] = [];
+      const arr = Array.isArray(value) ? value : [value];
+      arr.forEach(v => { if (!mnProfile[key].includes(v)) mnProfile[key].push(v); });
+    } else if (key.startsWith('ai_')) {
+      // AI metric fields â€” write to hidden inputs too
+      if (!mnProfile.ai_metrics) mnProfile.ai_metrics = {};
+      mnProfile.ai_metrics[key] = value;
+      const el = document.getElementById(key);
+      if (el) el.value = value;
+    } else {
+      mnProfile[key] = value;
+    }
+  });
+
+  mnProfile.chatbot_synced_at = new Date().toISOString();
+  mnUpdateProgress();
+  mnSaveToStorage();
+  mnRestoreUI();
+
+  // Update sync indicator
+  const syncEl = document.getElementById('mn-chatbot-last-sync');
+  if (syncEl) syncEl.textContent = 'Synced ' + new Date().toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
+});
+
+// Also listen for raw localStorage changes (cross-tab sync)
+window.addEventListener('storage', function(e) {
+  if (e.key === MN_STORE_KEY && e.newValue) {
+    try {
+      const updated = JSON.parse(e.newValue);
+      Object.assign(mnProfile, updated);
+      mnRestoreUI();
+      mnUpdateProgress();
+      const syncEl = document.getElementById('mn-chatbot-last-sync');
+      if (syncEl && updated.chatbot_synced_at) {
+        syncEl.textContent = 'Synced ' + new Date(updated.chatbot_synced_at).toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
+      }
+    } catch(err) {}
+  }
+});
+
+// â”€â”€ Save button (explicit user save) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+async function mnSaveProfile() {
+  const btn   = document.getElementById('mn-save-btn');
+  const label = document.getElementById('mn-save-label');
+  if (btn) btn.classList.add('saved');
+  if (label) label.textContent = 'âœ“ Profile Saved!';
+  mnSaveToStorage();
+
+  // Optional: POST to your backend for server-side persistence
+  try {
+    await fetch('https://mynarrative-ai.vercel.app/api/profile_manager', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'save_profile', user_id: MN_CUSTOMER, profile: mnProfile })
+    });
+  } catch(e) { /* Non-critical â€” data already in localStorage */ }
+
+  setTimeout(() => {
+    if (btn) btn.classList.remove('saved');
+    if (label) label.textContent = 'ðŸ’¾ Save Style Profile';
+  }, 2500);
+}
+
+// â”€â”€ Profile photo upload â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function mnInitPhotoUpload() {
+  const wrap  = document.getElementById('mn-avatar-wrap');
+  const inp   = document.getElementById('mn-profile-photo-input');
+  const aiBtn = document.getElementById('mn-ai-photo-btn');
+
+  if (wrap && inp) {
+    wrap.addEventListener('click', () => inp.click());
+    inp.addEventListener('change', function() {
+      if (!this.files[0]) return;
+      mnHandleMagicUpload(this.files[0]);
+    });
+  }
+  if (aiBtn && inp) {
+    aiBtn.addEventListener('click', e => { e.stopPropagation(); inp.click(); });
+  }
+  // Magic dropzone input
+  const magicInp = document.getElementById('mn-magic-upload-input');
+  if (magicInp) {
+    magicInp.addEventListener('change', function() {
+      if (this.files[0]) mnHandleMagicUpload(this.files[0]);
+    });
+  }
+}
+
+// â”€â”€ Restore UI from saved profile â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function mnRestoreUI() {
+  const p = mnProfile;
+
+  // Gender
+  if (p.gender) {
+    document.querySelectorAll('.mn-chip[data-field="gender"]').forEach(c => c.classList.toggle('selected', c.dataset.val === p.gender));
+    mnSetCheck('gender', true);
+  }
+  // Height
+  if (p.height_cm) {
+    const sl = document.getElementById('mn-height-slider');
+    if (sl) sl.value = p.height_cm;
+    mnHeightChange(p.height_cm);
+  }
+  // Skin tone
+  if (p.skin_mst) mnSelectMST(p.skin_mst, p.skin_label || 'Custom', p.skin_hex || '#d7bd96');
+  // Fit
+  if (p.preferred_fit) {
+    document.querySelectorAll('.mn-chip[data-field="fit"]').forEach(c => c.classList.toggle('selected', c.dataset.val === p.preferred_fit));
+    mnSetCheck('fit', true);
+  }
+  // Occasions
+  if (Array.isArray(p.occasions) && p.occasions.length) {
+    document.querySelectorAll('.mn-chip[data-field="occasions"]').forEach(c => c.classList.toggle('selected', p.occasions.includes(c.dataset.val)));
+    mnSetCheck('occasions', true);
+  }
+  // Hair
+  if (p.hair_style) {
+    document.querySelectorAll('.mn-chip[data-field="hair"]').forEach(c => c.classList.toggle('selected', c.dataset.val === p.hair_style));
+    mnSetCheck('hair', true);
+  }
+  // Price
+  if (p.price_min || p.price_max) {
+    const pmn = document.getElementById('mn-price-min'), pmx = document.getElementById('mn-price-max');
+    if (pmn) pmn.value = p.price_min || 2000;
+    if (pmx) pmx.value = p.price_max || 8000;
+    mnPriceChange();
+  }
+  // Weather
+  if (p.weather && p.weather.city) mnShowWeather(p.weather.city, p.weather.temp, p.weather.condition, p.weather.humidity);
+  // Vibes
+  if (Array.isArray(p.style_vibes) && p.style_vibes.length) {
+    document.querySelectorAll('.mn-vibe-card').forEach(c => c.classList.toggle('selected', p.style_vibes.includes(c.dataset.vibe)));
+    mnSetCheck('vibes', true);
+  }
+  // Bank cards
+  if (Array.isArray(p.bank_cards) && p.bank_cards.length) { mnRenderCardTags(); mnSetCheck('bank', true); }
+  // Interests
+  if (Array.isArray(p.interests) && p.interests.length) {
+    document.querySelectorAll('#mn-interest-chips .mn-chip').forEach(c => {
+      const label = c.textContent.replace(/^[^\w\u20ac\u00a3\u00a5]+/, '').trim();
+      c.classList.toggle('selected', p.interests.some(i => c.textContent.includes(i)));
+    });
+    mnSetCheck('interests', true);
+  }
+  // Photo
+  if (p.profile_photo_b64) {
+    const ph = document.getElementById('mn-avatar-photo'), em = document.getElementById('mn-avatar-emoji');
+    if (ph) { ph.src = 'data:image/jpeg;base64,' + p.profile_photo_b64; ph.style.display = 'block'; }
+    if (em) em.style.display = 'none';
+    mnSetCheck('photo', true);
+  }
+  // AI hidden metrics
+  if (p.ai_metrics) {
+    Object.entries(p.ai_metrics).forEach(([id, val]) => {
+      const el = document.getElementById(id);
+      if (el && val !== undefined) el.value = val;
+    });
+  }
+  // Closet
+  mnRenderCloset();
+  // Sync indicator
+  if (p.chatbot_synced_at) {
+    const syncEl = document.getElementById('mn-chatbot-last-sync');
+    if (syncEl) syncEl.textContent = 'Synced ' + new Date(p.chatbot_synced_at).toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
+  }
+}
+
+// â”€â”€ Init â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+document.addEventListener('DOMContentLoaded', function() {
+  mnLoadProfile();
+  mnInitPhotoUpload();
+  mnPriceChange();   // initialise price fill bar
+  mnUpdateProgress();
+
+  // â”€â”€ Handle arrival from widget profile ring click â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // Detect ?mn_focus=profile in URL or #style-profile hash
+  const urlParams  = new URLSearchParams(window.location.search);
+  const hashTarget = window.location.hash === '#style-profile';
+  const fromWidget = urlParams.get('mn_focus') === 'profile' || hashTarget;
+
+  if (fromWidget) {
+    // Check if profile photo is missing
+    const hasPhoto = !!(mnProfile.profile_photo_b64 || mnProfile.profile_photo_url);
+    const pct      = mnCalcCompletion();
+
+    // Scroll to top of dashboard smoothly
+    setTimeout(() => {
+      const hero = document.getElementById('style-profile');
+      if (hero) hero.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 120);
+
+    // If no photo â€” show the welcome banner + pulse the dropzone
+    if (!hasPhoto || pct < 30) {
+      const banner = document.getElementById('mn-welcome-banner');
+      if (banner) banner.style.display = 'block';
+
+      // Highlight the Magic Upload dropzone after scroll settles
+      setTimeout(() => {
+        const dropzone = document.getElementById('mn-magic-dropzone');
+        if (dropzone) {
+          dropzone.classList.add('mn-dropzone-focused');
+          dropzone.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          // Remove focus class after animation finishes (3 cycles Ã— 1.5s)
+          setTimeout(() => dropzone.classList.remove('mn-dropzone-focused'), 5000);
+        }
+        // Also pulse the avatar ring
+        const avatarWrap = document.getElementById('mn-avatar-wrap');
+        if (avatarWrap) {
+          avatarWrap.classList.add('mn-ring-focused');
+          setTimeout(() => avatarWrap.classList.remove('mn-ring-focused'), 4500);
+        }
+      }, 600);
+
+    } else {
+      // Profile partially/fully filled â€” just scroll to hero, no banner
+      // Highlight the first empty section instead
+      const sectionIds = [
+        { id: 'mn-sec-gender',    filled: !!mnProfile.gender },
+        { id: 'mn-sec-skin',      filled: !!mnProfile.skin_mst },
+        { id: 'mn-sec-fit',       filled: !!mnProfile.preferred_fit },
+        { id: 'mn-sec-occasions', filled: !!(mnProfile.occasions && mnProfile.occasions.length) },
+        { id: 'mn-sec-vibes',     filled: !!(mnProfile.style_vibes && mnProfile.style_vibes.length) },
+        { id: 'mn-sec-bank',      filled: !!(mnProfile.bank_cards && mnProfile.bank_cards.length) },
+      ];
+      const firstEmpty = sectionIds.find(s => !s.filled);
+      if (firstEmpty) {
+        setTimeout(() => {
+          const sec = document.getElementById(firstEmpty.id);
+          if (sec) {
+            sec.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            sec.classList.add('mn-ai-flash');
+            setTimeout(() => sec.classList.remove('mn-ai-flash'), 1200);
+          }
+        }, 600);
+      }
+    }
+
+    // Clean up URL param without page reload
+    if (urlParams.get('mn_focus')) {
+      const cleanUrl = window.location.pathname + window.location.hash;
+      window.history.replaceState({}, '', cleanUrl);
+    }
+  }
+});
+</script>
+
+{% schema %}
+{
+  "name": "User Dashboard",
+  "settings": [
+    {
+      "type": "text",
+      "id": "weather_api_key",
+      "label": "OpenWeather API Key",
+      "info": "Get a free key at openweathermap.org/api. Required for live weather auto-detect."
+    }
+  ],
+  "presets": [
+    { "name": "User Dashboard" }
+  ]
+}
+{% endschema %}
+

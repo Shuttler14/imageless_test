@@ -1,0 +1,66 @@
+<div class="mx-4 md:mx-6 my-6 md:my-12">
+  {% if section.settings.section_title != blank %}
+  <p class="text-center text-3xl md:text-5xl my-6 md:my-12 heading-font font-bold">
+    {{ section.settings.section_title }}
+  </p>
+  {% endif %}
+  <div class="flex flex-col gap-4" data-for="section-content">
+    {% for block in section.blocks %}
+      {% if block.type == 'text_block' %}
+      <div class="border-b-2 pb-2 last-of-type:border-b-0 flex flex-col gap-2 [&_h2]:text-xl [&_h2]:md:text-2xl [&_ul]:list-disc [&_ul]:pl-4 ">
+        {{ block.settings.main_content }}
+      </div>
+      {%  elsif block.type == 'html_block' %}
+        {{ block.settings.html_content }}
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Rich Text Section",
+  "tag": "section",
+  "class": "container max-w-screen-xl mx-auto",
+  "limit": 1,
+  "settings": [
+    {
+      "type": "text",
+      "id": "section_title",
+      "label": "Add section Title",
+      "default": "Rich Text Section"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "text_block",
+      "name": "Text Block",
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "main_content",
+          "label": "Add Content",
+          "default": "<h2>Heading</h2><p>This is a paragraph with <strong>bold</strong> and <em>italic</em> text.</p><ul><li>List item 1</li><li>List item 2</li></ul>"
+        }
+      ]
+    },
+    {
+      "type": "html_block",
+      "name": "HTML Block",
+      "settings": [
+        {
+          "type": "html",
+          "id": "html_content",
+          "label": "Add Content",
+          "default": "<div class='custom-html'>This is a custom HTML block. You can add any HTML content here.</div>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Rich Text Section"
+    }
+  ]
+}
+{% endschema %}

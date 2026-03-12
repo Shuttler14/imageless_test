@@ -1,0 +1,1385 @@
+{% comment %}
+=================================================================================
+MY NARRATIVE - CREATOR DASHBOARD SECTION (PRODUCTION)
+=================================================================================
+Design-to-Earn Creator Dashboard - Fully Integrated with Supabase & Stripe
+
+Author: My Narrative AI Team
+Version: 2.0.0
+
+CONFIGURATION:
+1. Set API base URL in the config object below (line 45)
+2. Or set via Shopify Theme Settings > Custom Data > API Configuration
+
+USAGE:
+{% section 'creator-dashboard' %}
+
+REQUIRED CUSTOMER AUTHENTICATION:
+This section requires Shopify customer authentication.
+Customer must be logged in to view their dashboard.
+
+API ENDPOINTS EXPECTED:
+- GET /api/creator/profile?user_id={customer.id}
+- GET /api/creator/payout-status?user_id={customer.id}
+- POST /api/creator/register
+- POST /api/creator/social/link
+- POST /api/creator/payout/initiate
+
+=================================================================================
+{% endcomment %}
+
+{% comment %} =====================================================
+SECTION CONFIGURATION
+==================================================== {% endcomment %}
+
+{% comment %} API Configuration - CHANGE THIS TO YOUR API URL {% endcomment %}
+{% assign api_base_url = section.settings.api_base_url | default: 'https://api.mynarrative.store' %}
+{% assign enable_debug = section.settings.enable_debug | default: false %}
+
+{% comment %} Get customer data {% endcomment %}
+{% assign creator_id = customer.id | default: '' %}
+{% assign creator_email = customer.email | default: '' %}
+{% assign creator_first_name = customer.first_name | default: '' %}
+{% assign creator_name = customer.name | default: 'Creator' %}
+
+{% comment %} Check if customer is logged in {% endcomment %}
+{% assign is_logged_in = false %}
+{% if customer.id != blank %}
+  {% assign is_logged_in = true %}
+{% endif %}
+
+<style>
+  /* =====================================================
+     CREATOR DASHBOARD - PRODUCTION STYLES
+     ===================================================== */
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap');
+
+  :root {
+    --mn-creator-teal: #39A596;
+    --mn-creator-teal-rgb: 57, 165, 150;
+    --mn-creator-purple: #8b5cf6;
+    --mn-creator-gold: #fbbf24;
+    --mn-creator-dark: #0a0a0a;
+    --mn-creator-card: rgba(255, 255, 255, 0.03);
+    --mn-creator-border: rgba(255, 255, 255, 0.08);
+  }
+
+  .mn-creator-dashboard {
+    font-family: 'Montserrat', sans-serif;
+    background: linear-gradient(135deg, #0a0a0a 0%, #111111 50%, #0a0a0a 100%);
+    color: #fff;
+    min-height: 100vh;
+    padding: 20px;
+    border-radius: 16px;
+    margin: 20px 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Background Effects */
+  .mn-creator-dashboard::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(57, 165, 150, 0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .mn-creator-dashboard::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -10%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* Header Section */
+  .mn-creator-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    border-bottom: 1px solid rgba(57, 165, 150, 0.2);
+    margin-bottom: 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .mn-creator-title {
+    font-size: 24px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #39A596, #2dd4bf);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .mn-creator-badge {
+    padding: 8px 16px;
+    background: rgba(57, 165, 150, 0.1);
+    border: 1px solid rgba(57, 165, 150, 0.3);
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #39A596;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .mn-creator-badge.mega {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.1));
+    border-color: rgba(251, 191, 36, 0.5);
+    color: #fbbf24;
+  }
+
+  /* Metrics Cards */
+  .mn-creator-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .mn-metric-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 20px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .mn-metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--accent-color, #39A596), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .mn-metric-card:hover {
+    border-color: rgba(57, 165, 150, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(57, 165, 150, 0.1);
+  }
+
+  .mn-metric-card:hover::before {
+    opacity: 1;
+  }
+
+  .mn-metric-card[data-metric="balance"] { --accent-color: #39A596; }
+  .mn-metric-card[data-metric="lifetime"] { --accent-color: #fbbf24; }
+  .mn-metric-card[data-metric="listings"] { --accent-color: #8b5cf6; }
+  .mn-metric-card[data-metric="sales"] { --accent-color: #22c55e; }
+
+  .mn-metric-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+    font-size: 24px;
+  }
+
+  .mn-metric-icon.balance { background: rgba(57, 165, 150, 0.15); }
+  .mn-metric-icon.lifetime { background: rgba(251, 191, 36, 0.15); }
+  .mn-metric-icon.listings { background: rgba(139, 92, 246, 0.15); }
+  .mn-metric-icon.sales { background: rgba(34, 197, 94, 0.15); }
+
+  .mn-metric-label {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+
+  .mn-metric-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .mn-metric-value.currency {
+    color: #39A596;
+  }
+
+  /* Progress Bar - Payout Thresholds */
+  .mn-payout-progress {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .mn-payout-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .mn-progress-track {
+    height: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 99px;
+    overflow: hidden;
+    position: relative;
+    margin: 24px 0;
+  }
+
+  .mn-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #39A596, #2dd4bf, #fbbf24);
+    border-radius: 99px;
+    transition: width 1s ease;
+    position: relative;
+  }
+
+  .mn-progress-fill::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 20px;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4));
+    border-radius: 99px;
+  }
+
+  .mn-progress-marker {
+    position: absolute;
+    top: -8px;
+    transform: translateX(-50%);
+  }
+
+  .mn-progress-marker .marker-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 3px solid #0a0a0a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    transition: all 0.3s ease;
+  }
+
+  .mn-progress-marker .marker-label {
+    font-size: 10px;
+    color: rgba(255,255,255,0.6);
+    text-align: center;
+    margin-top: 4px;
+    white-space: nowrap;
+  }
+
+  .mn-progress-marker.locked .marker-dot {
+    background: #ef4444;
+    color: #fff;
+  }
+
+  .mn-progress-marker.store-credit .marker-dot {
+    background: #fbbf24;
+    color: #000;
+  }
+
+  .mn-progress-marker.cash .marker-dot {
+    background: #22c55e;
+    color: #fff;
+  }
+
+  .mn-payout-status {
+    padding: 16px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.3s ease;
+  }
+
+  .mn-payout-status.locked {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+  }
+
+  .mn-payout-status.store-credit {
+    background: rgba(251, 191, 36, 0.1);
+    border: 1px solid rgba(251, 191, 36, 0.3);
+  }
+
+  .mn-payout-status.cash {
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+  }
+
+  /* Social Connect Section */
+  .mn-social-section {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .mn-social-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+
+  .mn-social-platforms {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  @media (max-width: 600px) {
+    .mn-social-platforms {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .mn-social-platform {
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 2px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .mn-social-platform:hover {
+    border-color: rgba(57, 165, 150, 0.4);
+  }
+
+  .mn-social-platform.connected {
+    border-color: #39A596;
+    background: rgba(57, 165, 150, 0.1);
+  }
+
+  .mn-social-platform-icon {
+    font-size: 24px;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .mn-social-platform-name {
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+  }
+
+  .mn-social-platform-followers {
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    margin-top: 4px;
+  }
+
+  .mn-connect-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .mn-connect-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+  }
+
+  /* Tier Upgrade Banner */
+  .mn-tier-banner {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(251, 191, 36, 0.1));
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .mn-tier-banner-icon {
+    font-size: 32px;
+  }
+
+  .mn-tier-banner-content {
+    flex: 1;
+  }
+
+  .mn-tier-banner-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #8b5cf6;
+    margin-bottom: 4px;
+  }
+
+  .mn-tier-banner-desc {
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+  }
+
+  /* Action Buttons */
+  .mn-actions-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+  }
+
+  .mn-action-btn {
+    flex: 1;
+    min-width: 150px;
+    padding: 16px 24px;
+    border-radius: 12px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-decoration: none;
+  }
+
+  .mn-action-btn-primary {
+    background: linear-gradient(135deg, #39A596, #2dd4bf);
+    border: none;
+    color: #000;
+  }
+
+  .mn-action-btn-primary:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+  }
+
+  .mn-action-btn-secondary {
+    background: transparent;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+  }
+
+  .mn-action-btn-secondary:hover {
+    border-color: #39A596;
+    color: #39A596;
+  }
+
+  /* Loading State */
+  .mn-creator-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px;
+    color: rgba(255,255,255,0.5);
+    position: relative;
+    z-index: 1;
+  }
+
+  .mn-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(57, 165, 150, 0.2);
+    border-top-color: #39A596;
+    border-radius: 50%;
+    animation: mnCreatorSpin 1s linear infinite;
+    margin-right: 12px;
+  }
+
+  @keyframes mnCreatorSpin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Error State */
+  .mn-creator-error {
+    padding: 24px;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 12px;
+    color: #ef4444;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Login Required State */
+  .mn-creator-login {
+    padding: 40px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .mn-creator-login h3 {
+    font-size: 20px;
+    margin-bottom: 12px;
+    color: #fff;
+  }
+
+  .mn-creator-login p {
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 20px;
+  }
+
+  .mn-creator-login a {
+    display: inline-block;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #39A596, #2dd4bf);
+    color: #000;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+  }
+
+  /* Modal */
+  .mn-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+  }
+
+  .mn-modal-overlay.active {
+    display: flex;
+  }
+
+  .mn-modal {
+    background: #111;
+    border: 1px solid rgba(57, 165, 150, 0.3);
+    border-radius: 16px;
+    padding: 24px;
+    max-width: 400px;
+    width: 100%;
+    position: relative;
+    z-index: 1001;
+  }
+
+  .mn-modal-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+
+  .mn-modal-input {
+    width: 100%;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+    margin-bottom: 12px;
+    box-sizing: border-box;
+  }
+
+  .mn-modal-input:focus {
+    border-color: #39A596;
+    outline: none;
+  }
+
+  .mn-modal-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .mn-modal-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 8px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .mn-modal-btn-cancel {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+  }
+
+  .mn-modal-btn-confirm {
+    background: #39A596;
+    border: none;
+    color: #000;
+  }
+
+  .mn-modal-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Alert/Toast */
+  .mn-toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 16px 24px;
+    border-radius: 12px;
+    color: #fff;
+    font-weight: 500;
+    z-index: 2000;
+    animation: slideIn 0.3s ease;
+    max-width: 300px;
+  }
+
+  .mn-toast.success {
+    background: rgba(34, 197, 94, 0.9);
+  }
+
+  .mn-toast.error {
+    background: rgba(239, 68, 68, 0.9);
+  }
+
+  .mn-toast.info {
+    background: rgba(57, 165, 150, 0.9);
+  }
+
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  /* Debug Panel */
+  {% if enable_debug %}
+  .mn-debug-panel {
+    margin-top: 20px;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    font-family: monospace;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+    position: relative;
+    z-index: 1;
+  }
+  {% endif %}
+</style>
+
+<div class="mn-creator-dashboard" id="mnCreatorDashboard">
+  {% comment %} Login Required State {% endcomment %}
+  {% unless is_logged_in %}
+    <div class="mn-creator-login">
+      <h3>🎨 Creator Dashboard</h3>
+      <p>Sign in to access your Design-to-Earn dashboard and start earning from your designs.</p>
+      <a href="{{ routes.account_login_url }}">Sign In to Continue</a>
+    </div>
+  {% else %}
+    {% comment %} Loading State {% endcomment %}
+    <div class="mn-creator-loading" id="mnCreatorLoading">
+      <div class="mn-spinner"></div>
+      Loading Creator Dashboard...
+    </div>
+
+    {% comment %} Content (hidden until loaded) {% endcomment %}
+    <div id="mnCreatorContent" style="display: none;">
+      {% comment %} Registration Prompt (shown if not registered) {% endcomment %}
+      <div class="mn-creator-register-prompt" id="mnRegisterPrompt" style="display: none;">
+        <div class="mn-tier-banner">
+          <span class="mn-tier-banner-icon">🚀</span>
+          <div class="mn-tier-banner-content">
+            <p class="mn-tier-banner-title">Welcome, {{ creator_first_name }}!</p>
+            <p class="mn-tier-banner-desc">Set up your creator profile to start earning from your designs.</p>
+          </div>
+        </div>
+        <div style="margin-bottom: 24px; position: relative; z-index: 1;">
+          <label class="mn-social-title" style="display: block; margin-bottom: 12px;">Choose a Username</label>
+          <input type="text" class="mn-modal-input" id="mnRegisterUsername" placeholder="your_creator_username" />
+          <button class="mn-connect-btn" id="mnRegisterBtn" style="margin-top: 12px;">
+            Start Creating
+          </button>
+        </div>
+      </div>
+
+      {% comment %} Header {% endcomment %}
+      <div class="mn-creator-header">
+        <div>
+          <h2 class="mn-creator-title">💼 Creator Dashboard</h2>
+          <p style="color: rgba(255,255,255,0.5); font-size: 14px; margin-top: 4px;">
+            Design-to-Earn | {{ creator_name }}
+          </p>
+        </div>
+        <span class="mn-creator-badge" id="mnTierBadge">Standard - 5%</span>
+      </div>
+
+      {% comment %} Tier Upgrade Banner {% endcomment %}
+      <div class="mn-tier-banner" id="mnTierBanner" style="display: none;">
+        <span class="mn-tier-banner-icon">👑</span>
+        <div class="mn-tier-banner-content">
+          <p class="mn-tier-banner-title">Upgrade Your Commission Tier</p>
+          <p class="mn-tier-banner-desc">Link socials with 500k+ followers to earn up to 50% commission!</p>
+        </div>
+      </div>
+
+      {% comment %} Metrics Row {% endcomment %}
+      <div class="mn-creator-metrics">
+        <div class="mn-metric-card" data-metric="balance">
+          <div class="mn-metric-icon balance">💰</div>
+          <p class="mn-metric-label">Current Balance</p>
+          <p class="mn-metric-value currency" id="mnBalance">₹0</p>
+        </div>
+        <div class="mn-metric-card" data-metric="lifetime">
+          <div class="mn-metric-icon lifetime">📈</div>
+          <p class="mn-metric-label">Lifetime Earnings</p>
+          <p class="mn-metric-value" id="mnLifetimeEarnings">₹0</p>
+        </div>
+        <div class="mn-metric-card" data-metric="listings">
+          <div class="mn-metric-icon listings">🛍️</div>
+          <p class="mn-metric-label">Active Listings</p>
+          <p class="mn-metric-value" id="mnActiveListings">0</p>
+        </div>
+        <div class="mn-metric-card" data-metric="sales">
+          <div class="mn-metric-icon sales">✅</div>
+          <p class="mn-metric-label">Items Sold</p>
+          <p class="mn-metric-value" id="mnItemsSold">0</p>
+        </div>
+      </div>
+
+      {% comment %} Payout Progress {% endcomment %}
+      <div class="mn-payout-progress">
+        <h3 class="mn-payout-title">🎯 Earnings Redemption Journey</h3>
+
+        <div class="mn-progress-track">
+          <div class="mn-progress-fill" id="mnProgressFill" style="width: 0%;"></div>
+
+          {% comment %} 2500 Marker {% endcomment %}
+          <div class="mn-progress-marker" style="left: 50%;">
+            <div class="marker-dot" id="mnMarker2500">🔒</div>
+            <p class="marker-label">₹2,500<br>Store Credit</p>
+          </div>
+
+          {% comment %} 5000 Marker {% endcomment %}
+          <div class="mn-progress-marker" style="left: 100%;">
+            <div class="marker-dot" id="mnMarker5000">💵</div>
+            <p class="marker-label">₹5,000<br>Cash</p>
+          </div>
+        </div>
+
+        <div class="mn-payout-status" id="mnPayoutStatus">
+        </div>
+      </div>
+
+      {% comment %} Social Connect Section {% endcomment %}
+      <div class="mn-social-section">
+        <h3 class="mn-social-title">🔗 Connect Social Accounts</h3>
+
+        <div class="mn-social-platforms">
+          <div class="mn-social-platform" id="mnPlatformInstagram" data-platform="instagram">
+            <span class="mn-social-platform-icon">📸</span>
+            <p class="mn-social-platform-name">Instagram</p>
+            <p class="mn-social-platform-followers" id="mnInstagramFollowers">--</p>
+          </div>
+          <div class="mn-social-platform" id="mnPlatformYoutube" data-platform="youtube">
+            <span class="mn-social-platform-icon">▶️</span>
+            <p class="mn-social-platform-name">YouTube</p>
+            <p class="mn-social-platform-followers" id="mnYoutubeFollowers">--</p>
+          </div>
+          <div class="mn-social-platform" id="mnPlatformTwitter" data-platform="twitter">
+            <span class="mn-social-platform-icon">🐦</span>
+            <p class="mn-social-platform-name">Twitter</p>
+            <p class="mn-social-platform-followers" id="mnTwitterFollowers">--</p>
+          </div>
+          <div class="mn-social-platform" id="mnPlatformLinkedin" data-platform="linkedin">
+            <span class="mn-social-platform-icon">💼</span>
+            <p class="mn-social-platform-name">LinkedIn</p>
+            <p class="mn-social-platform-followers" id="mnLinkedinFollowers">--</p>
+          </div>
+        </div>
+
+        <button class="mn-connect-btn" id="mnConnectSocialBtn">
+          🔗 Connect More Accounts
+        </button>
+      </div>
+
+      {% comment %} Quick Actions {% endcomment %}
+      <div class="mn-actions-row">
+        <a href="/pages/creator-designs" class="mn-action-btn mn-action-btn-primary">
+          ➕ Add New Design
+        </a>
+        <a href="/pages/my-closet" class="mn-action-btn mn-action-btn-secondary">
+          💼 My Digital Closet
+        </a>
+        <a href="/featured-creators" class="mn-action-btn mn-action-btn-secondary">
+          👑 Featured Creators
+        </a>
+      </div>
+
+      {% comment %} Debug Panel {% endcomment %}
+      {% if enable_debug %}
+      <div class="mn-debug-panel">
+        <strong>Debug Info:</strong><br>
+        API Base: {{ api_base_url }}<br>
+        Customer ID: {{ creator_id }}<br>
+        Email: {{ creator_email }}<br>
+        Logged In: {{ is_logged_in }}
+      </div>
+      {% endif %}
+    </div>
+
+    {% comment %} Error State {% endcomment %}
+    <div class="mn-creator-error" id="mnCreatorError" style="display: none;">
+      <p>⚠️ Unable to load creator dashboard.</p>
+      <p style="font-size: 12px; margin-top: 8px; color: rgba(255,255,255,0.5);">
+        Please ensure you're logged in and try again.
+      </p>
+    </div>
+  {% endunless %}
+</div>
+
+{% comment %} Social Connect Modal {% endcomment %}
+<div class="mn-modal-overlay" id="mnSocialModal">
+  <div class="mn-modal">
+    <h3 class="mn-modal-title">Connect Social Account</h3>
+
+    <select class="mn-modal-input" id="mnPlatformSelect">
+      <option value="">Select Platform</option>
+      <option value="instagram">Instagram</option>
+      <option value="youtube">YouTube</option>
+      <option value="twitter">Twitter (X)</option>
+      <option value="linkedin">LinkedIn</option>
+    </select>
+
+    <input type="text" class="mn-modal-input" id="mnHandleInput" placeholder="@your_handle">
+
+    <input type="number" class="mn-modal-input" id="mnFollowersInput" placeholder="Follower count (e.g., 500000)">
+
+    <div class="mn-modal-buttons">
+      <button class="mn-modal-btn mn-modal-btn-cancel" id="mnCancelSocial">Cancel</button>
+      <button class="mn-modal-btn mn-modal-btn-confirm" id="mnConfirmSocial">🔗 Connect</button>
+    </div>
+  </div>
+</div>
+
+{% comment %} Registration Modal {% endcomment %}
+<div class="mn-modal-overlay" id="mnRegisterModal">
+  <div class="mn-modal">
+    <h3 class="mn-modal-title">🎨 Set Up Your Creator Profile</h3>
+
+    <p style="color: rgba(255,255,255,0.6); font-size: 14px; margin-bottom: 16px;">
+      Choose a unique username to showcase your designs.
+    </p>
+
+    <input type="text" class="mn-modal-input" id="mnRegisterUsernameModal" placeholder="your_creator_username">
+
+    <div class="mn-modal-buttons">
+      <button class="mn-modal-btn mn-modal-btn-cancel" id="mnSkipRegister">Skip for Now</button>
+      <button class="mn-modal-btn mn-modal-btn-confirm" id="mnSubmitRegister">Start Creating</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // =====================================================
+  // CONFIGURATION
+  // =====================================================
+  const CONFIG = {
+    apiBaseUrl: '{{ api_base_url }}',
+    creatorId: '{{ creator_id }}',
+    creatorEmail: '{{ creator_email }}',
+    creatorFirstName: '{{ creator_first_name }}',
+    isLoggedIn: {{ is_logged_in }},
+    payoutThresholds: {
+      storeCredit: 2500,
+      cash: 5000
+    },
+    commissionTiers: {
+      standard: { rate: 5, label: 'Standard Creator' },
+      micro_influencer: { rate: 15, label: 'Micro-Influencer' },
+      mega_influencer: { rate: 50, label: 'Mega-Influencer' }
+    },
+    rankEmojis: {
+      rookie_designer: '🌱',
+      emerging_talent: '⭐',
+      trendsetter: '🔥',
+      style_architect: '🏛️',
+      platform_icon: '👑'
+    }
+  };
+
+  // =====================================================
+  // STATE
+  // =====================================================
+  const state = {
+    profile: null,
+    payouts: null,
+    isRegistered: true,
+    isLoading: true
+  };
+
+  // =====================================================
+  // API FUNCTIONS
+  // =====================================================
+  async function fetchCreatorProfile() {
+    if (!CONFIG.creatorId) {
+      throw new Error('No creator ID');
+    }
+
+    const response = await fetch(
+      `${CONFIG.apiBaseUrl}/api/creator/profile?user_id=${CONFIG.creatorId}`
+    );
+
+    const data = await response.json();
+    return data;
+  }
+
+  async function fetchPayoutStatus() {
+    const response = await fetch(
+      `${CONFIG.apiBaseUrl}/api/creator/payout-status?user_id=${CONFIG.creatorId}`
+    );
+
+    const data = await response.json();
+    return data;
+  }
+
+  async function registerCreator(username) {
+    const response = await fetch(`${CONFIG.apiBaseUrl}/api/creator/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        user_id: CONFIG.creatorId,
+        email: CONFIG.creatorEmail,
+        username: username,
+        first_name: CONFIG.creatorFirstName
+      })
+    });
+
+    return await response.json();
+  }
+
+  async function linkSocial(platform, handle, followers) {
+    const response = await fetch(`${CONFIG.apiBaseUrl}/api/creator/social/link`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        user_id: CONFIG.creatorId,
+        platform: platform,
+        handle: handle,
+        followers: parseInt(followers)
+      })
+    });
+
+    return await response.json();
+  }
+
+  // =====================================================
+  // UI FUNCTIONS
+  // =====================================================
+  function formatCurrency(amount) {
+    if (amount === null || amount === undefined) return '₹0';
+    return '₹' + new Intl.NumberFormat('en-IN').format(amount || 0);
+  }
+
+  function formatFollowers(count) {
+    if (!count || count === 0) return '--';
+    if (count >= 1000000) return (count / 1000000).toFixed(1) + 'M';
+    if (count >= 1000) return (count / 1000).toFixed(0) + 'K';
+    return count.toString();
+  }
+
+  function showToast(message, type = 'info') {
+    // Remove existing toast
+    const existing = document.querySelector('.mn-toast');
+    if (existing) existing.remove();
+
+    const toast = document.createElement('div');
+    toast.className = `mn-toast ${type}`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+
+    setTimeout(() => toast.remove(), 4000);
+  }
+
+  function updateMetrics(profile) {
+    // Balance
+    document.getElementById('mnBalance').textContent = formatCurrency(profile.balance || 0);
+
+    // Lifetime Earnings
+    document.getElementById('mnLifetimeEarnings').textContent = formatCurrency(profile.lifetime_earnings || 0);
+
+    // Active Listings
+    document.getElementById('mnActiveListings').textContent = profile.active_listings || 0;
+
+    // Items Sold
+    document.getElementById('mnItemsSold').textContent = profile.total_items_sold || 0;
+
+    // Tier Badge
+    const tier = CONFIG.commissionTiers[profile.commission_tier] || CONFIG.commissionTiers.standard;
+    const badge = document.getElementById('mnTierBadge');
+    badge.textContent = `${tier.label} - ${profile.commission_rate}%`;
+
+    if (profile.commission_tier === 'mega_influencer') {
+      badge.classList.add('mega');
+    } else {
+      badge.classList.remove('mega');
+    }
+
+    // Tier Banner (show if not mega)
+    const tierBanner = document.getElementById('mnTierBanner');
+    if (profile.commission_tier !== 'mega_influencer') {
+      tierBanner.style.display = 'flex';
+    } else {
+      tierBanner.style.display = 'none';
+    }
+
+    // Update Social Platforms
+    updateSocialPlatforms(profile.social_links);
+  }
+
+  function updatePayoutProgress(payoutStatus) {
+    const balance = payoutStatus.current_balance || 0;
+    const maxCash = CONFIG.payoutThresholds.cash;
+
+    // Progress bar
+    const progress = Math.min((balance / maxCash) * 100, 100);
+    document.getElementById('mnProgressFill').style.width = progress + '%';
+
+    // Markers
+    const marker2500 = document.getElementById('mnMarker2500');
+    const marker5000 = document.getElementById('mnMarker5000');
+
+    if (payoutStatus.store_credit_unlocked) {
+      marker2500.innerHTML = '✓';
+      marker2500.parentElement.classList.remove('locked');
+      marker2500.parentElement.classList.add('store-credit');
+    }
+
+    if (payoutStatus.cash_withdrawal_unlocked) {
+      marker5000.innerHTML = '✓';
+      marker5000.parentElement.classList.remove('locked');
+      marker5000.parentElement.classList.add('cash');
+    }
+
+    // Status message
+    const statusEl = document.getElementById('mnPayoutStatus');
+    let statusClass = '';
+    let statusHTML = '';
+
+    switch (payoutStatus.status) {
+      case 'LOCKED':
+        statusClass = 'locked';
+        statusHTML = `
+          <span style="font-size: 24px;">🔒</span>
+          <div>
+            <p style="font-weight: 700; color: #ef4444;">Balance Locked</p>
+            <p style="font-size: 13px; color: rgba(255,255,255,0.6);">
+              Earn ${formatCurrency(payoutStatus.amount_needed)} more to unlock store credit redemption
+            </p>
+          </div>
+        `;
+        break;
+      case 'STORE_CREDIT_ONLY':
+        statusClass = 'store-credit';
+        statusHTML = `
+          <span style="font-size: 24px;">🎁</span>
+          <div>
+            <p style="font-weight: 700; color: #fbbf24;">Store Credit Unlocked!</p>
+            <p style="font-size: 13px; color: rgba(255,255,255,0.6);">
+              Redeem now as store credit, or earn ${formatCurrency(payoutStatus.amount_needed)} more for cash withdrawal
+            </p>
+          </div>
+        `;
+        break;
+      case 'CASH_AVAILABLE':
+        statusClass = 'cash';
+        statusHTML = `
+          <span style="font-size: 24px;">💵</span>
+          <div>
+            <p style="font-weight: 700; color: #22c55e;">Cash Withdrawal Available!</p>
+            <p style="font-size: 13px; color: rgba(255,255,255,0.6);">
+              Withdraw ${formatCurrency(payoutStatus.amount_to_cash)} to bank OR use up to ${formatCurrency(payoutStatus.amount_to_store_credit)} as store credit
+            </p>
+          </div>
+        `;
+        break;
+    }
+
+    statusEl.className = 'mn-payout-status ' + statusClass;
+    statusEl.innerHTML = statusHTML;
+  }
+
+  function updateSocialPlatforms(socialLinks) {
+    const platforms = ['instagram', 'youtube', 'twitter', 'linkedin'];
+
+    platforms.forEach(platform => {
+      const el = document.getElementById('mnPlatform' + capitalizeFirst(platform));
+      const followersEl = document.getElementById('mn' + capitalizeFirst(platform) + 'Followers');
+
+      if (socialLinks && socialLinks[platform]) {
+        el.classList.add('connected');
+        followersEl.textContent = formatFollowers(socialLinks[platform].followers);
+      } else {
+        el.classList.remove('connected');
+        followersEl.textContent = '--';
+      }
+    });
+  }
+
+  function capitalizeFirst(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
+  // =====================================================
+  // EVENT HANDLERS
+  // =====================================================
+  function setupEventListeners() {
+    // Connect Social Button
+    document.getElementById('mnConnectSocialBtn').addEventListener('click', function() {
+      document.getElementById('mnSocialModal').classList.add('active');
+    });
+
+    // Cancel Social Modal
+    document.getElementById('mnCancelSocial').addEventListener('click', function() {
+      document.getElementById('mnSocialModal').classList.remove('active');
+      clearSocialForm();
+    });
+
+    // Confirm Social Link
+    document.getElementById('mnConfirmSocial').addEventListener('click', async function() {
+      const platform = document.getElementById('mnPlatformSelect').value;
+      const handle = document.getElementById('mnHandleInput').value;
+      const followers = document.getElementById('mnFollowersInput').value;
+
+      if (!platform || !handle || !followers) {
+        showToast('Please fill in all fields', 'error');
+        return;
+      }
+
+      this.disabled = true;
+      this.textContent = 'Connecting...';
+
+      try {
+        const result = await linkSocial(platform, handle, followers);
+
+        if (result.success) {
+          // Refresh data
+          await loadDashboard();
+          document.getElementById('mnSocialModal').classList.remove('active');
+          clearSocialForm();
+          showToast(result.data.message, 'success');
+
+          if (result.data.is_mega_influencer) {
+            showToast('🎉 Congratulations! You are now a Mega-Influencer!', 'success');
+          }
+        } else {
+          showToast(result.error || 'Failed to connect', 'error');
+        }
+      } catch (error) {
+        showToast(error.message, 'error');
+      } finally {
+        this.disabled = false;
+        this.innerHTML = '🔗 Connect';
+      }
+    });
+
+    // Skip Registration
+    document.getElementById('mnSkipRegister')?.addEventListener('click', function() {
+      document.getElementById('mnRegisterModal').classList.remove('active');
+      document.getElementById('mnRegisterPrompt').style.display = 'none';
+      document.getElementById('mnCreatorContent').style.display = 'block';
+    });
+
+    // Submit Registration
+    document.getElementById('mnSubmitRegister')?.addEventListener('click', async function() {
+      const username = document.getElementById('mnRegisterUsernameModal').value;
+      if (!username || username.length < 3) {
+        showToast('Username must be at least 3 characters', 'error');
+        return;
+      }
+
+      this.disabled = true;
+      this.textContent = 'Creating...';
+
+      try {
+        const result = await registerCreator(username);
+        if (result.success) {
+          document.getElementById('mnRegisterModal').classList.remove('active');
+          showToast('Welcome to the creator program!', 'success');
+          await loadDashboard();
+        } else {
+          showToast(result.error || 'Registration failed', 'error');
+        }
+      } catch (error) {
+        showToast(error.message, 'error');
+      } finally {
+        this.disabled = false;
+        this.innerHTML = 'Start Creating';
+      }
+    });
+
+    // Close modal on overlay click
+    document.getElementById('mnSocialModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        this.classList.remove('active');
+        clearSocialForm();
+      }
+    });
+
+    document.getElementById('mnRegisterModal')?.addEventListener('click', function(e) {
+      if (e.target === this) {
+        // Don't close on overlay click for registration
+      }
+    });
+  }
+
+  function clearSocialForm() {
+    document.getElementById('mnPlatformSelect').value = '';
+    document.getElementById('mnHandleInput').value = '';
+    document.getElementById('mnFollowersInput').value = '';
+  }
+
+  // =====================================================
+  // MAIN INIT
+  // =====================================================
+  async function loadDashboard() {
+    if (!CONFIG.isLoggedIn || !CONFIG.creatorId) {
+      state.isLoading = false;
+      return;
+    }
+
+    try {
+      // Fetch data
+      const profileResponse = await fetchCreatorProfile();
+
+      if (!profileResponse.success) {
+        if (profileResponse.needs_registration) {
+          // Show registration prompt
+          state.isRegistered = false;
+          document.getElementById('mnCreatorLoading').style.display = 'none';
+          document.getElementById('mnCreatorContent').style.display = 'none';
+          document.getElementById('mnRegisterPrompt').style.display = 'block';
+          return;
+        }
+        throw new Error(profileResponse.error);
+      }
+
+      const payoutResponse = await fetchPayoutStatus();
+
+      // Update state
+      state.profile = profileResponse.data;
+      state.payouts = payoutResponse.data;
+
+      // Update UI
+      updateMetrics(state.profile);
+      updatePayoutProgress(state.payouts);
+
+      // Show content
+      document.getElementById('mnCreatorLoading').style.display = 'none';
+      document.getElementById('mnCreatorContent').style.display = 'block';
+
+    } catch (error) {
+      console.error('Dashboard load error:', error);
+      document.getElementById('mnCreatorLoading').style.display = 'none';
+
+      // Show error for logged in users
+      if (CONFIG.isLoggedIn) {
+        document.getElementById('mnCreatorError').style.display = 'block';
+      }
+    }
+
+    state.isLoading = false;
+  }
+
+  // Initialize
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+      loadDashboard();
+      setupEventListeners();
+    });
+  } else {
+    loadDashboard();
+    setupEventListeners();
+  }
+
+})();
+</script>
+
+{% comment %} =====================================================
+SCHEMA SETTINGS
+==================================================== {% endcomment %}
+
+{% schema %}
+{
+  "name": "Creator Dashboard",
+  "settings": [
+    {
+      "type": "text",
+      "id": "api_base_url",
+      "label": "API Base URL",
+      "default": "https://api.mynarrative.store",
+      "info": "The base URL for your Creator Economy API"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_debug",
+      "label": "Enable Debug Mode",
+      "default": false,
+      "info": "Show debug information in the dashboard"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Creator Dashboard"
+    }
+  ]
+}
+{% endschema %}

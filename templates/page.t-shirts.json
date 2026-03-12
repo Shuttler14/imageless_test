@@ -1,0 +1,533 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "placeholder": {
+      "type": "placeholder",
+      "disabled": true,
+      "settings": {}
+    },
+    "badges_navigation_iYRimA": {
+      "type": "badges-navigation",
+      "blocks": {
+        "collections_PdC47x": {
+          "type": "collections",
+          "settings": {
+            "collection": "bumbling-my-life",
+            "collection_img": "shopify://shop_images/bumbling_my_life.webp"
+          }
+        },
+        "collections_Qjk3Q7": {
+          "type": "collections",
+          "settings": {
+            "collection": "friday-night-beer",
+            "collection_img": "shopify://shop_images/friday_night_beer.webp"
+          }
+        },
+        "collections_KiWa3z": {
+          "type": "collections",
+          "settings": {
+            "collection": "gamer-by-profession",
+            "collection_img": "shopify://shop_images/gamer_by_profession.webp"
+          }
+        },
+        "collections_fhBYt6": {
+          "type": "collections",
+          "settings": {
+            "collection": "gym-fitness-freak",
+            "collection_img": "shopify://shop_images/gym_and_fitness_freak.webp"
+          }
+        },
+        "collections_7QhMnC": {
+          "type": "collections",
+          "settings": {
+            "collection": "live-to-dance",
+            "collection_img": "shopify://shop_images/caffeine_addict.webp"
+          }
+        },
+        "collections_PkQNPH": {
+          "type": "collections",
+          "settings": {
+            "collection": "mysterious-hot",
+            "collection_img": "shopify://shop_images/mysterious_and_hot.webp"
+          }
+        },
+        "collections_VAAyeP": {
+          "type": "collections",
+          "settings": {
+            "collection": "road-royalty",
+            "collection_img": "shopify://shop_images/road_royalty.webp"
+          }
+        },
+        "collections_a6t4r9": {
+          "type": "collections",
+          "settings": {
+            "collection": "shuttlers-arena",
+            "collection_img": "shopify://shop_images/Keep_calm_and_chai_on.png"
+          }
+        },
+        "collections_p7BKj6": {
+          "type": "collections",
+          "settings": {
+            "collection": "surviving-on-caffeine",
+            "collection_img": "shopify://shop_images/road_royalty.webp"
+          }
+        },
+        "collections_amLFD7": {
+          "type": "collections",
+          "settings": {
+            "collection": "technologist-on-toes",
+            "collection_img": "shopify://shop_images/technologist_on_toes.webp"
+          }
+        },
+        "collections_Ahn4mh": {
+          "type": "collections",
+          "settings": {
+            "collection": "the-ultimate-husband-material",
+            "collection_img": "shopify://shop_images/the_ultimate_husband_material.webp"
+          }
+        },
+        "collections_AEikgR": {
+          "type": "collections",
+          "settings": {
+            "collection": "the-mindful-adventurer",
+            "collection_img": "shopify://shop_images/the_mindful_adventurer.webp"
+          }
+        },
+        "collections_JzryaQ": {
+          "type": "collections",
+          "settings": {
+            "collection": "the-modern-influencer",
+            "collection_img": "shopify://shop_images/the_modern_infleuncer.webp"
+          }
+        },
+        "collections_cx4MFW": {
+          "type": "collections",
+          "settings": {
+            "collection": "the-sarcastic-rizzler",
+            "collection_img": "shopify://shop_images/the_sarcastic_rizzler.webp"
+          }
+        },
+        "collections_kgQEQb": {
+          "type": "collections",
+          "settings": {
+            "collection": "wanna-be-unicorn",
+            "collection_img": "shopify://shop_images/Wanna_Be_unicorn.webp"
+          }
+        }
+      },
+      "block_order": [
+        "collections_PdC47x",
+        "collections_Qjk3Q7",
+        "collections_KiWa3z",
+        "collections_fhBYt6",
+        "collections_7QhMnC",
+        "collections_PkQNPH",
+        "collections_VAAyeP",
+        "collections_a6t4r9",
+        "collections_p7BKj6",
+        "collections_amLFD7",
+        "collections_Ahn4mh",
+        "collections_AEikgR",
+        "collections_JzryaQ",
+        "collections_cx4MFW",
+        "collections_kgQEQb"
+      ],
+      "disabled": true,
+      "name": "Badges Navigation",
+      "settings": {
+        "url_1": "/",
+        "url_title_1": "Hoodies",
+        "url_2": "shopify://pages/t-shirts",
+        "url_title_2": "T-Shirts"
+      }
+    },
+    "title_6FpJAn": {
+      "type": "title",
+      "name": "Title",
+      "settings": {
+        "title": "WEAR YOUR PERSONALITY",
+        "subtitle": "",
+        "description": ""
+      }
+    },
+    "image_slider_AhQykK": {
+      "type": "image-slider",
+      "blocks": {
+        "image_D4k7hj": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/1.webp",
+            "image_link": "shopify://collections/gamer-by-profession"
+          }
+        },
+        "image_YH3J4i": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/MN_Caraousel.webp",
+            "image_link": "shopify://collections/mad-about-cars"
+          }
+        },
+        "image_4kKhP4": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/2.webp",
+            "image_link": "shopify://collections/the-mindful-adventurer"
+          }
+        },
+        "image_MRBD8z": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/4.webp",
+            "image_link": "shopify://collections/the-sarcastic-rizzler"
+          }
+        },
+        "image_9EdztN": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/7.webp",
+            "image_link": "shopify://collections/gym-fitness-freak"
+          }
+        },
+        "image_C8gqQm": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/3.webp",
+            "image_link": "shopify://collections/surviving-on-caffeine"
+          }
+        },
+        "image_WJrG8z": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/5.webp",
+            "image_link": "shopify://collections/mysterious-hot"
+          }
+        },
+        "image_4gktRb": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/6.webp",
+            "image_link": "shopify://collections/technologist-on-toes"
+          }
+        }
+      },
+      "block_order": [
+        "image_D4k7hj",
+        "image_YH3J4i",
+        "image_4kKhP4",
+        "image_MRBD8z",
+        "image_9EdztN",
+        "image_C8gqQm",
+        "image_WJrG8z",
+        "image_4gktRb"
+      ],
+      "name": "Image Slider",
+      "settings": {
+        "section_title": "",
+        "enable_autoplay": true,
+        "autoplay_duration": 3000,
+        "enable_navigation": false,
+        "enable_pagination": true,
+        "enable_loop": true
+      }
+    },
+    "product_slider_6TeD4h": {
+      "type": "product-slider",
+      "settings": {
+        "section_title": "",
+        "collection_for": "T shirt",
+        "collection": "mad-about-cars",
+        "enable_autoplay": false,
+        "autoplay_duration": 3000,
+        "enable_navigation": true,
+        "enable_pagination": true,
+        "enable_loop": false
+      }
+    },
+    "product_slider_9wKiV9": {
+      "type": "product-slider",
+      "settings": {
+        "section_title": "",
+        "collection_for": "T shirt",
+        "collection": "the-sarcastic-rizzler",
+        "enable_autoplay": false,
+        "autoplay_duration": 3000,
+        "enable_navigation": true,
+        "enable_pagination": true,
+        "enable_loop": true
+      }
+    },
+    "product_slider_H6eMJw": {
+      "type": "product-slider",
+      "settings": {
+        "section_title": "",
+        "collection_for": "T shirt",
+        "collection": "its-football",
+        "enable_autoplay": false,
+        "autoplay_duration": 3000,
+        "enable_navigation": true,
+        "enable_pagination": true,
+        "enable_loop": false
+      }
+    },
+    "product_slider_bgtUBr": {
+      "type": "product-slider",
+      "settings": {
+        "section_title": "",
+        "collection_for": "T shirt",
+        "collection": "music-therapy",
+        "enable_autoplay": false,
+        "autoplay_duration": 3000,
+        "enable_navigation": true,
+        "enable_pagination": true,
+        "enable_loop": false
+      }
+    },
+    "collection_list_Bj4wzP": {
+      "type": "collection-list",
+      "settings": {
+        "section_title": "Choose Your Narratives",
+        "collection_list": [
+          "wanna-be-unicorn",
+          "the-sarcastic-rizzler",
+          "the-modern-influencer",
+          "the-mindful-adventurer",
+          "the-ultimate-husband-material",
+          "technologist-on-toes",
+          "surviving-on-caffeine",
+          "road-royalty",
+          "mysterious-hot",
+          "gamer-by-profession",
+          "friday-night-beer",
+          "gym-fitness-freak",
+          "live-to-dance",
+          "shuttlers-arena",
+          "its-football",
+          "music-therapy",
+          "bumbling-my-life",
+          "cricket-fever",
+          "mad-about-cars"
+        ]
+      }
+    },
+    "product_slider_NMDJMH": {
+      "type": "product-slider",
+      "name": "Product Slider",
+      "settings": {
+        "section_title": "",
+        "collection_for": "T shirt",
+        "collection": "technologist-on-toes",
+        "enable_autoplay": false,
+        "autoplay_duration": 3000,
+        "enable_navigation": true,
+        "enable_pagination": true,
+        "enable_loop": true
+      }
+    },
+    "product_slider_wYJcG4": {
+      "type": "product-slider",
+      "settings": {
+        "section_title": "",
+        "collection_for": "T shirt",
+        "collection": "live-to-dance",
+        "enable_autoplay": false,
+        "autoplay_duration": 3000,
+        "enable_navigation": true,
+        "enable_pagination": true,
+        "enable_loop": false
+      }
+    },
+    "product_slider_q9FUry": {
+      "type": "product-slider",
+      "settings": {
+        "section_title": "",
+        "collection_for": "T shirt",
+        "collection": "the-mindful-adventurer",
+        "enable_autoplay": false,
+        "autoplay_duration": 3000,
+        "enable_navigation": true,
+        "enable_pagination": true,
+        "enable_loop": true
+      }
+    },
+    "product_slider_kQQ7wf": {
+      "type": "product-slider",
+      "name": "Product Slider",
+      "settings": {
+        "section_title": "",
+        "collection_for": "T shirt",
+        "collection": "bumbling-my-life",
+        "enable_autoplay": false,
+        "autoplay_duration": 3000,
+        "enable_navigation": true,
+        "enable_pagination": true,
+        "enable_loop": true
+      }
+    },
+    "product_slider_A4bXUC": {
+      "type": "product-slider",
+      "settings": {
+        "section_title": "",
+        "collection_for": "T shirt",
+        "collection": "friday-night-beer",
+        "enable_autoplay": false,
+        "autoplay_duration": 3000,
+        "enable_navigation": true,
+        "enable_pagination": true,
+        "enable_loop": true
+      }
+    },
+    "product_slider_TPHEkB": {
+      "type": "product-slider",
+      "name": "Product Slider",
+      "settings": {
+        "section_title": "",
+        "collection_for": "T shirt",
+        "collection": "gamer-by-profession",
+        "enable_autoplay": true,
+        "autoplay_duration": 3000,
+        "enable_navigation": true,
+        "enable_pagination": true,
+        "enable_loop": true
+      }
+    },
+    "product_slider_bPPdJF": {
+      "type": "product-slider",
+      "name": "Product Slider",
+      "settings": {
+        "section_title": "",
+        "collection_for": "T shirt",
+        "collection": "mysterious-hot",
+        "enable_autoplay": false,
+        "autoplay_duration": 3000,
+        "enable_navigation": true,
+        "enable_pagination": true,
+        "enable_loop": true
+      }
+    },
+    "product_slider_QhExTB": {
+      "type": "product-slider",
+      "name": "Product Slider",
+      "settings": {
+        "section_title": "",
+        "collection_for": "T shirt",
+        "collection": "the-ultimate-husband-material",
+        "enable_autoplay": false,
+        "autoplay_duration": 3000,
+        "enable_navigation": true,
+        "enable_pagination": true,
+        "enable_loop": true
+      }
+    },
+    "product_slider_BQJGPe": {
+      "type": "product-slider",
+      "settings": {
+        "section_title": "",
+        "collection_for": "T shirt",
+        "collection": "shuttlers-arena",
+        "enable_autoplay": false,
+        "autoplay_duration": 3000,
+        "enable_navigation": true,
+        "enable_pagination": true,
+        "enable_loop": false
+      }
+    },
+    "product_slider_dbJA8P": {
+      "type": "product-slider",
+      "settings": {
+        "section_title": "",
+        "collection_for": "T shirt",
+        "collection": "the-modern-influencer",
+        "enable_autoplay": false,
+        "autoplay_duration": 3000,
+        "enable_navigation": true,
+        "enable_pagination": true,
+        "enable_loop": true
+      }
+    },
+    "product_slider_YURVcT": {
+      "type": "product-slider",
+      "settings": {
+        "section_title": "",
+        "collection_for": "T shirt",
+        "collection": "wanna-be-unicorn",
+        "enable_autoplay": false,
+        "autoplay_duration": 3000,
+        "enable_navigation": true,
+        "enable_pagination": true,
+        "enable_loop": true
+      }
+    },
+    "product_slider_Y6QtMQ": {
+      "type": "product-slider",
+      "settings": {
+        "section_title": "",
+        "collection_for": "T shirt",
+        "collection": "surviving-on-caffeine",
+        "enable_autoplay": false,
+        "autoplay_duration": 3000,
+        "enable_navigation": true,
+        "enable_pagination": true,
+        "enable_loop": true
+      }
+    },
+    "product_slider_K7AJh7": {
+      "type": "product-slider",
+      "settings": {
+        "section_title": "",
+        "collection_for": "T shirt",
+        "collection": "gym-fitness-freak",
+        "enable_autoplay": false,
+        "autoplay_duration": 3000,
+        "enable_navigation": true,
+        "enable_pagination": true,
+        "enable_loop": true
+      }
+    },
+    "product_slider_bWrJVR": {
+      "type": "product-slider",
+      "settings": {
+        "section_title": "",
+        "collection_for": "T shirt",
+        "collection": "cricket-fever",
+        "enable_autoplay": false,
+        "autoplay_duration": 3000,
+        "enable_navigation": true,
+        "enable_pagination": true,
+        "enable_loop": false
+      }
+    }
+  },
+  "order": [
+    "placeholder",
+    "badges_navigation_iYRimA",
+    "title_6FpJAn",
+    "image_slider_AhQykK",
+    "product_slider_Y6QtMQ",
+    "product_slider_6TeD4h",
+    "product_slider_9wKiV9",
+    "product_slider_bPPdJF",
+    "product_slider_q9FUry",
+    "product_slider_H6eMJw",
+    "product_slider_bgtUBr",
+    "collection_list_Bj4wzP",
+    "product_slider_NMDJMH",
+    "product_slider_wYJcG4",
+    "product_slider_kQQ7wf",
+    "product_slider_A4bXUC",
+    "product_slider_QhExTB",
+    "product_slider_BQJGPe",
+    "product_slider_dbJA8P",
+    "product_slider_YURVcT",
+    "product_slider_K7AJh7",
+    "product_slider_TPHEkB",
+    "product_slider_bWrJVR"
+  ]
+}

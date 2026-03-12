@@ -1,0 +1,342 @@
+<section class="container max-w-screen-xl mx-auto px-4 md:px-6 py-12">
+  
+  <style>
+    /* Importing Montserrat (Headers) and Mulish (Body) */
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Mulish:wght@300;400;600&family=Rajdhani:wght@600&display=swap');
+
+    :root {
+      --brand-green: #39A596; /* Your Narrative Green */
+      --brand-black: #111111;
+      --brand-gray: #f9f9f9;
+    }
+
+    body {
+      font-family: 'Mulish', sans-serif;
+      color: var(--brand-black);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Typography Utility Classes */
+    .font-heading { 
+      font-family: 'Montserrat', sans-serif; 
+      text-transform: uppercase; 
+      letter-spacing: 0.05em; /* Luxury spacing */
+    }
+    
+    .font-tech { font-family: 'Rajdhani', sans-serif; } /* Kept strictly for the Vault Glitch text */
+
+    /* Custom Narrative Button - UPDATED WITH GREEN OUTLINE */
+    .btn-narrative {
+      background: var(--brand-black);
+      color: white;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 14px;
+      letter-spacing: 2px;
+      padding: 16px 32px;
+      transition: all 0.3s cubic-bezier(0.215, 0.610, 0.355, 1);
+      
+      /* --- THE GREEN OUTLINE --- */
+      border: 1px solid var(--brand-green); 
+      
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .btn-narrative:hover {
+      background: var(--brand-green); /* Fills with green on hover */
+      color: white;
+      box-shadow: 0 0 20px rgba(57, 165, 150, 0.4); /* Green glow */
+      transform: translateY(-2px);
+    }
+
+    /* Vault Card - "The Black Card" Look */
+    .vault-card {
+      background: #000;
+      background-image: radial-gradient(circle at 100% 0%, #1a1a1a 0%, #000 50%);
+      border-left: 6px solid var(--brand-green);
+      position: relative;
+      overflow: hidden;
+      color: white;
+    }
+    
+    /* Subtle background grid pattern for streetwear vibe */
+    .vault-card::before {
+      content: '';
+      position: absolute;
+      width: 100%; height: 100%;
+      background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 20px 20px;
+      opacity: 0.5;
+      pointer-events: none;
+    }
+  </style>
+
+  <div class="mb-12 text-center md:text-left border-b border-gray-200 pb-8 mt-1">
+    <p class="text-s font-bold tracking-[0.3em] text-gray-400 mb-3 font-heading">My Narrative / Account</p>
+    <h1 class="text-4xl md:text-5xl font-heading font-extrabold text-black">Order Details</h1>
+  </div>
+
+  <div class="vault-card p-8 md:p-12 shadow-2xl mb-16 flex flex-col md:flex-row justify-between items-center gap-8 group">
+    <div class="relative z-2 text-center md:text-left">
+      <div class="flex flex-col md:flex-row items-center gap-4 mb-3">
+        <h2 class="font-heading text-2xl md:text-3xl font-bold tracking-widest text-white">
+           <span class="text-[#39A596]">ORDER DETAILS</span>
+        </h2>
+        <span class="border border-[#39A596] text-[#39A596] text-[10px] font-heading font-bold px-2 py-1 rounded-full">
+          ACCESS GRANTED
+        </span>
+      </div>
+      <p class="text-gray-400 font-light text-sm md:text-base max-w-lg leading-relaxed mb-4">
+        Your choices define your narrative. Access your generated Digital Personality Card based on this order.
+      </p>
+    </div>
+    
+    <button onclick="openVault()" class="btn-narrative z-2 relative overflow-hidden group">
+      <span class="relative z-2">REVEAL MY CARD</span>
+      <svg class="w-4 h-4 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+    </button>
+  </div>
+
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-y-8 gap-x-4 border-b border-black pb-12 mb-12">
+    <div class="space-y-2">
+      <p class="text-[10px] text-gray-400 uppercase tracking-[0.2em] font-bold font-heading">Order No.</p>
+      <p class="font-heading text-xl md:text-2xl font-bold text-black">#{{ order.order_number }}</p>
+    </div>
+
+    <div class="space-y-2">
+      <p class="text-[10px] text-gray-400 uppercase tracking-[0.2em] font-bold font-heading">Date</p>
+      <p class="font-heading text-xl md:text-2xl font-medium">{{ order.created_at | date: format: 'date' }}</p>
+    </div>
+
+    <div class="space-y-2">
+      <p class="text-[10px] text-gray-400 uppercase tracking-[0.2em] font-bold font-heading">Status</p>
+      <p class="font-heading text-xl md:text-2xl font-medium">{{ order.fulfillment_status_label }}</p>
+      
+      <a href="{{ order.order_status_url }}" class="inline-flex items-center gap-1 text-[#39A596] font-heading font-bold text-xs tracking-widest hover:text-black transition-colors uppercase mt-1">
+        Track Package 
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
+      </a>
+    </div>
+
+    <div class="space-y-2">
+      <p class="text-[10px] text-gray-400 uppercase tracking-[0.2em] font-bold font-heading">Payment</p>
+      <p class="font-heading text-xl md:text-2xl font-medium">{{ order.financial_status_label }}</p>
+    </div>
+  </div>
+
+  <div class="space-y-10 mb-16">
+    {% for line_item in order.line_items %}
+    <div class="flex flex-col md:flex-row gap-8 group">
+      
+      <a href="{{ line_item.url }}" class="w-full md:w-1/4 aspect-[4/5] bg-gray-100 relative overflow-hidden">
+        {% if line_item.image != blank %}
+          <img src="{{ line_item.image | image_url }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="{{ line_item.product.title }}">
+        {% else %}
+          <div class="w-full h-full flex items-center justify-center text-gray-300 font-heading text-sm">NO IMAGE</div>
+        {% endif %}
+      </a>
+      
+      <div class="flex-1 flex flex-col border-b border-gray-100 pb-8 md:pb-0 md:border-none">
+        <div class="flex-1">
+          <p class="text-[#39A596] text-xs font-bold uppercase tracking-widest font-heading mb-2">
+            {{ line_item.variant.option3 }}
+          </p>
+          <a href="{{ line_item.url }}">
+            <h3 class="text-2xl md:text-3xl font-heading font-bold uppercase text-black mb-2 hover:text-[#39A596] transition-colors">
+              {{ line_item.product.title }}
+            </h3>
+          </a>
+          <p class="text-gray-500 font-light text-sm tracking-wide">{{ line_item.variant.title }}</p>
+        </div>
+        
+        <div class="mt-6 flex justify-between items-end">
+          <div class="text-sm font-heading font-bold text-gray-400">QTY: {{ line_item.quantity }}</div>
+          <div class="text-xl md:text-2xl font-heading font-bold text-black">{{ line_item.original_price | money_without_trailing_zeros }}</div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="flex flex-col md:items-end pt-10 border-t-4 border-black">
+    <div class="w-full md:w-1/3 space-y-4">
+      <div class="flex justify-between text-gray-500 font-heading text-sm tracking-widest uppercase">
+        <span>Subtotal</span>
+        <span>{{ order.line_items_subtotal_price | money_without_trailing_zeros }}</span>
+      </div>
+      <div class="flex justify-between items-center pt-4 border-t border-gray-200">
+        <span class="font-heading text-lg font-bold uppercase text-black">Total</span>
+        <span class="font-heading text-3xl font-extrabold text-[#39A596]">{{ order.total_net_amount | money_without_trailing_zeros }}</span>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<style>
+  #vault-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: #000;
+    z-index: 99999;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Rajdhani', sans-serif; /* Kept Tech font for the overlay specifically */
+    color: #39A596;
+    background-image: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #000 80%);
+  }
+
+  .close-vault {
+    position: absolute; top: 30px; right: 30px; color: #fff;
+    font-size: 40px; cursor: pointer; background: none; border: none; z-index: 100000;
+    transition: transform 0.3s;
+  }
+  .close-vault:hover { transform: rotate(90deg); color: #39A596; }
+
+  /* LOADING ANIMATION */
+  .scanner-bar { width: 80%; max-width: 300px; height: 2px; background: #111; margin: 30px 0; position: relative; overflow: hidden; border: 1px solid #39A596; }
+  .scanner-light { width: 50%; height: 100%; background: #39A596; position: absolute; animation: scan 1.5s infinite alternate; box-shadow: 0 0 20px #39A596; }
+  @keyframes scan { from { left: 0; } to { left: 50%; } }
+
+  .glitch-text { animation: blink 0.2s infinite; letter-spacing: 3px; font-weight: 600; text-transform: uppercase; font-size: 14px; }
+  @keyframes blink { 0% {opacity: 1} 90% {opacity: 1} 95% {opacity: 0.5} 100% {opacity: 1} }
+
+  /* CARD RESULT */
+  #final-card-img {
+    width: 90%; max-width: 350px;
+    border: 1px solid #39A596;
+    box-shadow: 0 0 50px rgba(57, 165, 150, 0.2);
+    border-radius: 4px; margin-bottom: 25px;
+    animation: zoomIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  @keyframes zoomIn { from {transform: scale(0.8); opacity: 0;} to {transform: scale(1); opacity: 1;} }
+
+  /* BUTTONS INSIDE VAULT */
+  .cyber-btn {
+    background: transparent; color: #39A596; border: 1px solid #39A596;
+    padding: 16px 30px; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;
+    cursor: pointer; display: flex; align-items: center; gap: 10px; margin-top: 10px;
+    width: 100%; max-width: 320px; justify-content: center;
+    transition: all 0.3s ease;
+  }
+  .cyber-btn:hover { background: #39A596; color: #000; box-shadow: 0 0 30px rgba(57, 165, 150, 0.5); }
+  
+  .insta-btn { border-color: #E1306C; color: #E1306C; }
+  .insta-btn:hover { background: #E1306C; color: white; box-shadow: 0 0 30px rgba(225, 48, 108, 0.5); }
+</style>
+
+<div id="vault-overlay">
+  <button class="close-vault" onclick="closeVault()">×</button>
+
+  <div id="loading-state" style="text-align: center;">
+    <h2 style="letter-spacing: 4px; color: white; margin-bottom: 10px; font-family: 'Montserrat', sans-serif; font-weight: 800;">NEURAL LINK ESTABLISHED</h2>
+    <div class="scanner-bar"><div class="scanner-light"></div></div>
+    <p id="status-text" class="glitch-text">ANALYZING PERSONALITY DATA...</p>
+  </div>
+
+  <div id="result-state" style="display: none; text-align: center; width: 100%; display: flex; flex-direction: column; align-items: center;">
+    <h3 style="color: white; letter-spacing: 3px; margin-bottom: 25px; font-family: 'Montserrat', sans-serif; font-weight: 700;">IDENTITY CONFIRMED</h3>
+    
+    <img id="final-card-img" src="" alt="Identity Card">
+    
+    <button class="cyber-btn insta-btn" onclick="shareToInstagram()">
+      <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+      SHARE TO STORY
+    </button>
+    
+    <a id="download-link" href="#" download class="cyber-btn" style="background:transparent; color:#888; border:none; margin-top:0;">
+      ⬇ Download Image
+    </a>
+  </div>
+</div>
+
+<script>
+  // --- CONFIGURATION ---
+  // USE YOUR VERCEL LINK HERE TO GET THE *NEW* CARD
+  const API_URL = "https://mynarrative-card-gen-aryans-projects-af8c9a95.vercel.app/api/index";
+  // KEEPS THE INTERNAL LONG ID FOR THE API
+  const ORDER_ID = "{{ order.id }}";
+  
+  let finalImageUrl = "";
+
+  // 1. OPEN THE VAULT
+  function openVault() {
+    document.getElementById('vault-overlay').style.display = 'flex';
+    document.getElementById('loading-state').style.display = 'block';
+    document.getElementById('result-state').style.display = 'none';
+    document.body.style.overflow = 'hidden'; 
+    
+    // Start Polling Vercel
+    startPolling();
+  }
+
+  function closeVault() {
+    document.getElementById('vault-overlay').style.display = 'none';
+    document.body.style.overflow = 'auto';
+  }
+
+  // 2. POLLING LOGIC (Checks if Vercel created the card yet)
+  function startPolling() {
+    const statusText = document.getElementById('status-text');
+    let attempts = 0;
+
+    const poller = setInterval(() => {
+      attempts++;
+      if(attempts % 2 === 0) statusText.innerText = "ANALYZING VIBE...";
+      else statusText.innerText = "GENERATING ASSET...";
+
+      fetch(`${API_URL}?order_id=${ORDER_ID}`)
+        .then(res => res.json())
+        .then(data => {
+          // If status is "ready", we have the NEW card!
+          if(data.status === "ready" && data.url.includes("http")) {
+            clearInterval(poller);
+            finalImageUrl = data.url;
+            
+            setTimeout(() => {
+               revealCard(finalImageUrl);
+            }, 1000);
+          }
+        })
+        .catch(err => console.error(err));
+
+      if(attempts > 40) { 
+        clearInterval(poller);
+        statusText.innerText = "Processing... Check back in 1 minute.";
+      }
+    }, 3000); // Check every 3 seconds
+  }
+
+  function revealCard(url) {
+    document.getElementById('loading-state').style.display = 'none';
+    document.getElementById('result-state').style.display = 'flex';
+    document.getElementById('final-card-img').src = url;
+    document.getElementById('download-link').href = url;
+  }
+
+  // 3. INSTAGRAM SHARE LOGIC
+  async function shareToInstagram() {
+    if(!finalImageUrl) return;
+    if (navigator.share) {
+      try {
+        const response = await fetch(finalImageUrl);
+        const blob = await response.blob();
+        const file = new File([blob], "identity_card.jpg", { type: "image/jpeg" });
+        await navigator.share({
+          files: [file],
+          title: 'My Narrative Identity',
+          text: 'Verified 1%. #MyNarrative'
+        });
+      } catch (e) { alert("Please save the image and upload manually."); }
+    } else {
+      alert("Image saved! Open Instagram to post.");
+      document.getElementById('download-link').click();
+    }
+  }
+</script>

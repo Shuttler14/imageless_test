@@ -1,0 +1,114 @@
+<div class="max-w-[500px] bg-white my-8 text-black mx-4 md:mx-6 p-8  w-full" data-for="login-form">
+  <h2 class="text-2xl md:text-4xl text-center mb-6 md:mb-9 lg:mb-14 heading-font">Sign In</h2>
+  {% form 'customer_login' %}
+    <div class="mb-2 text-red-500">
+      {{ form.errors | default_errors }}
+    </div>
+    <div class="flex flex-col gap-4 md:gap-6 normal-font">
+      <input
+        id="email-input"
+        type="email"
+        name="customer[email]"
+        autofocus
+        placeholder="Enter Your Email"
+        class="border p-1 md:p-2 focus:outline-none "
+      >
+      <div class="relative">
+        <input
+          id="password-input"
+          type="password"
+          name="customer[password]"
+          placeholder="Enter Your Password"
+          class="border p-1 md:p-2 focus:outline-none w-full "
+        >
+        <button id="password-toggle" class="absolute right-3 top-1/2 border-gray-700 -translate-y-1/2">
+          <i
+            class="bi bi-eye-fill"
+          ></i>
+        </button>
+      </div>
+      <div class="text-center cursor-pointer" data-for="forget-btn">Forgot Password?</div>
+      <button
+        type="submit"
+        class="border  p-2 uppercase text-sm md:text-xl bg-black text-white hover:bg-white hover:text-black transition-all shadow-inner"
+      >
+        Login
+      </button>
+      <a href="{{ routes.account_register_url }}" class="text-center block">Create an account</a>
+    </div>
+  {% endform %}
+</div>
+
+<div
+  class="max-w-[500px] bg-white my-8 text-black mx-4 md:mx-6 p-8  w-full hidden"
+  data-for="forget-password-form"
+>
+  <h2 class="text-2xl md:text-4xl text-center mb-6 md:mb-9 lg:mb-14 heading-font">Reset Password</h2>
+  {% form 'recover_customer_password' %}
+    <div class="mb-2 text-red-500 normal-font">
+      {{ form.errors | default_errors }}
+    </div>
+    <div class="flex flex-col gap-4 md:gap-6">
+      <input
+        type="email"
+        name="email"
+        placeholder="Enter Your Email"
+        class="border p-1 md:p-2 focus:outline-none "
+      >
+      <button
+        type="submit"
+        class="border  p-2 uppercase text-sm md:text-xl bg-black text-white hover:bg-white hover:text-black transition-all shadow-inner"
+      >
+        Get Email
+      </button>
+      <div class="text-center cursor-pointer" data-for="login-btn">Login</div>
+    </div>
+  {% endform %}
+</div>
+
+<script>
+  const passwordToggle = document.getElementById('password-toggle');
+  const passwordInput = document.getElementById('password-input');
+  const loginForm = document.querySelector(`[data-for="login-form"]`);
+  const forgetPasswordForm = document.querySelector(`[data-for="forget-password-form"]`);
+  const loginBtn = document.querySelector(`[data-for="login-btn"]`);
+  const forgetBtn = document.querySelector(`[data-for="forget-btn"]`);
+  loginBtn.addEventListener('click', () => {
+    forgetPasswordForm.classList.add('hidden');
+    loginForm.classList.remove('hidden');
+  });
+  forgetBtn.addEventListener('click', () => {
+    forgetPasswordForm.classList.remove('hidden');
+    forgetPasswordForm.querySelector(`[name="email"]`).focus();
+    loginForm.classList.add('hidden');
+  });
+  forgetPasswordForm.addEventListener('submit', () => alert('A link has been shared on your mail to reset the password'));
+
+  passwordToggle.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (passwordInput.type === 'password') {
+      passwordInput.type = 'text';
+      passwordToggle.innerHTML = `<i class="bi bi-eye-slash-fill"></i>`;
+    } else {
+      passwordToggle.innerHTML = `<i class="bi bi-eye-fill"></i>`;
+      passwordInput.type = 'password';
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Login",
+  "tag": "section",
+  "class": "container max-w-screen-xl mx-auto flex justify-center",
+  "limit": 1,
+  "settings": [
+   
+  ],
+  "presets": [
+    {
+      "name": "Login"
+    }
+  ]
+}
+{% endschema %}

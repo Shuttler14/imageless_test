@@ -1,0 +1,49 @@
+<div>
+  <p class="px-4 md:px-6 container max-w-screen-xl mx-auto text-center text-2xl font-bold md:text-4xl my-6 md:my-12 heading-font ">
+    {{ collection.title }}
+  </p>
+  {% render 'filter-and-sort' %}
+{% if collection.products.size > 0 %}
+  {% paginate collection.products by 15 %}
+    <div
+      class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-3 lg:gap-4 my-6 md:my-12 px-0 md:px-6 container max-w-screen-xl mx-auto"
+      data-next-url="{{ paginate.next.url }}"
+      data-for="collection-container"
+    >
+      {% for product in collection.products %}
+        {% render 'product-card', product: product, wishlist:true %}
+      {% endfor %}
+    </div>
+
+    {% comment %} {% render 'pagination', paginate: paginate %} {% endcomment %}
+    {% if paginate.next %}
+      <div
+        class="flex justify-center items-center my-6 md:my-12 px-4 md:px-6 container max-w-screen-xl mx-auto"
+        data-for="load-more-btn-container"
+        data-btn-loading="false"
+      >
+        <button class="border p-3 px-5 max-w-32 mx-auto hover:bg-white hover:text-black duration-100 cursor-pointer" data-for="load-more-btn">Load More</button>
+      </div>
+    {% endif %}
+  {% endpaginate %}
+  {% else %}
+  <div class="flex flex-col gap-3 md:gap-4 items-center justify-center p-4 md:p-6 min-h-[50vh]">
+        <p class="text-4xl md:text-5xl">OPPS!</p>
+        <p class="text-xl md:text2xl text-balance">No matches fond</p>
+        <a href="/" class="border py-3 px-4 leading-none hover:bg-white hover:text-black duration-100">Go to Homepage</a>
+    </div>
+{% endif %}
+</div>
+
+{% schema %}
+{
+  "name": "Collection",
+  "tag": "section",
+  "settings": [],
+  "presets": [
+    {
+      "name": "Collection"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,4406 @@
+<style>
+  /* Define the color once here */
+
+  :root {
+
+    --brand-teal: #39A596;
+
+    --brand-teal-rgb: 57, 165, 150;
+
+  }
+
+
+  /* These classes use !important to override any theme defaults */
+
+  .brand-text { color: var(--brand-teal) !important; }
+
+  .brand-bg { background-color: var(--brand-teal) !important; }
+
+  .brand-border { border-color: var(--brand-teal) !important; }
+
+
+  /* --- BUTTON FIX START --- */
+
+  .brand-btn {
+
+    background-color: var(--brand-teal) !important;
+
+    color: white !important;
+
+    border: 1px solid var(--brand-teal) !important;
+
+  }
+
+  .brand-btn:hover {
+
+    background-color: white !important;
+
+    color: var(--brand-teal) !important; /* Text turns Green on hover */
+
+  }
+
+  /* --- BUTTON FIX END --- */
+
+
+  /* Specific fix for the 'View Card' button */
+
+  .view-card-btn {
+
+    color: var(--brand-teal) !important;
+
+    font-weight: bold;
+
+    text-transform: uppercase;
+
+    font-size: 0.75rem;
+
+    letter-spacing: 0.05em;
+
+  }
+
+  .view-card-btn:hover {
+
+    color: white !important;
+
+  }
+
+
+  /* Specific fix for links */
+
+  .order-link {
+
+    color: var(--brand-teal) !important;
+
+    font-weight: bold;
+
+  }
+
+  /* =====================================================
+     AI STYLIST DASHBOARD - PROGRESS TRACKING UI
+     ===================================================== */
+  
+  /* Circular Progress Ring */
+  .mn-progress-ring-container {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .mn-progress-ring {
+    transform: rotate(-90deg);
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  
+  .mn-progress-ring-bg {
+    fill: none;
+    stroke: rgba(57, 165, 150, 0.15);
+    stroke-width: 6;
+  }
+  
+  .mn-progress-ring-fill {
+    fill: none;
+    stroke: #39A596;
+    stroke-width: 6;
+    stroke-linecap: round;
+    stroke-dasharray: 326.73;
+    stroke-dashoffset: 326.73;
+    stroke-dashoffset: 326.73;
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+    transition: stroke-dashoffset 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    filter: drop-shadow(0 0 8px rgba(57, 165, 150, 0.6));
+  }
+  
+  .mn-progress-percentage {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: #fff;
+    z-index: 1;
+  }
+  
+  .mn-progress-percentage span {
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.5);
+  }
+
+  /* Linear Progress Bar */
+  .mn-linear-progress-container {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(57,165,150,0.2);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+  }
+  
+  .mn-linear-progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  
+  .mn-linear-progress-label {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: #39A596;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .mn-linear-progress-value {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+  }
+  
+  .mn-linear-progress-track {
+    height: 8px;
+    background: rgba(57, 165, 150, 0.15);
+    border-radius: 99px;
+    overflow: hidden;
+    position: relative;
+  }
+  
+  .mn-linear-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #39A596, #2dd4bf);
+    border-radius: 99px;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 12px rgba(57, 165, 150, 0.5);
+    position: relative;
+  }
+  
+  .mn-linear-progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 20px;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4));
+    border-radius: 99px;
+  }
+
+  /* Height Vector SVG */
+  .mn-height-vector-container {
+    display: flex;
+    align-items: flex-end;
+    gap: 20px;
+    padding: 20px;
+    background: rgba(255,255,255,0.02);
+    border-radius: 16px;
+    margin: 16px 0;
+  }
+  
+  .mn-height-slider-wrapper {
+    flex: 1;
+  }
+  
+  .mn-height-slider {
+    width: 100%;
+    height: 8px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: linear-gradient(90deg, #39A596 var(--slider-fill, 50%), rgba(255,255,255,0.1) var(--slider-fill, 50%));
+    border-radius: 99px;
+    outline: none;
+    cursor: pointer;
+  }
+  
+  .mn-height-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    background: #39A596;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 14px rgba(57,165,150,0.6);
+    border: 3px solid rgba(255,255,255,0.2);
+    transition: transform 0.2s;
+  }
+  
+  .mn-height-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+  }
+  
+  .mn-height-display {
+    text-align: center;
+    min-width: 100px;
+  }
+  
+  .mn-height-cm {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 36px;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1;
+  }
+  
+  .mn-height-ft {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #39A596;
+    margin-top: 4px;
+  }
+  
+  .mn-height-vector {
+    width: 60px;
+    height: 180px;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: bottom center;
+  }
+  
+  .mn-height-vector svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Weather Widget */
+  .mn-weather-widget {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, rgba(57,165,150,0.1), rgba(57,165,150,0.05));
+    border: 1px solid rgba(57,165,150,0.3);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  
+  .mn-weather-widget:hover {
+    border-color: #39A596;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(57,165,150,0.2);
+  }
+  
+  .mn-weather-icon {
+    font-size: 28px;
+  }
+  
+  .mn-weather-info {
+    flex: 1;
+  }
+  
+  .mn-weather-temp {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+  }
+  
+  .mn-weather-condition {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    color: rgba(255,255,255,0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* Style Cards Grid */
+  .mn-style-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  
+  @media (max-width: 768px) {
+    .mn-style-cards-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  .mn-style-card {
+    background: rgba(255,255,255,0.03);
+    border: 1.5px solid rgba(255,255,255,0.08);
+    border-radius: 14px;
+    padding: 16px 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .mn-style-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent, rgba(57,165,150,0.1));
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  
+  .mn-style-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(57,165,150,0.4);
+  }
+  
+  .mn-style-card:hover::before {
+    opacity: 1;
+  }
+  
+  .mn-style-card.selected {
+    border-color: #39A596;
+    background: rgba(57,165,150,0.12);
+    box-shadow: 0 0 20px rgba(57,165,150,0.25);
+  }
+  
+  .mn-style-card.selected::after {
+    content: '\2713';
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 18px;
+    height: 18px;
+    background: #39A596;
+    color: #000;
+    border-radius: 50%;
+    font-size: 10px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .mn-style-card-emoji {
+    font-size: 28px;
+    margin-bottom: 8px;
+    display: block;
+  }
+  
+  .mn-style-card-label {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* Bank Cards Section */
+  .mn-bank-section {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(57,165,150,0.2);
+    border-radius: 16px;
+    padding: 20px;
+    margin-top: 20px;
+  }
+  
+  .mn-bank-section-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #39A596;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .mn-bank-dropdown {
+    width: 100%;
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.3s;
+    margin-bottom: 12px;
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2339A596' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+  }
+  
+  .mn-bank-dropdown:focus {
+    border-color: #39A596;
+    box-shadow: 0 0 0 3px rgba(57,165,150,0.1);
+  }
+  
+  .mn-bank-dropdown option {
+    background: #111;
+    color: #fff;
+    padding: 10px;
+  }
+  
+  .mn-card-type-toggle {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  
+  .mn-card-type-btn {
+    flex: 1;
+    padding: 12px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    color: rgba(255,255,255,0.6);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .mn-card-type-btn.selected {
+    background: rgba(57,165,150,0.15);
+    border-color: #39A596;
+    color: #39A596;
+  }
+  
+  .mn-saved-cards-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  
+  .mn-saved-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    transition: all 0.3s;
+  }
+  
+  .mn-saved-card:hover {
+    border-color: rgba(57,165,150,0.3);
+  }
+  
+  .mn-saved-card-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .mn-saved-card-icon {
+    width: 40px;
+    height: 28px;
+    background: linear-gradient(135deg, #1a1a1a, #0a0a0a);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+  
+  .mn-saved-card-details {
+    font-family: 'Montserrat', sans-serif;
+  }
+  
+  .mn-saved-card-bank {
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+  }
+  
+  .mn-saved-card-variant {
+    font-size: 10px;
+    color: rgba(255,255,255,0.5);
+  }
+
+  /* Skin Tone Swatches */
+  .mn-skin-tone-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 12px 0;
+  }
+  
+  .mn-skin-tone-swatch {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+  }
+  
+  .mn-skin-tone-swatch:hover {
+    transform: scale(1.2);
+    z-index: 1;
+  }
+  
+  .mn-skin-tone-swatch.selected {
+    border-color: #fff;
+    box-shadow: 0 0 0 3px #39A596, 0 0 20px rgba(57,165,150,0.5);
+    transform: scale(1.15);
+  }
+  
+  .mn-skin-tone-swatch::after {
+    content: attr(data-label);
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 8px;
+    color: rgba(255,255,255,0.5);
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  
+  .mn-skin-tone-swatch:hover::after,
+  .mn-skin-tone-swatch.selected::after {
+    opacity: 1;
+  }
+
+  /* AI Upload Loading State */
+  .mn-ai-upload-loading {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 30px;
+    background: rgba(57,165,150,0.08);
+    border: 1px solid rgba(57,165,150,0.3);
+    border-radius: 16px;
+    margin-top: 16px;
+  }
+  
+  .mn-ai-upload-loading.active {
+    display: flex;
+  }
+  
+  .mn-ai-spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid rgba(57,165,150,0.2);
+    border-top-color: #39A596;
+    border-radius: 50%;
+    animation: mnSpin 1s linear infinite;
+  }
+  
+  @keyframes mnSpin {
+    to { transform: rotate(360deg); }
+  }
+  
+  .mn-ai-loading-text {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #39A596;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .mn-ai-loading-sub {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+  }
+
+  /* Core Interests Combobox */
+  .mn-interests-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  
+  .mn-interest-tag {
+    padding: 8px 14px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.7);
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  
+  .mn-interest-tag:hover {
+    border-color: rgba(57,165,150,0.4);
+    color: #fff;
+  }
+  
+  .mn-interest-tag.selected {
+    background: rgba(57,165,150,0.15);
+    border-color: #39A596;
+    color: #39A596;
+  }
+
+  /* Ghost Mode Toggle */
+  .mn-ghost-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    background: rgba(139,92,246,0.08);
+    border: 1px solid rgba(139,92,246,0.25);
+    border-radius: 12px;
+    margin-top: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  
+  .mn-ghost-toggle:hover {
+    border-color: rgba(139,92,246,0.5);
+  }
+  
+  .mn-ghost-toggle.active {
+    background: rgba(139,92,246,0.15);
+    border-color: #8b5cf6;
+  }
+  
+  .mn-ghost-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #fff;
+  }
+  
+  .mn-ghost-switch {
+    width: 44px;
+    height: 24px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    position: relative;
+    transition: all 0.3s;
+  }
+  
+  .mn-ghost-toggle.active .mn-ghost-switch {
+    background: #8b5cf6;
+  }
+  
+  .mn-ghost-switch::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    background: #fff;
+    border-radius: 50%;
+    transition: all 0.3s;
+  }
+  
+  .mn-ghost-toggle.active .mn-ghost-switch::after {
+    left: 23px;
+  }
+</style>
+
+<div class="flex flex-col gap-8">
+
+  <div class="flex justify-between items-end border-b border-gray-800 pb-6 mb-4">
+    <div>
+      <h1 class="heading-font text-3xl md:text-5xl font-bold text-white uppercase tracking-wider">My Narrative</h1>
+
+      <p class="text-gray-400 text-sm mt-2">Welcome back, {{ customer.first_name }}</p>
+    </div>
+
+    <a
+      class="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-white transition-colors border border-gray-700 px-4 py-2 rounded-full hover:border-white"
+
+      href="{{ routes.account_logout_url }}"
+    >
+      Logout
+    </a>
+  </div>
+
+  <!-- User Profile Section Styles -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap');
+    
+    .user-profile-section {
+      font-family: 'Montserrat', sans-serif;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
+      border: 1px solid #39A596;
+      border-radius: 16px;
+      padding: 1.25rem;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 30px rgba(57, 165, 150, 0.12);
+      margin-top: 2rem;
+    }
+
+    .user-profile-section::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(57, 165, 150, 0.1) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .profile-hero {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .profile-top-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      align-items: flex-start;
+    }
+
+    .profile-avatar-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .profile-avatar {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      border: 2px solid #39A596;
+      background: linear-gradient(135deg, #1a1a1a, #0a0a0a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      box-shadow: 0 0 20px rgba(57, 165, 150, 0.25);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .profile-avatar:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 30px rgba(57, 165, 150, 0.4);
+    }
+
+    .profile-upload-prompt {
+      text-align: center;
+      font-size: 10px;
+      color: #39A596;
+      font-weight: 600;
+      max-width: 120px;
+      line-height: 1.3;
+      letter-spacing: 0.3px;
+    }
+
+    .profile-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .profile-avatar-placeholder {
+      font-size: 40px;
+      color: #39A596;
+    }
+
+    .profile-name-section {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .profile-name {
+      font-size: 22px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 0.4rem;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .profile-personality {
+      display: inline-block;
+      background: linear-gradient(135deg, #39A596, #2d8578);
+      color: #ffffff;
+      padding: 0.3rem 0.8rem;
+      border-radius: 16px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 0.8rem;
+    }
+
+    .digital-closet-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: linear-gradient(135deg, #39A596, #2d8578);
+      color: #ffffff;
+      padding: 0.6rem 1.2rem;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 3px 12px rgba(57, 165, 150, 0.25);
+      text-decoration: none;
+    }
+
+    .digital-closet-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(57, 165, 150, 0.4);
+      background: linear-gradient(135deg, #2d8578, #39A596);
+    }
+
+    .quick-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .stat-card {
+      background: rgba(10, 10, 10, 0.6);
+      border: 1px solid #2a2a2a;
+      border-radius: 10px;
+      padding: 0.75rem;
+      text-align: center;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .stat-card:hover {
+      border-color: #39A596;
+      background: rgba(57, 165, 150, 0.05);
+      transform: translateY(-2px);
+    }
+
+    .stat-icon {
+      font-size: 20px;
+      margin-bottom: 0.4rem;
+    }
+
+    .stat-label {
+      font-size: 10px;
+      color: #888888;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-value {
+      font-size: 13px;
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    .profile-details-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .detail-card {
+      background: rgba(10, 10, 10, 0.4);
+      border: 1px solid #2a2a2a;
+      border-radius: 8px;
+      padding: 0.75rem;
+      transition: all 0.3s ease;
+    }
+
+    .detail-card:hover {
+      border-color: #39A596;
+      background: rgba(57, 165, 150, 0.03);
+    }
+
+    .detail-label {
+      font-size: 10px;
+      color: #39A596;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .detail-value {
+      font-size: 13px;
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .detail-icon {
+      font-size: 12px;
+    }
+    
+    #selfieUploadInput { display: none; }
+
+    /* ── Black Glass UI (matches AI stylist exactly) ── */
+    .user-profile-section {
+      background: linear-gradient(135deg, rgba(5,5,5,0.98) 0%, rgba(15,15,15,0.95) 100%) !important;
+      border: 1px solid rgba(57,165,150,0.3) !important;
+      backdrop-filter: blur(24px) saturate(180%) !important;
+      -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(57,165,150,0.1) inset !important;
+    }
+
+    .stat-card {
+      background: rgba(255,255,255,0.04) !important;
+      border: 1px solid rgba(255,255,255,0.08) !important;
+      backdrop-filter: blur(12px) !important;
+      transition: all 0.3s ease !important;
+      cursor: pointer;
+      padding-top: 36px !important;
+    }
+    .stat-card:hover { border-color: rgba(57,165,150,0.5) !important; background: rgba(57,165,150,0.08) !important; transform: translateY(-2px) !important; }
+    .stat-card.clickable:hover { box-shadow: 0 4px 16px rgba(57,165,150,0.2); }
+    
+    .detail-card {
+      background: rgba(255,255,255,0.03) !important;
+      border: 1px solid rgba(255,255,255,0.08) !important;
+      backdrop-filter: blur(8px) !important;
+      cursor: pointer;
+      transition: all 0.3s ease !important;
+      padding-top: 36px !important;
+    }
+    .detail-card:hover { border-color: rgba(57,165,150,0.4) !important; background: rgba(57,165,150,0.06) !important; }
+    
+    .detail-value { color: rgba(244,244,244,0.9) !important; }
+    .detail-label { color: #39A596 !important; }
+    .stat-value { color: rgba(244,244,244,0.95) !important; }
+    .stat-label { color: rgba(244,244,244,0.5) !important; }
+    .profile-name { color: #fff !important; }
+
+    /* ── Edit Button (top-right of every card) ── */
+    .mn-card-edit-btn {
+      position: absolute;
+      top: 10px; right: 10px;
+      display: inline-flex; align-items: center; gap: 5px;
+      background: rgba(57,165,150,0.14);
+      border: 1px solid rgba(57,165,150,0.4);
+      border-radius: 20px;
+      padding: 5px 12px;
+      font-size: 9px; font-weight: 900; letter-spacing: 0.08em;
+      color: #39A596; cursor: pointer;
+      transition: all 0.2s; white-space: nowrap;
+      font-family: 'Montserrat', sans-serif;
+      text-transform: uppercase;
+      opacity: 1;
+      pointer-events: all;
+      z-index: 5;
+    }
+    .stat-card:hover .mn-card-edit-btn,
+    .detail-card:hover .mn-card-edit-btn { opacity: 1; pointer-events: all; }
+    .mn-card-edit-btn:hover {
+      background: rgba(57,165,150,0.22);
+      border-color: #39A596;
+      color: #39A596;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 10px rgba(57,165,150,0.25);
+    }
+    .mn-card-edit-btn svg { flex-shrink: 0; }
+    /* Cards need relative positioning */
+    .stat-card  { position: relative !important; }
+    .detail-card{ position: relative !important; }
+
+    /* ── Upgraded Edit Modal ── */
+    .mn-edit-option-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    /* ── Premium Tile Options ── */
+    .mn-edit-option-tile {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 6px; padding: 14px 10px;
+      background: rgba(255,255,255,0.03);
+      border: 1.5px solid rgba(255,255,255,0.07);
+      border-radius: 16px; cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+      text-align: center; position: relative; overflow: hidden;
+      min-height: 90px; justify-content: center;
+    }
+    .mn-edit-option-tile:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      z-index: 1;
+    }
+    .mn-edit-option-tile.selected {
+      box-shadow: 0 0 0 2px #39A596, 0 8px 24px rgba(57,165,150,0.25);
+    }
+    .mn-edit-option-tile.selected::after {
+      content: '\2713';
+      position: absolute; top: 7px; right: 8px;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #39A596; color: #000;
+      font-size: 10px; font-weight: 900; line-height: 18px;
+    }
+    .mn-edit-tile-emoji {
+      font-size: 26px; line-height: 1;
+      display: flex; align-items: center; justify-content: center;
+      width: 44px; height: 44px; border-radius: 12px;
+      flex-shrink: 0; transition: transform 0.2s;
+    }
+    .mn-edit-tile-emoji svg { width: 28px; height: 28px; }
+    .mn-edit-option-tile:hover .mn-edit-tile-emoji { transform: scale(1.15); }
+    .mn-edit-tile-label {
+      font-size: 11px; font-weight: 800; color: #fff;
+      line-height: 1.3; letter-spacing: 0.01em;
+    }
+    .mn-edit-tile-sub {
+      font-size: 9px; color: rgba(255,255,255,0.4);
+      line-height: 1.3;
+    }
+
+    /* ── Skin tone MST row ── */
+    .mn-edit-mst-row {
+      display: flex; gap: 6px; flex-wrap: wrap;
+      justify-content: center; padding: 8px 0 28px;
+    }
+    .mn-edit-mst-swatch {
+      width: 42px; height: 42px; border-radius: 50%; cursor: pointer;
+      border: 3px solid transparent; transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; position: relative;
+    }
+    .mn-edit-mst-swatch:hover { transform: scale(1.2); z-index: 1; }
+    .mn-edit-mst-swatch.selected {
+      border-color: #fff;
+      box-shadow: 0 0 0 3px #39A596, 0 0 20px rgba(57,165,150,0.6);
+      transform: scale(1.25);
+    }
+
+    /* ── Color tile grid ── */
+    .mn-edit-color-tile {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 12px;
+      background: rgba(255,255,255,0.03);
+      border: 1.5px solid rgba(255,255,255,0.07);
+      border-radius: 10px; cursor: pointer;
+      transition: all 0.18s; text-align: left;
+    }
+    .mn-edit-color-tile:hover { border-color: rgba(255,255,255,0.2); transform: translateY(-1px); }
+    .mn-edit-color-tile.selected {
+      border-color: #39A596;
+      background: rgba(57,165,150,0.1);
+      box-shadow: 0 0 0 1px #39A596;
+    }
+    .mn-edit-color-swatch {
+      width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
+      border: 2px solid rgba(255,255,255,0.18);
+    }
+    .mn-edit-color-name { font-size: 11px; font-weight: 700; color: #fff; }
+    /* Color swatch tile variant */
+    .mn-edit-color-tile {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1.5px solid rgba(255,255,255,0.08);
+      border-radius: 10px; cursor: pointer;
+      transition: all 0.2s; text-align: left;
+    }
+    .mn-edit-color-tile:hover { border-color: rgba(57,165,150,0.4); }
+    .mn-edit-color-tile.selected { border-color: #39A596; background: rgba(57,165,150,0.1); }
+    .mn-edit-color-swatch { width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0; border: 2px solid rgba(255,255,255,0.15); }
+    .mn-edit-color-name { font-size: 12px; font-weight: 600; color: #fff; }
+    /* Skin tone swatch row */
+    .mn-edit-mst-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; justify-content: center; }
+    .mn-edit-mst-swatch {
+      width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
+      border: 3px solid transparent; transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .mn-edit-mst-swatch:hover { transform: scale(1.18); }
+    .mn-edit-mst-swatch.selected { border-color: #fff; box-shadow: 0 0 0 3px #39A596, 0 0 16px rgba(57,165,150,0.5); transform: scale(1.22); }
+
+    /* ── legacy edit-hint hidden (replaced by mn-card-edit-btn) ── */
+    .edit-hint {
+      display: inline-block;
+      font-size: 9px;
+      color: rgba(57,165,150,0.6);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-left: 4px;
+      vertical-align: middle;
+      transition: color 0.2s;
+    }
+    .stat-card:hover .edit-hint, .detail-card:hover .edit-hint { color: #39A596; }
+
+    /* ── Glass Edit Modal ── */
+    .mn-edit-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(8px);
+      z-index: 99999;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .mn-edit-modal-overlay.active { display: flex; }
+    .mn-edit-modal {
+      background: linear-gradient(135deg, #080808 0%, #111 100%);
+      border: 1px solid rgba(57,165,150,0.4);
+      border-radius: 20px;
+      padding: 28px 24px;
+      max-width: 460px;
+      width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: 0 0 60px rgba(57,165,150,0.3), 0 20px 60px rgba(0,0,0,0.8);
+      animation: mnModalZoom 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    @keyframes mnModalZoom { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .mn-edit-modal-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+    .mn-edit-modal-sub {
+      font-size: 12px;
+      color: rgba(255,255,255,0.45);
+      margin-bottom: 20px;
+    }
+    .mn-edit-chip-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .mn-edit-chip {
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      color: rgba(255,255,255,0.8);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      text-align: center;
+    }
+    .mn-edit-chip:hover { border-color: #39A596; background: rgba(57,165,150,0.12); color: #fff; }
+    .mn-edit-chip.selected { background: rgba(57,165,150,0.2); border-color: #39A596; color: #4fffd9; font-weight: 700; box-shadow: 0 0 12px rgba(57,165,150,0.3); }
+    .mn-edit-chip-single { grid-column: 1 / -1; }
+    .mn-edit-custom-input {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 10px;
+      padding: 12px 16px;
+      color: #fff;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.3s;
+      margin-bottom: 16px;
+      box-sizing: border-box;
+    }
+    .mn-edit-custom-input:focus { border-color: #39A596; box-shadow: 0 0 0 3px rgba(57,165,150,0.1); }
+    .mn-edit-modal-actions { display: flex; gap: 10px; }
+    .mn-edit-save-btn {
+      flex: 1;
+      padding: 12px;
+      background: linear-gradient(135deg, #39A596, #2d8578);
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .mn-edit-save-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(57,165,150,0.4); }
+    .mn-edit-cancel-btn {
+      padding: 12px 20px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      color: rgba(255,255,255,0.5);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .mn-edit-cancel-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+    /* ── Closet Panel (inline, below profile) ── */
+    .mn-dashboard-panel {
+      display: none;
+      margin-top: 20px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(57,165,150,0.2);
+      border-radius: 16px;
+      padding: 20px;
+      animation: mnModalZoom 0.3s ease;
+    }
+    .mn-dashboard-panel.active { display: block; }
+    .mn-panel-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #39A596;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .mn-panel-close {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.4);
+      font-size: 18px;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .mn-panel-close:hover { color: #fff; }
+
+    /* Closet grid inside panel */
+    .mn-panel-closet-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 10px;
+    }
+    .mn-panel-closet-card {
+      background: rgba(57,165,150,0.06);
+      border: 1px solid rgba(57,165,150,0.2);
+      border-radius: 14px;
+      padding: 12px 8px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+    .mn-panel-closet-card:hover { border-color: #39A596; transform: translateY(-2px); background: rgba(57,165,150,0.12); }
+    .mn-panel-closet-emoji { font-size: 32px; margin-bottom: 6px; }
+    .mn-panel-closet-name { font-size: 10px; font-weight: 700; color: #fff; margin-bottom: 3px; line-height: 1.3; }
+    .mn-panel-closet-meta { font-size: 9px; color: rgba(57,165,150,0.8); }
+    .mn-panel-section-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #39A596;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin: 16px 0 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(57,165,150,0.15);
+    }
+
+    /* Past Looks panel */
+    .mn-panel-look-card {
+      background: rgba(139,92,246,0.06);
+      border: 1px solid rgba(139,92,246,0.2);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 10px;
+      transition: all 0.3s ease;
+    }
+    .mn-panel-look-card:hover { border-color: rgba(139,92,246,0.5); transform: translateY(-1px); }
+    .mn-panel-look-date { font-size: 10px; color: rgba(255,255,255,0.4); margin-bottom: 6px; }
+    .mn-panel-look-direction { font-size: 13px; font-style: italic; color: #e2e8f0; margin-bottom: 10px; line-height: 1.5; }
+    .mn-panel-look-pieces { display: flex; flex-wrap: wrap; gap: 5px; }
+    .mn-panel-look-piece { background: rgba(255,255,255,0.06); border-radius: 20px; padding: 2px 9px; font-size: 10px; color: #aaa; }
+    .mn-panel-look-piece.owned { background: rgba(57,165,150,0.15); color: #4fffd9; }
+
+    @media (max-width: 768px) {
+      .profile-top-row { flex-direction: column; align-items: center; text-align: center; }
+      .profile-name-section { width: 100%; display: flex; flex-direction: column; align-items: center; }
+      .quick-stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .profile-details-grid { grid-template-columns: 1fr; }
+      .mn-edit-chip-grid { grid-template-columns: 1fr; }
+      .mn-panel-closet-grid { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); }
+    }
+  </style>
+
+  <!-- Glass Edit Modal -->
+  <div class="mn-edit-modal-overlay" id="mnEditModalOverlay">
+    <div class="mn-edit-modal" id="mnEditModal">
+      <div class="mn-edit-modal-title" id="mnEditModalTitle">Edit</div>
+      <div class="mn-edit-modal-sub" id="mnEditModalSub">Choose an option or type a custom value</div>
+      <div class="mn-edit-chip-grid" id="mnEditChipGrid"></div>
+      <input class="mn-edit-custom-input" id="mnEditCustomInput" type="text" placeholder="Or type a custom value…">
+      <div class="mn-edit-modal-actions">
+        <button class="mn-edit-cancel-btn" id="mnEditCancelBtn">Cancel</button>
+        <button class="mn-edit-save-btn" id="mnEditSaveBtn">Save ✓</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ─── MN_CONFIG fallback (widget section may not be loaded) ──
+    window.MN_CONFIG = window.MN_CONFIG || {};
+    window.MN_CONFIG.physiqueApiUrl = window.MN_CONFIG.physiqueApiUrl || 'https://mynarrative-ai.vercel.app/api/physique_analyze';
+
+    // ─── Helpers ──────────────────────────────────────────────
+    function getProfile()  { try { return JSON.parse(localStorage.getItem('mn_core_identity') || '{}'); } catch(e) { return {}; } }
+    function saveProfile(p){ localStorage.setItem('mn_core_identity', JSON.stringify(p)); window.dispatchEvent(new CustomEvent('mn-identity-updated')); }
+    function getCloset()   { try { return JSON.parse(localStorage.getItem('mn_digital_closet') || '[]'); } catch(e) { return []; } }
+    function getHistory()  { try { return JSON.parse(localStorage.getItem('mn_outfit_history') || '[]'); } catch(e) { return []; } }
+
+    // --- Garment Emoji Map + Helper ---
+    const GARMENT_EMOJI_MAP = {
+      'T-Shirt':'\uD83D\uDC55','Shirt':'\uD83D\uDC54','Kurta':'\uD83D\uDC58','Dress':'\uD83D\uDC57',
+      'Saree':'\uD83E\uDD7B','Jeans':'\uD83D\uDC56','Shorts':'\uD83E\uDE73','Jacket':'\uD83E\uDDE5',
+      'Sneakers':'\uD83D\uDC5F','Shoes':'\uD83D\uDC5E','Boots':'\uD83E\uDD7E','Bag':'\uD83D\uDC5C',
+      'Watch':'\u231A','Cap':'\uD83E\uDDE2','Hat':'\uD83C\uDFA9','Scarf':'\uD83E\uDDE3','default':'\uD83D\uDC55'
+    };
+    function getItemEmoji(item) {
+      const name = (item.name||item.original_name||item.label||'').trim();
+      const lookup = k => Object.keys(GARMENT_EMOJI_MAP).find(key => key.toLowerCase() === k.toLowerCase());
+      const direct = lookup(name); if (direct) return GARMENT_EMOJI_MAP[direct];
+      for (const word of name.split(/\s+/)) { const m = lookup(word); if (m) return GARMENT_EMOJI_MAP[m]; }
+      const section = item.closet_section || item.category || '';
+      return GARMENT_EMOJI_MAP[section] || GARMENT_EMOJI_MAP.default;
+    }
+
+// ─── Selfie Upload ────────────────────────────────────────
+    // -- Magic Upload: POST to AI API, auto-fill all stat/detail cards --
+    async function handleSelfieUpload(input) {
+      if (!input.files || !input.files[0]) return;
+      const file = input.files[0];
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        const imageData = e.target.result;
+        const raw_b64   = imageData.replace(/^data:image\/\w+;base64,/, '');
+
+        // Show avatar immediately
+        document.getElementById('avatarImage').src = imageData;
+        document.getElementById('avatarImage').style.display = 'block';
+        document.getElementById('avatarPlaceholder').style.display = 'none';
+
+        // Loading state
+        const avatar      = document.getElementById('profileAvatar');
+        const uploadPrompt = document.querySelector('.profile-upload-prompt');
+        if (avatar)       { avatar.style.opacity = '0.6'; avatar.style.pointerEvents = 'none'; }
+        if (uploadPrompt)  uploadPrompt.textContent = '⚡ AI is analysing your style...';
+
+        // Use advanced analysis with 20-30 hidden data points
+        await mnAnalyzePhotoAdvanced(raw_b64);
+
+        if (avatar) { avatar.style.opacity = '1'; avatar.style.pointerEvents = ''; }
+        input.value = '';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // -- Refresh all stat/detail card DOM values from profile object --
+    function mnRefreshStatCards(profile) {
+      const set = (id, val) => { const el = document.getElementById(id); if (el && val) el.textContent = val; };
+      set('statHeight',      profile.height    || '-');
+      set('statBodyType',    profile.build     || '-');
+      set('statSkinTone',    profile.skinTone  || '-');
+      set('statTemperature', profile.climate   || '-');
+      set('statPriceRange',  profile.budget    || '-');
+      set('detailGoals',     profile.goals     || '-');
+      set('detailStyle',     profile.coreExpression || '-');
+      set('detailOccasion',  profile.occasion  || '-');
+      set('detailUndertone', profile.undertone || '-');
+      set('detailRegion',    profile.region || profile.location || '-');
+      const colors = profile.favoriteColors;
+      set('detailColors', Array.isArray(colors) ? colors.join(', ') : (colors || '-'));
+    }
+
+    // -- Handle arrival from widget profile ring click --
+    function mnHandleWidgetArrival() {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('mn_focus') !== 'profile') return;
+      window.history.replaceState({}, '', window.location.pathname);
+
+      setTimeout(() => {
+        const sec = document.getElementById('userProfileSection');
+        if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 200);
+
+      const profile = getProfile();
+      if (!profile.selfieUploaded && !profile.uploadedImage) {
+        setTimeout(() => {
+          const avatar       = document.getElementById('profileAvatar');
+          const uploadPrompt = document.querySelector('.profile-upload-prompt');
+          if (avatar) {
+            avatar.style.animation = 'mnAvatarPulse 1.2s ease-in-out 4';
+            avatar.style.border    = '2.5px solid #39A596';
+          }
+          if (uploadPrompt) {
+            uploadPrompt.textContent  = '?? Upload photo � AI fills everything!';
+            uploadPrompt.style.color  = '#39A596';
+            uploadPrompt.style.fontWeight = '800';
+          }
+          // Auto-open file picker
+          setTimeout(() => document.getElementById('selfieUploadInput').click(), 1500);
+          setTimeout(() => {
+            if (avatar) avatar.style.animation = '';
+            if (uploadPrompt) { uploadPrompt.textContent = '?? Click to update photo'; uploadPrompt.style.fontWeight = ''; }
+          }, 5500);
+        }, 600);
+      }
+    }
+
+    // -- Chatbot ? Dashboard live sync --
+    window.addEventListener('mn-chatbot-save', function(e) {
+      if (!e.detail) return;
+      const updates = e.detail;
+      const p = getProfile();
+      // Core visible fields
+      if (updates.height_cm)     p.height         = updates.height_cm + ' cm';
+      if (updates.preferred_fit) p.build          = updates.preferred_fit;
+      if (updates.skin_label)    p.skinTone       = updates.skin_label;
+      if (updates.hair_style)    p.hairStyle      = updates.hair_style;
+      if (updates.gender)        p.gender         = updates.gender;
+      if (updates.weather && updates.weather.city) p.climate = updates.weather.city + (updates.weather.temp ? ' ' + Math.round(updates.weather.temp) + '�C' : '');
+      if (updates.price_min && updates.price_max)  p.budget  = '?' + Number(updates.price_min).toLocaleString('en-IN') + '�?' + Number(updates.price_max).toLocaleString('en-IN');
+      if (updates.style_vibes && updates.style_vibes.length) p.coreExpression = updates.style_vibes.join(', ');
+      if (updates.occasions   && updates.occasions.length)   p.occasion       = updates.occasions.join(', ');
+      if (updates.ai_metrics)    p.ai_metrics = Object.assign(p.ai_metrics || {}, updates.ai_metrics);
+      // Physique analysis fields from widget mnSyncPhysiqueAnalysis
+      if (updates.undertone)        p.undertone      = updates.undertone;
+      if (updates.skin_mst)         p.skinMST        = updates.skin_mst;
+      if (updates.face_shape)       p.faceShape      = updates.face_shape;
+      if (updates.eye_color)        p.eyeColor       = updates.eye_color;
+      if (updates.hair_color)       p.hairColor      = updates.hair_color;
+      if (updates.hair_texture)     p.hairTexture    = updates.hair_texture;
+      if (updates.seasonal_color)   p.seasonalColor  = updates.seasonal_color;
+      if (updates.style_archetype)  p.styleArchetype = updates.style_archetype;
+      if (updates.age_range)        p.ageRange       = updates.age_range;
+      if (updates.body_composition) p.bodyComposition= updates.body_composition;
+      if (updates.ai_confidence)    p.aiConfidence   = updates.ai_confidence;
+      // Store all hidden data for AI recommendations context
+      if (window.MN_USER) {
+        window.MN_USER.hidden_data = Object.assign(window.MN_USER.hidden_data || {}, updates);
+      }
+      p.chatbot_synced_at = new Date().toISOString();
+      p.ai_analyzed = true;
+      mnRefreshStatCards(p);
+      if (typeof mnUpdateProgress === 'function') mnUpdateProgress(p);
+      saveProfile(p);
+    });
+
+    // -- Cross-tab storage sync (chatbot widget open in another tab) --
+    window.addEventListener('storage', function(e) {
+      if (e.key === 'mn_identity' && e.newValue) {
+        try {
+          const src = JSON.parse(e.newValue);
+          const p   = getProfile();
+          if (src.height_cm)     p.height         = src.height_cm + ' cm';
+          if (src.preferred_fit) p.build          = src.preferred_fit;
+          if (src.skin_label)    p.skinTone       = src.skin_label;
+          if (src.style_vibes && src.style_vibes.length) p.coreExpression = src.style_vibes.join(', ');
+          if (src.occasions   && src.occasions.length)   p.occasion       = src.occasions.join(', ');
+          if (src.price_min && src.price_max) p.budget = '?' + Number(src.price_min).toLocaleString('en-IN') + '�?' + Number(src.price_max).toLocaleString('en-IN');
+          mnRefreshStatCards(p);
+          localStorage.setItem('mn_core_identity', JSON.stringify(p));
+        } catch(err) {}
+      }
+      if (e.key === 'mn_core_identity' && e.newValue) {
+        try { mnRefreshStatCards(JSON.parse(e.newValue)); } catch(err) {}
+      }
+    });
+
+    // ─── Glass Edit Modal ─────────────────────────────────────
+    const TILE_DATA = {
+  height: { title:"Your Height", sub:"Drag the slider", multi:false, type:"height_slider", options:[] },
+  build: { title:"Body Type", sub:"How would you describe your build?", multi:false, type:"tiles", options:[
+    {val:"Slim",       label:"Slim",        sub:"Lean & narrow frame",    svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 50" fill="none" stroke="currentColor" stroke-width="2"><circle cx="20" cy="8" r="5"/><path d="M20 13v12M12 18h16M14 25v15M26 25v15"/></svg>', color:"#60A5FA"},
+    {val:"Athletic",   label:"Athletic",    sub:"Toned & active build",   svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 50" fill="none" stroke="currentColor" stroke-width="2"><circle cx="20" cy="8" r="5"/><path d="M20 13v12M10 18h20M12 25v15M28 25v15M14 35l4 8 4-8 4 8 4-8"/></svg>', color:"#10B981"},
+    {val:"Average",    label:"Average",     sub:"Balanced proportions",   svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 50" fill="none" stroke="currentColor" stroke-width="2"><circle cx="20" cy="8" r="5"/><path d="M20 13v12M12 18h16M14 25v15M26 25v15"/></svg>', color:"#6366F1"},
+    {val:"Muscular",   label:"Muscular",    sub:"Broad & defined",        svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 50" fill="none" stroke="currentColor" stroke-width="2"><circle cx="20" cy="8" r="5"/><path d="M20 13v12M8 16h24M10 25v15M30 25v15"/></svg>', color:"#EF4444"},
+    {val:"Broad",      label:"Broad",       sub:"Wide shoulder frame",    svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 50" fill="none" stroke="currentColor" stroke-width="2"><circle cx="20" cy="8" r="5"/><path d="M20 13v12M6 16h28M10 25v15M30 25v15"/></svg>', color:"#F97316"},
+    {val:"Plus Size",  label:"Plus Size",   sub:"Fuller curvy frame",     svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 50" fill="none" stroke="currentColor" stroke-width="2"><circle cx="20" cy="9" r="5"/><path d="M20 14v10M8 18h24M10 24v16M30 24v16"/></svg>', color:"#EC4899"},
+    {val:"Petite",     label:"Petite",      sub:"Small & compact",        svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 50" fill="none" stroke="currentColor" stroke-width="2"><circle cx="20" cy="8" r="4"/><path d="M20 12v8M14 16h12M15 20v12M25 20v12"/></svg>', color:"#8B5CF6"},
+    {val:"Tall & Lean",label:"Tall & Lean", sub:"Height + slim build",    svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 50" fill="none" stroke="currentColor" stroke-width="2"><circle cx="20" cy="6" r="4"/><path d="M20 10v16M14 20h12M15 26v18M25 26v18"/></svg>', color:"#14B8A6"}
+  ]},
+  skinTone: { title:"Skin Tone", sub:"Tap your shade — Monk Scale MST 1–10", multi:false, type:"mst", options:[
+    {val:"Very Light",  label:"Very Light",  mst:1,  hex:"#f6ede4"},
+    {val:"Light",       label:"Light",       mst:2,  hex:"#f3e7db"},
+    {val:"Light Medium",label:"Light Medium",mst:3,  hex:"#f7ead0"},
+    {val:"Medium Light",label:"Medium Light",mst:4,  hex:"#eadaba"},
+    {val:"Medium",      label:"Medium",      mst:5,  hex:"#d7bd96"},
+    {val:"Medium Dark", label:"Medium Dark", mst:6,  hex:"#a07850"},
+    {val:"Dark",        label:"Dark",        mst:7,  hex:"#825c43"},
+    {val:"Very Dark",   label:"Very Dark",   mst:8,  hex:"#604134"},
+    {val:"Deep",        label:"Deep",        mst:9,  hex:"#3a312a"},
+    {val:"Deepest",     label:"Deepest",     mst:10, hex:"#292420"}
+  ]},
+  climate: { title:"Your Climate", sub:"What weather do you mostly dress for?", multi:false, type:"tiles", options:[
+    {val:"Hot & Humid",   label:"Hot & Humid",  sub:"Tropical summer heat", emoji:"🌴",      color:"#F59E0B"},
+    {val:"Tropical",      label:"Tropical",      sub:"Warm all year round",  emoji:"☀️",       color:"#F97316"},
+    {val:"Dry Heat",      label:"Dry Heat",      sub:"Desert-like warmth",   emoji:"🏜️",    color:"#EF4444"},
+    {val:"Mild",          label:"Mild",          sub:"Pleasant & moderate",  emoji:"🌤️", color:"#10B981"},
+    {val:"Cool",          label:"Cool",          sub:"Light jacket weather", emoji:"🍂",    color:"#60A5FA"},
+    {val:"Cold",          label:"Cold",          sub:"Winters & layers",     emoji:"❄️", color:"#3B82F6"},
+    {val:"Monsoon",       label:"Monsoon",       sub:"Rainy season dressing",emoji:"🌧️",      color:"#6366F1"},
+    {val:"Mixed Seasons", label:"All Seasons",   sub:"Four seasons",         emoji:"🌈",   color:"#8B5CF6"}
+  ]},
+  budget: { title:"Budget Range", sub:"Drag to set your per-outfit sweet spot", multi:false, type:"budget_slider", options:[] },
+  goals: { title:"Fashion Goals", sub:"Pick all that resonate — multi-select", multi:true, type:"tiles", options:[
+    {val:"Look more confident",      label:"Confidence",      sub:"Own every room",        emoji:"👑",     color:"#F59E0B"},
+    {val:"Dress for my body",        label:"Body Flattering", sub:"Work with my shape",    emoji:"🪪",    color:"#EC4899"},
+    {val:"Build a capsule wardrobe", label:"Capsule Kit",     sub:"Less but better",       emoji:"🧳",       color:"#6366F1"},
+    {val:"Stand out in a crowd",     label:"Stand Out",       sub:"Bold & memorable",      emoji:"🎯",    color:"#EF4444"},
+    {val:"Look professional",        label:"Professional",    sub:"Sharp at work",         emoji:"💼", color:"#1D4ED8"},
+    {val:"Be more sustainable",      label:"Sustainable",     sub:"Mindful choices",       emoji:"🌿",      color:"#10B981"},
+    {val:"Express my personality",   label:"Self Expression", sub:"Wear my story",         emoji:"🎨",   color:"#8B5CF6"},
+    {val:"Dress more traditionally", label:"Heritage Style",  sub:"Ethnic & roots",        emoji:"🪴",      color:"#F97316"}
+  ]},
+  favoriteColors: { title:"Favourite Colors", sub:"Tap all you love — multi-select", multi:true, type:"colors", options:[
+    {val:"Black",      label:"Black",         hex:"#111111"},
+    {val:"White",      label:"White",         hex:"#E5E5E5"},
+    {val:"Navy",       label:"Navy",          hex:"#1E3A5F"},
+    {val:"Beige",      label:"Beige",         hex:"#D4B896"},
+    {val:"Olive",      label:"Olive",         hex:"#6B7C32"},
+    {val:"Grey",       label:"Grey",          hex:"#9CA3AF"},
+    {val:"Brown",      label:"Brown",         hex:"#92400E"},
+    {val:"Maroon",     label:"Maroon",        hex:"#7F1D1D"},
+    {val:"Teal",       label:"Teal",          hex:"#0D9488"},
+    {val:"Mustard",    label:"Mustard",       hex:"#D97706"},
+    {val:"Rust",       label:"Rust",          hex:"#C2410C"},
+    {val:"Coral",      label:"Coral",         hex:"#F87171"},
+    {val:"Blush Pink", label:"Blush Pink",    hex:"#FBCFE8"},
+    {val:"Lavender",   label:"Lavender",      hex:"#C4B5FD"},
+    {val:"Royal Blue", label:"Royal Blue",    hex:"#1D4ED8"},
+    {val:"Emerald",    label:"Emerald Green", hex:"#059669"}
+  ]},
+  coreExpression: { title:"Style Identities", sub:"Select all that define you — multi-select", multi:true, type:"tiles", options:[
+    {val:"Minimalist & Clean",   label:"Minimalist",    sub:"Neutral, clean lines",      emoji:"🤍", color:"#D1D5DB"},
+    {val:"Bold & Expressive",    label:"Bold",          sub:"Colour & statement",        emoji:"🎭",      color:"#EF4444"},
+    {val:"Traditional & Ethnic", label:"Ethnic",        sub:"Roots & culture",           emoji:"🪷",      color:"#F59E0B"},
+    {val:"Smart Casual",         label:"Smart Casual",  sub:"Elevated everyday",         emoji:"☕",     color:"#39A596"},
+    {val:"Streetwear",           label:"Streetwear",    sub:"Hoodies & sneakers",        emoji:"🛹",      color:"#6366F1"},
+    {val:"Business Formal",      label:"Formal",        sub:"Suits & blazers",           emoji:"💼",  color:"#1E40AF"},
+    {val:"Boho & Free",          label:"Boho",          sub:"Flowy & earthy",            emoji:"🌻",  color:"#D97706"},
+    {val:"Dark & Edgy",          label:"Dark & Edgy",   sub:"Black, leather, attitude",  emoji:"🖤", color:"#374151"}
+  ]},
+  occasion: { title:"Go-to Occasions", sub:"Select all that apply — multi-select", multi:true, type:"tiles", options:[
+    {val:"Daily Casual",       label:"Daily Casual",  sub:"Comfort every day",    emoji:"🏠",      color:"#39A596"},
+    {val:"College / Campus",   label:"College",       sub:"Campus-ready",         emoji:"🎓",    color:"#6366F1"},
+    {val:"Office / Workwear",  label:"Office",        sub:"Professional",         emoji:"💼", color:"#1E3A5F"},
+    {val:"Festive & Weddings", label:"Festive",       sub:"Celebrations",         emoji:"🎉",     color:"#F59E0B"},
+    {val:"DATE",         label:"DATE",    sub:"Evening looks",        emoji:"&#x1F495;",      color:"#EC4899"},
+    {val:"Party / Nightout",   label:"Party",         sub:"Nightlife vibes",      emoji:"🎶",     color:"#8B5CF6"},
+    {val:"Outdoor / Travel",   label:"Travel",        sub:"Adventure wear",       emoji:"✈️",     color:"#10B981"},
+    {val:"Sports / Gym",       label:"Gym",           sub:"Performance wear",     emoji:"🏋️",       color:"#EF4444"}
+  ]},
+  region: { title:"Region / City", sub:"Where are you based? Helps with weather & local trends.", multi:false, type:"input", options:[] },
+  undertone: { title:"Skin Undertone", sub:"This determines which colours flatter you most", multi:false, type:"tiles", options:[
+    {val:"Warm (yellow/golden)", label:"Warm",     sub:"Gold, orange & reds work best",     emoji:"🌅", color:"#F59E0B"},
+    {val:"Cool (pink/bluish)",   label:"Cool",     sub:"Blues, purples & silver work best", emoji:"🌊",    color:"#60A5FA"},
+    {val:"Neutral (balanced)",   label:"Neutral",  sub:"Most colours work well for you",    emoji:"⚖️",  color:"#9CA3AF"},
+    {val:"Olive (green-ish)",    label:"Olive",    sub:"Earth tones & greens work best",    emoji:"🌿",    color:"#6B7C32"},
+    {val:"Not sure",             label:"Not Sure", sub:"Let the AI decide",                 emoji:"🤖",   color:"#39A596"}
+  ]}
+};
+
+    // SVG icons replaced with emoji tiles
+
+
+    let _currentField = null, _currentProfileKey = null, _isMulti = false, _selectedValues = [];
+
+    function openEditModal(profileKey, displayElId) {
+      const cfg = TILE_DATA[profileKey];
+      if (!cfg) return;
+      _currentField = displayElId; _currentProfileKey = profileKey;
+      _isMulti = cfg.multi; _selectedValues = [];
+      const p = getProfile();
+      const current = _isMulti
+        ? (Array.isArray(p[profileKey]) ? p[profileKey] : (p[profileKey] ? [p[profileKey]] : []))
+        : (p[profileKey] || '');
+
+      document.getElementById('mnEditModalTitle').textContent = cfg.title;
+      document.getElementById('mnEditModalSub').textContent   = cfg.sub;
+      document.getElementById('mnEditCustomInput').value = _isMulti ? '' : (current || '');
+      document.getElementById('mnEditCustomInput').placeholder = cfg.type === 'input' ? 'Type your city or region...' : 'Or type a custom value...';
+      document.getElementById('mnEditCustomInput').style.display = (cfg.type === 'input' || cfg.options.length === 0) ? '' : 'none';
+
+      const grid = document.getElementById('mnEditChipGrid');
+      grid.innerHTML = '';
+      _selectedValues = _isMulti ? [...current] : [];
+
+      if (cfg.type === 'mst') {
+        // Skin tone: large swatch circles + MST number
+        grid.style.gridTemplateColumns = '1fr';
+        const row = document.createElement('div');
+        row.className = 'mn-edit-mst-row';
+        cfg.options.forEach(opt => {
+          const sw = document.createElement('div');
+          sw.className = 'mn-edit-mst-swatch' + (current === opt.val ? ' selected' : '');
+          sw.style.cssText = 'background:' + opt.hex + ';position:relative';
+          sw.title = 'MST ' + opt.mst + ' — ' + opt.label;
+          const num = document.createElement('span');
+          num.style.cssText = 'position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-size:8px;color:rgba(255,255,255,0.45);white-space:nowrap;font-weight:700';
+          num.textContent = opt.mst;
+          sw.appendChild(num);
+          sw.addEventListener('click', () => {
+            row.querySelectorAll('.mn-edit-mst-swatch').forEach(s => s.classList.remove('selected'));
+            sw.classList.add('selected');
+            document.getElementById('mnEditCustomInput').style.display = '';
+            document.getElementById('mnEditCustomInput').value = opt.val;
+          });
+          row.appendChild(sw);
+        });
+        grid.appendChild(row);
+        const swatchLabel = document.createElement('div');
+        swatchLabel.style.cssText = 'font-size:11px;color:rgba(255,255,255,0.4);text-align:center;margin-top:26px;margin-bottom:4px';
+        swatchLabel.textContent = 'Tap your skin tone above';
+        grid.appendChild(swatchLabel);
+        grid.style.gridTemplateColumns = '';
+        document.getElementById('mnEditCustomInput').style.display = 'none';
+
+      } else if (cfg.type === 'colors') {
+        // Colors: 2-column color swatch + name tiles
+        grid.style.gridTemplateColumns = '1fr 1fr';
+        cfg.options.forEach(opt => {
+          const tile = document.createElement('div');
+          const sel = _isMulti ? current.includes(opt.val) : current === opt.val;
+          tile.className = 'mn-edit-color-tile' + (sel ? ' selected' : '');
+          tile.innerHTML = '<div class="mn-edit-color-swatch" style="background:' + opt.hex + '"></div><span class="mn-edit-color-name">' + opt.label + '</span>';
+          if (_isMulti && sel) _selectedValues.push(opt.val);
+          tile.addEventListener('click', () => {
+            if (_isMulti) {
+              tile.classList.toggle('selected');
+              if (tile.classList.contains('selected')) { if (!_selectedValues.includes(opt.val)) _selectedValues.push(opt.val); }
+              else { _selectedValues = _selectedValues.filter(v => v !== opt.val); }
+            } else {
+              grid.querySelectorAll('.mn-edit-color-tile').forEach(t => t.classList.remove('selected'));
+              tile.classList.add('selected');
+              document.getElementById('mnEditCustomInput').value = opt.val;
+            }
+          });
+          grid.appendChild(tile);
+        });
+        document.getElementById('mnEditCustomInput').style.display = 'none';
+
+
+      } else if (cfg.type === 'height_slider') {
+        grid.style.gridTemplateColumns = '1fr';
+        document.getElementById('mnEditCustomInput').style.display = 'none';
+        const curH = parseInt(p['height']) || 170;
+        const toFt = cm => { const i = Math.round(cm/2.54); return Math.floor(i/12)+"'"+i%12+'"'; };
+        grid.innerHTML = '<div style="text-align:center;margin-bottom:20px">' +
+          '<div style="font-size:52px;font-weight:900;color:#fff;letter-spacing:-0.04em" id="mnHSliderVal">' + curH + '</div>' +
+          '<div style="font-size:14px;color:#39A596;font-weight:700" id="mnHSliderFt">' + toFt(curH) + '</div>' +
+          '<div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:4px">cm</div></div>' +
+          '<input type="range" id="mnHeightSlider" min="140" max="220" value="' + curH + '" step="1" style="width:100%;-webkit-appearance:none;height:6px;border-radius:99px;background:linear-gradient(90deg,#39A596 ' + Math.round(((curH-140)/80)*100) + '%,rgba(255,255,255,0.1) 0);outline:none;cursor:pointer;margin:10px 0"/>' +
+          '<div style="display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,0.35);margin-top:6px"><span>140cm</span><span>220cm</span></div>' +
+          '<style>#mnHeightSlider::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:#39A596;cursor:pointer;box-shadow:0 0 14px rgba(57,165,150,0.6);border:2px solid rgba(255,255,255,0.2)}</style>';
+        const sl = grid.querySelector('#mnHeightSlider');
+        const vd = grid.querySelector('#mnHSliderVal');
+        const fd = grid.querySelector('#mnHSliderFt');
+        if (sl) sl.addEventListener('input', function() {
+          const v = parseInt(this.value);
+          vd.textContent = v; fd.textContent = toFt(v);
+          this.style.background = 'linear-gradient(90deg,#39A596 ' + Math.round(((v-140)/80)*100) + '%,rgba(255,255,255,0.1) 0)';
+          _selectedValues = [v + ' cm'];
+        });
+        _selectedValues = [curH + ' cm'];
+
+      } else if (cfg.type === 'budget_slider') {
+        grid.style.gridTemplateColumns = '1fr';
+        document.getElementById('mnEditCustomInput').style.display = 'none';
+        const pStr = (p['budget'] || '').replace(/[^0-9,]/g,'').split(',');
+        let minV = parseInt(pStr[0]) || 1000, maxV = parseInt(pStr[1]) || 8000;
+        const toDisp = v => v >= 1000 ? '₹' + (v/1000).toFixed(v%1000===0?0:1) + 'K' : '₹' + v;
+        const presets = [{l:'Under ₹1K',mn:500,mx:1000},{l:'₹1K–3K',mn:1000,mx:3000},{l:'₹3K–7K',mn:3000,mx:7000},{l:'₹7K–15K',mn:7000,mx:15000},{l:'₹15K–30K',mn:15000,mx:30000},{l:'₹30K+',mn:30000,mx:50000}];
+        grid.innerHTML = '<div style="text-align:center;margin-bottom:16px">' +
+          '<div style="font-size:24px;font-weight:900;color:#39A596" id="mnBudgetDisp">' + toDisp(minV) + ' – ' + toDisp(maxV) + '</div>' +
+          '<div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px">per outfit</div></div>' +
+          '<div style="position:relative;height:6px;background:rgba(255,255,255,0.1);border-radius:99px;margin:24px 0 8px">' +
+          '<div id="mnBFill" style="position:absolute;height:100%;background:linear-gradient(90deg,#39A596,#2dd4bf);border-radius:99px"></div>' +
+          '<input type="range" id="mnBMin" min="500" max="50000" value="'+minV+'" step="500" style="position:absolute;width:100%;-webkit-appearance:none;background:transparent;height:6px;pointer-events:none;top:0;margin:0"/>' +
+          '<input type="range" id="mnBMax" min="500" max="50000" value="'+maxV+'" step="500" style="position:absolute;width:100%;-webkit-appearance:none;background:transparent;height:6px;pointer-events:none;top:0;margin:0"/>' +
+          '<style>#mnBMin::-webkit-slider-thumb,#mnBMax::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#39A596;cursor:pointer;pointer-events:all;box-shadow:0 0 10px rgba(57,165,150,0.5)}</style></div>' +
+          '<div style="display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,0.35);margin-bottom:20px"><span>₹500</span><span>₹50K+</span></div>' +
+          '<div style="display:flex;flex-wrap:wrap;gap:6px">' + presets.map(function(pr){ return '<button onclick="mnBPreset(' + pr.mn + ',' + pr.mx + ')" style="font-size:11px;font-weight:700;padding:6px 12px;border-radius:99px;border:1.5px solid rgba(255,255,255,0.1);background:transparent;color:rgba(255,255,255,0.5);cursor:pointer;font-family:Montserrat,sans-serif">' + pr.l + '</button>'; }).join('') + '</div>';
+        
+        window.mnBPreset = function(mn,mx) {
+          document.getElementById('mnBMin').value = mn;
+          document.getElementById('mnBMax').value = mx;
+          mnUpdateBudget();
+        };
+        function mnUpdateBudget() {
+          let mn = parseInt(document.getElementById('mnBMin').value);
+          let mx = parseInt(document.getElementById('mnBMax').value);
+          if (mn > mx) { const t=mn; mn=mx; mx=t; }
+          document.getElementById('mnBudgetDisp').textContent = toDisp(mn) + ' – ' + toDisp(mx);
+          const total = 50000-500;
+          const lp = ((mn-500)/total)*100, rp = ((mx-500)/total)*100;
+          const fill = document.getElementById('mnBFill');
+          if (fill) { fill.style.left=lp+'%'; fill.style.width=(rp-lp)+'%'; }
+          _selectedValues = ['₹'+mn.toLocaleString('en-IN')+'–₹'+mx.toLocaleString('en-IN')];
+        }
+        grid.querySelector('#mnBMin').addEventListener('input', mnUpdateBudget);
+        grid.querySelector('#mnBMax').addEventListener('input', mnUpdateBudget);
+        mnUpdateBudget();
+
+      } else if (cfg.type !== 'input') {
+        // SVG vector tiles — 2-column side-by-side
+        grid.style.gridTemplateColumns = '1fr 1fr';
+        cfg.options.forEach(opt => {
+          const tile = document.createElement('div');
+          const sel = _isMulti ? current.includes(opt.val) : current === opt.val;
+          tile.className = 'mn-edit-option-tile' + (sel ? ' selected' : '');
+          // Distinct emoji+color tile per category
+          const clr = opt.color || '#39A596'; const emo = opt.svg || opt.emoji || '◆';
+          tile.style.background = 'linear-gradient(135deg,' + clr + '18,' + clr + '06)';
+          tile.style.borderColor = clr + '45';
+          tile.innerHTML = '<div class="mn-edit-tile-emoji" style="background:' + clr + '25;color:' + clr + '">' + emo + '</div><div class="mn-edit-tile-label">' + opt.label + '</div>' + (opt.sub ? '<div class="mn-edit-tile-sub">' + opt.sub + '</div>' : '');
+          if (_isMulti && sel) _selectedValues.push(opt.val);
+          tile.addEventListener('click', () => {
+            if (_isMulti) {
+              tile.classList.toggle('selected');
+              if (tile.classList.contains('selected')) { if (!_selectedValues.includes(opt.val)) _selectedValues.push(opt.val); }
+              else { _selectedValues = _selectedValues.filter(v => v !== opt.val); }
+            } else {
+              grid.querySelectorAll('.mn-edit-option-tile').forEach(t => t.classList.remove('selected'));
+              tile.classList.add('selected');
+            }
+          });
+          grid.appendChild(tile);
+        });
+      }
+      document.getElementById('mnEditModalOverlay').classList.add('active');
+    }
+
+function closeEditModal() { document.getElementById('mnEditModalOverlay').classList.remove('active'); }
+
+    document.getElementById('mnEditCancelBtn').addEventListener('click', closeEditModal);
+    document.getElementById('mnEditModalOverlay').addEventListener('click', function(e) { if (e.target === this) closeEditModal(); });
+
+    document.getElementById('mnEditSaveBtn').addEventListener('click', function() {
+      const p = getProfile();
+      const customVal = document.getElementById('mnEditCustomInput').value.trim();
+      if (_isMulti) {
+        if (customVal) { _selectedValues = [...new Set([..._selectedValues, ...customVal.split(',').map(s => s.trim()).filter(Boolean)])]; }
+        p[_currentProfileKey] = _selectedValues;
+        const el = document.getElementById(_currentField);
+        if (el) el.textContent = _selectedValues.join(', ') || '-';
+      } else {
+        // Get value from: custom input, or selected tile, or selected color tile, or selected mst swatch
+        const selTile  = document.querySelector('#mnEditChipGrid .mn-edit-option-tile.selected');
+        const selColor = document.querySelector('#mnEditChipGrid .mn-edit-color-tile.selected');
+        const selMST   = document.querySelector('#mnEditChipGrid .mn-edit-mst-swatch.selected');
+        const selChip  = document.querySelector('#mnEditChipGrid .mn-edit-chip.selected');
+        // For tiles, find the val from TILE_DATA by matching label
+        let val = customVal;
+        if (!val && selTile) {
+          const label = selTile.querySelector('.mn-edit-tile-label')?.textContent || '';
+          const cfg = TILE_DATA[_currentProfileKey];
+          const found = cfg && cfg.options.find(o => o.label === label);
+          val = found ? found.val : label;
+        }
+        if (!val && selColor) { val = selColor.querySelector('.mn-edit-color-name')?.textContent || ''; }
+        if (!val && selMST)   { val = document.getElementById('mnEditCustomInput').value.trim(); }
+        // Height slider
+        if (!val && _currentProfileKey === 'height' && document.getElementById('mnHeightSlider')) {
+          val = document.getElementById('mnHeightSlider').value + ' cm';
+        }
+        // Budget slider
+        if (!val && _currentProfileKey === 'budget' && _selectedValues.length) { val = _selectedValues[0]; }
+        if (!val && selChip)  { val = selChip.textContent || ''; }
+        p[_currentProfileKey] = val;
+        const el = document.getElementById(_currentField);
+        if (el) el.textContent = val || '-';
+      }
+      saveProfile(p);
+      closeEditModal();
+    });
+
+    // ─── Closet Panel ─────────────────────────────────────────
+    function togglePanel(panelId) {
+      const panel = document.getElementById(panelId);
+      if (!panel) return;
+      const isActive = panel.classList.contains('active');
+      document.querySelectorAll('.mn-dashboard-panel').forEach(p => p.classList.remove('active'));
+      if (!isActive) panel.classList.add('active');
+    }
+
+    function handleClosetPhotoUpload(input) {
+      if (!input.files || !input.files[0]) return;
+      // Simulated AI auto-detection
+      const btn = document.getElementById('mnUploadPhotoBtn');
+      if (btn) btn.innerHTML = '<span class="mn-ai-spinner" style="width:14px;height:14px;border-width:2px;display:inline-block;margin-right:8px;"></span> Analyzing...';
+      setTimeout(() => {
+        const closet = getCloset();
+        closet.push({
+          name: "Structured Denim Jacket",
+          category: "Outerwear",
+          closet_section: "Outerwear",
+          color: "Indigo",
+          fabric: "Denim",
+          emoji: "🧥",
+          ghost: false,
+          added_at: new Date().toISOString()
+        });
+        localStorage.setItem(MN_CLOSET_KEY, JSON.stringify(closet));
+        renderClosetPanel();
+        alert("✨ AI Detected: Structured Denim Jacket in Indigo");
+      }, 1500);
+    }
+
+    function openGhostModeModal() {
+      const name = prompt("Ghost Mode \nEnter what you own (e.g. 'Vintage Leather Jacket'):");
+      if (name && name.trim()) {
+        const closet = getCloset();
+        closet.push({
+          name: name.trim(),
+          category: "Wardrobe",
+          closet_section: "Wardrobe",
+          emoji: "👻",
+          ghost: true,
+          added_at: new Date().toISOString()
+        });
+        localStorage.setItem(MN_CLOSET_KEY, JSON.stringify(closet));
+        renderClosetPanel();
+      }
+    }
+
+    window.handleClosetPhotoUpload = handleClosetPhotoUpload;
+    window.openGhostModeModal = openGhostModeModal;
+
+    function renderClosetPanel() {
+      const closet = getCloset();
+      const container = document.getElementById('mnClosetPanelContent');
+      if (!container) return;
+      
+      let html = `
+        <div style="display:flex; gap:10px; margin-bottom: 20px;">
+          <button id="mnUploadPhotoBtn" class="digital-closet-btn" onclick="window.location.href='/pages/my-closet'" style="flex:1;">
+            <span>📸</span><span>Upload Photo</span>
+          </button>
+          <button class="digital-closet-btn" onclick="window.location.href='/pages/my-closet#ghost-mode'" style="flex:1; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.2); color:#fff;">
+            <span>👻</span><span>Ghost Mode</span>
+          </button>
+        </div>
+      `;
+
+      if (closet.length === 0) {
+        html += '<p style="color:rgba(255,255,255,0.4);font-size:13px;text-align:center;padding:20px;">No items yet — upload clothing to start styling</p>';
+        container.innerHTML = html;
+        return;
+      }
+      
+      // Group by section
+      const sections = {};
+      closet.forEach(item => {
+        const s = item.closet_section || item.category || 'Other';
+        if (!sections[s]) sections[s] = [];
+        sections[s].push(item);
+      });
+      
+      Object.entries(sections).forEach(([section, items]) => {
+        html += `<div class="mn-panel-section-label">${section} <span style="opacity:0.5;">(${items.length})</span></div>`;
+        html += '<div class="mn-panel-closet-grid">';
+        items.forEach(item => {
+          const emoji = getItemEmoji(item);
+          const name  = item.original_name || item.name || 'Item';
+          const meta  = [item.color, item.fabric].filter(Boolean).join(' · ');
+          html += `<div class="mn-panel-closet-card">
+            <div class="mn-panel-closet-emoji">${emoji}</div>
+            <div class="mn-panel-closet-name">${name}</div>
+            ${meta ? `<div class="mn-panel-closet-meta">${meta}</div>` : ''}
+          </div>`;
+        });
+        html += '</div>';
+      });
+      container.innerHTML = html;
+    }
+
+    function renderHistoryPanel() {
+      const history = getHistory();
+      const container = document.getElementById('mnHistoryPanelContent');
+      if (!container) return;
+      if (history.length === 0) {
+        container.innerHTML = '<p style="color:rgba(255,255,255,0.4);font-size:13px;text-align:center;padding:20px;">No outfits generated yet — open the AI Stylist to create your first look</p>';
+        return;
+      }
+      let html = '';
+      history.slice(0, 10).forEach(look => {
+        const date = look.savedAt ? new Date(look.savedAt).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : '';
+        const pieces = (look.outfit_pieces || []);
+        html += `<div class="mn-panel-look-card">
+          <div class="mn-panel-look-date">${date}</div>
+          <div class="mn-panel-look-direction">${look.direction || look.context || 'AI Generated Outfit'}</div>
+          <div class="mn-panel-look-pieces">
+            ${pieces.map(p => `<span class="mn-panel-look-piece ${p.owned ? 'owned' : ''}">${getItemEmoji(p)} ${p.name || ''}</span>`).join('')}
+          </div>
+        </div>`;
+      });
+      container.innerHTML = html;
+    }
+
+    // ─── Load & Render ────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', function() {
+      try {
+        const profile = getProfile();
+        const closet  = getCloset();
+        const history = getHistory();
+
+        document.getElementById('userProfileSection').style.display = 'block';
+
+        // Avatar
+        if (profile.uploadedImage) {
+          document.getElementById('avatarImage').src = profile.uploadedImage;
+          document.getElementById('avatarImage').style.display = 'block';
+          document.getElementById('avatarPlaceholder').style.display = 'none';
+        } else if (profile.archetype?.icon) {
+          document.getElementById('avatarPlaceholder').textContent = profile.archetype.icon;
+        }
+
+        // Personality badge
+        document.getElementById('personalityTone').textContent = profile.tone || profile.coreExpression || 'Style Explorer';
+
+        // Quick stats
+        document.getElementById('statHeight').textContent       = profile.height ? profile.height + '' : '-';
+        document.getElementById('statBodyType').textContent     = profile.build || profile.bodyType || '-';
+        document.getElementById('statSkinTone').textContent     = profile.skinTone || '-';
+        document.getElementById('statTemperature').textContent  = profile.climate || profile.temperature || '-';
+        document.getElementById('statPriceRange').textContent   = profile.budget || profile.priceRange || '-';
+        document.getElementById('statClosetItems').textContent  = closet.length + ' items';
+        document.getElementById('statOutfitsSaved').textContent = history.length + ' looks';
+
+        // Detail cards
+        document.getElementById('detailGoals').textContent    = profile.goals || profile.fashionGoals || profile.signal || '-';
+        const colors = profile.favoriteColors || profile.colors;
+        document.getElementById('detailColors').textContent   = Array.isArray(colors) ? colors.join(', ') : (colors || '-');
+        document.getElementById('detailStyle').textContent    = profile.coreExpression || profile.style || '-';
+        document.getElementById('detailOccasion').textContent = profile.occasion || (Array.isArray(profile.contexts) ? profile.contexts.join(', ') : '-');
+        document.getElementById('detailRegion').textContent   = profile.region || profile.location || profile.city || '-';
+        document.getElementById('detailUndertone').textContent = profile.undertone || '-';
+
+        // Closet breakdown
+        const emptyClosetActions = document.getElementById('mnEmptyClosetActions');
+        if (closet.length > 0) {
+          const sections = {};
+          closet.forEach(i => { const s = i.closet_section || i.category || 'Other'; sections[s] = (sections[s]||0)+1; });
+          document.getElementById('detailClosetBreakdown').textContent = Object.entries(sections).map(([s,n])=>n+' '+s).join(' · ') || '-';
+          if (emptyClosetActions) emptyClosetActions.style.display = 'none';
+        } else {
+          document.getElementById('detailClosetBreakdown').textContent = 'Upload clothing photos to see your closet breakdown';
+          if (emptyClosetActions) emptyClosetActions.style.display = 'flex';
+        }
+
+        // Most recent outfit
+        if (history.length > 0) {
+          const last = history[0];
+          document.getElementById('detailLastOutfit').textContent = last.direction || last.context || last.occasion || '-';
+        }
+
+        // Wire stat cards to edit modal
+        const editMap = [
+          ['statHeight','height'],['statBodyType','build'],['statSkinTone','skinTone'],
+          ['statTemperature','climate'],['statPriceRange','budget']
+        ];
+        editMap.forEach(([elId, key]) => {
+          const el = document.getElementById(elId);
+          if (el) el.addEventListener('click', () => openEditModal(key, elId));
+        });
+
+        // Wire detail cards to edit modal
+        const detailMap = [
+          ['detailGoals','goals'],['detailColors','favoriteColors'],['detailStyle','coreExpression'],
+          ['detailOccasion','occasion'],['detailRegion','region'],['detailUndertone','undertone']
+        ];
+        detailMap.forEach(([elId, key]) => {
+          const el = document.getElementById(elId);
+          if (el) el.addEventListener('click', () => openEditModal(key, elId));
+        });
+
+        // Wire Digital Closet stat card → show closet panel
+        const closetStatCard = document.getElementById('statClosetItems');
+        if (closetStatCard) {
+          closetStatCard.parentElement.addEventListener('click', () => {
+            renderClosetPanel();
+            togglePanel('mnClosetPanel');
+          });
+        }
+
+        // Wire Outfits Saved stat card → show history panel
+        const histStatCard = document.getElementById('statOutfitsSaved');
+        if (histStatCard) {
+          histStatCard.parentElement.addEventListener('click', () => {
+            renderHistoryPanel();
+            togglePanel('mnHistoryPanel');
+          });
+        }
+
+      } catch (error) {
+        console.error('Error loading AI Stylist profile:', error);
+      }
+
+      // Handle arrival from widget profile ring ? /account?mn_focus=profile
+      mnHandleWidgetArrival();
+    });
+
+    // Avatar pulse animation keyframe (injected once at runtime)
+    (function() {
+      const s = document.createElement('style');
+      s.textContent = '@keyframes mnAvatarPulse { 0%{box-shadow:0 0 0 0 rgba(57,165,150,0.7)} 70%{box-shadow:0 0 0 14px rgba(57,165,150,0)} 100%{box-shadow:0 0 0 0 rgba(57,165,150,0)} }';
+      document.head.appendChild(s);
+    })();
+
+    // =====================================================
+    // AI STYLIST DASHBOARD - PROGRESS TRACKING & SYNC
+    // =====================================================
+    
+    // MN_USER Global State
+    window.MN_USER = window.MN_USER || {
+      hidden_data: {},
+      bank_cards: [],
+      ghost_mode: false,
+      photo_analysis_history: [],
+      completion_pct: 0
+    };
+
+    // Profile completion fields
+    const PROFILE_FIELDS = [
+      'uploadedImage', 'height', 'build', 'skinTone', 'skinMST', 
+      'hairStyle', 'gender', 'climate', 'budget', 'goals',
+      'coreExpression', 'occasion', 'favoriteColors', 'undertone', 'region'
+    ];
+
+    // Calculate completion percentage
+    function mnCalculateCompletion(profile) {
+      let filled = 0;
+      PROFILE_FIELDS.forEach(field => {
+        if (profile[field] && profile[field] !== '' && profile[field] !== '-') {
+          filled++;
+        }
+      });
+      return Math.round((filled / PROFILE_FIELDS.length) * 100);
+    }
+
+    // Update progress rings
+    function mnUpdateProgress(profile) {
+      const pct = mnCalculateCompletion(profile);
+      window.MN_USER.completion_pct = pct;
+      
+      // Circular progress ring
+      const ringFill = document.querySelector('.mn-progress-ring-fill');
+      if (ringFill) {
+        const circumference = 326.73;
+        const offset = circumference - (pct / 100) * circumference;
+        ringFill.style.strokeDashoffset = offset;
+      }
+      
+      // Circular percentage display
+      const pctDisplay = document.querySelector('.mn-progress-percentage');
+      if (pctDisplay) {
+        pctDisplay.innerHTML = pct + '<span>%</span>';
+      }
+      
+      // Linear progress bar
+      const linearFill = document.querySelector('.mn-linear-progress-fill');
+      if (linearFill) {
+        linearFill.style.width = pct + '%';
+      }
+      
+      const linearValue = document.querySelector('.mn-linear-progress-value');
+      if (linearValue) {
+        linearValue.textContent = pct + '% Complete';
+      }
+      
+      return pct;
+    }
+
+    // Debounced save to Supabase
+    let mnSaveTimeout;
+    function mnDebouncedSave() {
+      clearTimeout(mnSaveTimeout);
+      mnSaveTimeout = setTimeout(async () => {
+        await mnSaveToSupabase();
+      }, 1500);
+    }
+
+    // Save to Supabase
+    async function mnSaveToSupabase() {
+      const profile = getProfile();
+      const userId = '{{ customer.id }}' || 'guest';
+      
+      try {
+        const res = await fetch('https://mynarrative-ai.vercel.app/api/user_profile/sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_id: userId,
+            profile: profile,
+            hidden_data: window.MN_USER.hidden_data,
+            bank_cards: window.MN_USER.bank_cards,
+            completion_pct: window.MN_USER.completion_pct,
+            ghost_mode: window.MN_USER.ghost_mode
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          console.log('[MN] Profile synced to Supabase');
+        }
+      } catch(err) {
+        console.warn('[MN] Supabase sync failed, using localStorage:', err);
+      }
+    }
+
+    // =====================================================
+    // COMPREHENSIVE AI ANALYSIS - 20-30 HIDDEN DATA POINTS
+    // =====================================================
+    
+    async function mnAnalyzePhotoAdvanced(base64Image) {
+      // Show loading state
+      const loadingEl = document.getElementById('mnAILoading');
+      if (loadingEl) loadingEl.classList.add('active');
+      
+      // Use configurable physique API URL or default to local dev
+      const PHYSIQUE_API_URL = (window.MN_CONFIG && window.MN_CONFIG.physiqueApiUrl) || 'http://localhost:8000/api/v1/analyze';
+      const userId = '{{ customer.id }}' || 'guest';
+      
+      try {
+        const res = await fetch(PHYSIQUE_API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_id: userId,
+            image_base64: base64Image,
+            save_to_profile: true
+          })
+        });
+        
+        let data = {};
+        if (res.ok) data = await res.json();
+        
+        // Map physique_analysis API response to profile fields
+        const bodyMetrics = data.body_metrics || {};
+        const skinTone = data.skin_tone || {};
+        const hairAnalysis = data.hair_analysis || {};
+        const facialAnalysis = data.facial_analysis || {};
+        const overallAppearance = data.overall_appearance || {};
+        
+        // Map undertone to dashboard options
+        const undertoneMap = { 
+          warm: 'Warm (yellow/golden)', 
+          cool: 'Cool (pink/red)', 
+          neutral: 'Neutral' 
+        };
+        
+        // Map body type to dashboard labels
+        const bodyTypeMap = { 
+          mesomorph: 'Athletic', 
+          ectomorph: 'Slim', 
+          endomorph: 'Curvy' 
+        };
+        
+        // Extract all 25+ hidden data points from structured API response
+        const hiddenMetrics = {
+          // Body metrics from API
+          height_cm: bodyMetrics.estimated_height_cm || null,
+          body_type: bodyMetrics.body_type || null,
+          body_composition: bodyMetrics.body_composition || null,
+          
+          // Body proportions (hidden)
+          shoulder_width: bodyMetrics.proportions?.shoulder_width || null,
+          chest_circumference: bodyMetrics.proportions?.chest_circumference || null,
+          waist_hip_ratio: bodyMetrics.proportions?.waist_hip_ratio || null,
+          leg_proportion: bodyMetrics.proportions?.leg_proportion || null,
+          arm_length: bodyMetrics.proportions?.arm_length || null,
+          torso_length: bodyMetrics.proportions?.torso_length || null,
+          
+          // Skin analysis
+          undertone: skinTone.undertone || null,
+          undertone_label: undertoneMap[skinTone.undertone] || null,
+          skin_mst: skinTone.mst_scale || null,
+          skin_label: skinTone.mst_label || null,
+          undertone_precision_score: data.confidence_scores?.skin_tone || Math.random() * 0.3 + 0.7,
+          melanin_level: skinTone.melanin_level || null,
+          skin_texture: skinTone.texture || 'smooth',
+          
+          // Face analysis
+          face_shape: facialAnalysis.face_shape || null,
+          face_card: facialAnalysis.face_card || null,
+          jawline_type: facialAnalysis.jawline_type || null,
+          cheekbone_presence: facialAnalysis.cheekbone_presence || null,
+          eye_color: facialAnalysis.eye_color || null,
+          
+          // Hair analysis
+          hair_style: hairAnalysis.hair_style || null,
+          hair_color: hairAnalysis.hair_color || null,
+          hair_texture: hairAnalysis.hair_texture || null,
+          hair_density: hairAnalysis.hair_density || null,
+          hair_volume: hairAnalysis.hair_volume || null,
+          
+          // Color analysis
+          contrast_level: overallAppearance.contrast_level || null,
+          seasonal_color: overallAppearance.seasonal_color || null,
+          recommended_colors: data.recommended_colors || [],
+          avoid_colors: data.avoid_colors || [],
+          
+          // Style metrics
+          silhouette_preference: bodyMetrics.silhouette_preference || null,
+          pattern_affinity: data.pattern_affinity || null,
+          fabric_preference: data.fabric_preference || null,
+          
+          // Overall appearance
+          gender: overallAppearance.gender || null,
+          age_range: overallAppearance.age_range || null,
+          style_archetype: overallAppearance.style_archetype || null,
+          
+          // Personality proxies
+          confidence_level: data.confidence_level || null,
+          formality_preference: data.formality_preference || null,
+          boldness_score: data.boldness_score || null,
+          
+          // AI learning data
+          analysis_timestamp: new Date().toISOString(),
+          confidence_score: data.confidence_scores?.overall || 0.85,
+          model_version: 'v2.1-physique-api'
+        };
+        
+        window.MN_USER.hidden_data = hiddenMetrics;
+        
+        // Add to photo history for AI learning
+        const photoEntry = {
+          id: Date.now(),
+          image: base64Image.substring(0, 100) + '...',
+          metrics: hiddenMetrics,
+          timestamp: new Date().toISOString()
+        };
+        window.MN_USER.photo_analysis_history.push(photoEntry);
+        
+        // Keep only last 10 entries
+        if (window.MN_USER.photo_analysis_history.length > 10) {
+          window.MN_USER.photo_analysis_history = window.MN_USER.photo_analysis_history.slice(-10);
+        }
+        
+        // Update visible profile data from mapped response
+        const p = getProfile();
+        p.uploadedImage = 'data:image/jpeg;base64,' + base64Image;
+        p.selfieUploaded = true;
+        p.ai_analyzed = true;
+        p.last_ai_analysis = new Date().toISOString();
+        
+        // Map from physique_analysis API response structure
+        if (bodyMetrics.estimated_height_cm) p.height = bodyMetrics.estimated_height_cm + ' cm';
+        if (bodyMetrics.body_type) {
+          p.build = bodyTypeMap[bodyMetrics.body_type] || bodyMetrics.body_type;
+        }
+        if (skinTone.mst_label) p.skinTone = skinTone.mst_label;
+        if (skinTone.mst_scale) p.skinMST = skinTone.mst_scale;
+        if (hairAnalysis.hair_style) p.hairStyle = hairAnalysis.hair_style;
+        if (overallAppearance.gender) p.gender = overallAppearance.gender;
+        if (skinTone.undertone) p.undertone = undertoneMap[skinTone.undertone] || skinTone.undertone;
+        if (overallAppearance.seasonal_color) p.seasonalColor = overallAppearance.seasonal_color;
+        if (overallAppearance.style_archetype) p.styleArchetype = overallAppearance.style_archetype;
+        
+        // Map hidden data for AI recommendations
+        if (facialAnalysis.face_shape) window.MN_USER.hidden_data.face_shape = facialAnalysis.face_shape;
+        if (facialAnalysis.eye_color) window.MN_USER.hidden_data.eye_color = facialAnalysis.eye_color;
+        if (hairAnalysis.hair_texture) window.MN_USER.hidden_data.hair_texture = hairAnalysis.hair_texture;
+        
+        saveProfile(p);
+        mnUpdateProgress(p);
+        mnRefreshStatCards(p);
+        
+        // Trigger hidden data sync
+        mnDebouncedSave();
+        
+        if (loadingEl) {
+          loadingEl.classList.remove('active');
+          const prompt = document.querySelector('.profile-upload-prompt');
+          if (prompt) prompt.textContent = '✨ AI Analysis Complete!';
+          setTimeout(() => {
+            if (prompt) prompt.textContent = '📸 Click to update photo';
+          }, 3000);
+        }
+        
+        return hiddenMetrics;
+        
+      } catch(err) {
+        console.warn('[MN] AI Analysis failed:', err);
+        if (loadingEl) loadingEl.classList.remove('active');
+        return null;
+      }
+    }
+
+    // =====================================================
+    // HEIGHT VECTOR SVG UPDATE
+    // =====================================================
+    
+    function mnUpdateHeightVector(cmValue) {
+      const vectorContainer = document.querySelector('.mn-height-vector');
+      if (!vectorContainer) return;
+      
+      // Scale: 140cm = 0.7, 220cm = 1.3
+      const scale = 0.7 + ((cmValue - 140) / 80) * 0.6;
+      vectorContainer.style.transform = `scaleY(${scale})`;
+      
+      // Update slider fill
+      const slider = document.getElementById('mnHeightSlider');
+      if (slider) {
+        const fillPct = ((cmValue - 140) / 80) * 100;
+        slider.style.setProperty('--slider-fill', fillPct + '%');
+      }
+    }
+
+    // =====================================================
+    // WEATHER WIDGET
+    // =====================================================
+    
+    async function mnInitWeatherWidget() {
+      const widget = document.getElementById('mnWeatherWidget');
+      if (!widget) return;
+      
+      try {
+        // Use Open-Meteo API (free, no key required)
+        // First get location from IP
+        const geoRes = await fetch('https://ipapi.co/json/');
+        const geoData = await geoRes.json();
+        
+        if (geoData.latitude && geoData.longitude) {
+          const weatherRes = await fetch(
+            `https://api.open-meteo.com/v1/forecast?latitude=${geoData.latitude}&longitude=${geoData.longitude}&current_weather=true`
+          );
+          const weatherData = await weatherRes.json();
+          
+          if (weatherData.current_weather) {
+            const temp = Math.round(weatherData.current_weather.temperature);
+            const code = weatherData.current_weather.weathercode;
+            
+            // Map weather code to icon
+            const weatherIcons = {
+              0: '☀️', 1: '🌤️', 2: '⛅', 3: '☁️',
+              45: '🌫️', 48: '🌫️',
+              51: '🌧️', 53: '🌧️', 55: '🌧️',
+              61: '🌧️', 63: '🌧️', 65: '🌧️',
+              71: '🌨️', 73: '🌨️', 75: '🌨️',
+              80: '🌦️', 81: '🌦️', 82: '🌦️',
+              95: '⛈️', 96: '⛈️', 99: '⛈️'
+            };
+            
+            const icon = weatherIcons[code] || '🌤️';
+            const condition = code <= 3 ? 'Clear' : code <= 48 ? 'Cloudy' : code <= 65 ? 'Rainy' : code <= 75 ? 'Snowy' : 'Stormy';
+            
+            widget.querySelector('.mn-weather-icon').textContent = icon;
+            widget.querySelector('.mn-weather-temp').textContent = temp + '°C';
+            widget.querySelector('.mn-weather-condition').textContent = geoData.city || condition;
+            
+            // Update profile climate if not set
+            const profile = getProfile();
+            if (!profile.climate) {
+              if (temp > 30) p.climate = 'Hot & Humid';
+              else if (temp > 20) p.climate = 'Mild';
+              else if (temp > 10) p.climate = 'Cool';
+              else p.climate = 'Cold';
+              saveProfile(p);
+            }
+          }
+        }
+      } catch(err) {
+        console.warn('[MN] Weather fetch failed:', err);
+        widget.querySelector('.mn-weather-temp').textContent = '--°C';
+        widget.querySelector('.mn-weather-condition').textContent = 'Unavailable';
+      }
+    }
+
+    // =====================================================
+    // BANK CARDS INTEGRATION
+    // =====================================================
+    
+    const BANK_DATA = {
+      'HDFC Bank': {
+        icon: '🏦',
+        cards: ['Regalia', 'Millennia', 'Infinia', 'Diners Club Black', 'Diners Club Privilege', 'MoneyBack+', 'Freedom', 'Tata Neu Infinity', 'Swiggy HDFC', 'Platinum Debit']
+      },
+      'ICICI Bank': {
+        icon: '🏦',
+        cards: ['Sapphiro', 'Rubyx', 'Platinum', 'Emerald', 'Manchester United', 'ICIICI Indian Oil', 'Club Vistara', ' HPCL', 'Power', 'SuperShine']
+      },
+      'SBI': {
+        icon: '🏦',
+        cards: ['SBI Elite', 'SBI Platinum', 'SBI Gold', 'SBI Classic', 'SBI Octane', 'SimplyCLICK', 'SimplySAVE', 'Cashback', 'Debit Card', 'Yuva']
+      },
+      'Axis Bank': {
+        icon: '🏦',
+        cards: ['Axis Magnus', 'Axis Reserve', 'Axis Vertigo', 'Axis Neo', 'Axis Flipkart', 'Axis Miles', 'Axis ACE', 'Axis Burgundy', 'Private Banking', 'Debit Card']
+      },
+      'Kotak Mahindra': {
+        icon: '🏦',
+        cards: ['Zenith Signature', 'Platinum', 'Gold', 'Mahindra Finance', '811', 'Essence', ' Vikram', 'Royal Signature', 'PVR Cinemas', 'Debit Card']
+      },
+      'IndusInd Bank': {
+        icon: '🏦',
+        cards: ['IndusInd Pioneer', 'IndusInd Iconic', 'IndusInd Platinum', 'IndusInd Aura', 'IndusInd BMW', 'Nexus', 'Euphoria', 'Harley-Davidson', 'Debit Card', 'Coral']
+      },
+      'YES Bank': {
+        icon: '🏦',
+        cards: ['YES FIRST Exclusive', 'YES FIRST Prefered', 'YES Prosperity', 'YES PRO', 'Elite', 'Essence', 'Titanium', ' Simply SAVE', 'Debit Card', 'First']
+      },
+      'Standard Chartered': {
+        icon: '🏦',
+        cards: ['Ultimate', 'Platinum', 'Gold', 'Cashback', 'Smart', 'SuperCash', ' Emirates', 'Debit Card', 'Premium', 'Priority']
+      },
+      'IDFC First Bank': {
+        icon: '🏦',
+        cards: ['First Wealth', 'First Select', 'First Classic', 'First Move', 'Millennia', 'SuperCard', 'Debit Card', 'Smart Money', 'Private Banking', 'Power']
+      },
+      'American Express': {
+        icon: '💳',
+        cards: ['Platinum Card', 'Gold Card', 'Platinum Travel', 'Membership Rewards', 'Blue', 'Centurion', 'Delta', 'Hilton', 'Marriott', 'Jet Airways']
+      }
+    };
+
+    function mnPopulateCardVariants() {
+      const bankSelect = document.getElementById('mnBankSelect');
+      const variantSelect = document.getElementById('mnCardVariant');
+      
+      if (!bankSelect || !variantSelect) return;
+      
+      bankSelect.addEventListener('change', function() {
+        const selectedBank = this.value;
+        variantSelect.innerHTML = '<option value="">Select Card Variant</option>';
+        
+        if (BANK_DATA[selectedBank]) {
+          BANK_DATA[selectedBank].cards.forEach(card => {
+            const option = document.createElement('option');
+            option.value = card;
+            option.textContent = card;
+            variantSelect.appendChild(option);
+          });
+        }
+      });
+    }
+
+    function mnAddBankCard() {
+      const bankSelect = document.getElementById('mnBankSelect');
+      const variantSelect = document.getElementById('mnCardVariant');
+      const cardTypeBtns = document.querySelectorAll('.mn-card-type-btn');
+      
+      const selectedBank = bankSelect?.value;
+      const selectedVariant = variantSelect?.value;
+      const selectedType = Array.from(cardTypeBtns).find(b => b.classList.contains('selected'))?.textContent || 'Credit';
+      
+      if (!selectedBank || !selectedVariant) {
+        alert('Please select a bank and card variant');
+        return;
+      }
+      
+      const newCard = {
+        id: Date.now(),
+        bank: selectedBank,
+        variant: selectedVariant,
+        type: selectedType,
+        addedAt: new Date().toISOString()
+      };
+      
+      window.MN_USER.bank_cards.push(newCard);
+      mnRenderSavedCards();
+      mnDebouncedSave();
+      
+      // Reset form
+      bankSelect.value = '';
+      variantSelect.innerHTML = '<option value="">Select Card Variant</option>';
+      cardTypeBtns.forEach(b => b.classList.remove('selected'));
+    }
+
+    function mnRenderSavedCards() {
+      const container = document.getElementById('mnSavedCardsList');
+      if (!container) return;
+      
+      if (window.MN_USER.bank_cards.length === 0) {
+        container.innerHTML = '<p style="color:rgba(255,255,255,0.4);font-size:12px;text-align:center;padding:16px;">No cards saved yet</p>';
+        return;
+      }
+      
+      container.innerHTML = window.MN_USER.bank_cards.map(card => `
+        <div class="mn-saved-card" data-id="${card.id}">
+          <div class="mn-saved-card-info">
+            <div class="mn-saved-card-icon">${BANK_DATA[card.bank]?.icon || '💳'}</div>
+            <div class="mn-saved-card-details">
+              <div class="mn-saved-card-bank">${card.bank} - ${card.variant}</div>
+              <div class="mn-saved-card-variant">${card.type}</div>
+            </div>
+          </div>
+          <button onclick="mnRemoveCard(${card.id})" style="background:none;border:none;color:rgba(255,255,255,0.4);cursor:pointer;font-size:16px;">✕</button>
+        </div>
+      `).join('');
+    }
+
+    function mnRemoveCard(cardId) {
+      window.MN_USER.bank_cards = window.MN_USER.bank_cards.filter(c => c.id !== cardId);
+      mnRenderSavedCards();
+      mnDebouncedSave();
+    }
+
+    // =====================================================
+    // STYLE PREFERENCE CARDS
+    // =====================================================
+    
+    const STYLE_PREFERENCES = [
+      { id: 'streetwear', label: 'Streetwear', emoji: '🛹' },
+      { id: 'minimalist', label: 'Minimalist', emoji: '🤍' },
+      { id: 'old_money', label: 'Old Money', emoji: '💰' },
+      { id: 'techwear', label: 'Techwear', emoji: '🎧' },
+      { id: 'gorpcore', label: 'Gorpcore', emoji: '🏔️' },
+      { id: 'y2k', label: 'Y2K', emoji: '💿' },
+      { id: 'smart_casual', label: 'Smart Casual', emoji: '☕' },
+      { id: 'avant_garde', label: 'Avant-Garde', emoji: '🎭' }
+    ];
+
+    function mnInitStyleCards() {
+      const container = document.getElementById('mnStyleCardsGrid');
+      if (!container) return;
+      
+      container.innerHTML = STYLE_PREFERENCES.map(style => `
+        <div class="mn-style-card" data-style="${style.id}" onclick="mnToggleStyleCard('${style.id}')">
+          <span class="mn-style-card-emoji">${style.emoji}</span>
+          <span class="mn-style-card-label">${style.label}</span>
+        </div>
+      `).join('');
+      
+      // Load saved preferences
+      const profile = getProfile();
+      if (profile.stylePreferences && Array.isArray(profile.stylePreferences)) {
+        profile.stylePreferences.forEach(id => {
+          container.querySelector(`[data-style="${id}"]`)?.classList.add('selected');
+        });
+      }
+    }
+
+    function mnToggleStyleCard(styleId) {
+      const card = document.querySelector(`[data-style="${styleId}"]`);
+      if (!card) return;
+      
+      card.classList.toggle('selected');
+      
+      // Update profile
+      const profile = getProfile();
+      if (!profile.stylePreferences) profile.stylePreferences = [];
+      
+      if (card.classList.contains('selected')) {
+        if (!profile.stylePreferences.includes(styleId)) {
+          profile.stylePreferences.push(styleId);
+        }
+      } else {
+        profile.stylePreferences = profile.stylePreferences.filter(s => s !== styleId);
+      }
+      
+      saveProfile(profile);
+      mnUpdateProgress(profile);
+      mnDebouncedSave();
+    }
+
+    // =====================================================
+    // CORE INTERESTS COMBOBOX
+    // =====================================================
+    
+    const CORE_INTERESTS = [
+      'Tech Innovator', 'Fitness Junkie', 'Digital Nomad', 'Gamer', 
+      'Music Lover', 'Traveler', 'Foodie', 'Art Enthusiast', 
+      'Entrepreneur', 'Student', 'Professional', 'Creative',
+      'Other (Type your own)'
+    ];
+
+    function mnInitInterests() {
+      const container = document.getElementById('mnInterestsContainer');
+      if (!container) return;
+      
+      container.innerHTML = CORE_INTERESTS.map(interest => `
+        <span class="mn-interest-tag" data-interest="${interest}" onclick="mnToggleInterest('${interest}')">${interest}</span>
+      `).join('');
+      
+      // Load saved interests
+      const profile = getProfile();
+      if (profile.coreInterests && Array.isArray(profile.coreInterests)) {
+        profile.coreInterests.forEach(interest => {
+          container.querySelector(`[data-interest="${interest}"]`)?.classList.add('selected');
+        });
+      }
+    }
+
+    function mnToggleInterest(interest) {
+      const tag = document.querySelector(`[data-interest="${interest}"]`);
+      if (!tag) return;
+      
+      if (interest === 'Other (Type your own)') {
+        const custom = prompt('Enter your custom interest:');
+        if (custom) {
+          mnAddCustomInterest(custom);
+        }
+        return;
+      }
+      
+      tag.classList.toggle('selected');
+      
+      const profile = getProfile();
+      if (!profile.coreInterests) profile.coreInterests = [];
+      
+      if (tag.classList.contains('selected')) {
+        if (!profile.coreInterests.includes(interest)) {
+          profile.coreInterests.push(interest);
+        }
+      } else {
+        profile.coreInterests = profile.coreInterests.filter(i => i !== interest);
+      }
+      
+      saveProfile(profile);
+      mnUpdateProgress(profile);
+      mnDebouncedSave();
+    }
+
+    function mnAddCustomInterest(customInterest) {
+      const container = document.getElementById('mnInterestsContainer');
+      
+      const tag = document.createElement('span');
+      tag.className = 'mn-interest-tag selected';
+      tag.dataset.interest = customInterest;
+      tag.textContent = customInterest;
+      tag.onclick = () => mnToggleInterest(customInterest);
+      
+      container.appendChild(tag);
+      
+      const profile = getProfile();
+      if (!profile.coreInterests) profile.coreInterests = [];
+      profile.coreInterests.push(customInterest);
+      saveProfile(profile);
+      mnUpdateProgress(profile);
+      mnDebouncedSave();
+    }
+
+    // =====================================================
+    // GHOST MODE TOGGLE
+    // =====================================================
+    
+    function mnToggleGhostMode() {
+      const toggle = document.getElementById('mnGhostToggle');
+      if (!toggle) return;
+      
+      toggle.classList.toggle('active');
+      window.MN_USER.ghost_mode = toggle.classList.contains('active');
+      
+      // Save preference
+      localStorage.setItem('mn_ghost_mode', window.MN_USER.ghost_mode);
+      mnDebouncedSave();
+      
+      // Open Digital Closet ghost flow when activated
+      if (window.MN_USER.ghost_mode) {
+        window.location.href = '/pages/my-closet#ghost-mode';
+      }
+      
+      // Dispatch event for other components
+      window.dispatchEvent(new CustomEvent('mn-ghost-mode-changed', { 
+        detail: { active: window.MN_USER.ghost_mode } 
+      }));
+    }
+
+    // =====================================================
+    // INITIALIZE ALL DASHBOARD FEATURES
+    // =====================================================
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      // Load saved ghost mode
+      const savedGhost = localStorage.getItem('mn_ghost_mode');
+      if (savedGhost === 'true') {
+        document.getElementById('mnGhostToggle')?.classList.add('active');
+        window.MN_USER.ghost_mode = true;
+      }
+      
+      // Initialize all features
+      mnPopulateCardVariants();
+      mnInitStyleCards();
+      mnInitInterests();
+      mnInitWeatherWidget();
+      mnRenderSavedCards();
+      
+      // Set initial height vector
+      const profile = getProfile();
+      const heightCm = parseInt(profile.height) || 170;
+      setTimeout(() => mnUpdateHeightVector(heightCm), 100);
+      
+      // Update progress on load
+      setTimeout(() => mnUpdateProgress(profile), 200);
+    });
+
+    // Listen for profile updates
+    window.addEventListener('mn-identity-updated', function(e) {
+      const profile = e.detail || getProfile();
+      mnUpdateProgress(profile);
+    });
+  </script>
+
+  {% if customer.orders.size > 0 %}
+    {% assign latest_order = customer.orders.first %}
+
+    <div class="relative w-full bg-gradient-to-r from-[#0a0a0a] to-[#111] brand-border border rounded-xl overflow-hidden shadow-[0_0_30px_rgba(57,165,150,0.1)] group">
+      <div
+        class="absolute top-0 right-0 w-64 h-64 brand-bg opacity-5 blur-[100px] rounded-full pointer-events-none"
+      ></div>
+
+      <div class="relative z-2 p-6 md:p-10 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="text-center md:text-left">
+          <div
+            class="inline-block brand-text text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest mb-3 border brand-border"
+
+            style="background: rgba(57,165,150,0.1);"
+          >
+            Latest Order
+          </div>
+
+          <h2 class="heading-font text-2xl md:text-3xl font-bold text-white mb-1">ORDER {{ latest_order.name }}</h2>
+
+          <p class="text-gray-400 text-sm">
+            {{ latest_order.created_at | date: '%B %d, %Y' }} • {{ latest_order.financial_status_label }}
+          </p>
+
+          <div class="flex flex-wrap gap-3 mt-4 justify-center md:justify-start">
+            {% for item in latest_order.line_items limit: 3 %}
+              <div class="flex items-center gap-3 bg-black/40 border border-gray-800 p-2 rounded-md pr-4 max-w-[200px]">
+                {% if item.image %}
+                  <img
+                    src="{{ item.image | image_url: width: 60 }}"
+
+                    class="w-10 h-10 object-cover rounded shadow-sm border border-gray-700 flex-shrink-0"
+                  >
+                {% endif %}
+
+                <div class="text-left">
+                  <p class="text-white text-xs font-bold whitespace-normal leading-tight">{{ item.product.title }}</p>
+
+                  <p class="text-gray-500 text-[10px] mt-1">{{ item.variant.title }}</p>
+                </div>
+              </div>
+            {% endfor %}
+
+            {% if latest_order.line_items.size > 3 %}
+              <div class="flex items-center justify-center bg-black/40 border border-gray-800 w-10 h-10 rounded-md flex-shrink-0">
+                <span class="text-gray-500 text-xs">+{{ latest_order.line_items.size | minus: 3 }}</span>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <button
+          onclick="openVault('{{ latest_order.id }}')"
+
+          class="brand-btn heading-font font-normal text-base md:text-lg py-3 px-8 rounded-md hover:scale-105 transition-all duration-300 shadow-[0_0_20px_rgba(57,165,150,0.4)] uppercase tracking-wide flex items-center gap-2"
+        >
+          <span class="px-2"> Unlock Personality Card </span>
+        </button>
+      </div>
+    </div>
+  {% endif %}
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');
+
+
+    /* LOCAL VARIABLES FOR THIS SNIPPET */
+
+    .artifact-section-wrapper {
+
+      --brand-teal: #39A596;
+
+      --font-main: 'Montserrat', sans-serif;
+
+      font-family: var(--font-main);
+
+    }
+
+
+    /* CONTAINER STYLES */
+
+    .loyalty-card-mini {
+
+      background: #050505;
+
+      border: 1px solid var(--brand-teal);
+
+      box-shadow: 0 0 40px rgba(57, 165, 150, 0.15);
+
+      border-radius: 16px;
+
+      padding: 20px;
+
+      position: relative;
+
+      overflow: hidden;
+
+      max-width: 420px;
+
+      width: 100%;
+
+    }
+
+
+    /* --- NEW SAGA HISTORY STYLES --- */
+
+    .saga-row {
+
+      margin-bottom: 30px; /* Space between rows */
+
+      position: relative;
+
+    }
+
+    .saga-row.completed {
+
+      opacity: 0.85;
+
+    }
+
+
+
+    .saga-completed-badge {
+
+      position: absolute;
+
+      bottom: -14px;
+
+      right: 0;
+
+      background-color: var(--brand-teal);
+
+      color: #fff;
+
+      font-size: 9px;
+
+      font-weight: 800;
+
+      padding: 4px 10px;
+
+      border-radius: 12px;
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 4px;
+
+      box-shadow: 0 4px 12px rgba(0,0,0,0.9);
+
+      z-index: 20;
+
+      font-family: 'Montserrat', sans-serif;
+
+      text-transform: uppercase;
+
+      letter-spacing: 0.5px;
+
+      border: 1px solid #000;
+
+    }
+
+
+    /* SLOTS - REDUCED SIZE */
+
+    .artifact-slot-mini {
+
+      aspect-ratio: 1/1;
+
+      border-radius: 6px;
+
+      position: relative;
+
+      overflow: hidden;
+
+      transition: all 0.3s ease;
+
+      width: 100%;
+
+      cursor: pointer;
+
+    }
+
+
+    .artifact-slot-mini:hover {
+
+      transform: scale(1.05);
+
+    }
+
+
+    /* FILLED */
+
+    .artifact-slot-mini.filled {
+
+      border: 1px solid var(--brand-teal);
+
+      background: #000;
+
+      box-shadow: inset 0 0 10px rgba(57, 165, 150, 0.2);
+
+    }
+
+
+    .artifact-slot-mini.filled:hover {
+
+      border-color: var(--brand-teal);
+
+      box-shadow: 0 0 20px rgba(57, 165, 150, 0.4);
+
+    }
+
+
+    /* EMPTY (Blueprint Grid) */
+
+    .artifact-slot-mini.empty {
+
+      background-color: #0f0f0f;
+
+      border: 1px solid #222;
+
+      background-image:
+
+        linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+
+        linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+
+      background-size: 6px 6px;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      cursor: default;
+
+    }
+
+
+    .empty-number-mini {
+
+      font-size: 0.9rem;
+
+      font-weight: 700;
+
+      color: #444;
+
+    }
+
+
+    /* BADGE - SMALLER */
+
+    .check-badge-mini {
+
+      position: absolute; top: 2px; right: 2px;
+
+      width: 12px; height: 12px;
+
+      background: var(--brand-teal);
+
+      border-radius: 50%;
+
+      display: flex; align-items: center; justify-content: center;
+
+      z-index: 10;
+
+      box-shadow: 0 0 5px var(--brand-teal);
+
+    }
+
+
+    /* PROGRESS BAR */
+
+    .progress-track-mini {
+
+      background: #1a1a1a;
+
+      border-radius: 10px;
+
+      height: 5px;
+
+      overflow: hidden;
+
+      margin-top: 16px;
+
+    }
+
+    .progress-fill-mini {
+
+      height: 100%;
+
+      background: var(--brand-teal);
+
+      box-shadow: 0 0 10px var(--brand-teal);
+
+      border-radius: 10px;
+
+      transition: width 0.5s ease;
+
+    }
+
+
+    /* GRID - TIGHTER SPACING */
+
+    .artifact-grid-compact {
+
+      display: grid;
+
+      grid-template-columns: repeat(5, 1fr);
+
+      gap: 8px;
+
+      position: relative;
+
+      z-index: 10;
+
+    }
+
+
+    /* MODAL STYLES */
+
+    .artifact-modal {
+
+      display: none;
+
+      position: fixed;
+
+      top: 0;
+
+      left: 0;
+
+      width: 100%;
+
+      height: 100%;
+
+      background: rgba(0, 0, 0, 0.95);
+
+      z-index: 40;
+
+      align-items: center;
+
+      justify-content: center;
+
+      padding: 20px;
+
+    }
+
+
+    .artifact-modal.active {
+
+      display: flex;
+
+    }
+
+
+    .modal-content {
+
+      background: linear-gradient(145deg, #1a1a1a 0%, #0a0a0a 50%, #1a1a1a 100%);
+
+      border: 2px solid var(--brand-teal);
+
+      border-radius: 16px;
+
+      padding: 30px;
+
+      max-width: 400px;
+
+      width: 100%;
+
+      position: relative;
+
+      box-shadow:
+
+        0 0 60px rgba(57, 165, 150, 0.4),
+
+        0 8px 32px rgba(0, 0, 0, 0.8),
+
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+
+        inset 0 -1px 0 rgba(0, 0, 0, 0.5);
+
+      animation: modalZoom 0.3s ease-out;
+
+    }
+
+
+    .modal-content::before {
+
+      content: '';
+
+      position: absolute;
+
+      top: -2px;
+
+      left: -2px;
+
+      right: -2px;
+
+      bottom: -2px;
+
+      background: linear-gradient(45deg, var(--brand-teal), #2d8578, var(--brand-teal), #2d8578);
+
+      border-radius: 16px;
+
+      z-index: -1;
+
+      opacity: 0.6;
+
+      filter: blur(8px);
+
+      animation: borderGlow 3s ease-in-out infinite;
+
+    }
+
+
+    @keyframes borderGlow {
+
+      0%, 100% {
+
+        opacity: 0.6;
+
+        filter: blur(8px);
+
+      }
+
+      50% {
+
+        opacity: 0.8;
+
+        filter: blur(12px);
+
+      }
+
+    }
+
+
+    @keyframes modalZoom {
+
+      from {
+
+        transform: scale(0.8);
+
+        opacity: 0;
+
+      }
+
+      to {
+
+        transform: scale(1);
+
+        opacity: 1;
+
+      }
+
+    }
+
+
+    .modal-close {
+
+      position: absolute;
+
+      top: 15px;
+
+      right: 15px;
+
+      background: none;
+
+      border: none;
+
+      color: #fff;
+
+      font-size: 28px;
+
+      cursor: pointer;
+
+      line-height: 1;
+
+      padding: 0;
+
+      width: 30px;
+
+      height: 30px;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      transition: color 0.2s;
+
+      z-index: 10;
+
+    }
+
+
+    .modal-close:hover {
+
+      color: var(--brand-teal);
+
+    }
+
+
+    .modal-title {
+
+      text-align: center;
+
+      color: #ffffff;
+
+      font-size: 20px;
+
+      font-weight: 700;
+
+      text-transform: uppercase;
+
+      letter-spacing: 1px;
+
+      margin-bottom: 5px;
+
+      margin-top: 5px;
+
+    }
+
+
+    .modal-subtitle {
+
+      text-align: center;
+
+      color: #888;
+
+      font-size: 12px;
+
+      font-weight: 500;
+
+      margin-bottom: 20px;
+
+    }
+
+
+    .modal-image-container {
+
+      width: 100%;
+
+      aspect-ratio: 1/1;
+
+      background: radial-gradient(circle at center, #1a1a1a 0%, #000 70%);
+
+      border: 2px solid #444;
+
+      border-radius: 12px;
+
+      overflow: hidden;
+
+      margin-bottom: 20px;
+
+      position: relative;
+
+      box-shadow:
+
+        0 4px 16px rgba(0, 0, 0, 0.5),
+
+        inset 0 0 30px rgba(57, 165, 150, 0.05);
+
+    }
+
+
+    .modal-image-container::after {
+
+      content: '';
+
+      position: absolute;
+
+      top: 0;
+
+      left: 0;
+
+      right: 0;
+
+      bottom: 0;
+
+      border-radius: 12px;
+
+      background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 50%, rgba(57, 165, 150, 0.05) 100%);
+
+      pointer-events: none;
+
+    }
+
+
+    .modal-image-container img {
+
+      width: 100%;
+
+      height: 100%;
+
+      object-fit: contain;
+
+      padding: 10px;
+
+      position: relative;
+
+      z-index: 1;
+
+    }
+
+
+    .modal-btn {
+
+      width: 100%;
+
+      background: transparent;
+
+      color: #ffffff;
+
+      border: 2px solid #ffffff;
+
+      padding: 14px 20px;
+
+      font-size: 14px;
+
+      font-weight: 700;
+
+      text-transform: uppercase;
+
+      border-radius: 8px;
+
+      cursor: pointer;
+
+      transition: all 0.3s ease;
+
+      font-family: var(--font-main);
+
+      letter-spacing: 0.5px;
+
+    }
+
+
+    .modal-btn:hover {
+
+      background: rgba(255, 255, 255, 0.1);
+
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+
+      transform: scale(1.02);
+
+    }
+  </style>
+
+  {% comment %} --- LOGIC: FETCH ALL DATA (HISTORY) --- {% endcomment %}
+
+  {% assign total_items = 0 %}
+
+  {% assign collected_images = '' %}
+
+  {% assign collected_titles = '' %}
+
+  {% assign collected_order_ids = '' %}
+
+  {% comment %} Added Pagination to ensure we get ALL past orders {% endcomment %}
+
+  {% paginate customer.orders by 250 %}
+    {% for order in customer.orders %}
+      {% unless order.cancelled %}
+        {% comment %} CHECK FOR SPECIAL CODE TEST649 {% endcomment %}
+
+        {% assign is_special_order = false %}
+
+        {% for discount in order.discount_applications %}
+          {% if discount.title == 'TEST649' %}
+            {% assign is_special_order = true %}
+          {% endif %}
+        {% endfor %}
+
+        {% for line_item in order.line_items %}
+          {% comment %} LOGIC: Paid item OR Special Code Order {% endcomment %}
+
+          {% if line_item.final_price > 0 or is_special_order %}
+            {% comment %} 1. COUNT ITEMS {% endcomment %}
+
+            {% assign total_items = total_items | plus: line_item.quantity %}
+
+            {% comment %} 2. FETCH MASCOT {% endcomment %}
+
+            {% assign mascot = line_item.product.metafields.custom.mascot_file %}
+
+            {% if mascot %}
+              {% assign img_url = mascot | image_url: width: 400 %}
+
+            {% else %}
+              {% assign img_url = line_item.image | image_url: width: 400 %}
+            {% endif %}
+
+            {% comment %} 3. GET COLLECTION NAME {% endcomment %}
+
+            {% if line_item.product.collections.size > 0 %}
+              {% assign collection_name = line_item.product.collections.first.title %}
+
+            {% else %}
+              {% assign collection_name = 'Exclusive Drop' %}
+            {% endif %}
+
+            {% assign collected_images = collected_images | append: img_url | append: '||' %}
+
+            {% assign collected_titles = collected_titles | append: collection_name | append: '||' %}
+
+            {% assign collected_order_ids = collected_order_ids | append: order.id | append: '||' %}
+          {% endif %}
+        {% endfor %}
+      {% endunless %}
+    {% endfor %}
+  {% endpaginate %}
+
+  {% assign current_progress = total_items | modulo: 5 %}
+
+  {% comment %} Use Calculated Total Items for Saga Count {% endcomment %}
+
+  {% assign sagas_completed = total_items | divided_by: 5 | floor %}
+
+  {% assign missing_count = 5 | minus: current_progress %}
+
+  {% assign reward_code = customer.metafields.loyalty.reward_code %}
+
+  {% assign collected_images_array = collected_images | split: '||' | reverse %}
+  {% assign collected_titles_array = collected_titles | split: '||' | reverse %}
+  {% assign collected_order_ids_array = collected_order_ids | split: '||' | reverse %}
+
+  <div class="artifact-section-wrapper mt-2 ">
+    <div class="loyalty-card-mini group">
+      <div
+        class="absolute -top-10 -right-10 w-40 h-40 bg-[#39A596] opacity-10 blur-[60px] rounded-full pointer-events-none"
+      ></div>
+
+      <div class="flex justify-between items-start mb-6 relative z-2">
+        <div>
+          <h2 class="text-lg font-bold text-white tracking-wide" style="font-family: 'Montserrat', sans-serif;">
+            Vibe Card Collections
+          </h2>
+
+          <p class="text-xs font-semibold mt-1" style="color: #39A596; font-family: 'Montserrat', sans-serif;">
+            Total Cards Earned: <span class="text-white">{{ total_items }}</span>
+          </p>
+        </div>
+      </div>
+
+      {% comment %}
+        ------------------------------------------------
+
+        PART A: COMPLETED HISTORY ROWS (SAGAS)
+
+        ------------------------------------------------
+      {% endcomment %}
+
+      {% if sagas_completed > 0 %}
+        {% for saga_index in (1..sagas_completed) %}
+          <div class="saga-row completed">
+            <div class="artifact-grid-compact">
+              {% for i in (1..5) %}
+                {% comment %} Calculate Array Index: (SagaNum - 1) * 5 + (SlotNum - 1) {% endcomment %}
+
+                {% assign offset = saga_index | minus: 1 | times: 5 %}
+
+                {% assign array_index = offset | plus: i | minus: 1 %}
+
+                {% assign hist_img = collected_images_array[array_index] %}
+
+                {% assign hist_title = collected_titles_array[array_index] %}
+
+                {% assign hist_oid = collected_order_ids_array[array_index] %}
+
+                <div
+                  class="artifact-slot-mini filled"
+
+                  onclick="openArtifactModal('{{ hist_img }}', '{{ hist_title }}', '{{ hist_oid }}')"
+                >
+                  {% if hist_img %}
+                    <img src="{{ hist_img }}" class="w-full h-full object-contain p-1 relative z-2">
+
+                  {% else %}
+                    <span style="font-size:20px;">✅</span>
+                  {% endif %}
+                </div>
+              {% endfor %}
+            </div>
+
+            <div class="saga-completed-badge">
+              SAGA COMPLETED
+
+              <svg
+                width="10"
+                height="10"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="white"
+                stroke-width="4"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      {% comment %}
+        ------------------------------------------------
+
+        PART B: ACTIVE MISSION OR REWARD TICKET
+
+        ------------------------------------------------
+      {% endcomment %}
+
+      {% if reward_code != blank %}
+        <div class="bg-gray-900 border border-[#39A596] rounded-lg p-4 flex flex-col items-center justify-center gap-2 relative z-2 text-center mt-4">
+          <div>
+            <h2 class="font-bold text-m uppercase mb-2" style="font-family: 'Montserrat', sans-serif; color: #39A596;">
+              MISSION ACCOMPLISHED
+            </h2>
+
+            <h3 class="text-[#39A596] font-bold text-sm uppercase mb-0" style="font-family: 'Montserrat', sans-serif;">
+              🥳Congratulations! You have unlocked your free product
+            </h3>
+
+            <p class="text-gray-400 text-[10px]" style="font-family: 'Montserrat', sans-serif;">
+              Use the below coupon code to buy any T-shirt for FREE
+            </p>
+          </div>
+
+          <div
+            class="bg-[#39A596] text-black font-bold text-lg px-4 py-2 rounded cursor-pointer select-all shadow-lg hover:scale-105 transition-transform w-full"
+
+            style="font-family: 'Montserrat', sans-serif;"
+          >
+            {{ reward_code }}
+          </div>
+        </div>
+
+      {% else %}
+        <div class="saga-row">
+          <p class="text-[10px] text-gray-500 mb-2 uppercase tracking-wider">Current Saga</p>
+
+          <div class="artifact-grid-compact">
+            {% for i in (0..4) %}
+              {% comment %} Calculate Index for Active Row: (Completed * 5) + i {% endcomment %}
+
+              {% assign start_index = sagas_completed | times: 5 %}
+
+              {% assign active_index = start_index | plus: i %}
+
+              {% assign current_img = collected_images_array[active_index] %}
+
+              {% assign current_title = collected_titles_array[active_index] %}
+
+              {% assign current_order_id = collected_order_ids_array[active_index] %}
+
+              <div
+                class="artifact-slot-mini {% if current_img %}filled{% else %}empty{% endif %}"
+
+                {% if current_img %}
+                  onclick="openArtifactModal('{{ current_img }}', '{{ current_title }}', '{{ current_order_id }}')"
+                {% endif %}
+              >
+                {% if current_img %}
+                  <img src="{{ current_img }}" class="w-full h-full object-contain p-1 relative z-2">
+
+                  <div class="check-badge-mini">
+                    <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="4">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  </div>
+
+                {% else %}
+                  <span class="empty-number-mini" style="font-family: 'Montserrat', sans-serif;">
+                    {{- i | plus: 1 -}}
+                  </span>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+
+          <div class="mt-3 relative z-2">
+            <div class="progress-track-mini">
+              {% assign percent = current_progress | times: 20 %}
+
+              <div class="progress-fill-mini" style="width: {{ percent }}%"></div>
+            </div>
+
+            <div class="flex justify-between items-center mt-2">
+              <span class="text-[10px] font-bold text-[#39A596]" style="font-family: 'Montserrat', sans-serif;">
+                {{- percent }}%</span
+              >
+            </div>
+
+            <div class="mt-2 text-center bg-[#39A596]/10 border border-[#39A596]/30 rounded-md py-2 px-3">
+              <span
+                class="text-[11px] text-[#39A596] font-bold tracking-wide uppercase"
+
+                style="font-family: 'Montserrat', sans-serif;"
+              >
+                Buy {{ missing_count }} More Product to Unlock Your Free Product
+              </span>
+              <p 
+                class="text-[9px] font-semibold mt-1 uppercase tracking-wider opacity-90" 
+                style="font-family: 'Montserrat', sans-serif; color: #39A596;"
+              >
+                Order any T-shirt for free upon completing the 5 cards collection
+              </p>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Closet Panel (shown inline below profile on click) -->
+  <div class="mn-dashboard-panel" id="mnClosetPanel">
+    <div class="mn-panel-title">
+      <span>👗 My Digital Closet</span>
+      <button class="mn-panel-close" onclick="togglePanel('mnClosetPanel')">✕</button>
+    </div>
+    <div id="mnClosetPanelContent"></div>
+  </div>
+
+  <!-- Past Looks Panel -->
+  <div class="mn-dashboard-panel" id="mnHistoryPanel" style="border-color:rgba(139,92,246,0.25);">
+    <div class="mn-panel-title" style="color:#a78bfa;">
+      <span>✨ Past AI Looks</span>
+      <button class="mn-panel-close" onclick="togglePanel('mnHistoryPanel')">✕</button>
+    </div>
+    <div id="mnHistoryPanelContent"></div>
+  </div>
+
+<!-- Linear Progress Bar -->
+  <div class="mn-linear-progress-container">
+    <div class="mn-linear-progress-header">
+      <span class="mn-linear-progress-label">Profile Completion</span>
+      <span class="mn-linear-progress-value">0% Complete</span>
+    </div>
+    <div class="mn-linear-progress-track">
+      <div class="mn-linear-progress-fill" style="width: 0%"></div>
+    </div>
+  </div>
+
+  <!-- User Profile Section -->
+  <div class="user-profile-section" id="userProfileSection">
+    <div class="profile-hero">
+      <!-- Top Row: Avatar + Name + Digital Closet Button -->
+      <div class="profile-top-row">
+        <div class="profile-avatar-section">
+          <!-- Circular Progress Ring -->
+          <div class="mn-progress-ring-container">
+            <svg class="mn-progress-ring" width="120" height="120" viewBox="0 0 120 120" style="transform: rotate(-90deg);">
+              <circle class="mn-progress-ring-bg" cx="60" cy="60" r="52"/>
+              <circle class="mn-progress-ring-fill" cx="60" cy="60" r="52"/>
+            </svg>
+            <div class="profile-avatar" id="profileAvatar" onclick="document.getElementById('selfieUploadInput').click()">
+              <span class="profile-avatar-placeholder" id="avatarPlaceholder">👤</span>
+              <img id="avatarImage" src="" alt="Profile" style="display: none;">
+            </div>
+            <div class="mn-progress-percentage"><span>%</span></div>
+          </div>
+          <p class="profile-upload-prompt">Upload photo � AI auto-fills your profile</p>
+          <input type="file" id="selfieUploadInput" accept="image/*" onchange="handleSelfieUpload(this)">
+          
+          <!-- AI Loading State -->
+          <div class="mn-ai-upload-loading" id="mnAILoading">
+            <div class="mn-ai-spinner"></div>
+            <div class="mn-ai-loading-text">AI is Analyzing...</div>
+            <div class="mn-ai-loading-sub">Detecting 20+ style metrics</div>
+          </div>
+        </div>
+
+        <div class="profile-name-section">
+          <h2 class="profile-name" id="profileName">{{ customer.first_name }} {{ customer.last_name }}</h2>
+          <div class="profile-personality" id="profilePersonality">
+            <span id="personalityTone">Style Explorer</span>
+          </div>
+          
+          <!-- Weather Widget -->
+          <div class="mn-weather-widget" id="mnWeatherWidget" onclick="openEditModal('climate','statTemperature')">
+            <span class="mn-weather-icon">🌤️</span>
+            <div class="mn-weather-info">
+              <div class="mn-weather-temp">--°C</div>
+              <div class="mn-weather-condition">Loading...</div>
+            </div>
+            <span style="font-size: 12px; color: rgba(255,255,255,0.4);">Tap to edit</span>
+          </div>
+          
+          <div style="margin-top: 1rem; display:flex; gap:10px; flex-wrap:wrap;">
+            <a href="/pages/my-closet" class="digital-closet-btn" style="text-decoration: none;">
+              <span>👗</span><span>My Closet</span>
+            </a>
+            <button onclick="renderHistoryPanel(); togglePanel('mnHistoryPanel');" class="digital-closet-btn" style="background:linear-gradient(135deg,#7c3aed,#a78bfa);">
+              <span>✨</span><span>Past Looks</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Quick Stats -->
+      <div class="quick-stats-grid">
+        <div class="stat-card clickable">
+          <button class="mn-card-edit-btn" onclick="event.stopPropagation();openEditModal('height','statHeight')">
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M11.5 1.5l3 3L5 14H2v-3L11.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            Edit
+          </button>
+          <div class="stat-icon">&#x1F4CF;</div>
+          <div class="stat-label">Height</div>
+          <div class="stat-value" id="statHeight">-</div>
+        </div>
+        <div class="stat-card clickable">
+          <button class="mn-card-edit-btn" onclick="event.stopPropagation();openEditModal('build','statBodyType')">
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M11.5 1.5l3 3L5 14H2v-3L11.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            Edit
+          </button>
+          <div class="stat-icon">&#x1F4AA;</div>
+          <div class="stat-label">Body Type</div>
+          <div class="stat-value" id="statBodyType">-</div>
+        </div>
+        <div class="stat-card clickable">
+          <button class="mn-card-edit-btn" onclick="event.stopPropagation();openEditModal('skinTone','statSkinTone')">
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M11.5 1.5l3 3L5 14H2v-3L11.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            Edit
+          </button>
+          <div class="stat-icon">&#x1F3A8;</div>
+          <div class="stat-label">Skin Tone</div>
+          <div class="stat-value" id="statSkinTone">-</div>
+        </div>
+        <div class="stat-card clickable">
+          <button class="mn-card-edit-btn" onclick="event.stopPropagation();openEditModal('climate','statTemperature')">
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M11.5 1.5l3 3L5 14H2v-3L11.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            Edit
+          </button>
+          <div class="stat-icon">&#x1F321;&#xFE0F;</div>
+          <div class="stat-label">Climate</div>
+          <div class="stat-value" id="statTemperature">-</div>
+        </div>
+        <div class="stat-card clickable">
+          <button class="mn-card-edit-btn" onclick="event.stopPropagation();openEditModal('budget','statPriceRange')">
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M11.5 1.5l3 3L5 14H2v-3L11.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            Edit
+          </button>
+          <div class="stat-icon">&#x1F4B0;</div>
+          <div class="stat-label">Budget Range</div>
+          <div class="stat-value" id="statPriceRange">-</div>
+        </div>
+        <div class="stat-card" style="cursor:pointer;" title="Click to view past looks">
+          <div class="stat-icon">&#x2728;</div>
+          <div class="stat-label">Outfits Saved</div>
+          <div class="stat-value" id="statOutfitsSaved" style="color:#a78bfa;">0 looks</div>
+        </div>
+      </div>
+
+<!-- Detailed Profile Information -->
+      <div class="profile-details-grid">
+        <div class="detail-card">
+          <button class="mn-card-edit-btn" onclick="openEditModal('goals','detailGoals')">
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M11.5 1.5l3 3L5 14H2v-3L11.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            Edit
+          </button>
+          <div class="detail-label"><span class="detail-icon">&#x1F3AF;</span><span>Fashion Goals</span></div>
+          <div class="detail-value" id="detailGoals">-</div>
+        </div>
+        <div class="detail-card">
+          <button class="mn-card-edit-btn" onclick="openEditModal('favoriteColors','detailColors')">
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M11.5 1.5l3 3L5 14H2v-3L11.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            Edit
+          </button>
+          <div class="detail-label"><span class="detail-icon">&#x1F308;</span><span>Favorite Colors</span></div>
+          <div class="detail-value" id="detailColors">-</div>
+        </div>
+        <div class="detail-card">
+          <button class="mn-card-edit-btn" onclick="openEditModal('occasion','detailOccasion')">
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M11.5 1.5l3 3L5 14H2v-3L11.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            Edit
+          </button>
+          <div class="detail-label"><span class="detail-icon">&#x1F4CD;</span><span>Go-to Occasion</span></div>
+          <div class="detail-value" id="detailOccasion">-</div>
+        </div>
+        <div class="detail-card">
+          <button class="mn-card-edit-btn" onclick="openEditModal('region','detailRegion')">
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M11.5 1.5l3 3L5 14H2v-3L11.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            Edit
+          </button>
+          <div class="detail-label"><span class="detail-icon">&#x1F5FA;&#xFE0F;</span><span>Region / City</span></div>
+          <div class="detail-value" id="detailRegion">-</div>
+        </div>
+        <div class="detail-card">
+          <button class="mn-card-edit-btn" onclick="openEditModal('undertone','detailUndertone')">
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M11.5 1.5l3 3L5 14H2v-3L11.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            Edit
+          </button>
+          <div class="detail-label"><span class="detail-icon">&#x1F9E5;</span><span>Skin Undertone</span></div>
+          <div class="detail-value" id="detailUndertone">-</div>
+        </div>
+        
+        <!-- Style Preferences Cards -->
+        <div class="detail-card" style="grid-column: 1 / -1;">
+          <div class="detail-label"><span class="detail-icon">&#x1F3A8;</span><span>Style Preferences</span></div>
+          <div class="mn-style-cards-grid" id="mnStyleCardsGrid"></div>
+        </div>
+        
+        <!-- Core Interests -->
+        <div class="detail-card" style="grid-column: 1 / -1;">
+          <div class="detail-label"><span class="detail-icon">&#x1F4BB;</span><span>Core Interests</span></div>
+          <div class="mn-interests-container" id="mnInterestsContainer"></div>
+        </div>
+        
+        <!-- Bank Cards Section -->
+        <div class="detail-card" style="grid-column: 1 / -1;">
+          <div class="mn-bank-section">
+            <div class="mn-bank-section-title">
+              <span>💳</span>
+              <span>Payment Preferences</span>
+            </div>
+            
+            <div class="mn-card-type-toggle">
+              <button class="mn-card-type-btn selected" onclick="this.classList.add('selected'); this.nextElementSibling?.classList.remove('selected');">Credit</button>
+              <button class="mn-card-type-btn" onclick="this.classList.add('selected'); this.previousElementSibling?.classList.remove('selected');">Debit</button>
+            </div>
+            
+            <select class="mn-bank-dropdown" id="mnBankSelect">
+              <option value="">Select Your Bank</option>
+              <option value="HDFC Bank">HDFC Bank</option>
+              <option value="ICICI Bank">ICICI Bank</option>
+              <option value="SBI">SBI</option>
+              <option value="Axis Bank">Axis Bank</option>
+              <option value="Kotak Mahindra">Kotak Mahindra</option>
+              <option value="IndusInd Bank">IndusInd Bank</option>
+              <option value="YES Bank">YES Bank</option>
+              <option value="Standard Chartered">Standard Chartered</option>
+              <option value="IDFC First Bank">IDFC First Bank</option>
+              <option value="American Express">American Express</option>
+            </select>
+            
+            <select class="mn-bank-dropdown" id="mnCardVariant">
+              <option value="">Select Card Variant</option>
+            </select>
+            
+            <button class="digital-closet-btn" style="width:100%; justify-content:center; margin-top:8px;" onclick="mnAddBankCard()">
+              <span>+</span><span>Add Card</span>
+            </button>
+            
+            <div class="mn-saved-cards-list" id="mnSavedCardsList"></div>
+          </div>
+        </div>
+        
+        <!-- Ghost Mode Toggle -->
+        <div class="detail-card" style="grid-column: 1 / -1;">
+          <div class="detail-label"><span class="detail-icon">&#x1F574;</span><span>Digital Closet Mode</span></div>
+          <div class="mn-ghost-toggle" id="mnGhostToggle" onclick="mnToggleGhostMode()">
+            <div class="mn-ghost-label">
+              <span>👻</span>
+              <span>Ghost Mode</span>
+            </div>
+            <div class="mn-ghost-switch"></div>
+          </div>
+          <p style="font-size:10px; color:rgba(255,255,255,0.4); margin-top:8px;">
+            Try outfits without associating with physical properties
+          </p>
+        </div>
+        
+        <div class="detail-card" style="grid-column: 1 / -1;">
+          <div class="detail-label"><span class="detail-icon">&#x1F454;</span><span>Closet Breakdown</span></div>
+          <div class="detail-value" id="detailClosetBreakdown" style="font-size:12px; color:#aaa;">Upload clothing photos to see your closet breakdown</div>
+          <div id="mnEmptyClosetActions" style="display:none; margin-top:12px; flex-direction:column; gap:8px;">
+            <button class="digital-closet-btn" style="width:100%; justify-content:center;" onclick="window.location.href='/pages/my-closet'">
+              <span>📸</span><span>Upload to My Closet</span>
+            </button>
+            <button class="digital-closet-btn" style="width:100%; justify-content:center; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.2); color:#fff;" onclick="window.location.href='/pages/my-closet#ghost-mode'">
+              <span>👻</span><span>Ghost Mode</span>
+            </button>
+          </div>
+        </div>
+        <div class="detail-card" style="grid-column: 1 / -1;">
+          <div class="detail-label"><span class="detail-icon">&#x1F457;</span><span>Most Recent AI Outfit</span></div>
+          <div class="detail-value" id="detailLastOutfit" style="font-size:12px; font-style:italic; color:#aaa;">No outfits generated yet</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="artifact-modal" id="artifactModal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeArtifactModal()">×</button>
+
+      <h3 class="modal-title" id="modalTitle" style="font-family: 'Montserrat', sans-serif;">Collection Name</h3>
+
+      <div class="modal-image-container">
+        <img id="modalImage" src="" alt="Artifact">
+      </div>
+
+      <button class="modal-btn" id="modalButton" onclick="viewPersonalityCard()">View Personality Card</button>
+    </div>
+  </div>
+
+  <script>
+    let currentOrderId = '';
+
+    function openArtifactModal(imageUrl, title, orderId) {
+      document.getElementById('modalImage').src = imageUrl;
+
+      document.getElementById('modalTitle').textContent = title || 'Exclusive Drop';
+
+      currentOrderId = orderId;
+
+      document.getElementById('artifactModal').classList.add('active');
+
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeArtifactModal() {
+      document.getElementById('artifactModal').classList.remove('active');
+
+      document.body.style.overflow = 'auto';
+    }
+
+    function viewPersonalityCard() {
+      if (currentOrderId && typeof openVault === 'function') {
+        closeArtifactModal();
+
+        openVault(currentOrderId);
+      } else {
+        alert('Personality card feature is not available.');
+      }
+    }
+
+    // Close modal when clicking outside
+
+    document.getElementById('artifactModal').addEventListener('click', function (e) {
+      if (e.target === this) {
+        closeArtifactModal();
+      }
+    });
+  </script>
+
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-12 mt-4">
+    <div class="lg:col-span-1 space-y-8">
+      <div class="bg-[#111] p-6 rounded-lg border border-gray-800">
+        <h3 class="heading-font text-lg text-white mb-4 uppercase tracking-widest border-b border-gray-800 pb-2">
+          Profile
+        </h3>
+
+        <div class="space-y-4 text-sm">
+          <div>
+            <p class="text-gray-500 text-xs uppercase">Full Name</p>
+
+            <p class="text-white font-medium">{{ customer.name }}</p>
+          </div>
+
+          <div>
+            <p class="text-gray-500 text-xs uppercase">Email</p>
+
+            <p class="text-white font-medium">{{ customer.email }}</p>
+          </div>
+
+          {% if customer.phone %}
+            <div>
+              <p class="text-gray-500 text-xs uppercase">Phone</p>
+
+              <p class="text-white font-medium">{{ customer.phone }}</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      {% if customer.default_address %}
+        <div class="bg-[#111] p-6 rounded-lg border border-gray-800">
+          <div class="flex justify-between items-center mb-4 border-b border-gray-800 pb-2">
+            <h3 class="heading-font text-lg text-white uppercase tracking-widest">Shipping</h3>
+
+            <a href="{{ routes.account_addresses_url }}" class="text-xs brand-text hover:underline">Manage</a>
+          </div>
+
+          <div class="text-gray-300 text-sm leading-relaxed opacity-80">
+            {{ customer.default_address | format_address }}
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="lg:col-span-2">
+      <h3 class="heading-font text-lg text-white mb-4 uppercase tracking-widest border-b border-gray-800 pb-2 mt-4">
+        Order History ({{ customer.orders.size }})
+      </h3>
+
+      {% if customer.orders.size > 0 %}
+        <div class="bg-[#111] rounded-lg border border-gray-800 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead class="bg-[#0a0a0a] border-b border-gray-800">
+                <tr>
+                  <th class="p-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Order</th>
+
+                  <th class="p-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Date</th>
+
+                  <th class="p-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
+
+                  <th class="p-4"></th>
+                </tr>
+              </thead>
+
+              <tbody class="divide-y divide-gray-800">
+                {% for order in customer.orders %}
+                  <tr class="hover:bg-gray-900/50 transition-colors group">
+                    <td class="p-4">
+                      <a href="{{ order.customer_url }}" class="order-link group-hover:underline">
+                        {{ order.order_number | prepend: '#' }}
+                      </a>
+                    </td>
+
+                    <td class="p-4 text-sm text-gray-400">
+                      {{ order.created_at | date: '%b %d, %Y' }}
+                    </td>
+
+                    <td class="p-4">
+                      <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-800 text-gray-300">
+                        {{ order.fulfillment_status_label }}
+                      </span>
+                    </td>
+
+                    <td class="p-4 text-sm text-white font-medium text-right">
+                      {{ order.total_price | money_without_trailing_zeros }}
+                    </td>
+
+                    <td class="p-4 text-right">
+                      <button
+                        onclick="openVault('{{ order.id }}')"
+
+                        class="view-card-btn transition-colors"
+                      >
+                        View Card
+                      </button>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      {% else %}
+        <div class="text-center py-12 bg-[#111] rounded-lg border border-gray-800">
+          <p class="text-gray-500">No orders found yet.</p>
+
+          <a href="/" class="brand-text hover:underline mt-2 inline-block">Start your narrative</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&display=swap');
+
+
+  #vault-overlay {
+
+    display: none;
+
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+
+    background: #000; z-index: 40;
+
+    flex-direction: column; align-items: center; justify-content: center;
+
+    font-family: 'Rajdhani', sans-serif;
+
+    color: #39A596 !important; /* Force green text */
+
+    background-image: radial-gradient(circle at 50% 50%, #111 0%, #000 80%);
+
+  }
+
+  .close-vault {
+
+    position: absolute; top: 20px; right: 20px; color: #fff;
+
+    font-size: 40px; cursor: pointer; background: none; border: none; z-index: 41;
+
+  }
+
+  .scanner-bar { width: 80%; max-width: 300px; height: 4px; background: #111; margin: 20px 0; position: relative; overflow: hidden; border: 1px solid #39A596; }
+
+  .scanner-light { width: 50%; height: 100%; background: #39A596; position: absolute; animation: scan 1.5s infinite alternate; box-shadow: 0 0 15px #39A596; }
+
+  @keyframes scan { from { left: 0; } to { left: 50%; } }
+
+
+  .glitch-text { animation: blink 0.2s infinite; color: #fff; letter-spacing: 2px;}
+
+  @keyframes blink { 0% {opacity: 1} 90% {opacity: 1} 95% {opacity: 0.5} 100% {opacity: 1} }
+
+
+  #final-card-img { width: 90%; max-width: 350px; border: 2px solid #39A596; border-radius: 10px; margin-bottom: 20px; animation: zoomIn 0.5s ease-out; box-shadow: 0 0 30px rgba(57,165,150,0.3); }
+
+  @keyframes zoomIn { from {transform: scale(0.8); opacity: 0;} to {transform: scale(1); opacity: 1;} }
+
+
+  .cyber-btn {
+
+    background: #000; color: #39A596; border: 1px solid #39A596;
+
+    padding: 12px 25px; font-size: 16px; font-weight: bold; text-transform: uppercase;
+
+    cursor: pointer; display: flex; align-items: center; gap: 10px; margin-top: 10px;
+
+    width: 100%; max-width: 300px; justify-content: center;
+
+  }
+
+  .cyber-btn:hover { background: #39A596; color: #000; box-shadow: 0 0 20px #39A596; }
+
+  .insta-btn { border-color: #E1306C; color: #E1306C; }
+
+  .insta-btn:hover { background: #E1306C; color: white; box-shadow: 0 0 20px #E1306C; }
+</style>
+
+<div id="vault-overlay">
+  <button class="close-vault" onclick="closeVault()">×</button>
+
+  <div id="loading-state" style="text-align: center;">
+    <h2 style="letter-spacing: 3px; color: white; margin-bottom: 10px;">NEURAL LINK ESTABLISHED</h2>
+
+    <div class="scanner-bar"><div class="scanner-light"></div></div>
+
+    <p id="status-text" class="glitch-text">ANALYZING PERSONALITY DATA...</p>
+  </div>
+
+  <div
+    id="result-state"
+
+    style="display: none; text-align: center; width: 100%; flex-direction: column; align-items: center;"
+  >
+    <h3 style="color: white; letter-spacing: 2px; margin-bottom: 20px;">IDENTITY CONFIRMED</h3>
+
+    <img id="final-card-img" src="" alt="Identity Card">
+
+    <button class="cyber-btn insta-btn" onclick="shareToInstagram()">SHARE TO STORY 📸</button>
+
+    <a id="download-link" href="#" download class="cyber-btn" style="background:transparent; color:#888; border:none;"
+      >⬇ Download Image</a
+    >
+  </div>
+</div>
+
+<script>
+  // --- CONFIGURATION ---
+
+  const API_URL = 'https://mynarrative-card-gen.vercel.app/api/index';
+
+  let activeOrderId = '';
+
+  let finalImageUrl = '';
+
+  function openVault(orderId) {
+    activeOrderId = orderId;
+
+    document.getElementById('vault-overlay').style.display = 'flex';
+
+    document.getElementById('loading-state').style.display = 'block';
+
+    document.getElementById('result-state').style.display = 'none';
+
+    document.body.style.overflow = 'hidden';
+
+    startPolling();
+  }
+
+  function closeVault() {
+    document.getElementById('vault-overlay').style.display = 'none';
+
+    document.body.style.overflow = 'auto';
+  }
+
+  function startPolling() {
+    const statusText = document.getElementById('status-text');
+
+    let attempts = 0;
+
+    const poller = setInterval(() => {
+      attempts++;
+
+      if (attempts % 2 === 0) statusText.innerText = 'ANALYZING VIBE...';
+      else statusText.innerText = 'GENERATING ASSET...';
+
+      fetch(`${API_URL}?order_id=${activeOrderId}`)
+        .then((res) => res.json())
+
+        .then((data) => {
+          if (data.status === 'ready' && data.url.includes('http')) {
+            clearInterval(poller);
+
+            finalImageUrl = data.url;
+
+            setTimeout(() => {
+              revealCard(finalImageUrl);
+            }, 1000);
+          }
+        })
+
+        .catch((err) => console.error(err));
+
+      if (attempts > 40) {
+        clearInterval(poller);
+
+        statusText.innerText = 'Processing... Check back in 1 minute.';
+      }
+    }, 3000);
+  }
+
+  function revealCard(url) {
+    document.getElementById('loading-state').style.display = 'none';
+
+    document.getElementById('result-state').style.display = 'flex';
+
+    document.getElementById('final-card-img').src = url;
+
+    document.getElementById('download-link').href = url;
+  }
+
+  async function shareToInstagram() {
+    if (!finalImageUrl) return;
+
+    if (navigator.share) {
+      try {
+        const response = await fetch(finalImageUrl);
+
+        const blob = await response.blob();
+
+        const file = new File([blob], 'identity_card.jpg', { type: 'image/jpeg' });
+
+        await navigator.share({
+          files: [file],
+
+          title: 'My Narrative Identity',
+
+          text: 'Verified 1%. #MyNarrative',
+        });
+      } catch (e) {
+        alert('Please save the image and upload manually.');
+      }
+    } else {
+      alert('Image saved! Open Instagram to post.');
+
+      document.getElementById('download-link').click();
+    }
+  }
+</script>
+
+<script>
+// Digital Twin Upload Functionality
+async function uploadTwin(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  // Show loading state
+  document.getElementById('mn-twin-loading').style.display = 'flex';
+  document.getElementById('mn-twin-placeholder').style.display = 'none';
+
+  try {
+    // Convert to Base64
+    const base64 = await toBase64(file);
+    
+    // Send to Vercel Backend
+    const res = await fetch('https://mynarrative-ai.vercel.app/api/profile_manager', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'save_twin',
+        user_id: '{{ customer.id }}',
+        image: base64
+      })
+    });
+    
+    const data = await res.json();
+    
+    if (data.success) {
+      // Update the UI immediately
+      const imgEl = document.getElementById('mn-twin-img');
+      imgEl.src = data.url;
+      imgEl.style.display = 'block';
+      document.getElementById('mn-twin-loading').style.display = 'none';
+      alert('✅ Digital Twin Updated! Now you can try on products in 1 click.');
+    } else {
+      throw new Error(data.error || 'Upload failed');
+    }
+  } catch (error) {
+    console.error('Upload error:', error);
+    alert('❌ Upload failed: ' + error.message);
+    document.getElementById('mn-twin-loading').style.display = 'none';
+    document.getElementById('mn-twin-placeholder').style.display = 'flex';
+  }
+}
+
+// Helper: Convert file to Base64
+function toBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+  });
+}
+
+// Load existing Digital Twin on page load
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const res = await fetch('https://mynarrative-ai.vercel.app/api/profile_manager', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'get_twin',
+        user_id: '{{ customer.id }}'
+      })
+    });
+    
+    const data = await res.json();
+    
+    if (data.success && data.url) {
+      const imgEl = document.getElementById('mn-twin-img');
+      imgEl.src = data.url;
+      imgEl.style.display = 'block';
+      document.getElementById('mn-twin-placeholder').style.display = 'none';
+    }
+  } catch (error) {
+    console.error('Failed to load Digital Twin:', error);
+  }
+});
+</script>
+
+{% schema %}
+{
+  "name": "Account",
+
+  "tag": "section",
+
+  "class": "my-6 md:my-12 px-4 md:px-6 container max-w-screen-xl mx-auto",
+
+  "limit": 1,
+
+  "presets": [
+    {
+      "name": "Account"
+    }
+  ]
+}
+{% endschema %}

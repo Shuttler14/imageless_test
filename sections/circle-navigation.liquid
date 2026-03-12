@@ -1,0 +1,87 @@
+<div class="mx-4 md:mx-6 my-4">
+  <div class="flex gap-2 md:gap-3 overflow-y-auto snap-mandatory snap-x justify-center items-start">
+    
+    {% for block in section.blocks %}
+      {% if block.type == 'url' and block.settings.url_img != blank and block.settings.url != blank %}
+        <div class="flex-shrink-0 flex flex-col gap-1 justify-center items-center w-16 md:w-20">
+          <a
+            href="{{ block.settings.url }}"
+            class="rounded-full aspect-square overflow-hidden h-16 md:h-20 flex-shrink-0 flex-grow-0"
+          >
+            <img src="{{ block.settings.url_img |  image_url }}" height="100%" width="100%" class="aspect-square object-cover">
+          </a>
+          <p class="leading-none line-clamp-2 text-xs md:text-sm normal-font text-center">{{ block.settings.url_title }}</p>
+        </div>
+        {%  elsif block.type == 'collections' and block.settings.collection_img != blank and block.settings.collection != blank %}
+      {% if block.settings.collection_img != blank %}
+        {% assign img = block.settings.collection_img %}
+      {% else %}
+        {% assign img = block.settings.collection.featured_image %}
+      {% endif %}
+      <div class="flex-shrink-0 flex flex-col gap-1 justify-center items-center w-16 md:w-20">
+        <a
+          href="{{ block.settings.collection.url }}"
+          class="rounded-full aspect-square overflow-hidden h-16 md:h-20 flex-shrink-0 flex-grow-0"
+        >
+          <img src="{{ img |  image_url }}" height="100%" width="100%" class="aspect-square object-cover">
+        </a>
+        <p class="leading-none line-clamp-2 text-xs md:text-sm normal-font text-center">{{ block.settings.collection.title }}</p>
+      </div>
+    {% endif %}
+    {% endfor %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Circle Navigation",
+  "tag": "section",
+  "class": "container max-w-screen-xl mx-auto",
+  "limit": 1,
+  "settings": [],
+  "blocks": [
+    {
+      "type": "collections",
+      "name": "Collection",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Choose Collection"
+        },
+        {
+          "type": "image_picker",
+          "id": "collection_img",
+          "label": "Choose Collection Image"
+        }
+      ]
+    },
+    {
+      "type": "url",
+      "name": "URL",
+      "settings": [
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Add URL"
+        },
+        {
+          "type": "image_picker",
+          "id": "url_img",
+          "label": "Choose Image"
+        },
+        {
+          "type": "text",
+          "id": "url_title",
+          "label": "Add Title"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Circle Navigation"
+    }
+  ]
+}
+{% endschema %}
