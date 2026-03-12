@@ -10,18 +10,3 @@ Access: /pages/creator-dashboard
 <div class="creator-dashboard-page">
   {% section 'creator-dashboard' %}
 </div>
-
-{% schema %}
-{
-  "name": "Creator Dashboard",
-  "templates": ["page"],
-  "settings": [
-    {
-      "type": "text",
-      "id": "api_base_url",
-      "label": "API Base URL",
-      "default": "https://api.mynarrative.store"
-    }
-  ]
-}
-{% endschema %}
