@@ -98,7 +98,7 @@ const MNOnboarding = (() => {
     { id: 'office',    label: 'Office / Corporate',          emoji: '💼' },
     { id: 'pooja',     label: 'Pooja / Ethnic Event',        emoji: '🪔' },
     { id: 'sangeet',   label: 'Sangeet / Family Function',   emoji: '💃' },
-    { id: 'date',      label: 'Date Night',                  emoji: '🌙' },
+    { id: 'date',      label: 'DATE',                  emoji: '&#x1F495;' },
     { id: 'airport',   label: 'Airport Look',                emoji: '✈️' },
     { id: 'gym',       label: 'Gym / Activewear',            emoji: '🏋️' },
     { id: 'casual',    label: 'Just Casual Daily Wear',      emoji: '☕' },

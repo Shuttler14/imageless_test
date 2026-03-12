@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect, use } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Wallet,
   TrendingUp,
@@ -10,569 +10,697 @@ import {
   Youtube,
   Twitter,
   Linkedin,
+  Link2,
   X,
+  Check,
   ChevronRight,
-  Tent,
+  Award,
   Users,
+  GraduationCap,
+  Banknote,
+  CreditCard,
   Lock,
-  CheckCircle,
-  AlertCircle,
-  ExternalLink,
-} from "lucide-react";
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+  Unlock,
+  ArrowUpRight,
+  Zap,
+} from 'lucide-react';
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
 import {
   Creator,
-  PayoutStatus,
-  PAYOUT_THRESHOLDS,
-  SocialPlatform,
-  SocialConnectResponse,
-} from "../types";
-
-// ─── helpers ────────────────────────────────────────────────────────────────
-
-function formatINR(amount: number): string {
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
-
-function getPayoutStatusMeta(status: PayoutStatus) {
-  switch (status) {
-    case "LOCKED":
-      return {
-        label: "Balance Locked",
-        icon: <Lock className="w-4 h-4" />,
-        color: "text-zinc-400",
-        bg: "bg-zinc-800",
-        border: "border-zinc-700",
-      };
-    case "STORE_CREDIT_ONLY":
-      return {
-        label: "Store Credit Redeemable",
-        icon: <ShoppingBag className="w-4 h-4" />,
-        color: "text-sky-400",
-        bg: "bg-sky-950",
-        border: "border-sky-800",
-      };
-    case "CASH_AVAILABLE":
-      return {
-        label: "Cash Withdrawal Available",
-        icon: <CheckCircle className="w-4 h-4" />,
-        color: "text-emerald-400",
-        bg: "bg-emerald-950",
-        border: "border-emerald-800",
-      };
-  }
-}
-
-// ─── Sub-components ──────────────────────────────────────────────────────────
-
-/** Metric card used in the top stats row */
-function MetricCard({
-  label,
-  value,
-  icon,
-  sub,
-}: {
-  label: string;
-  value: string;
-  icon: React.ReactNode;
-  sub?: string;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="flex-1 min-w-[180px] rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-5 flex flex-col gap-3"
-    >
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-medium uppercase tracking-widest text-zinc-500">{label}</span>
-        <span className="text-zinc-400">{icon}</span>
-      </div>
-      <span className="text-2xl font-bold text-white tracking-tight">{value}</span>
-      {sub && <span className="text-xs text-zinc-500">{sub}</span>}
-    </motion.div>
-  );
-}
-
-// ─── Threshold Progress Bar ──────────────────────────────────────────────────
-
-function ThresholdProgressBar({ balance }: { balance: number }) {
-  const max = PAYOUT_THRESHOLDS.CASH_WITHDRAWAL; // 5000
-  const clampedBalance = Math.min(balance, max);
-  const progressPct = (clampedBalance / max) * 100;
-  const storeCreditPct = (PAYOUT_THRESHOLDS.STORE_CREDIT / max) * 100; // 50%
-
-  const storeCreditUnlocked = balance >= PAYOUT_THRESHOLDS.STORE_CREDIT;
-  const cashUnlocked = balance >= PAYOUT_THRESHOLDS.CASH_WITHDRAWAL;
-
-  return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-6 space-y-4">
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold uppercase tracking-widest text-zinc-400">
-          Earnings Threshold
-        </h3>
-        <span className="text-xs text-zinc-500">
-          {formatINR(balance)} of {formatINR(max)}
-        </span>
-      </div>
-
-      {/* Bar */}
-      <div className="relative h-4 rounded-full bg-zinc-800 overflow-visible">
-        {/* Filled portion */}
-        <motion.div
-          className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-white/80 to-white"
-          initial={{ width: 0 }}
-          animate={{ width: `${progressPct}%` }}
-          transition={{ duration: 1, ease: "easeOut" }}
-        />
-
-        {/* Marker — ₹2,500 Store Credit */}
-        <div
-          className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 z-10"
-          style={{ left: `${storeCreditPct}%` }}
-        >
-          <div
-            className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors duration-500 ${
-              storeCreditUnlocked
-                ? "bg-sky-400 border-sky-300"
-                : "bg-zinc-900 border-zinc-600"
-            }`}
-          >
-            {storeCreditUnlocked && <CheckCircle className="w-3 h-3 text-white" />}
-          </div>
-        </div>
-
-        {/* Marker — ₹5,000 Cash */}
-        <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 z-10" style={{ left: "100%" }}>
-          <div
-            className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors duration-500 ${
-              cashUnlocked
-                ? "bg-emerald-400 border-emerald-300"
-                : "bg-zinc-900 border-zinc-600"
-            }`}
-          >
-            {cashUnlocked && <CheckCircle className="w-3 h-3 text-white" />}
-          </div>
-        </div>
-      </div>
-
-      {/* Labels */}
-      <div className="relative flex justify-between text-xs mt-1">
-        <span className="text-zinc-600">₹0</span>
-        <span
-          className={`absolute left-1/2 -translate-x-1/2 text-center ${
-            storeCreditUnlocked ? "text-sky-400 font-semibold" : "text-zinc-500"
-          }`}
-        >
-          ₹2,500
-          <br />
-          <span className="text-[10px] font-normal">Store Credit</span>
-        </span>
-        <span className={cashUnlocked ? "text-emerald-400 font-semibold" : "text-zinc-500"}>
-          ₹5,000
-          <br />
-          <span className="text-[10px] font-normal">Cash Out</span>
-        </span>
-      </div>
-
-      {/* Status Pill */}
-      {(() => {
-        const meta = getPayoutStatusMeta(
-          cashUnlocked ? "CASH_AVAILABLE" : storeCreditUnlocked ? "STORE_CREDIT_ONLY" : "LOCKED"
-        );
-        return (
-          <div className={`flex items-center gap-2 px-4 py-2 rounded-xl border ${meta.bg} ${meta.border} ${meta.color} w-fit text-sm font-medium`}>
-            {meta.icon}
-            {meta.label}
-          </div>
-        );
-      })()}
-
-      {/* Next milestone hint */}
-      {!cashUnlocked && (
-        <p className="text-xs text-zinc-500">
-          {!storeCreditUnlocked
-            ? `Earn ${formatINR(PAYOUT_THRESHOLDS.STORE_CREDIT - balance)} more to unlock Store Credit`
-            : `Earn ${formatINR(PAYOUT_THRESHOLDS.CASH_WITHDRAWAL - balance)} more to unlock Cash Withdrawal`}
-        </p>
-      )}
-    </div>
-  );
-}
-
-// ─── Social Connect Modal ────────────────────────────────────────────────────
-
-const PLATFORM_META: Record<
-  SocialPlatform,
-  { label: string; icon: React.ReactNode; placeholder: string; threshold: string }
-> = {
-  instagram: {
-    label: "Instagram",
-    icon: <Instagram className="w-5 h-5" />,
-    placeholder: "@yourhandle",
-    threshold: "500k followers",
-  },
-  youtube: {
-    label: "YouTube",
-    icon: <Youtube className="w-5 h-5" />,
-    placeholder: "youtube.com/c/yourchannel",
-    threshold: "250k subscribers",
-  },
-  twitter: {
-    label: "Twitter / X",
-    icon: <Twitter className="w-5 h-5" />,
-    placeholder: "@yourhandle",
-    threshold: "150k followers",
-  },
-  linkedin: {
-    label: "LinkedIn",
-    icon: <Linkedin className="w-5 h-5" />,
-    placeholder: "linkedin.com/in/yourprofile",
-    threshold: "75k followers",
-  },
-};
-
-function SocialConnectModal({
-  onClose,
-  onConnect,
-  connectedPlatforms,
-}: {
-  onClose: () => void;
-  onConnect: (platform: SocialPlatform, handle: string) => Promise<SocialConnectResponse>;
-  connectedPlatforms: SocialPlatform[];
-}) {
-  const [selected, setSelected] = useState<SocialPlatform | null>(null);
-  const [handle, setHandle] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<SocialConnectResponse | null>(null);
-
-  async function handleConnect() {
-    if (!selected || !handle.trim()) return;
-    setLoading(true);
-    try {
-      const res = await onConnect(selected, handle.trim());
-      setResult(res);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  return (
-    <AnimatePresence>
-      <motion.div
-        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-      >
-        <motion.div
-          className="w-full max-w-lg rounded-3xl border border-white/10 bg-zinc-950 shadow-2xl p-8 relative"
-          initial={{ scale: 0.92, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.92, opacity: 0 }}
-          transition={{ type: "spring", stiffness: 300, damping: 28 }}
-        >
-          <button
-            onClick={onClose}
-            className="absolute top-5 right-5 text-zinc-500 hover:text-white transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
-
-          <h2 className="text-xl font-bold text-white mb-1">Connect Your Socials</h2>
-          <p className="text-sm text-zinc-400 mb-6">
-            Link your accounts to upgrade your commission tier.{" "}
-            <span className="text-white font-semibold">500k+ IG followers</span> unlocks up to{" "}
-            <span className="text-yellow-400 font-bold">50% commission</span>.
-          </p>
-
-          {/* Platform grid */}
-          <div className="grid grid-cols-2 gap-3 mb-6">
-            {(Object.keys(PLATFORM_META) as SocialPlatform[]).map((p) => {
-              const meta = PLATFORM_META[p];
-              const isConnected = connectedPlatforms.includes(p);
-              const isSelected = selected === p;
-              return (
-                <button
-                  key={p}
-                  onClick={() => { setSelected(p); setResult(null); }}
-                  className={`flex items-center gap-3 rounded-xl border px-4 py-3 text-left transition-all duration-200 ${
-                    isSelected
-                      ? "border-white bg-white/10 text-white"
-                      : isConnected
-                      ? "border-emerald-700 bg-emerald-950/40 text-emerald-400"
-                      : "border-white/10 bg-white/5 text-zinc-400 hover:border-white/30 hover:text-white"
-                  }`}
-                >
-                  {meta.icon}
-                  <div>
-                    <p className="text-sm font-semibold">{meta.label}</p>
-                    <p className="text-[10px] text-zinc-500">{meta.threshold} → Mega tier</p>
-                  </div>
-                  {isConnected && <CheckCircle className="w-4 h-4 ml-auto text-emerald-400" />}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Handle input */}
-          {selected && !result && (
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="space-y-3"
-            >
-              <input
-                type="text"
-                value={handle}
-                onChange={(e) => setHandle(e.target.value)}
-                placeholder={PLATFORM_META[selected].placeholder}
-                className="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-zinc-600 text-sm outline-none focus:border-white/40 transition-colors"
-              />
-              <button
-                onClick={handleConnect}
-                disabled={loading || !handle.trim()}
-                className="w-full rounded-xl bg-white text-black font-bold py-3 text-sm hover:bg-zinc-200 transition-colors disabled:opacity-40"
-              >
-                {loading ? "Verifying…" : `Connect ${PLATFORM_META[selected].label}`}
-              </button>
-            </motion.div>
-          )}
-
-          {/* Result */}
-          {result && (
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              className={`rounded-xl border p-4 text-sm ${
-                result.tier_upgraded
-                  ? "border-yellow-700 bg-yellow-950/40 text-yellow-300"
-                  : "border-sky-800 bg-sky-950/40 text-sky-300"
-              }`}
-            >
-              {result.tier_upgraded ? (
-                <div className="flex items-start gap-2">
-                  <AlertCircle className="w-4 h-4 mt-0.5 shrink-0 text-yellow-400" />
-                  <p>
-                    🎉 Tier upgraded to{" "}
-                    <span className="font-bold text-yellow-400">{result.new_tier}</span>!
-                    Your new commission rate is{" "}
-                    <span className="font-bold">{result.new_rate}%</span>.
-                  </p>
-                </div>
-              ) : (
-                <p>{result.message}</p>
-              )}
-            </motion.div>
-          )}
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>
-  );
-}
-
-// ─── Campus Fest Pool Card ───────────────────────────────────────────────────
-
-function FestPoolCard({ pool }: { pool: Creator["fest_pools"][0] }) {
-  const daysLeft = Math.max(
-    0,
-    Math.ceil((new Date(pool.campaign_end).getTime() - Date.now()) / 86400000)
-  );
-  return (
-    <div className="rounded-2xl border border-purple-800/50 bg-purple-950/20 p-5 space-y-3">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-purple-300">
-          <Tent className="w-4 h-4" />
-          <span className="text-sm font-semibold">{pool.fest_name}</span>
-        </div>
-        <span
-          className={`text-xs px-2 py-0.5 rounded-full ${
-            pool.is_active ? "bg-purple-800/50 text-purple-200" : "bg-zinc-800 text-zinc-500"
-          }`}
-        >
-          {pool.is_active ? `${daysLeft}d left` : "Ended"}
-        </span>
-      </div>
-      <p className="text-xs text-zinc-500">{pool.institution}</p>
-      <div className="flex items-end justify-between">
-        <div>
-          <p className="text-2xl font-bold text-white">{formatINR(pool.pool_balance)}</p>
-          <p className="text-xs text-zinc-500">Collective Fest Pool</p>
-        </div>
-        <div className="flex items-center gap-1 text-purple-400 text-xs">
-          <Users className="w-3.5 h-3.5" />
-          {pool.active_ambassadors} ambassadors
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── Earnings Chart ──────────────────────────────────────────────────────────
-
-function EarningsChart({ data }: { data: Creator["earnings"]["earnings_by_month"] }) {
-  return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-6 space-y-4">
-      <h3 className="text-sm font-semibold uppercase tracking-widest text-zinc-400">
-        Monthly Earnings
-      </h3>
-      <div className="h-48">
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
-            <defs>
-              <linearGradient id="earningsGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#ffffff" stopOpacity={0.15} />
-                <stop offset="95%" stopColor="#ffffff" stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#27272a" />
-            <XAxis dataKey="month" tick={{ fill: "#71717a", fontSize: 11 }} axisLine={false} tickLine={false} />
-            <YAxis tick={{ fill: "#71717a", fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => `₹${v}`} />
-            <Tooltip
-              contentStyle={{ background: "#18181b", border: "1px solid #3f3f46", borderRadius: 12, color: "#fff", fontSize: 12 }}
-              formatter={(val: number) => [formatINR(val), "Earnings"]}
-            />
-            <Area type="monotone" dataKey="earnings" stroke="#ffffff" strokeWidth={2} fill="url(#earningsGrad)" dot={false} />
-          </AreaChart>
-        </ResponsiveContainer>
-      </div>
-    </div>
-  );
-}
-
-// ─── Main Dashboard Component ────────────────────────────────────────────────
+  PayoutCalculation,
+  CampusFest,
+  EarningsDataPoint,
+  StyleInfluenceRank,
+  CommissionTier,
+} from '@/lib/types';
+import {
+  mockCreators,
+  mockCampusFests,
+  mockEarningsHistory,
+  RANK_LABELS,
+  COMMISSION_TIERS,
+  formatCurrency,
+  calculateProgressPercentage,
+} from '@/lib/data';
 
 interface CreatorDashboardProps {
-  creator: Creator;
-  onConnectSocial: (platform: SocialPlatform, handle: string) => Promise<SocialConnectResponse>;
-  onRedeemStoreCredit: () => void;
-  onWithdrawCash: () => void;
+  userId?: string;
 }
 
-export default function CreatorDashboard({
-  creator,
-  onConnectSocial,
-  onRedeemStoreCredit,
-  onWithdrawCash,
-}: CreatorDashboardProps) {
-  const [socialModalOpen, setSocialModalOpen] = useState(false);
-  const { earnings, listings, is_campus_ambassador, fest_pools, commission_rate, commission_tier, social_accounts } = creator;
+// Mock current user (in production, this would come from auth context)
+const CURRENT_USER_ID = 'creator_001';
 
-  const connectedPlatforms = social_accounts.map((s) => s.platform);
-  const storeCreditUnlocked = earnings.current_balance >= PAYOUT_THRESHOLDS.STORE_CREDIT;
-  const cashUnlocked = earnings.current_balance >= PAYOUT_THRESHOLDS.CASH_WITHDRAWAL;
+export default function CreatorDashboard({ userId = CURRENT_USER_ID }: CreatorDashboardProps) {
+  const [creator, setCreator] = useState<Creator | null>(null);
+  const [payoutInfo, setPayoutInfo] = useState<PayoutCalculation | null>(null);
+  const [campusFests, setCampusFests] = useState<CampusFest[]>([]);
+  const [earningsHistory, setEarningsHistory] = useState<EarningsDataPoint[]>([]);
+  const [showSocialModal, setShowSocialModal] = useState(false);
+  const [isLinking, setIsLinking] = useState(false);
+
+  // Social link form state
+  const [selectedPlatform, setSelectedPlatform] = useState<string>('');
+  const [handle, setHandle] = useState('');
+  const [followers, setFollowers] = useState('');
+
+  useEffect(() => {
+    // Load mock data
+    const user = mockCreators.find(c => c.id === userId);
+    if (user) {
+      setCreator(user);
+      setCampusFests(user.is_campus_ambassador ? mockCampusFests : []);
+      setEarningsHistory(mockEarningsHistory);
+
+      // Calculate payout info
+      const balance = user.balance;
+      if (balance < 2500) {
+        setPayoutInfo({
+          status: 'LOCKED',
+          current_balance: balance,
+          store_credit_unlocked: false,
+          cash_withdrawal_unlocked: false,
+          amount_to_store_credit: 0,
+          amount_to_cash: 0,
+          next_threshold: 2500,
+          next_threshold_type: 'store_credit',
+        });
+      } else if (balance < 5000) {
+        setPayoutInfo({
+          status: 'STORE_CREDIT_ONLY',
+          current_balance: balance,
+          store_credit_unlocked: true,
+          cash_withdrawal_unlocked: false,
+          amount_to_store_credit: balance,
+          amount_to_cash: 0,
+          next_threshold: 5000,
+          next_threshold_type: 'cash',
+        });
+      } else {
+        setPayoutInfo({
+          status: 'CASH_AVAILABLE',
+          current_balance: balance,
+          store_credit_unlocked: true,
+          cash_withdrawal_unlocked: true,
+          amount_to_store_credit: 5000,
+          amount_to_cash: balance - 5000,
+          next_threshold: 0,
+          next_threshold_type: null,
+        });
+      }
+    }
+  }, [userId]);
+
+  const handleLinkSocial = async () => {
+    if (!selectedPlatform || !handle || !followers) return;
+
+    setIsLinking(true);
+
+    // Mock API call - in production this would POST to /api/creators/link-social
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
+    // Update local state (mock)
+    if (creator) {
+      const newFollowers = parseInt(followers);
+      let newRate = 5;
+      let newTier: CommissionTier = 'standard';
+
+      if (selectedPlatform === 'instagram' && newFollowers >= 500000) {
+        newRate = 50;
+        newTier = 'mega_influencer';
+      } else if (selectedPlatform === 'youtube' && newFollowers >= 250000) {
+        newRate = 50;
+        newTier = 'mega_influencer';
+      } else if (newFollowers >= 100000) {
+        newRate = 15;
+        newTier = 'micro_influencer';
+      }
+
+      setCreator({
+        ...creator,
+        commission_rate: newRate,
+        commission_tier: newTier,
+        social_links: {
+          ...creator.social_links,
+          [selectedPlatform]: {
+            handle,
+            followers: newFollowers,
+            verified: newFollowers >= 100000,
+            linked_at: new Date().toISOString().split('T')[0],
+          },
+        },
+      });
+    }
+
+    setIsLinking(false);
+    setShowSocialModal(false);
+    setSelectedPlatform('');
+    setHandle('');
+    setFollowers('');
+  };
+
+  const getRankInfo = (rank: StyleInfluenceRank) => {
+    return RANK_LABELS[rank] || RANK_LABELS.rookie_designer;
+  };
+
+  const getTierBadge = () => {
+    if (!creator) return null;
+
+    const tierConfig = COMMISSION_TIERS[creator.commission_tier];
+    const isMega = creator.is_mega_influencer;
+
+    return (
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        className={`px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 ${
+          isMega
+            ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black'
+            : 'bg-mn-teal/20 text-mn-teal border border-mn-teal'
+        }`}
+      >
+        <Zap className="w-4 h-4" />
+        {tierConfig.label} - {creator.commission_rate}% Commission
+      </motion.div>
+    );
+  };
+
+  if (!creator || !payoutInfo) {
+    return (
+      <div className="min-h-screen bg-mn-dark flex items-center justify-center">
+        <div className="animate-pulse text-mn-teal">Loading dashboard...</div>
+      </div>
+    );
+  }
+
+  const rankInfo = getRankInfo(creator.style_influence_rank);
+  const storeCreditProgress = calculateProgressPercentage(payoutInfo.current_balance, 2500);
+  const cashProgress = calculateProgressPercentage(payoutInfo.current_balance, 5000);
 
   return (
-    <div className="min-h-screen bg-black text-white font-sans antialiased">
-      {/* ── Header bar ── */}
-      <div className="border-b border-white/10 px-6 py-4 flex items-center justify-between">
-        <div>
-          <h1 className="text-lg font-bold tracking-tight">Creator Dashboard</h1>
-          <p className="text-xs text-zinc-500">@{creator.username} · {commission_tier.replace("_", " ")} · {commission_rate}% commission</p>
+    <div className="min-h-screen bg-mn-dark text-white font-montserrat">
+      {/* Header Section */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-mn-dark via-mn-dark-secondary to-mn-dark">
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-mn-teal/20 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-mn-purple/20 rounded-full blur-3xl" />
         </div>
-        <button
-          onClick={() => setSocialModalOpen(true)}
-          className="flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold hover:bg-white/10 transition-colors"
-        >
-          <ExternalLink className="w-4 h-4" />
-          Connect Socials
-        </button>
+
+        <div className="relative max-w-7xl mx-auto px-6 py-8">
+          {/* Profile Header */}
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                className="relative"
+              >
+                <img
+                  src={creator.avatar_url}
+                  alt={creator.username}
+                  className="w-20 h-20 rounded-full border-4 border-mn-teal object-cover"
+                />
+                <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-mn-gold rounded-full flex items-center justify-center text-lg">
+                  {rankInfo.emoji}
+                </div>
+              </motion.div>
+
+              <div>
+                <h1 className="text-3xl font-bold flex items-center gap-3">
+                  @{creator.username}
+                  <span className="text-2xl">{rankInfo.emoji}</span>
+                </h1>
+                <p className="text-gray-400 text-sm">{rankInfo.description}</p>
+                <div className="mt-2">{getTierBadge()}</div>
+              </div>
+            </div>
+
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => setShowSocialModal(true)}
+              className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-mn-purple to-mn-purple-light rounded-xl font-semibold text-white shadow-lg shadow-mn-purple/25"
+            >
+              <Link2 className="w-4 h-4" />
+              Connect Socials
+            </motion.button>
+          </div>
+
+          {/* Metrics Row */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
+            {/* Current Balance */}
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.1 }}
+              className="bg-mn-card border border-mn-border rounded-2xl p-6"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 bg-mn-teal/20 rounded-xl">
+                  <Wallet className="w-6 h-6 text-mn-teal" />
+                </div>
+                <span className={`text-xs font-bold px-3 py-1 rounded-full ${
+                  payoutInfo.status === 'CASH_AVAILABLE'
+                    ? 'bg-green-500/20 text-green-400'
+                    : payoutInfo.status === 'STORE_CREDIT_ONLY'
+                    ? 'bg-amber-500/20 text-amber-400'
+                    : 'bg-red-500/20 text-red-400'
+                }`}>
+                  {payoutInfo.status === 'CASH_AVAILABLE'
+                    ? '✓ Unlocked'
+                    : payoutInfo.status === 'STORE_CREDIT_ONLY'
+                    ? 'Store Credit Only'
+                    : '🔒 Locked'}
+                </span>
+              </div>
+              <p className="text-gray-400 text-sm mb-1">Current Balance</p>
+              <p className="text-3xl font-bold text-white">{formatCurrency(creator.balance)}</p>
+            </motion.div>
+
+            {/* Lifetime Earnings */}
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="bg-mn-card border border-mn-border rounded-2xl p-6"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 bg-mn-gold/20 rounded-xl">
+                  <TrendingUp className="w-6 h-6 text-mn-gold" />
+                </div>
+                <ArrowUpRight className="w-5 h-5 text-green-400" />
+              </div>
+              <p className="text-gray-400 text-sm mb-1">Lifetime Earnings</p>
+              <p className="text-3xl font-bold text-white">{formatCurrency(creator.lifetime_earnings)}</p>
+            </motion.div>
+
+            {/* Active Listings */}
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="bg-mn-card border border-mn-border rounded-2xl p-6"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 bg-mn-purple/20 rounded-xl">
+                  <ShoppingBag className="w-6 h-6 text-mn-purple" />
+                </div>
+              </div>
+              <p className="text-gray-400 text-sm mb-1">Active Listings</p>
+              <p className="text-3xl font-bold text-white">{creator.active_listings}</p>
+              <p className="text-xs text-gray-500 mt-1">{creator.total_items_sold} items sold total</p>
+            </motion.div>
+          </div>
+        </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-6 py-8 space-y-6">
-        {/* ── Mega-influencer commission badge ── */}
-        {creator.is_mega_influencer && (
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Left Column - Payout Progress */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Payout Threshold Progress */}
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.4 }}
+              className="bg-mn-card border border-mn-border rounded-2xl p-6"
+            >
+              <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
+                <Award className="w-5 h-5 text-mn-gold" />
+                Earnings Redemption Journey
+              </h3>
+
+              {/* Progress Bar */}
+              <div className="relative mb-8">
+                <div className="h-4 bg-gray-800 rounded-full overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${cashProgress}%` }}
+                    transition={{ duration: 1, ease: 'easeOut' }}
+                    className="h-full bg-gradient-to-r from-mn-teal via-mn-gold to-green-400 rounded-full"
+                  />
+                </div>
+
+                {/* Threshold Markers */}
+                <div className="absolute top-5 left-[50%] transform -translate-x-1/2 -translate-y-1/2">
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.8 }}
+                    className={`w-8 h-8 rounded-full flex items-center justify-center border-4 ${
+                      payoutInfo.store_credit_unlocked
+                        ? 'bg-mn-gold border-mn-gold'
+                        : 'bg-gray-700 border-gray-600'
+                    }`}
+                  >
+                    {payoutInfo.store_credit_unlocked ? (
+                      <Check className="w-4 h-4 text-black" />
+                    ) : (
+                      <Lock className="w-4 h-4 text-gray-400" />
+                    )}
+                  </motion.div>
+                  <p className="text-xs text-center mt-1 text-mn-gold font-bold">₹2,500</p>
+                  <p className="text-[10px] text-center text-gray-500">Store Credit</p>
+                </div>
+
+                <div className="absolute top-5 right-0 -translate-y-1/2">
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 1 }}
+                    className={`w-8 h-8 rounded-full flex items-center justify-center border-4 ${
+                      payoutInfo.cash_withdrawal_unlocked
+                        ? 'bg-green-400 border-green-400'
+                        : 'bg-gray-700 border-gray-600'
+                    }`}
+                  >
+                    {payoutInfo.cash_withdrawal_unlocked ? (
+                      <Check className="w-4 h-4 text-black" />
+                    ) : (
+                      <Lock className="w-4 h-4 text-gray-400" />
+                    )}
+                  </motion.div>
+                  <p className="text-xs text-center mt-1 text-green-400 font-bold">₹5,000</p>
+                  <p className="text-[10px] text-center text-gray-500">Cash</p>
+                </div>
+              </div>
+
+              {/* Status Message */}
+              <div className="bg-gray-900/50 rounded-xl p-4">
+                {payoutInfo.status === 'LOCKED' && (
+                  <div className="flex items-center gap-3">
+                    <Lock className="w-5 h-5 text-red-400" />
+                    <div>
+                      <p className="text-sm font-semibold text-red-400">Balance Locked</p>
+                      <p className="text-xs text-gray-400">
+                        Earn {formatCurrency(2500 - payoutInfo.current_balance)} more to unlock store credit redemption
+                      </p>
+                    </div>
+                  </div>
+                )}
+                {payoutInfo.status === 'STORE_CREDIT_ONLY' && (
+                  <div className="flex items-center gap-3">
+                    <CreditCard className="w-5 h-5 text-mn-gold" />
+                    <div>
+                      <p className="text-sm font-semibold text-mn-gold">Store Credit Unlocked!</p>
+                      <p className="text-xs text-gray-400">
+                        Redeem as store credit now, or earn {formatCurrency(5000 - payoutInfo.current_balance)} more for cash withdrawal
+                      </p>
+                    </div>
+                  </div>
+                )}
+                {payoutInfo.status === 'CASH_AVAILABLE' && (
+                  <div className="flex items-center gap-3">
+                    <Banknote className="w-5 h-5 text-green-400" />
+                    <div>
+                      <p className="text-sm font-semibold text-green-400">Cash Withdrawal Available!</p>
+                      <p className="text-xs text-gray-400">
+                        You can withdraw {formatCurrency(payoutInfo.amount_to_cash)} to bank OR use up to {formatCurrency(payoutInfo.amount_to_store_credit)} as store credit
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+
+            {/* Earnings Chart */}
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="bg-mn-card border border-mn-border rounded-2xl p-6"
+            >
+              <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-mn-teal" />
+                Earnings Trend
+              </h3>
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={earningsHistory}>
+                    <defs>
+                      <linearGradient id="earningsGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#39A596" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#39A596" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <XAxis
+                      dataKey="date"
+                      stroke="#666"
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                    />
+                    <YAxis
+                      stroke="#666"
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                      tickFormatter={(value) => `₹${value / 1000}k`}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: '#1a1a1a',
+                        border: '1px solid rgba(57,165,150,0.3)',
+                        borderRadius: '12px',
+                        color: '#fff',
+                      }}
+                      formatter={(value: number) => [formatCurrency(value), 'Earnings']}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="amount"
+                      stroke="#39A596"
+                      strokeWidth={2}
+                      fill="url(#earningsGradient)"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Right Column - Social & Campus */}
+          <div className="space-y-8">
+            {/* Social Connections */}
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.6 }}
+              className="bg-mn-card border border-mn-border rounded-2xl p-6"
+            >
+              <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                <Users className="w-5 h-5 text-mn-purple" />
+                Connected Accounts
+              </h3>
+
+              <div className="space-y-3">
+                {Object.entries(creator.social_links).map(([platform, account]) => (
+                  <div
+                    key={platform}
+                    className="flex items-center justify-between p-3 bg-gray-900/50 rounded-xl"
+                  >
+                    <div className="flex items-center gap-3">
+                      {platform === 'instagram' && <Instagram className="w-5 h-5 text-pink-500" />}
+                      {platform === 'youtube' && <Youtube className="w-5 h-5 text-red-500" />}
+                      {platform === 'twitter' && <Twitter className="w-5 h-5 text-blue-400" />}
+                      {platform === 'linkedin' && <Linkedin className="w-5 h-5 text-blue-600" />}
+                      <div>
+                        <p className="text-sm font-medium">{account?.handle}</p>
+                        <p className="text-xs text-gray-400">
+                          {account?.followers?.toLocaleString()} followers
+                        </p>
+                      </div>
+                    </div>
+                    {account?.verified && (
+                      <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded-full">
+                        Verified
+                      </span>
+                    )}
+                  </div>
+                ))}
+
+                {Object.keys(creator.social_links).length === 0 && (
+                  <div className="text-center py-6 text-gray-500">
+                    <Link2 className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">No accounts connected</p>
+                    <p className="text-xs mt-1">Link socials to upgrade your tier</p>
+                  </div>
+                )}
+              </div>
+
+              <button
+                onClick={() => setShowSocialModal(true)}
+                className="w-full mt-4 py-3 border-2 border-dashed border-gray-700 rounded-xl text-gray-400 hover:border-mn-purple hover:text-mn-purple transition-colors text-sm font-medium"
+              >
+                + Add Social Account
+              </button>
+            </motion.div>
+
+            {/* Campus Fests (if applicable) */}
+            {creator.is_campus_ambassador && campusFests.length > 0 && (
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.7 }}
+                className="bg-mn-card border border-mn-border rounded-2xl p-6"
+              >
+                <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                  <GraduationCap className="w-5 h-5 text-mn-te Campus Fest Pal" />
+                 ools
+                </h3>
+
+                <div className="space-y-4">
+                  {campusFests.filter(f => f.is_active).map(fest => (
+                    <div
+                      key={fest.id}
+                      className="p-4 bg-gradient-to-r from-mn-teal/10 to-transparent rounded-xl border border-mn-teal/20"
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <h4 className="font-semibold text-sm">{fest.name}</h4>
+                        <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">
+                          Active
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-400 mb-3">
+                        {fest.location} • {fest.date}
+                      </p>
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <p className="text-xs text-gray-500">Collective Pool</p>
+                          <p className="text-lg font-bold text-mn-teal">
+                            {formatCurrency(fest.collective_pool)}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-xs text-gray-500">Your Share</p>
+                          <p className="text-lg font-bold text-white">
+                            {formatCurrency(fest.creator_contribution)}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Social Connect Modal */}
+      <AnimatePresence>
+        {showSocialModal && (
           <motion.div
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-3 rounded-2xl border border-yellow-700/60 bg-gradient-to-r from-yellow-950/60 to-zinc-950 px-5 py-3"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={() => setShowSocialModal(false)}
           >
-            <span className="text-xl">👑</span>
-            <div>
-              <p className="text-sm font-bold text-yellow-400">Mega-Influencer — {commission_rate}% Commission</p>
-              <p className="text-xs text-zinc-400">Your social reach earns you a premium commission rate on every sale.</p>
-            </div>
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-mn-dark-secondary border border-mn-border rounded-2xl max-w-md w-full p-6"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold">Connect Social Account</h2>
+                <button
+                  onClick={() => setShowSocialModal(false)}
+                  className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Platform Selection */}
+              <div className="grid grid-cols-4 gap-3 mb-6">
+                {[
+                  { id: 'instagram', icon: Instagram, color: 'text-pink-500', bg: 'bg-pink-500/20' },
+                  { id: 'youtube', icon: Youtube, color: 'text-red-500', bg: 'bg-red-500/20' },
+                  { id: 'twitter', icon: Twitter, color: 'text-blue-400', bg: 'bg-blue-400/20' },
+                  { id: 'linkedin', icon: Linkedin, color: 'text-blue-600', bg: 'bg-blue-600/20' },
+                ].map(platform => (
+                  <button
+                    key={platform.id}
+                    onClick={() => setSelectedPlatform(platform.id)}
+                    className={`p-4 rounded-xl flex flex-col items-center gap-2 transition-all ${
+                      selectedPlatform === platform.id
+                        ? `${platform.bg} border-2 border-mn-teal`
+                        : 'bg-gray-900 border-2 border-transparent hover:border-gray-700'
+                    }`}
+                  >
+                    <platform.icon className={`w-6 h-6 ${platform.color}`} />
+                    <span className="text-xs text-gray-400 capitalize">{platform.id}</span>
+                  </button>
+                ))}
+              </div>
+
+              {/* Form Fields */}
+              <div className="space-y-4 mb-6">
+                <div>
+                  <label className="block text-sm text-gray-400 mb-2">Handle / Username</label>
+                  <input
+                    type="text"
+                    value={handle}
+                    onChange={e => setHandle(e.target.value)}
+                    placeholder="@your_handle"
+                    className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-xl focus:border-mn-teal focus:outline-none transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-400 mb-2">Follower Count</label>
+                  <input
+                    type="number"
+                    value={followers}
+                    onChange={e => setFollowers(e.target.value)}
+                    placeholder="e.g., 500000"
+                    className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-xl focus:border-mn-teal focus:outline-none transition-colors"
+                  />
+                </div>
+              </div>
+
+              {/* Tier Upgrade Info */}
+              <div className="bg-mn-purple/10 border border-mn-purple/30 rounded-xl p-4 mb-6">
+                <p className="text-sm text-mn-purple-light font-semibold mb-2">Unlock Higher Commissions!</p>
+                <ul className="text-xs text-gray-400 space-y-1">
+                  <li>• 100k+ followers → 15% commission</li>
+                  <li>• 500k+ Instagram OR 250k+ YouTube → 50% commission</li>
+                </ul>
+              </div>
+
+              <button
+                onClick={handleLinkSocial}
+                disabled={!selectedPlatform || !handle || !followers || isLinking}
+                className={`w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all ${
+                  !selectedPlatform || !handle || !followers
+                    ? 'bg-gray-800 text-gray-500 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-mn-purple to-mn-purple-light text-white hover:opacity-90'
+                }`}
+              >
+                {isLinking ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Linking...
+                  </>
+                ) : (
+                  <>
+                    <Link2 className="w-4 h-4" />
+                    Connect & Upgrade
+                  </>
+                )}
+              </button>
+            </motion.div>
           </motion.div>
         )}
-
-        {/* ── Metrics Row ── */}
-        <div className="flex flex-wrap gap-4">
-          <MetricCard
-            label="Current Balance"
-            value={formatINR(earnings.current_balance)}
-            icon={<Wallet className="w-4 h-4" />}
-            sub={earnings.payout_status === "LOCKED" ? "Locked — keep earning!" : "Ready to redeem"}
-          />
-          <MetricCard
-            label="Lifetime Earnings"
-            value={formatINR(earnings.lifetime_earnings)}
-            icon={<TrendingUp className="w-4 h-4" />}
-            sub={`${commission_rate}% on every sale`}
-          />
-          <MetricCard
-            label="Active Listings"
-            value={listings.filter((l) => l.is_active).length.toString()}
-            icon={<ShoppingBag className="w-4 h-4" />}
-            sub={`${creator.total_units_sold} units sold total`}
-          />
-        </div>
-
-        {/* ── Threshold Progress Bar ── */}
-        <ThresholdProgressBar balance={earnings.current_balance} />
-
-        {/* ── Redemption Actions ── */}
-        <div className="flex flex-wrap gap-3">
-          <button
-            onClick={onRedeemStoreCredit}
-            disabled={!storeCreditUnlocked}
-            className="flex items-center gap-2 rounded-xl border border-sky-700 bg-sky-950/40 px-5 py-3 text-sm font-semibold text-sky-300 hover:bg-sky-900/50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-          >
-            <ShoppingBag className="w-4 h-4" />
-            Redeem as Store Credit
-            <ChevronRight className="w-4 h-4" />
-          </button>
-          <button
-            onClick={onWithdrawCash}
-            disabled={!cashUnlocked}
-            className="flex items-center gap-2 rounded-xl border border-emerald-700 bg-emerald-950/40 px-5 py-3 text-sm font-semibold text-emerald-300 hover:bg-emerald-900/50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-          >
-            <Wallet className="w-4 h-4" />
-            Withdraw Cash
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-
-        {/* ── Earnings Chart ── */}
-        {earnings.earnings_by_month.length > 0 && (
-          <EarningsChart data={earnings.earnings_by_month} />
-        )}
-
-        {/* ── Campus Fest Pool (ambassadors only) ── */}
-        {is_campus_ambassador && fest_pools.length > 0 && (
-          <div className="space-y-4">
-            <h3 className="text-sm font-semibold uppercase tracking-widest text-zinc-400">
-              Campus Fest Pools
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {fest_pools.map((pool) => (
-                <FestPoolCard key={pool.fest_name} pool={pool} />
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* ── Social Connect Modal ── */}
-      {socialModalOpen && (
-        <SocialConnectModal
-          onClose={() => setSocialModalOpen(false)}
-          onConnect={onConnectSocial}
-          connectedPlatforms={connectedPlatforms}
-        />
-      )}
+      </AnimatePresence>
     </div>
   );
 }

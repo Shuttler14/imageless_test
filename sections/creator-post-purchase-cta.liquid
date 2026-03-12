@@ -1,0 +1,243 @@
+{% comment %}
+=================================================================================
+MY NARRATIVE - POST-PURCHASE CREATOR CTA (ORDER CONFIRMATION)
+=================================================================================
+Aggressive acquisition CTA on the Thank You / Order Confirmation page
+Converts highly engaged buyers into instant creators
+Version: 1.0.0
+
+INTEGRATION:
+Add to page.thank-you.json or thank-you.liquid section:
+{% section 'creator-post-purchase-cta' %}
+
+IMPORTANT: Only shows for customers who are NOT already creators
+
+=================================================================================
+{% endcomment %}
+
+{% comment %} Check if we should show the CTA {% endcomment %}
+{% assign show_cta = true %}
+
+{% if customer %}
+  {% if customer.metafields.creator.registered == true %}
+    {% assign show_cta = false %}
+  {% endif %}
+{% endif %}
+
+{% if show_cta %}
+<style>
+  .mn-post-purchase-creator {
+    font-family: 'Montserrat', sans-serif;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(251, 191, 36, 0.1));
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: 20px;
+    padding: 28px;
+    margin: 24px 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .mn-post-purchase-creator::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.15), transparent 70%);
+    pointer-events: none;
+  }
+
+  .mn-post-purchase-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .mn-post-purchase-icon {
+    font-size: 48px;
+    flex-shrink: 0;
+  }
+
+  .mn-post-purchase-text {
+    flex: 1;
+  }
+
+  .mn-post-purchase-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .mn-post-purchase-title .highlight {
+    color: #fbbf24;
+  }
+
+  .mn-post-purchase-desc {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.5;
+    margin-bottom: 4px;
+  }
+
+  .mn-post-purchase-stats {
+    display: flex;
+    gap: 20px;
+    margin: 12px 0;
+    flex-wrap: wrap;
+  }
+
+  .mn-stat-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .mn-stat-item .icon {
+    color: #39A596;
+  }
+
+  .mn-post-purchase-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    color: #fff;
+    text-decoration: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+  }
+
+  .mn-post-purchase-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3);
+  }
+
+  .mn-post-purchase-dismiss {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 4px 8px;
+    line-height: 1;
+    transition: color 0.3s ease;
+  }
+
+  .mn-post-purchase-dismiss:hover {
+    color: #fff;
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .mn-post-purchase-content {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .mn-post-purchase-stats {
+      justify-content: center;
+    }
+
+    .mn-post-purchase-cta {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  /* Animation */
+  .mn-post-purchase-creator {
+    animation: mnSlideIn 0.5s ease;
+  }
+
+  @keyframes mnSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
+
+<div class="mn-post-purchase-creator" id="mnPostPurchaseCreator">
+  <button class="mn-post-purchase-dismiss" onclick="this.parentElement.style.display='none'" aria-label="Dismiss">
+    &times;
+  </button>
+
+  <div class="mn-post-purchase-content">
+    <div class="mn-post-purchase-icon">&#10024;</div>
+
+    <div class="mn-post-purchase-text">
+      <h3 class="mn-post-purchase-title">
+        Love your style? Turn it into <span class="highlight">cash</span>
+      </h3>
+      <p class="mn-post-purchase-desc">
+        Join the My Narrative Creator Economy and start earning from your fashion sense.
+        No inventory, no shipping&#8212;we handle everything.
+      </p>
+
+      <div class="mn-post-purchase-stats">
+        <span class="mn-stat-item">
+          <span class="icon">&#128176;</span> Earn 5-50% commission
+        </span>
+        <span class="mn-stat-item">
+          <span class="icon">&#127873;</span> &#8377;2,500 store credit unlock
+        </span>
+        <span class="mn-stat-item">
+          <span class="icon">&#128640;</span> Instant onboarding
+        </span>
+      </div>
+    </div>
+
+    <a href="/pages/become-creator" class="mn-post-purchase-cta">
+      Start Earning
+      <span>&#8594;</span>
+    </a>
+  </div>
+</div>
+
+<script>
+  // Dismiss permanently for this session
+  document.querySelector('.mn-post-purchase-dismiss')?.addEventListener('click', function() {
+    sessionStorage.setItem('mn_creator_cta_dismissed', 'true');
+  });
+
+  // Check if previously dismissed
+  if (sessionStorage.getItem('mn_creator_cta_dismissed') === 'true') {
+    const container = document.getElementById('mnPostPurchaseCreator');
+    if (container) {
+      container.style.display = 'none';
+    }
+  }
+</script>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Post-Purchase Creator CTA",
+  "settings": [],
+  "presets": [
+    {
+      "name": "Post-Purchase Creator CTA"
+    }
+  ]
+}
+{% endschema %}

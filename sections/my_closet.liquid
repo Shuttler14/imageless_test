@@ -1,11 +1,155 @@
 <!-- My Digital Closet Section with AI Classification -->
-<div class="digital-closet-page" style="min-height: 100vh; background: #000; color: #fff; padding: 40px 20px;">
-  <div style="max-width: 1200px; margin: 0 auto;">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
 
+:root {
+  --mn-bg: #000000;
+  --mn-card-bg: #111111;
+  --mn-accent: #39A596;
+  --mn-text-main: #ffffff;
+  --mn-text-muted: #888888;
+  --mn-glass: rgba(255, 255, 255, 0.05);
+  --mn-glass-border: rgba(255, 255, 255, 0.1);
+}
+
+.mn-closet-page {
+  background-color: var(--mn-bg);
+  min-height: 100vh;
+  font-family: 'Montserrat', sans-serif;
+  color: var(--mn-text-main);
+  padding: 60px 20px;
+}
+
+.mn-closet-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.mn-closet-header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.mn-closet-header h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  margin: 0 0 10px 0;
+  text-transform: uppercase;
+  background: linear-gradient(45deg, #fff, #888);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.mn-closet-header p {
+  color: var(--mn-text-muted);
+  font-size: 1.1rem;
+  font-weight: 300;
+}
+
+.mn-closet-upload-card {
+  background: var(--mn-glass);
+  border: 1px solid var(--mn-glass-border);
+  border-radius: 16px;
+  padding: 20px 40px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.mn-closet-upload-card:hover {
+  background: rgba(255,255,255,0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  border-color: var(--mn-accent);
+}
+
+.mn-upload-icon-wrapper {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: var(--mn-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 600;
+  color: #000;
+}
+
+.mn-upload-text h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.mn-upload-text p {
+  margin: 4px 0 0 0;
+  color: var(--mn-text-muted);
+  font-size: 0.85rem;
+}
+</style>
+
+<div class="mn-closet-page">
+  <div class="mn-closet-container">
+    
     <!-- Header -->
-    <div style="text-align: center; margin-bottom: 40px;">
-      <h1 style="font-size: 32px; font-weight: 700; margin-bottom: 10px;">👕 My Digital Closet</h1>
-      <p style="color: #888; font-size: 14px;">AI-powered wardrobe analysis • Upload your clothes and let AI classify them</p>
+    <div class="mn-closet-header">
+      <h1>MY DIGITAL CLOSET</h1>
+      <p>Your wardrobe, reimagined in the cloud.</p>
+    </div>
+
+    <!-- Stats Bar -->
+    <div id="closet-stats" style="display: flex; justify-content: center; gap: 40px; margin-bottom: 40px; flex-wrap: wrap;">
+      <div style="text-align: center; padding: 20px 30px; background: var(--mn-glass); border: 1px solid var(--mn-glass-border); border-radius: 12px; min-width: 120px;">
+        <div id="total-items" style="font-size: 32px; font-weight: 700; color: #39A596;">0</div>
+        <div style="font-size: 12px; color: #888; margin-top: 5px; text-transform: uppercase; letter-spacing: 1px;">Total Items</div>
+      </div>
+      <div style="text-align: center; padding: 20px 30px; background: var(--mn-glass); border: 1px solid var(--mn-glass-border); border-radius: 12px; min-width: 120px;">
+        <div id="categories-count" style="font-size: 32px; font-weight: 700; color: #39A596;">0</div>
+        <div style="font-size: 12px; color: #888; margin-top: 5px; text-transform: uppercase; letter-spacing: 1px;">Categories</div>
+      </div>
+      <div style="text-align: center; padding: 20px 30px; background: var(--mn-glass); border: 1px solid var(--mn-glass-border); border-radius: 12px; min-width: 120px;">
+        <div id="western-count" style="font-size: 32px; font-weight: 700; color: #39A596;">0</div>
+        <div style="font-size: 12px; color: #888; margin-top: 5px; text-transform: uppercase; letter-spacing: 1px;">Western</div>
+      </div>
+      <div style="text-align: center; padding: 20px 30px; background: var(--mn-glass); border: 1px solid var(--mn-glass-border); border-radius: 12px; min-width: 120px;">
+        <div id="ethnic-count" style="font-size: 32px; font-weight: 700; color: #39A596;">0</div>
+        <div style="font-size: 12px; color: #888; margin-top: 5px; text-transform: uppercase; letter-spacing: 1px;">Ethnic</div>
+      </div>
+    </div>
+
+    <!-- Upload Section with Two Options -->
+    <div id="upload-section" style="margin-bottom: 50px;">
+      <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+        
+        <!-- Option 1: Image Upload with Auto-Detect -->
+        <div class="mn-closet-upload-card" style="flex: 1; min-width: 280px; max-width: 400px;"
+             onclick="document.getElementById('closet-upload').click()">
+          <div class="mn-upload-icon-wrapper">+</div>
+          <div class="mn-upload-text">
+            <h3>Add New Item</h3>
+            <p>AI Auto-Tagging Enabled</p>
+          </div>
+          <input type="file" id="closet-upload" accept="image/*" style="display: none;" onchange="DigitalCloset.upload(this)">
+        </div>
+
+        <!-- Option 2: Ghost Mode -->
+        <div class="mn-closet-upload-card" style="flex: 1; min-width: 280px; max-width: 400px; background: rgba(167, 139, 250, 0.1); border-color: rgba(167, 139, 250, 0.3);"
+             onclick="document.getElementById('ghost-modal').classList.add('active')">
+          <div class="mn-upload-icon-wrapper" style="background: linear-gradient(135deg, #a78bfa, #7c3aed);">&#x1F47B;</div>
+          <div class="mn-upload-text">
+            <h3 style="color: #a78bfa;">Ghost Mode</h3>
+            <p>Describe or type any item</p>
+          </div>
+        </div>
+
+      </div>
     </div>
 
     <!-- Stats Bar -->
@@ -28,24 +172,108 @@
       </div>
     </div>
 
-    <!-- Upload Section -->
-    <div id="upload-section" style="background: #111; border: 2px dashed #39A596; border-radius: 12px; padding: 40px; text-align: center; margin-bottom: 40px; cursor: pointer; transition: all 0.3s;"
-         onclick="document.getElementById('closet-upload').click()">
-      <div style="font-size: 48px; margin-bottom: 15px;">📸</div>
-      <div style="font-size: 16px; font-weight: 700; margin-bottom: 10px;">Upload Clothing Item</div>
-      <div style="font-size: 12px; color: #888;">AI will automatically detect and classify your clothing</div>
-      <input type="file" id="closet-upload" accept="image/*" style="display: none;" onchange="DigitalCloset.upload(this)">
-    </div>
+    <!-- Upload Section with Two Options -->
+    <div id="upload-section" style="background: #111; border: 2px dashed #39A596; border-radius: 12px; padding: 40px; text-align: center; margin-bottom: 40px;">
+      <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+        
+        <!-- Option 1: Image Upload with Auto-Detect -->
+        <div style="flex: 1; min-width: 250px; max-width: 400px; background: #1a1a1a; border-radius: 12px; padding: 30px; cursor: pointer; transition: all 0.3s;"
+             onclick="document.getElementById('closet-upload').click()"
+             onmouseover="this.style.borderColor='#39A596'; this.style.transform='translateY(-2px)';"
+             onmouseout="this.style.borderColor='transparent'; this.style.transform='translateY(0)';">
+          <div style="font-size: 48px; margin-bottom: 15px;">ðŸ“·</div>
+          <div style="font-size: 16px; font-weight: 700; margin-bottom: 10px;">Upload from Photo</div>
+          <div style="font-size: 12px; color: #888; margin-bottom: 15px;">AI will automatically detect and classify your clothing</div>
+          <div style="font-size: 11px; color: #39A596; font-weight: 600;">âš¡ Auto-detect cloth type</div>
+          <input type="file" id="closet-upload" accept="image/*" style="display: none;" onchange="DigitalCloset.upload(this)">
+        </div>
 
-    <!-- Loading State -->
-    <div id="loading-state" style="display: none; text-align: center; padding: 60px 20px;">
-      <div style="font-size: 48px; margin-bottom: 20px;">🤖</div>
-      <div style="font-size: 18px; margin-bottom: 10px;">AI is analyzing your item...</div>
-      <div style="font-size: 14px; color: #666; margin-bottom: 20px;">Detecting clothing and classifying into categories</div>
-      <div style="max-width: 300px; margin: 0 auto; height: 4px; background: #222; border-radius: 2px; overflow: hidden;">
-        <div id="loading-progress" style="width: 0%; height: 100%; background: #39A596; transition: width 0.3s;"></div>
+        <!-- Option 2: Ghost Mode -->
+        <div style="flex: 1; min-width: 250px; max-width: 400px; background: #1a1a1a; border-radius: 12px; padding: 30px; cursor: pointer; transition: all 0.3s;"
+             onclick="document.getElementById('ghost-modal').classList.add('active')"
+             onmouseover="this.style.borderColor='#39A596'; this.style.transform='translateY(-2px)';"
+             onmouseout="this.style.borderColor='transparent'; this.style.transform='translateY(0)';">
+          <div style="font-size: 48px; margin-bottom: 15px;">ðŸ'»</div>
+          <div style="font-size: 16px; font-weight: 700; margin-bottom: 10px;">Ghost Mode</div>
+          <div style="font-size: 12px; color: #888; margin-bottom: 15px;">Type anything you want to add - describe your item</div>
+          <div style="font-size: 11px; color: #39A596; font-weight: 600;">âœ¨ Describe or type any item</div>
+        </div>
+
       </div>
     </div>
+
+    <!-- Scanning Animation State (Enhanced Premium Design) -->
+    <div id="scanning-state" style="display: none; text-align: center; padding: 40px 20px;">
+      <div class="mn-scanner-title">AI SCANNING</div>
+      <div class="mn-scanner-subtitle">Analyzing your clothing item</div>
+      
+      <div class="mn-enhanced-scanner">
+        <div class="mn-scan-image-container">
+          <img id="scanner-preview-img" class="mn-scan-preview-img" src="" alt="Scanning item">
+          <div class="mn-laser-line"></div>
+          <div class="mn-scan-corner mn-scan-corner-tl"></div>
+          <div class="mn-scan-corner mn-scan-corner-tr"></div>
+          <div class="mn-scan-corner mn-scan-corner-bl"></div>
+          <div class="mn-scan-corner mn-scan-corner-br"></div>
+          <div class="mn-scan-overlay-text">SCANNING</div>
+        </div>
+        
+        <div class="mn-enhanced-terminal" id="scanner-terminal">
+          <!-- Terminal output will be inserted here -->
+        </div>
+        
+        <div class="mn-scan-progress">
+          <div class="mn-scan-progress-fill" id="scan-progress-fill" style="width: 0%;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ghost Mode Modal -->
+    <div id="ghost-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9999; align-items: center; justify-content: center; padding: 20px; overflow-y: auto;">
+      <div style="background: linear-gradient(135deg,#0a0a0a,#1a1a1a); border: 1px solid rgba(167,139,250,0.4); border-radius: 20px; padding: 32px; max-width: 550px; width: 100%; box-shadow: 0 0 80px rgba(167,139,250,0.25); max-height: 90vh; overflow-y: auto;">
+        <div style="font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; color: #a78bfa;">&#x1F47B; Ghost Mode</div>
+        <div style="font-size: 13px; color: #888; margin-bottom: 24px;">Select items from your closet or add new ones</div>
+        
+        <!-- Recommendation Categories based on existing closet -->
+        <div id="ghost-recommendations" style="margin-bottom: 24px;">
+          <div style="font-size: 11px; color: #a78bfa; font-weight: 700; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.08em;">Quick Add from Your Closet</div>
+          <div id="ghost-recommendation-chips" style="display: flex; flex-wrap: wrap; gap: 8px;">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+        
+        <!-- Divider -->
+        <div style="border-top: 1px solid rgba(255,255,255,0.1); margin: 24px 0;"></div>
+        
+        <!-- Custom Entry -->
+        <div style="font-size: 11px; color: #a78bfa; font-weight: 700; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.08em;">Or Add Custom Item</div>
+        <input type="text" id="ghost-input" style="width: 100%; background: rgba(255,255,255,0.06); border: 1.5px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 14px 16px; color: #fff; font-size: 14px; margin-bottom: 14px; outline: none; font-family: Montserrat, sans-serif;" placeholder="E.g. Black Levis 501 Jeans, size 32..." />
+        <select id="ghost-category" style="width: 100%; background: rgba(255,255,255,0.06); border: 1.5px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 14px 16px; color: #fff; font-size: 14px; margin-bottom: 14px; outline: none; font-family: Montserrat, sans-serif;">
+          <option value="">Category (optional)</option>
+          <option>Topwear</option>
+          <option>Bottomwear</option>
+          <option>Outerwear</option>
+          <option>Footwear</option>
+          <option>Ethnic Wear</option>
+          <option>Accessories</option>
+        </select>
+        <div style="display: flex; gap: 12px; margin-top: 24px;">
+          <button onclick="document.getElementById('ghost-modal').classList.remove('active')" style="flex: 1; padding: 14px 20px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: #888; font-size: 14px; font-weight: 600; cursor: pointer; font-family: Montserrat, sans-serif;">Cancel</button>
+          <button onclick="DigitalCloset.submitGhost()" style="flex: 1; padding: 14px 20px; background: linear-gradient(135deg, #a78bfa, #7c3aed); border: none; border-radius: 12px; color: #fff; font-size: 14px; font-weight: 700; cursor: pointer; font-family: Montserrat, sans-serif;">Add to Closet</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+    // Ghost Mode recommendation data loader
+    document.getElementById('ghost-modal').addEventListener('click', function(e) {
+      // Only load recommendations once when modal opens
+      if (!this.dataset.loaded) {
+        this.dataset.loaded = 'true';
+        DigitalCloset.loadGhostRecommendations();
+      }
+    });
+    </script>
 
     <!-- Results Display -->
     <div id="result-display" style="display: none; background: #111; border-radius: 12px; padding: 30px; margin-bottom: 40px;">
@@ -70,30 +298,52 @@
     </div>
 
     <!-- Filter Tabs -->
-    <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
-      <button class="filter-tab active" data-filter="all" onclick="DigitalCloset.filter('all')" style="background: #39A596; color: #000; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: 600;">All</button>
-      <button class="filter-tab" data-filter="Topwear" onclick="DigitalCloset.filter('Topwear')" style="background: #222; color: #fff; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer;">Topwear</button>
-      <button class="filter-tab" data-filter="Bottomwear" onclick="DigitalCloset.filter('Bottomwear')" style="background: #222; color: #fff; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer;">Bottomwear</button>
-      <button class="filter-tab" data-filter="Footwear" onclick="DigitalCloset.filter('Footwear')" style="background: #222; color: #fff; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer;">Footwear</button>
-      <button class="filter-tab" data-filter="Accessory" onclick="DigitalCloset.filter('Accessory')" style="background: #222; color: #fff; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer;">Accessories</button>
+    <div class="mn-closet-tabs" style="display: flex; justify-content: center; gap: 15px; margin-bottom: 40px; flex-wrap: wrap;">
+      <button class="mn-tab active" data-filter="all" onclick="DigitalCloset.filter('all', this)" style="background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 12px 28px; border-radius: 30px; cursor: pointer; font-family: Montserrat, sans-serif; font-size: 14px; transition: all 0.3s;">All</button>
+      <button class="mn-tab" data-filter="Topwear" onclick="DigitalCloset.filter('Topwear', this)" style="background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #888; padding: 12px 28px; border-radius: 30px; cursor: pointer; font-family: Montserrat, sans-serif; font-size: 14px; transition: all 0.3s;">Topwear</button>
+      <button class="mn-tab" data-filter="Bottomwear" onclick="DigitalCloset.filter('Bottomwear', this)" style="background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #888; padding: 12px 28px; border-radius: 30px; cursor: pointer; font-family: Montserrat, sans-serif; font-size: 14px; transition: all 0.3s;">Bottomwear</button>
+      <button class="mn-tab" data-filter="Footwear" onclick="DigitalCloset.filter('Footwear', this)" style="background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #888; padding: 12px 28px; border-radius: 30px; cursor: pointer; font-family: Montserrat, sans-serif; font-size: 14px; transition: all 0.3s;">Footwear</button>
+      <button class="mn-tab" data-filter="Accessory" onclick="DigitalCloset.filter('Accessory', this)" style="background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #888; padding: 12px 28px; border-radius: 30px; cursor: pointer; font-family: Montserrat, sans-serif; font-size: 14px; transition: all 0.3s;">Accessories</button>
     </div>
 
     <!-- Wardrobe Grid -->
-    <div id="wardrobe-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px;">
+    <div id="wardrobe-grid" class="mn-closet-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px;">
       <!-- Items will be loaded here dynamically -->
     </div>
 
     <!-- Empty State -->
-    <div id="empty-state" style="display: none; text-align: center; padding: 60px 20px; color: #666;">
-      <div style="font-size: 64px; margin-bottom: 20px;">👔</div>
-      <div style="font-size: 18px; margin-bottom: 10px;">Your closet is empty</div>
-      <div style="font-size: 14px;">Upload your first item to get started!</div>
+    <div id="empty-state" style="display: none; text-align: center; padding: 80px 20px; color: #666;">
+      <div style="font-size: 64px; margin-bottom: 20px; opacity: 0.5;">🧥</div>
+      <h3 style="font-size: 24px; color: #fff; margin-bottom: 10px; font-weight: 600;">Your closet is empty</h3>
+      <p style="font-size: 14px;">Upload your first item to see AI magic happen.</p>
     </div>
 
   </div>
 </div>
 
 <style>
+/* Premium Tab Styling */
+.mn-tab.active, .mn-tab:hover {
+  background: #fff !important;
+  color: #000 !important;
+  border-color: #fff !important;
+}
+
+/* Premium Grid Styling */
+.mn-closet-grid .closet-item {
+  background: #111;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  transition: transform 0.3s ease;
+  border: 1px solid transparent;
+}
+
+.mn-closet-grid .closet-item:hover {
+  transform: translateY(-5px);
+  border-color: rgba(255,255,255,0.1);
+}
+
 .closet-item {
   position: relative;
   background: #111;
@@ -170,10 +420,9 @@
 // Digital Closet with AI Classification Integration
 if (!window.DigitalCloset) {
   window.DigitalCloset = {
-    // API Configuration - Point to your local cloth detection API
-    // For local: http://localhost:5000
+    // API Configuration - Point to your cloth detection API
     // For production: Update to your deployed API URL
-    apiUrl: "{{ routes.root_url }}api/cloth-detect" || "http://localhost:5000",
+    apiUrl: "https://api.mynarrative.store/v1/cloth-detect",
     closetApi: "https://mynarrative-ai.vercel.app/api/profile_manager",
     userId: "{{ customer.id }}",
     currentFilter: 'all',
@@ -251,13 +500,18 @@ if (!window.DigitalCloset) {
       `).join('');
     },
 
-    filter: function(category) {
+    filter: function(category, btn) {
       this.currentFilter = category;
 
       // Update tab styles
-      document.querySelectorAll('.filter-tab').forEach(tab => {
-        tab.classList.toggle('active', tab.dataset.filter === category);
+      document.querySelectorAll('.mn-tab').forEach(tab => {
+        tab.classList.remove('active');
+        tab.style.color = '#888';
       });
+      if (btn) {
+        btn.classList.add('active');
+        btn.style.color = '#fff';
+      }
 
       // Reload with filter
       this.loadItems();
@@ -270,68 +524,187 @@ if (!window.DigitalCloset) {
       const reader = new FileReader();
 
       reader.onload = async (e) => {
-        try {
-          // Show loading state
-          document.getElementById('upload-section').style.display = 'none';
-          document.getElementById('loading-state').style.display = 'block';
-          document.getElementById('loading-progress').style.width = '30%';
-
-          // Step 1: Call AI Classification API
-          let classification = null;
-
-          try {
-            // Try local API first
-            const classifyResponse = await fetch(this.apiUrl, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ image: e.target.result }),
-              timeout: 30000
-            });
-
-            if (classifyResponse.ok) {
-              const classifyData = await classifyResponse.json();
-              if (classifyData.success && classifyData.detected_items && classifyData.detected_items.length > 0) {
-                classification = classifyData.detected_items[0];
-                console.log('Local API classification:', classification);
-              }
-            }
-          } catch (apiError) {
-            console.warn('Local API not available, trying classification fallback:', apiError);
-          }
-
-          // Fallback: If local API fails, use basic detection
-          if (!classification) {
-            classification = this.basicClassify(e.target.result);
-          }
-
-          document.getElementById('loading-progress').style.width = '80%';
-
-          // Show result
-          this.showResult(e.target.result, classification);
-          document.getElementById('loading-state').style.display = 'none';
-
-        } catch (error) {
-          console.error('Upload error:', error);
-          alert('Upload failed. Please try again.');
-          document.getElementById('upload-section').style.display = 'block';
-          document.getElementById('loading-state').style.display = 'none';
-        }
+        // Show scanning animation state
+        document.getElementById('upload-section').style.display = 'none';
+        document.getElementById('scanning-state').style.display = 'block';
+        
+        // Set preview image
+        document.getElementById('scanner-preview-img').src = e.target.result;
+        
+        // Clear previous terminal output
+        const terminal = document.getElementById('scanner-terminal');
+        terminal.innerHTML = '';
+        
+        // Run scanning animation with simulated logs
+        await this.runScanningAnimation(e.target.result);
       };
 
       reader.readAsDataURL(file);
     },
 
-    // Basic fallback classification using canvas analysis
-    basicClassify: function(imageData) {
-      // This is a fallback - in production you'd use the API
-      return {
+    // Run the scanning animation with simulated terminal logs
+    runScanningAnimation: async function(imageData) {
+      const terminal = document.getElementById('scanner-terminal');
+      const progressFill = document.getElementById('scan-progress-fill');
+      const previewImg = document.getElementById('scanner-preview-img');
+      const overlayText = document.querySelector('.mn-scan-overlay-text');
+      const self = this;
+      
+      // Clear previous content
+      terminal.innerHTML = '';
+      
+      // Simulated scan logs with enhanced messages
+      const scanLogs = [
+        { text: '[SYS] Initializing neural network...', type: 'sys' },
+        { text: '[SYS] Loading image buffer: 1024x768px', type: 'sys' },
+        { text: '[DATA] Analyzing pixel composition...', type: 'data' },
+        { text: '[DATA] Detecting edges: 847 vertices found', type: 'data' },
+        { text: '[DATA] RGB(45, 55, 72) primary color', type: 'data' },
+        { text: '[DATA] RGB(139, 92, 246) accent color', type: 'data' },
+        { text: '[SYS] Fabric analysis: Denim weave detected', type: 'sys' },
+        { text: '[DATA] Thread count: 12x12 per cm²', type: 'data' },
+        { text: '[DATA] Texture: Twill pattern', type: 'data' },
+        { text: '[SYS] Shape recognition: Upper body garment', type: 'sys' },
+        { text: '[CLASSIFY] Category: Topwear (98.5%)', type: 'classify' },
+        { text: '[CLASSIFY] Sub-type: Denim Jacket', type: 'classify' },
+        { text: '[CLASSIFY] Style: Western / Casual', type: 'classify' },
+        { text: '[DATA] Occasion tags: Outdoor, Travel', type: 'data' },
+        { text: '[DATA] Season suitability: Fall, Winter', type: 'data' },
+        { text: '[SYS] Generating embedding vector...', type: 'sys' },
+        { text: '[SYS] Embedding stored: mn_closet_2024', type: 'sys' },
+        { text: '[SUCCESS] Item added to digital closet!', type: 'success' }
+      ];
+      
+      // Display logs with animation and progress
+      for (let i = 0; i < scanLogs.length; i++) {
+        await this.addEnhancedTerminalLine(terminal, scanLogs[i].text, scanLogs[i].type);
+        
+        // Update progress bar
+        const progress = Math.round(((i + 1) / scanLogs.length) * 100);
+        if (progressFill) {
+          progressFill.style.width = progress + '%';
+        }
+        
+        await this.sleep(120 + Math.random() * 80); // Random delay between 120-200ms
+      }
+      
+      // Update overlay text to show complete
+      if (overlayText) {
+        overlayText.textContent = 'COMPLETE';
+        overlayText.style.color = '#34d399';
+      }
+      
+      // Remove blur from image
+      if (previewImg) {
+        previewImg.classList.add('scanned');
+      }
+      
+      // Wait a bit after the last message
+      await this.sleep(800);
+      
+      // Try to get API classification
+      let classification = null;
+      try {
+        const classifyResponse = await fetch(this.apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image: imageData }),
+          timeout: 30000
+        });
+
+        if (classifyResponse.ok) {
+          const classifyData = await classifyResponse.json();
+          if (classifyData.success && classifyData.detected_items && classifyData.detected_items.length > 0) {
+            classification = classifyData.detected_items[0];
+          }
+        }
+      } catch (apiError) {
+        console.warn('Cloth detection API not available:', apiError);
+      }
+
+      // Hide scanning state and show result
+      document.getElementById('scanning-state').style.display = 'none';
+      
+      if (classification) {
+        this.showResult(imageData, classification);
+      } else {
+        this.showManualClassification(imageData);
+      }
+    },
+
+    // Add a single terminal line with animation
+    addTerminalLine: function(terminal, text, type) {
+      return new Promise((resolve) => {
+        const line = document.createElement('div');
+        line.className = 'mn-terminal-line';
+        line.innerHTML = `<span class="mn-terminal-${type}">${text}</span>`;
+        terminal.appendChild(line);
+        terminal.scrollTop = terminal.scrollHeight;
+        resolve();
+      });
+    },
+
+    // Add enhanced terminal line with premium styling
+    addEnhancedTerminalLine: function(terminal, text, type) {
+      return new Promise((resolve) => {
+        const line = document.createElement('div');
+        line.className = 'mn-enhanced-line';
+        line.innerHTML = `<span class="mn-line-${type}">${text}</span>`;
+        terminal.appendChild(line);
+        terminal.scrollTop = terminal.scrollHeight;
+        resolve();
+      });
+    },
+
+    // Helper sleep function
+    sleep: function(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    },
+
+    // Show manual classification modal when API fails
+    showManualClassification: function(imageData) {
+      document.getElementById('scanning-state').style.display = 'none';
+      document.getElementById('loading-state').style.display = 'none';
+      
+      const modal = document.createElement('div');
+      modal.id = 'manual-classify-modal';
+      modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+      modal.innerHTML = `
+        <div style="background:linear-gradient(135deg,#0a0a0a,#1a1a1a);border:1px solid rgba(57,165,150,0.4);border-radius:20px;padding:28px;max-width:500px;width:100%;box-shadow:0 0 60px rgba(57,165,150,0.25);">
+          <div style="font-size:18px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Select Category</div>
+          <div style="font-size:12px;color:#888;margin-bottom:18px;">AI detection unavailable. Please select the category manually.</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;">
+            <button onclick="DigitalCloset.selectCategory('Topwear','${imageData}')" style="flex:1;min-width:100px;padding:12px;background:#222;border:1px solid #39A596;border-radius:8px;color:#fff;font-weight:600;cursor:pointer;">Topwear</button>
+            <button onclick="DigitalCloset.selectCategory('Bottomwear','${imageData}')" style="flex:1;min-width:100px;padding:12px;background:#222;border:1px solid #39A596;border-radius:8px;color:#fff;font-weight:600;cursor:pointer;">Bottomwear</button>
+            <button onclick="DigitalCloset.selectCategory('Footwear','${imageData}')" style="flex:1;min-width:100px;padding:12px;background:#222;border:1px solid #39A596;border-radius:8px;color:#fff;font-weight:600;cursor:pointer;">Footwear</button>
+            <button onclick="DigitalCloset.selectCategory('Outerwear','${imageData}')" style="flex:1;min-width:100px;padding:12px;background:#222;border:1px solid #39A596;border-radius:8px;color:#fff;font-weight:600;cursor:pointer;">Outerwear</button>
+            <button onclick="DigitalCloset.selectCategory('Ethnic Wear','${imageData}')" style="flex:1;min-width:100px;padding:12px;background:#222;border:1px solid #39A596;border-radius:8px;color:#fff;font-weight:600;cursor:pointer;">Ethnic Wear</button>
+            <button onclick="DigitalCloset.selectCategory('Accessories','${imageData}')" style="flex:1;min-width:100px;padding:12px;background:#222;border:1px solid #39A596;border-radius:8px;color:#fff;font-weight:600;cursor:pointer;">Accessories</button>
+          </div>
+          <button onclick="this.closest('#manual-classify-modal').remove()" style="width:100%;padding:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#888;cursor:pointer;">Cancel</button>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    },
+
+    // Handle manual category selection
+    selectCategory: function(category, imageData) {
+      const classification = {
         name: 'Uploaded Item',
-        category: 'Topwear',
+        category: category,
         style_type: 'Western',
         color: 'Unknown',
         pattern: 'Solid',
-        confidence: 0.5
+        confidence: 1.0,
+        manual: true
       };
+      
+      // Remove modal
+      const modal = document.getElementById('manual-classify-modal');
+      if (modal) modal.remove();
+      
+      // Show result
+      this.showResult(imageData, classification);
     },
 
     showResult: function(imageData, classification) {
@@ -407,8 +780,182 @@ if (!window.DigitalCloset) {
     cancelAdd: function() {
       this.pendingItem = null;
       document.getElementById('result-display').style.display = 'none';
+      document.getElementById('scanning-state').style.display = 'none';
       document.getElementById('upload-section').style.display = 'block';
       document.getElementById('closet-upload').value = '';
+    },
+
+    // Load recommendations from existing closet data
+    loadGhostRecommendations: async function() {
+      const container = document.getElementById('ghost-recommendation-chips');
+      if (!container) return;
+      
+      // Common clothing suggestions by category
+      const suggestions = {
+        'Topwear': [
+          { name: 'White T-Shirt', emoji: '👕' },
+          { name: 'Black T-Shirt', emoji: '👕' },
+          { name: 'Blue Shirt', emoji: '👔' },
+          { name: 'Formal Shirt', emoji: '👔' },
+          { name: 'Hoodie', emoji: '🧥' },
+          { name: 'Sweater', emoji: '🧶' }
+        ],
+        'Bottomwear': [
+          { name: 'Blue Jeans', emoji: '👖' },
+          { name: 'Black Jeans', emoji: '👖' },
+          { name: 'Chinos', emoji: '👖' },
+          { name: 'Shorts', emoji: '🩳' },
+          { name: 'Formal Pants', emoji: '👖' }
+        ],
+        'Footwear': [
+          { name: 'White Sneakers', emoji: '👟' },
+          { name: 'Black Shoes', emoji: '👞' },
+          { name: 'Boots', emoji: '👢' },
+          { name: 'Sandals', emoji: '🩴' },
+          { name: 'Running Shoes', emoji: '👟' }
+        ],
+        'Outerwear': [
+          { name: 'Denim Jacket', emoji: '🧥' },
+          { name: 'Leather Jacket', emoji: '🧥' },
+          { name: 'Blazer', emoji: '🧥' },
+          { name: 'Rain Jacket', emoji: '🧥' }
+        ],
+        'Ethnic Wear': [
+          { name: 'Kurta', emoji: '👘' },
+          { name: 'Sherwani', emoji: '👘' },
+          { name: 'Saree', emoji: '👘' },
+          { name: 'Ldhengwa', emoji: '👘' }
+        ],
+        'Accessories': [
+          { name: 'Watch', emoji: '⌚' },
+          { name: 'Sunglasses', emoji: '🕶️' },
+          { name: 'Belt', emoji: '🥋' },
+          { name: 'Cap', emoji: '🧢' },
+          { name: 'Wallet', emoji: '👛' }
+        ]
+      };
+      
+      // Get existing items from closet to check/pre-select
+      let existingItems = [];
+      try {
+        const response = await fetch(`${this.closetApi}?action=get_closet&user_id=${this.userId}`);
+        const data = await response.json();
+        if (data.success && data.items) {
+          existingItems = data.items.map(i => i.name?.toLowerCase() || '');
+        }
+      } catch (e) {
+        // Fallback to local storage
+        const localCloset = localStorage.getItem('mn_digital_closet');
+        if (localCloset) {
+          existingItems = JSON.parse(localCloset).map(i => i.name?.toLowerCase() || '');
+        }
+      }
+      
+      // Build HTML for suggestions
+      let html = '';
+      Object.entries(suggestions).forEach(([category, items]) => {
+        items.forEach(item => {
+          const isOwned = existingItems.some(existing => 
+            existing.includes(item.name.toLowerCase()) || item.name.toLowerCase().includes(existing)
+          );
+          const style = isOwned 
+            ? 'background: rgba(167,139,250,0.2); border-color: #a78bfa; color: #a78bfa; opacity: 0.7;'
+            : 'background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.15); color: #fff;';
+          html += `<button onclick="DigitalCloset.quickAddGhost('${item.name}', '${category}')" 
+            style="${style} border: 1px solid; border-radius: 20px; padding: 6px 12px; font-size: 11px; cursor: pointer; transition: all 0.2s;">
+            ${item.emoji} ${item.name}${isOwned ? ' &#x2713;' : ''}
+          </button>`;
+        });
+      });
+      
+      container.innerHTML = html || '<div style="color: #666; font-size: 12px;">No recommendations available</div>';
+    },
+
+    // Quick add from recommendations
+    quickAddGhost: async function(name, category) {
+      try {
+        const ghostItem = {
+          id: 'ghost_' + Date.now(),
+          name: name,
+          original_name: name,
+          category: category,
+          emoji: '&#x1F47B;',
+          ghost: true,
+          added_at: new Date().toISOString()
+        };
+
+        const response = await fetch(this.closetApi, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'add_closet_item',
+            user_id: this.userId,
+            item: ghostItem
+          })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          // Close modal and reload
+          document.getElementById('ghost-modal').classList.remove('active');
+          await this.loadItems();
+        }
+      } catch (error) {
+        console.error('Quick add error:', error);
+      }
+    },
+
+    submitGhost: async function() {
+      const desc = document.getElementById('ghost-input').value.trim();
+      const cat = document.getElementById('ghost-category').value;
+      
+      if (!desc) {
+        alert('Please describe the item you want to add');
+        return;
+      }
+
+      try {
+        // Show loading
+        document.getElementById('ghost-modal').querySelector('button:last-child').textContent = 'Adding...';
+        
+        // Create ghost item
+        const ghostItem = {
+          id: 'ghost_' + Date.now(),
+          name: desc,
+          original_name: desc,
+          category: cat || 'Other',
+          emoji: 'ðŸ'»',
+          ghost: true,
+          added_at: new Date().toISOString()
+        };
+
+        // Save to API
+        const response = await fetch(this.closetApi, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'add_closet_item',
+            user_id: this.userId,
+            item: ghostItem
+          })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          // Close modal and reload
+          document.getElementById('ghost-modal').classList.remove('active');
+          document.getElementById('ghost-input').value = '';
+          document.getElementById('ghost-category').value = '';
+          await this.loadItems();
+        } else {
+          alert('Failed to add item: ' + (data.error || 'Unknown error'));
+        }
+      } catch (error) {
+        console.error('Ghost add error:', error);
+        alert('Failed to add item. Please try again.');
+      } finally {
+        document.getElementById('ghost-modal').querySelector('button:last-child').textContent = 'Add to Closet ðŸ'»';
+      }
     },
 
     deleteItem: async function(itemId) {

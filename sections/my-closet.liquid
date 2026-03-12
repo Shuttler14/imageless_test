@@ -1,488 +1,851 @@
-<!-- 
-  SECTION: My Digital Closet (Premium UI)
-  - Dark Mode / Glassmorphism
-  - Montserrat Font
-  - Integrated Image Upload & Auto-Classification
--->
+﻿{% comment %} Digital Closet Page - Matches store dark luxury theme {% endcomment %}
 
-<div class="mn-closet-page">
-  <div class="mn-closet-container">
-    
-    <!-- Header -->
-    <div class="mn-closet-header">
-      <h1>MY DIGITAL CLOSET</h1>
-      <p>"Your wardrobe, reimagined in the cloud."</p>
-    </div>
+<div class="mnc-page">
 
-    <!-- Stats & Actions -->
-    <div class="mn-closet-actions">
-      <div class="mn-closet-upload-card" onclick="document.getElementById('closet-upload-input').click()">
-        <div class="mn-upload-icon-wrapper">
-          <span class="mn-upload-icon">+</span>
-        </div>
-        <div class="mn-upload-text">
-          <h3>Add New Item</h3>
-          <p>AI Auto-Tagging Enabled</p>
-        </div>
-        <input type="file" id="closet-upload-input" accept="image/*" hidden onchange="MNCloset.uploadItem(this)">
+  <!-- Hero Header -->
+  <div class="mnc-hero">
+    <div class="mnc-hero-inner">
+      <p class="mnc-hero-eyebrow">MY NARRATIVE</p>
+      <h1 class="mnc-hero-title">My Digital Closet</h1>
+      <p class="mnc-hero-sub">Your wardrobe, classified by AI. Every piece, perfectly organised.</p>
+      <div class="mnc-stats-row">
+        <div class="mnc-stat"><span class="mnc-stat-num" id="mnc-total-count">0</span><span class="mnc-stat-lbl">Items</span></div>
+        <div class="mnc-stat-div"></div>
+        <div class="mnc-stat"><span class="mnc-stat-num" id="mnc-cat-count">0</span><span class="mnc-stat-lbl">Categories</span></div>
+        <div class="mnc-stat-div"></div>
+        <div class="mnc-stat"><span class="mnc-stat-num" id="mnc-complete-pct">0</span><span class="mnc-stat-lbl">% Complete</span></div>
       </div>
     </div>
+  </div>
 
-    <!-- Filter Tabs (Optional Enhancement) -->
-    <div class="mn-closet-tabs">
-      <button class="mn-tab active" onclick="MNCloset.filter('all', this)">All</button>
-      <button class="mn-tab" onclick="MNCloset.filter('Tops', this)">Tops</button>
-      <button class="mn-tab" onclick="MNCloset.filter('Bottoms', this)">Bottoms</button>
-      <button class="mn-tab" onclick="MNCloset.filter('Footwear', this)">Footwear</button>
+  <!-- Filter Tabs -->
+  <div class="mnc-filters-wrap">
+    <div class="mnc-filters" id="mnc-filters">
+      <button class="mnc-filter active" data-cat="all">All</button>
+      <button class="mnc-filter" data-cat="tops">Tops</button>
+      <button class="mnc-filter" data-cat="bottoms">Bottoms</button>
+      <button class="mnc-filter" data-cat="outerwear">Outerwear</button>
+      <button class="mnc-filter" data-cat="footwear">Footwear</button>
+      <button class="mnc-filter" data-cat="accessories">Accessories</button>
+      <button class="mnc-filter" data-cat="watches">Watches</button>
+      <button class="mnc-filter" data-cat="ethnic">Ethnic</button>
+      <button class="mnc-filter" data-cat="dresses">Dresses</button>
     </div>
+  </div>
 
-    <!-- Grid -->
-    <div id="mn-closet-grid" class="mn-closet-grid">
-      <!-- Items injected via JS -->
-      <div class="mn-loading-state">
-        <div class="mn-spinner"></div>
-        <p>Loading your collection...</p>
+  <!-- Items Grid -->
+  <div class="mnc-grid-wrap">
+    <div class="mnc-grid" id="mnc-grid">
+      <div class="mnc-empty" id="mnc-empty" style="display:none">
+        <span class="mnc-empty-icon">&#128247;</span>
+        <p class="mnc-empty-title">Your closet is empty</p>
+        <p class="mnc-empty-sub">Add your first item using the options below</p>
       </div>
     </div>
+  </div>
 
+  <!-- Add Clothes Section -->
+  <div class="mnc-add-section">
+    <div class="mnc-add-header">
+      <p class="mnc-add-eyebrow">EXPAND YOUR WARDROBE</p>
+      <h2 class="mnc-add-title">Add More Clothes</h2>
+      <p class="mnc-add-sub">Choose how you want to digitise your wardrobe.</p>
+    </div>
+
+    <div class="mnc-add-cards">
+
+      <!-- Option 1: Photo Upload -->
+      <div class="mnc-add-card mnc-card-photo" id="mnc-card-photo">
+        <div class="mnc-card-glow mnc-glow-green"></div>
+        <div class="mnc-card-inner">
+          <div class="mnc-card-icon">&#128247;</div>
+          <h3 class="mnc-card-title">Upload a Photo</h3>
+          <p class="mnc-card-sub">We will auto-detect your clothes from the image</p>
+          <button class="mnc-btn mnc-btn-primary" id="mnc-snap-btn">Choose Photo</button>
+          <input type="file" id="mnc-photo-input" accept="image/*" style="display:none" multiple>
+          <div class="mnc-scan-ui" id="mnc-scan-ui" style="display:none">
+            <div class="mnc-scan-wrap">
+              <img class="mnc-scan-img" id="mnc-preview-img" alt="Uploaded"/>
+              <div class="mnc-scan-anim">
+                <div class="mnc-scan-line"></div>
+                <div class="mnc-scan-corner mnc-sc-tl"></div>
+                <div class="mnc-scan-corner mnc-sc-tr"></div>
+                <div class="mnc-scan-corner mnc-sc-bl"></div>
+                <div class="mnc-scan-corner mnc-sc-br"></div>
+              </div>
+            </div>
+            <p class="mnc-scan-status" id="mnc-scan-status">&#128269; Detecting clothes&hellip;</p>
+            <div class="mnc-detected" id="mnc-detected-items"></div>
+            <button class="mnc-btn mnc-btn-primary" id="mnc-save-detected" style="display:none">&#10003; Save to Closet</button>
+            <button class="mnc-btn mnc-btn-ghost" id="mnc-retake-btn">&#8635; Choose different photo</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Option 2: Ghost Mode -->
+      <div class="mnc-add-card mnc-card-ghost" id="mnc-card-ghost">
+        <div class="mnc-card-glow mnc-glow-purple"></div>
+        <div class="mnc-card-inner">
+          <div class="mnc-card-icon">&#128123;</div>
+          <h3 class="mnc-card-title">Ghost Mode</h3>
+          <p class="mnc-card-sub">Select your clothes — pick from popular options or type your own</p>
+          <button type="button" class="mnc-btn mnc-btn-ghost-outline" id="mnc-ghost-btn">Enter Ghost Mode</button>
+
+          <!-- Ghost Form -->
+          <div class="mnc-ghost-form" id="mnc-ghost-form" style="display:none">
+
+            <!-- Step 1: Category -->
+            <div class="mnc-field">
+              <label class="mnc-lbl">1. Choose Category</label>
+              <div class="mnc-cat-pills" id="mnc-cat-pills">
+                <button type="button" class="mnc-cat-pill" data-cat="tops">&#128085; Tops</button>
+                <button type="button" class="mnc-cat-pill" data-cat="bottoms">&#128086; Bottoms</button>
+                <button type="button" class="mnc-cat-pill" data-cat="outerwear">&#129693; Outerwear</button>
+                <button type="button" class="mnc-cat-pill" data-cat="footwear">&#128097; Footwear</button>
+                <button type="button" class="mnc-cat-pill" data-cat="accessories">&#128092; Accessories</button>
+                <button type="button" class="mnc-cat-pill" data-cat="watches">⌚ Watches</button>
+                <button type="button" class="mnc-cat-pill" data-cat="ethnic">&#129399; Ethnic</button>
+                <button type="button" class="mnc-cat-pill" data-cat="dresses">&#128247; Dresses</button>
+                <button type="button" class="mnc-cat-pill" data-cat="activewear">&#127947; Activewear</button>
+              </div>
+            </div>
+
+            <!-- Step 2: Item tiles (shown after category selected) -->
+            <div class="mnc-field" id="mnc-items-field" style="display:none">
+              <label class="mnc-lbl">2. Select Items <span class="mnc-lbl-hint">(tap multiple to add all)</span></label>
+              <div class="mnc-item-tiles" id="mnc-item-tiles"></div>
+              <input class="mnc-input" id="mnc-ghost-custom" type="text" placeholder="Or type a custom item name&hellip;" autocomplete="off" style="margin-top:10px"/>
+            </div>
+
+            <!-- Selected items preview -->
+            <div class="mnc-field" id="mnc-selected-field" style="display:none">
+              <label class="mnc-lbl">3. Selected Items</label>
+              <div class="mnc-selected-pills" id="mnc-selected-pills"></div>
+            </div>
+
+            <button type="button" class="mnc-btn mnc-btn-primary" id="mnc-ghost-save" style="display:none">Add to My Closet &#10003;</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
 </div>
 
+
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+/* ── MY NARRATIVE DIGITAL CLOSET – Dark Luxury Theme ────── */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;800;900&display=swap');
+:root {
+  --mnc-bg:#000; --mnc-surface:#0f0f0f; --mnc-surface2:#1a1a1a;
+  --mnc-border:rgba(255,255,255,0.08); --mnc-green:#7ed957;
+  --mnc-green-dim:rgba(126,217,87,0.15); --mnc-purple:#a855f7;
+  --mnc-text:#f4f4f4; --mnc-muted:rgba(244,244,244,0.5);
+  --mnc-font:'Montserrat',-apple-system,sans-serif;
+}
+.mnc-page { background:var(--mnc-bg); color:var(--mnc-text); font-family:var(--mnc-font); min-height:100vh; padding-bottom:80px; }
 
-  :root {
-    --mn-bg: #000000;
-    --mn-card-bg: #111111;
-    --mn-accent: #39A596; /* Brand Green */
-    --mn-text-main: #ffffff;
-    --mn-text-muted: #888888;
-    --mn-glass: rgba(255, 255, 255, 0.05);
-    --mn-glass-border: rgba(255, 255, 255, 0.1);
-  }
+/* Hero */
+.mnc-hero { background:linear-gradient(135deg,#050505 0%,#0d1a0d 50%,#050505 100%); border-bottom:1px solid var(--mnc-border); padding:60px 24px 48px; text-align:center; position:relative; overflow:hidden; }
+.mnc-hero::before { content:''; position:absolute; top:-60px; left:50%; transform:translateX(-50%); width:400px; height:400px; background:radial-gradient(circle,rgba(126,217,87,0.08) 0%,transparent 70%); pointer-events:none; }
+.mnc-hero-inner { position:relative; z-index:1; max-width:680px; margin:0 auto; }
+.mnc-hero-eyebrow { font-size:11px; font-weight:800; letter-spacing:0.25em; color:var(--mnc-green); text-transform:uppercase; margin:0 0 16px; }
+.mnc-hero-title { font-size:clamp(32px,5vw,52px); font-weight:900; letter-spacing:-0.03em; margin:0 0 12px; background:linear-gradient(135deg,#fff 0%,rgba(255,255,255,0.7) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.mnc-hero-sub { font-size:15px; color:var(--mnc-muted); margin:0 0 32px; line-height:1.6; }
+.mnc-stats-row { display:inline-flex; align-items:center; background:rgba(255,255,255,0.04); border:1px solid var(--mnc-border); border-radius:100px; padding:12px 28px; gap:20px; }
+.mnc-stat { text-align:center; }
+.mnc-stat-num { display:block; font-size:22px; font-weight:800; color:var(--mnc-green); line-height:1; }
+.mnc-stat-lbl { display:block; font-size:10px; font-weight:600; color:var(--mnc-muted); text-transform:uppercase; letter-spacing:0.1em; margin-top:2px; }
+.mnc-stat-div { width:1px; height:32px; background:var(--mnc-border); }
 
-  .mn-closet-page {
-    background-color: var(--mn-bg);
-    min-height: 100vh;
-    font-family: 'Montserrat', sans-serif;
-    color: var(--mn-text-main);
-    padding: 60px 20px;
-  }
+/* Filters */
+.mnc-filters-wrap { border-bottom:1px solid var(--mnc-border); background:var(--mnc-surface); padding:0 24px; overflow-x:auto; }
+.mnc-filters { display:flex; gap:4px; padding:12px 0; min-width:max-content; }
+.mnc-filter { padding:7px 18px; border-radius:100px; border:1px solid transparent; background:transparent; font-size:12px; font-weight:700; font-family:var(--mnc-font); color:var(--mnc-muted); cursor:pointer; transition:all 0.2s; white-space:nowrap; text-transform:uppercase; letter-spacing:0.05em; }
+.mnc-filter:hover { color:var(--mnc-text); border-color:var(--mnc-border); }
+.mnc-filter.active { background:var(--mnc-green-dim); border-color:var(--mnc-green); color:var(--mnc-green); }
 
-  .mn-closet-container {
-    max-width: 1400px;
-    margin: 0 auto;
-  }
+/* Grid */
+.mnc-grid-wrap { max-width:760px; margin:0 auto; padding:28px 20px; }
+.mnc-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; min-height:60px; }
+.mnc-empty { grid-column:1/-1; text-align:center; padding:48px 20px; color:var(--mnc-muted); }
+.mnc-empty-icon { font-size:48px; display:block; margin-bottom:10px; }
+.mnc-empty-title { font-size:15px; font-weight:700; color:var(--mnc-text); margin:0 0 6px; }
+.mnc-empty-sub { font-size:12px; margin:0; }
+.mnc-item-card { border-radius:12px; overflow:hidden; border:1px solid var(--mnc-border); background:var(--mnc-surface); transition:transform 0.2s,border-color 0.2s,box-shadow 0.2s; position:relative; cursor:pointer; animation:mncPop 0.3s ease; }
+.mnc-item-card:hover { transform:translateY(-3px); border-color:rgba(126,217,87,0.3); box-shadow:0 10px 24px rgba(0,0,0,0.42); }
+@keyframes mncPop { from{opacity:0;transform:scale(0.96)} to{opacity:1;transform:scale(1)} }
+.mnc-item-img { width:100%; aspect-ratio:1/1.12; object-fit:cover; background:var(--mnc-surface2); display:block; }
+.mnc-item-body { padding:9px 10px 12px; }
+.mnc-item-cat { display:inline-block; font-size:8px; font-weight:800; text-transform:uppercase; letter-spacing:0.1em; padding:2px 7px; border-radius:100px; background:var(--mnc-green-dim); color:var(--mnc-green); margin-bottom:5px; }
+.mnc-item-label { font-size:11px; font-weight:700; color:var(--mnc-text); margin:0 0 3px; line-height:1.25; }
+.mnc-item-meta { font-size:10px; color:var(--mnc-muted); margin:0; }
+.mnc-item-del { position:absolute; top:7px; right:7px; width:24px; height:24px; border-radius:50%; background:rgba(0,0,0,0.7); border:1px solid rgba(255,255,255,0.1); color:rgba(255,255,255,0.7); font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity 0.2s; }
+.mnc-item-card:hover .mnc-item-del { opacity:1; }
+@media (max-width: 520px) { .mnc-grid-wrap { padding:22px 14px; } .mnc-grid { gap:10px; } }
 
-  .mn-closet-header {
-    text-align: center;
-    margin-bottom: 60px;
-  }
+/* Add Section */
+.mnc-add-section { max-width:1200px; margin:0 auto; padding:48px 24px 60px; border-top:1px solid var(--mnc-border); }
+.mnc-add-header { text-align:center; margin-bottom:36px; }
+.mnc-add-eyebrow { font-size:11px; font-weight:800; letter-spacing:0.25em; color:var(--mnc-green); text-transform:uppercase; margin:0 0 10px; }
+.mnc-add-title { font-size:28px; font-weight:900; letter-spacing:-0.02em; margin:0 0 8px; }
+.mnc-add-sub { font-size:14px; color:var(--mnc-muted); margin:0; }
+.mnc-add-cards { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+@media (max-width:680px) { .mnc-add-cards { grid-template-columns:1fr; } }
+.mnc-add-card { border-radius:16px; border:1px solid var(--mnc-border); background:var(--mnc-surface); position:relative; overflow:hidden; transition:border-color 0.3s; }
+.mnc-add-card:hover { border-color:rgba(255,255,255,0.15); }
+.mnc-card-inner { padding:32px 28px; position:relative; z-index:1; }
+.mnc-card-ghost, .mnc-card-ghost .mnc-card-inner, .mnc-ghost-form, .mnc-field, .mnc-selected-pills, .mnc-sel-pill-wrap { overflow: visible; }
+.mnc-card-ghost { z-index: 3; }
+.mnc-card-glow { position:absolute; top:-40px; right:-40px; width:200px; height:200px; border-radius:50%; filter:blur(60px); pointer-events:none; opacity:0.4; }
+.mnc-glow-green { background:var(--mnc-green); }
+.mnc-glow-purple { background:var(--mnc-purple); }
+.mnc-card-icon { font-size:36px; margin-bottom:14px; display:block; }
+.mnc-card-title { font-size:20px; font-weight:800; margin:0 0 8px; letter-spacing:-0.01em; }
+.mnc-card-sub { font-size:13px; color:var(--mnc-muted); margin:0 0 20px; line-height:1.5; }
 
-  .mn-closet-header h1 {
-    font-size: 3rem;
-    font-weight: 700;
-    letter-spacing: 2px;
-    margin: 0 0 10px 0;
-    text-transform: uppercase;
-    background: linear-gradient(45deg, #fff, #888);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
+/* Buttons */
+.mnc-btn { display:block; width:100%; padding:11px 20px; border-radius:100px; font-size:13px; font-weight:700; font-family:var(--mnc-font); cursor:pointer; transition:all 0.2s; border:none; margin-top:10px; letter-spacing:0.02em; }
+.mnc-btn-primary { background:var(--mnc-green); color:#000; }
+.mnc-btn-primary:hover { background:#90e060; transform:translateY(-1px); box-shadow:0 6px 20px rgba(126,217,87,0.3); }
+.mnc-btn-ghost { background:transparent; color:var(--mnc-muted); border:1px solid var(--mnc-border); }
+.mnc-btn-ghost:hover { border-color:rgba(255,255,255,0.2); color:var(--mnc-text); }
+.mnc-btn-ghost-outline { background:transparent; color:var(--mnc-purple); border:1.5px solid var(--mnc-purple); }
+.mnc-btn-ghost-outline:hover { background:var(--mnc-purple); color:#fff; }
 
-  .mn-closet-header p {
-    color: var(--mn-text-muted);
-    font-size: 1.1rem;
-    font-weight: 300;
-  }
+/* Scan UI */
+.mnc-scan-ui { margin-top:16px; }
+.mnc-scan-wrap { position:relative; width:100%; max-width:240px; margin:0 auto 14px; border-radius:10px; overflow:hidden; border:1.5px solid var(--mnc-green); }
+.mnc-scan-img { width:100%; display:block; max-height:280px; object-fit:cover; }
+.mnc-scan-anim { position:absolute; inset:0; pointer-events:none; }
+.mnc-scan-line { position:absolute; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,var(--mnc-green),transparent); box-shadow:0 0 10px rgba(126,217,87,0.8); animation:mncScanLine 1.8s ease-in-out infinite; }
+@keyframes mncScanLine { 0%{top:0;opacity:1} 90%{top:100%;opacity:1} 100%{top:100%;opacity:0} }
+.mnc-scan-corner { position:absolute; width:14px; height:14px; border-color:var(--mnc-green); border-style:solid; border-width:0; }
+.mnc-sc-tl { top:4px;left:4px;border-top-width:2px;border-left-width:2px; }
+.mnc-sc-tr { top:4px;right:4px;border-top-width:2px;border-right-width:2px; }
+.mnc-sc-bl { bottom:4px;left:4px;border-bottom-width:2px;border-left-width:2px; }
+.mnc-sc-br { bottom:4px;right:4px;border-bottom-width:2px;border-right-width:2px; }
+.mnc-scan-status { font-size:12px; color:var(--mnc-green); font-weight:700; text-align:center; margin-bottom:10px; }
+.mnc-detected { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-bottom:10px; }
+.mnc-detected-chip { padding:4px 12px; border-radius:100px; background:var(--mnc-green-dim); border:1px solid var(--mnc-green); color:var(--mnc-green); font-size:11px; font-weight:700; animation:mncPop 0.3s ease; }
 
-  /* Upload Card */
-  .mn-closet-actions {
-    margin-bottom: 40px;
-    display: flex;
-    justify-content: center;
-  }
+/* Ghost Form - new design */
+.mnc-ghost-form { margin-top:18px; text-align:left; }
+.mnc-field { margin-bottom:16px; }
+.mnc-lbl { display:block; font-size:10px; font-weight:800; color:var(--mnc-muted); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.1em; }
+.mnc-lbl-hint { font-weight:400; text-transform:none; letter-spacing:0; font-size:9px; color:rgba(244,244,244,0.3); }
 
-  .mn-closet-upload-card {
-    background: var(--mn-glass);
-    border: 1px solid var(--mn-glass-border);
-    border-radius: 16px;
-    padding: 20px 40px;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
-  }
+/* Category pills */
+.mnc-cat-pills { display:flex; flex-wrap:wrap; gap:6px; }
+.mnc-cat-pill { padding:7px 14px; border-radius:100px; border:1px solid var(--mnc-border); background:var(--mnc-surface2); font-size:12px; font-weight:700; font-family:var(--mnc-font); color:var(--mnc-muted); cursor:pointer; transition:all 0.15s; }
+.mnc-cat-pill:hover { border-color:rgba(255,255,255,0.2); color:var(--mnc-text); }
+.mnc-cat-pill.sel { background:var(--mnc-green-dim); border-color:var(--mnc-green); color:var(--mnc-green); }
 
-  .mn-closet-upload-card:hover {
-    background: rgba(255,255,255,0.1);
-    transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    border-color: var(--mn-accent);
-  }
+/* Item tiles - multi-select */
+.mnc-item-tiles { display:flex; flex-wrap:wrap; gap:6px; }
+.mnc-item-tile { padding:6px 12px; border-radius:100px; border:1px solid var(--mnc-border); background:var(--mnc-surface2); font-size:11px; font-weight:600; font-family:var(--mnc-font); color:var(--mnc-muted); cursor:pointer; transition:all 0.15s; white-space:nowrap; }
+.mnc-item-tile:hover { border-color:rgba(255,255,255,0.2); color:var(--mnc-text); }
+.mnc-item-tile.sel { background:var(--mnc-green-dim); border-color:var(--mnc-green); color:var(--mnc-green); }
 
-  .mn-upload-icon-wrapper {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: var(--mn-accent);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    font-weight: 600;
-    color: #000;
-  }
+/* Selected pills with brand extension */
+.mnc-selected-pills { display:flex; flex-wrap:wrap; gap:8px; }
+.mnc-sel-pill-wrap { position:relative; display:inline-block; }
+.mnc-sel-pill { display:inline-flex; align-items:center; gap:0; border-radius:100px; border:1px solid var(--mnc-green); background:var(--mnc-green-dim); overflow:hidden; }
+.mnc-sel-pill-name { padding:6px 10px 6px 12px; font-size:12px; font-weight:700; color:var(--mnc-green); font-family:var(--mnc-font); white-space:nowrap; }
+.mnc-sel-pill-brand-btn { display:flex; align-items:center; gap:3px; padding:6px 10px; font-size:10px; font-weight:800; color:var(--mnc-green); cursor:pointer; border-left:1px solid rgba(126,217,87,0.3); background:transparent; border-top:none; border-right:none; border-bottom:none; font-family:var(--mnc-font); transition:background 0.15s; }
+.mnc-sel-pill-brand-btn:hover { background:rgba(126,217,87,0.1); }
+.mnc-sel-pill-remove { display:flex; align-items:center; padding:6px 10px 6px 4px; font-size:14px; color:rgba(126,217,87,0.6); cursor:pointer; background:transparent; border:none; font-family:var(--mnc-font); line-height:1; }
+.mnc-sel-pill-remove:hover { color:var(--mnc-green); }
 
-  .mn-upload-text h3 {
-    margin: 0;
-    font-size: 1.1rem;
-    font-weight: 600;
-  }
+/* Inline brand dropdown */
+.mnc-brand-menu { position:absolute; top:calc(100% + 8px); left:0; z-index:20; background:#1a1a1a; border:1px solid rgba(126,217,87,0.3); border-radius:12px; padding:8px 0; min-width:190px; box-shadow:0 16px 40px rgba(0,0,0,0.6); }
+.mnc-brand-menu-hdr { padding:6px 12px; font-size:10px; font-weight:800; color:#7ed957; text-transform:uppercase; letter-spacing:0.1em; border-bottom:1px solid rgba(255,255,255,0.06); margin-bottom:4px; }
+.mnc-brand-item { padding:7px 16px; font-size:12px; font-weight:600; color:var(--mnc-muted); cursor:pointer; font-family:var(--mnc-font); transition:all 0.1s; display:block; width:100%; text-align:left; background:transparent; border:none; }
+.mnc-brand-item:hover { background:var(--mnc-green-dim); color:var(--mnc-green); }
+.mnc-brand-custom-wrap { padding:6px 8px; border-top:1px solid rgba(255,255,255,0.06); margin-top:4px; }
+.mnc-brand-custom { width:100%; padding:6px 10px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:#f4f4f4; font-size:12px; outline:none; box-sizing:border-box; font-family:inherit; }
 
-  .mn-upload-text p {
-    margin: 4px 0 0 0;
-    color: var(--mn-text-muted);
-    font-size: 0.85rem;
-  }
-
-  /* Tabs */
-  .mn-closet-tabs {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin-bottom: 40px;
-  }
-
-  .mn-tab {
-    background: transparent;
-    border: 1px solid var(--mn-glass-border);
-    color: var(--mn-text-muted);
-    padding: 10px 24px;
-    border-radius: 30px;
-    cursor: pointer;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 0.9rem;
-    transition: all 0.3s;
-  }
-
-  .mn-tab.active, .mn-tab:hover {
-    background: var(--mn-text-main);
-    color: #000;
-    border-color: var(--mn-text-main);
-  }
-
-  /* Grid */
-  .mn-closet-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 30px;
-  }
-
-  /* Item Card */
-  .mn-item-card {
-    background: var(--mn-card-bg);
-    border-radius: 12px;
-    overflow: hidden;
-    position: relative;
-    transition: transform 0.3s ease;
-    border: 1px solid transparent;
-  }
-
-  .mn-item-card:hover {
-    transform: translateY(-5px);
-    border-color: var(--mn-glass-border);
-  }
-
-  .mn-item-image-wrapper {
-    position: relative;
-    aspect-ratio: 3/4;
-    overflow: hidden;
-  }
-
-  .mn-item-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.5s ease;
-  }
-
-  .mn-item-card:hover .mn-item-image {
-    transform: scale(1.05);
-  }
-
-  .mn-item-overlay {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-  }
-
-  .mn-delete-btn {
-    background: rgba(0,0,0,0.6);
-    color: #fff;
-    border: none;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    backdrop-filter: blur(4px);
-    opacity: 0;
-    transition: opacity 0.2s;
-  }
-
-  .mn-item-card:hover .mn-delete-btn {
-    opacity: 1;
-  }
-
-  .mn-item-info {
-    padding: 20px;
-  }
-
-  .mn-item-category {
-    color: var(--mn-accent);
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: 600;
-    margin-bottom: 6px;
-  }
-
-  .mn-item-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 10px;
-  }
-
-  .mn-tag {
-    background: rgba(255,255,255,0.08);
-    color: #ccc;
-    font-size: 0.7rem;
-    padding: 4px 8px;
-    border-radius: 4px;
-  }
-
-  /* Loading & Empty States */
-  .mn-loading-state, .mn-empty-state {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 60px;
-    color: var(--mn-text-muted);
-  }
-
-  .mn-spinner {
-    border: 3px solid rgba(255,255,255,0.1);
-    border-top: 3px solid var(--mn-accent);
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 20px;
-  }
-
-  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
+/* Input */
+.mnc-input { width:100%; padding:10px 14px; border:1px solid var(--mnc-border); border-radius:8px; background:var(--mnc-surface2); color:var(--mnc-text); font-size:13px; font-family:var(--mnc-font); outline:none; transition:border-color 0.2s; box-sizing:border-box; }
+.mnc-input::placeholder { color:var(--mnc-muted); }
+.mnc-input:focus { border-color:var(--mnc-green); }
 </style>
 
 <script>
-class DigitalClosetManager {
-  constructor() {
-    this.api = "https://mynarrative-ai.vercel.app/api/profile_manager";
-    this.userId = "{{ customer.id }}";
-    this.items = [];
-    this.grid = document.getElementById('mn-closet-grid');
+(function() {
+  'use strict';
+  var $ = function(id){ return document.getElementById(id); };
+  var PH = 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=300&h=400&fit=crop';
+  var CAT = {tops:'Tops',bottoms:'Bottoms',outerwear:'Outerwear',footwear:'Footwear',accessories:'Accessories',watches:'Watches',ethnic:'Ethnic',dresses:'Dresses',activewear:'Activewear',other:'Other'};
+  var CLOTH_API = 'https://mynarrative-ai.vercel.app/api/cloth_detection';
 
-    if (this.userId) {
-      this.init();
-    } else {
-      window.location.href = '/account/login';
-    }
-  }
+  // Popular items per category (format: "Color Name")
+  var ITEMS = {
+    tops:        ['White Oversized Tee','Black T-Shirt','Grey Striped Shirt','Navy Blue Polo','White Linen Shirt','Black Crop Top','Sky Blue Oxford Shirt','Graphic Print Tee','Olive Henley','Maroon Turtleneck','Pink Boxy Shirt','Beige Knit Top'],
+    bottoms:     ['Blue Slim Jeans','Black Skinny Jeans','Olive Cargo Pants','Beige Chinos','Grey Joggers','Denim Shorts','Black Pleated Trousers','Khaki Wide Leg Pants','Navy Track Pants','Brown Corduroy Pants','White Linen Trousers','Charcoal Sweatpants'],
+    outerwear:   ['Black Hoodie','Oversized Beige Blazer','Blue Denim Jacket','Black Leather Jacket','Olive Puffer Jacket','Camel Trench Coat','Navy Bomber Jacket','Grey Windbreaker','Burgundy Cardigan','Brown Shacket','White Fleece Jacket','Plaid Overshirt'],
+    footwear:    ['White Sneakers','Black Sneakers','Brown Chelsea Boots','White Loafers','Grey Running Shoes','Black Chunky Boots','Black Slides','Brown Oxford Shoes','Nude Block Heels','Tan Kolhapuris','Navy Boat Shoes','Black Derby Shoes'],
+    accessories: ['Black Leather Belt','Canvas Tote Bag','Black Sunglasses','Black Baseball Cap','Gold Chain Necklace','Brown Leather Backpack','Tan Crossbody Bag','Silk Scarf','Gold Hoop Earrings','Leather Wallet','Beaded Bracelet','Silver Cuff Bracelet'],
+    watches:     ['Silver Metal Watch','Gold Dial Watch','Black Leather Watch','Rose Gold Watch','Brown Strap Watch','Chronograph Watch','Minimalist Watch','Smart Watch','Mesh Strap Watch','Classic Round Watch','Sport Watch','Dress Watch'],
+    ethnic:      ['White Cotton Kurta','Blue Printed Kurta','Black Sherwani','Olive Nehru Jacket','Cream Silk Kurta','Navy Bandhgala','White Dhoti Kurta','Yellow Anarkali Kurta','Maroon Lehenga Set','Beige Palazzo Kurta Set','Navy Jodhpuri Suit','Printed Co-ord Kurta Set'],
+    dresses:     ['Black Midi Dress','Floral Maxi Dress','White Bodycon Dress','Sage Green Co-ord Set','Denim Shirt Dress','Navy Wrap Dress','Red Mini Dress','Beige Slip Dress','Yellow Sundress','Black Jumpsuit','Striped Co-ord Set','Pink Satin Dress'],
+    activewear:  ['Black Yoga Leggings','Sports Bra','Grey Track Pants','White Gym T-Shirt','Navy Running Shorts','Black Compression Tights','Olive Hoodie Sweatshirt','Blue Athletic Shorts','Grey Sports Jacket','Black Training Vest','Pink Yoga Set','Neon Green Running Tee'],
+  };
 
-  async init() {
-    await this.loadItems();
-  }
+  var TOP_BRANDS = ['Zara','H&M','Snitch','Uniqlo','Mango','Levi\'s','Nike','Adidas','Puma','The Souled Store'];
 
-  async loadItems() {
+  // State
+  var closetItems = [], filter = 'all', detected = [];
+  var ghost = { cat: '', selectedItems: [] }; // selectedItems: [{label, brand:''}]
+  var activeBrandPill = null; // which selected pill's inline brand menu is open
+
+  // ── Load/Save ─────────────────────────────────────────────
+  function load() {
     try {
-      this.renderLoading();
-      const res = await fetch(`${this.api}?action=get_closet&user_id=${this.userId}`);
-      const data = await res.json();
-      
-      if (data.success) {
-        this.items = data.items || [];
-        this.renderGrid(this.items);
-      } else {
-        throw new Error(data.error || 'Failed to fetch');
-      }
-    } catch (e) {
-      console.error(e);
-      this.grid.innerHTML = `<div class="mn-empty-state"><p>Could not load closet. Please try refreshing.</p></div>`;
+      var id = JSON.parse(localStorage.getItem('mn_identity')||'{}');
+      closetItems = Array.isArray(id.closet_items)?id.closet_items:[];
+      if($('mnc-complete-pct'))$('mnc-complete-pct').textContent=id.completion_pct||0;
+    } catch(e){ closetItems=[]; }
+    render();
+  }
+
+  function save() {
+    try {
+      var id = JSON.parse(localStorage.getItem('mn_identity')||'{}');
+      id.closet_items=closetItems; id.closet_count=closetItems.length;
+      var fields=['gender','height_cm','skin_mst','preferred_fit','style_vibes','occasions','closet_items','bank_cards'];
+      id.completion_pct=Math.round((fields.filter(function(f){var v=id[f];return v!==undefined&&v!==null&&v!==''&&!(Array.isArray(v)&&v.length===0);}).length/fields.length)*100);
+      localStorage.setItem('mn_identity',JSON.stringify(id));
+      window.MN_IDENTITY=id;
+      window.dispatchEvent(new CustomEvent('mn-identity-updated',{detail:id}));
+    } catch(e){}
+  }
+
+  function classify(l) {
+    l=(l||'').toLowerCase();
+    if(/jacket|coat|blazer|hoodie|cardigan|sweater|puffer|trench|shacket|windbreaker|fleece/.test(l)) return 'outerwear';
+    if(/jean|pant|trouser|short|skirt|chino|cargo|jogger|track|legging/.test(l)) return 'bottoms';
+    if(/shoe|sneaker|heel|boot|sandal|loafer|slipper|oxford|derby|kolhapuri|boat/.test(l)) return 'footwear';
+    if(/watch|chronograph|smart watch|strap watch|dial watch/.test(l)) return 'watches';
+    if(/bag|belt|scarf|jewel|necklace|bracelet|sunglass|hat|cap|wallet|earring/.test(l)) return 'accessories';
+    if(/kurta|saree|lehenga|sherwani|salwar|dupatta|dhoti|anarkali|bandhgala|nehru|jodhpuri/.test(l)) return 'ethnic';
+    if(/dress|gown|romper|jumpsuit|co-ord|coord|midi|maxi|mini/.test(l)) return 'dresses';
+    if(/sport|gym|yoga|activewear|compression|athletic|training/.test(l)) return 'activewear';
+    return 'tops';
+  }
+
+  // ── Render Grid ───────────────────────────────────────────
+  function normalizeText(v) {
+    return String(v || '').toLowerCase().replace(/[^a-z0-9\s-]/g,' ').replace(/\s+/g,' ').trim();
+  }
+
+  function colorFromItem(item) {
+    var l = normalizeText((item && item.label) || '');
+    var c = normalizeText((item && item.color) || '');
+    var source = (c ? c + ' ' : '') + l;
+    if(/rose gold/.test(source)) return '#b67a6d';
+    if(/silver|metallic silver/.test(source)) return '#b7bcc6';
+    if(/gold|mustard|ochre/.test(source)) return '#c69b2d';
+    if(/black|jet/.test(source)) return '#1f1f1f';
+    if(/white|ivory|off white|cream/.test(source)) return '#f1ece2';
+    if(/grey|gray|charcoal/.test(source)) return '#6b7280';
+    if(/navy/.test(source)) return '#243b6b';
+    if(/denim|cobalt|royal blue|sky blue|blue/.test(source)) return '#4f6fae';
+    if(/tan|camel|cognac|brown/.test(source)) return '#8a5a3c';
+    if(/beige|khaki|sand|taupe/.test(source)) return '#c7b08a';
+    if(/olive|sage/.test(source)) return '#6d7b45';
+    if(/emerald|forest|green/.test(source)) return '#3f8750';
+    if(/burgundy|maroon|wine|red/.test(source)) return '#8a2f3d';
+    if(/lavender|lilac|purple|violet/.test(source)) return '#8b68b8';
+    if(/pink|rose/.test(source)) return '#d48097';
+    if(/orange|rust|terracotta/.test(source)) return '#c66a3d';
+    if(/teal|turquoise/.test(source)) return '#3c8d94';
+    return '#7b8794';
+  }
+
+  function svgUri(svg) {
+    return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+  }
+
+  function detectSubtype(item, cat) {
+    var l = normalizeText((item && item.label) || '');
+    if(cat==='tops') {
+      if(/polo/.test(l)) return 'polo';
+      if(/shirt|oxford|linen shirt|button/.test(l)) return 'shirt';
+      if(/crop/.test(l)) return 'crop';
+      if(/tank|vest/.test(l)) return 'tank';
+      if(/turtleneck|henley|knit/.test(l)) return 'knit';
+      return 'tee';
     }
-  }
-
-  renderLoading() {
-    this.grid.innerHTML = `
-      <div class="mn-loading-state">
-        <div class="mn-spinner"></div>
-        <p>Syncing with your digital wardrobe...</p>
-      </div>
-    `;
-  }
-
-  renderGrid(items) {
-    if (items.length === 0) {
-      this.grid.innerHTML = `
-        <div class="mn-empty-state">
-          <div style="font-size: 48px; margin-bottom: 20px; opacity: 0.5;">🧥</div>
-          <h3>Your closet is empty</h3>
-          <p>Upload your first item to see AI magic happen.</p>
-        </div>
-      `;
-      return;
+    if(cat==='bottoms') {
+      if(/short/.test(l)) return 'shorts';
+      if(/cargo/.test(l)) return 'cargo';
+      if(/jogger|sweatpant|track/.test(l)) return 'joggers';
+      if(/skirt/.test(l)) return 'skirt';
+      return 'trousers';
     }
-
-    this.grid.innerHTML = items.map(item => `
-      <div class="mn-item-card mn-fade-in">
-        <div class="mn-item-image-wrapper">
-          <img src="${item.image_url}" class="mn-item-image" alt="${item.category}" loading="lazy" />
-          <div class="mn-item-overlay">
-            <button class="mn-delete-btn" onclick="MNCloset.deleteItem('${item.id}')" title="Remove Item">×</button>
-          </div>
-        </div>
-        <div class="mn-item-info">
-          <div class="mn-item-category">${item.category || 'General'}</div>
-          <div class="mn-item-color" style="display:flex; align-items:center; gap:6px; font-size: 0.8rem; color: #aaa; margin-bottom:8px;">
-             ${item.color !== 'unknown' ? `<div style="width:12px; height:12px; border-radius:50%; background:${item.color}; border:1px solid #333;"></div> ${item.color}` : ''}
-          </div>
-          <div class="mn-item-tags">
-            ${(item.tags || []).map(tag => `<span class="mn-tag">#${tag}</span>`).join('')}
-          </div>
-        </div>
-      </div>
-    `).join('');
+    if(cat==='outerwear') {
+      if(/blazer/.test(l)) return 'blazer';
+      if(/hoodie/.test(l)) return 'hoodie';
+      if(/trench/.test(l)) return 'trench';
+      if(/bomber/.test(l)) return 'bomber';
+      if(/cardigan/.test(l)) return 'cardigan';
+      if(/puffer/.test(l)) return 'puffer';
+      return 'jacket';
+    }
+    if(cat==='footwear') {
+      if(/boot/.test(l)) return 'boots';
+      if(/heel/.test(l)) return 'heels';
+      if(/loafer|oxford|derby|boat/.test(l)) return 'formal';
+      if(/slide|sandal|kolhapuri/.test(l)) return 'sandals';
+      return 'sneakers';
+    }
+    if(cat==='accessories') {
+      if(/bag|tote|backpack|crossbody/.test(l)) return 'bag';
+      if(/belt/.test(l)) return 'belt';
+      if(/sunglass/.test(l)) return 'sunglasses';
+      if(/cap|hat/.test(l)) return 'cap';
+      if(/necklace|chain/.test(l)) return 'necklace';
+      if(/bracelet|cuff/.test(l)) return 'bracelet';
+      return 'accessory';
+    }
+    if(cat==='watches') {
+      if(/smart ?watch|apple watch/.test(l)) return 'smartwatch';
+      if(/chronograph/.test(l)) return 'chronograph';
+      if(/dress|minimalist|classic|round|mesh|strap/.test(l)) return 'analog';
+      return 'analog';
+    }
+    if(cat==='ethnic') {
+      if(/saree/.test(l)) return 'saree';
+      if(/lehenga/.test(l)) return 'lehenga';
+      if(/nehru|jacket/.test(l)) return 'nehru';
+      if(/sherwani|bandhgala|jodhpuri/.test(l)) return 'sherwani';
+      return 'kurta';
+    }
+    if(cat==='dresses') {
+      if(/jumpsuit/.test(l)) return 'jumpsuit';
+      if(/coord|co ord|co-ord/.test(l)) return 'coord';
+      if(/maxi/.test(l)) return 'maxi';
+      if(/mini/.test(l)) return 'mini';
+      if(/wrap/.test(l)) return 'wrap';
+      return 'dress';
+    }
+    if(cat==='activewear') {
+      if(/bra/.test(l)) return 'sportsbra';
+      if(/legging|tight|compression/.test(l)) return 'leggings';
+      if(/short/.test(l)) return 'sportsshorts';
+      if(/jacket|hoodie/.test(l)) return 'sportsjacket';
+      return 'gymtop';
+    }
+    return 'generic';
   }
 
-  filter(category, btn) {
-    // Update active tab
-    document.querySelectorAll('.mn-tab').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
+  function renderVectorArt(item, cat) {
+    var fill = colorFromItem(item);
+    var stroke = '#d8e3d2';
+    var subtype = detectSubtype(item, cat);
+    var icon = '';
 
-    if (category === 'all') {
-      this.renderGrid(this.items);
+    if(cat==='tops') {
+      if(subtype==='shirt') icon='<path d="M62 42l18-16 10 8 10-8 18 16-10 22v50H72V64z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/><path d="M90 34v78" stroke="'+stroke+'" stroke-width="3" opacity=".35"/><path d="M80 26l10 10 10-10" fill="none" stroke="'+stroke+'" stroke-width="3"/>';
+      else if(subtype==='polo') icon='<path d="M66 40l16-12 8 8 8-8 16 12-8 18v54H74V58z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/><path d="M82 30l8 8 8-8" fill="none" stroke="'+stroke+'" stroke-width="3"/>';
+      else if(subtype==='tank') icon='<path d="M76 28h28l8 14-8 16v54H76V58l-8-16z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/>';
+      else if(subtype==='crop') icon='<path d="M68 42l16-12 12 10 16-10 8 18-10 20H70L60 48z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/>';
+      else if(subtype==='knit') icon='<path d="M68 42l18-12 18 12-8 20v50H76V62z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/><path d="M74 56h32M74 68h32M74 80h32" stroke="'+stroke+'" stroke-width="1.5" opacity=".28"/>';
+      else icon='<path d="M70 42l18-12 18 12-8 18v50H78V60z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/><path d="M88 30v18" stroke="'+stroke+'" stroke-width="3" opacity=".35"/>';
+    } else if(cat==='bottoms') {
+      if(subtype==='shorts') icon='<path d="M76 34h28l6 36H94l-4-16-4 16H70z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/>';
+      else if(subtype==='cargo') icon='<path d="M78 30h20l8 82H92l-4-40-4 40H70z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/><rect x="70" y="54" width="12" height="12" rx="2" fill="none" stroke="'+stroke+'" stroke-width="2" opacity=".45"/><rect x="98" y="54" width="12" height="12" rx="2" fill="none" stroke="'+stroke+'" stroke-width="2" opacity=".45"/>';
+      else if(subtype==='joggers') icon='<path d="M78 30h20l6 76-8 8H84l-8-8-6-76z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/>';
+      else if(subtype==='skirt') icon='<path d="M74 36h32l12 62H62z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/><path d="M74 52h32" stroke="'+stroke+'" stroke-width="2" opacity=".28"/>';
+      else icon='<path d="M78 30h20l8 82H92l-4-40-4 40H70z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/>';
+    } else if(cat==='outerwear') {
+      if(subtype==='blazer') icon='<path d="M70 38l18-14 18 14 6 22-10 54H78L68 60z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/><path d="M88 24l2 36 14 0-14-18-14 18 14 0" fill="none" stroke="'+stroke+'" stroke-width="2.5" opacity=".5"/>';
+      else if(subtype==='hoodie') icon='<path d="M76 30c0-8 6-14 14-14s14 6 14 14l10 10-8 18v54H74V58l-8-18z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/><path d="M82 26c2 8 14 8 16 0" fill="none" stroke="'+stroke+'" stroke-width="2.5" opacity=".45"/>';
+      else if(subtype==='trench') icon='<path d="M72 24l18 10 18-10 6 24-10 66H76L66 48z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/><path d="M78 60h24" stroke="'+stroke+'" stroke-width="3" opacity=".4"/>';
+      else if(subtype==='bomber') icon='<path d="M70 40l18-12 18 12 8 18-8 54H74L66 58z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/><path d="M74 108h32" stroke="'+stroke+'" stroke-width="3" opacity=".38"/>';
+      else if(subtype==='cardigan') icon='<path d="M74 28l16 8 16-8 8 20-8 64H74L66 48z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/><path d="M90 36v76" stroke="'+stroke+'" stroke-width="3" opacity=".32"/>';
+      else if(subtype==='puffer') icon='<path d="M70 34l18-10 18 10 8 18-8 60H74L66 52z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/><path d="M72 54h36M72 68h36M72 82h36" stroke="'+stroke+'" stroke-width="2" opacity=".22"/>';
+      else icon='<path d="M72 34l16-10 16 10 8 18-8 58H96V70H80v40H72l-8-58z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/><path d="M88 24v46" stroke="'+stroke+'" stroke-width="3" opacity=".45"/>';
+    } else if(cat==='footwear') {
+      if(subtype==='boots') icon='<path d="M62 94h18V54h22v24c0 8 8 14 16 16 8 2 12 8 12 14H62z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/>';
+      else if(subtype==='heels') icon='<path d="M58 94c12 0 18-8 28-8 8 0 10 8 24 8h14v10H58z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/><path d="M104 92l8 16" stroke="'+stroke+'" stroke-width="3"/>';
+      else if(subtype==='formal') icon='<path d="M56 92c10 0 18-8 24-8 10 0 16 8 30 8 10 0 14 4 14 10H56z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/><path d="M92 84l10-8" stroke="'+stroke+'" stroke-width="2.5" opacity=".35"/>';
+      else if(subtype==='sandals') icon='<path d="M60 96h58c8 0 10 4 10 8H60z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/><path d="M72 84h30" stroke="'+stroke+'" stroke-width="3"/>';
+      else icon='<path d="M54 84c10 0 18-8 24-8 8 0 12 12 28 12 12 0 18 8 18 16H54z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/>';
+    } else if(cat==='accessories') {
+      if(subtype==='bag') icon='<path d="M64 54c0-14 12-26 26-26s26 12 26 26v10H64z" fill="none" stroke="'+stroke+'" stroke-width="4"/><rect x="58" y="60" width="64" height="46" rx="10" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/>';
+      else if(subtype==='belt') icon='<rect x="44" y="76" width="92" height="16" rx="8" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/><rect x="108" y="70" width="18" height="28" rx="2" fill="none" stroke="'+stroke+'" stroke-width="3"/>';
+      else if(subtype==='sunglasses') icon='<circle cx="72" cy="72" r="18" fill="none" stroke="'+stroke+'" stroke-width="4"/><circle cx="108" cy="72" r="18" fill="none" stroke="'+stroke+'" stroke-width="4"/><path d="M90 72h0" stroke="'+stroke+'" stroke-width="4"/><path d="M54 66H40M126 66h14" stroke="'+stroke+'" stroke-width="4"/>';
+      else if(subtype==='cap') icon='<path d="M62 74c0-18 12-30 28-30s28 12 28 30H62z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/><path d="M84 74c6 0 18 0 36 8-8 4-18 6-30 6" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/>';
+      else if(subtype==='necklace') icon='<path d="M58 52c8 28 18 42 32 42s24-14 32-42" fill="none" stroke="'+stroke+'" stroke-width="4"/><circle cx="90" cy="102" r="8" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/>';
+      else if(subtype==='bracelet') icon='<circle cx="90" cy="84" r="24" fill="none" stroke="'+stroke+'" stroke-width="5"/><circle cx="90" cy="84" r="10" fill="'+fill+'" opacity=".25"/>';
+      else icon='<rect x="62" y="50" width="56" height="54" rx="12" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/>';
+    } else if(cat==='watches') {
+      if(subtype==='smartwatch') icon='<rect x="68" y="44" width="44" height="46" rx="12" fill="'+fill+'" stroke="'+stroke+'" stroke-width="4"/><rect x="82" y="16" width="16" height="28" rx="6" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/><rect x="82" y="90" width="16" height="34" rx="6" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/><rect x="78" y="54" width="24" height="16" rx="4" fill="none" stroke="'+stroke+'" stroke-width="2.5" opacity=".7"/>';
+      else if(subtype==='chronograph') icon='<circle cx="90" cy="66" r="24" fill="'+fill+'" stroke="'+stroke+'" stroke-width="4"/><circle cx="82" cy="62" r="4" fill="none" stroke="'+stroke+'" stroke-width="2"/><circle cx="98" cy="62" r="4" fill="none" stroke="'+stroke+'" stroke-width="2"/><path d="M90 66 L90 54 M90 66 L102 72" stroke="'+stroke+'" stroke-width="3" stroke-linecap="round"/><rect x="82" y="18" width="16" height="28" rx="6" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/><rect x="82" y="86" width="16" height="28" rx="6" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/>';
+      else icon='<circle cx="90" cy="66" r="24" fill="'+fill+'" stroke="'+stroke+'" stroke-width="4"/><rect x="82" y="18" width="16" height="28" rx="6" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/><rect x="82" y="86" width="16" height="28" rx="6" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/><path d="M90 66 L90 54 M90 66 L100 70" stroke="'+stroke+'" stroke-width="3" stroke-linecap="round"/>';
+    } else if(cat==='ethnic') {
+      if(subtype==='saree') icon='<path d="M72 34c10 0 18 8 18 18v56H72z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/><path d="M90 52c26 0 34 18 30 50H90z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/><path d="M90 52l18-10" stroke="'+stroke+'" stroke-width="2.5" opacity=".35"/>';
+      else if(subtype==='lehenga') icon='<path d="M82 34h16l8 18-4 10 16 40H62l16-40-4-10z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/>';
+      else if(subtype==='nehru') icon='<path d="M74 28h32l8 22-8 60H74L66 50z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/><path d="M90 28v82" stroke="'+stroke+'" stroke-width="3" opacity=".32"/>';
+      else if(subtype==='sherwani') icon='<path d="M76 22h28l10 22-8 70H74l-8-70z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/><path d="M90 22v92" stroke="'+stroke+'" stroke-width="3" opacity=".35"/>';
+      else icon='<path d="M76 28h28l10 18-8 66H74l-8-66z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/><path d="M90 28v84" stroke="'+stroke+'" stroke-width="3" opacity=".35"/>';
+    } else if(cat==='dresses') {
+      if(subtype==='jumpsuit') icon='<path d="M82 26h16l10 22-6 20 4 44H94l-4-26-4 26H74l4-44-6-20z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/>';
+      else if(subtype==='coord') icon='<path d="M70 36l16-10 8 8 8-8 16 10-8 18H78z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/><path d="M78 72h24l8 40H70z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/>';
+      else if(subtype==='maxi') icon='<path d="M90 24c8 0 10 8 10 14l20 72H60l20-72c0-6 2-14 10-14z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/>';
+      else if(subtype==='mini') icon='<path d="M90 26c8 0 10 8 10 14l14 40H66l14-40c0-6 2-14 10-14z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/>';
+      else if(subtype==='wrap') icon='<path d="M82 28h16l14 20-18 50H68l18-50z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/><path d="M80 56h20" stroke="'+stroke+'" stroke-width="2.5" opacity=".35"/>';
+      else icon='<path d="M90 26c8 0 10 8 10 14l18 56H62l18-56c0-6 2-14 10-14z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/>';
+    } else if(cat==='activewear') {
+      if(subtype==='sportsbra') icon='<path d="M72 48c4-12 12-18 18-18s14 6 18 18v22H72z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/>';
+      else if(subtype==='leggings') icon='<path d="M80 28h20l8 84H94l-4-38-4 38H72z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/>';
+      else if(subtype==='sportsshorts') icon='<path d="M76 36h28l6 28H94l-4-10-4 10H70z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/>';
+      else if(subtype==='sportsjacket') icon='<path d="M72 34l16-10 16 10 8 18-8 60H76L68 52z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/><path d="M90 24v88" stroke="'+stroke+'" stroke-width="3" opacity=".3"/>';
+      else icon='<path d="M76 30h28l6 18-10 12 6 50H74l6-50-10-12z" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/>';
     } else {
-      const filtered = this.items.filter(item => 
-        (item.category || '').toLowerCase().includes(category.toLowerCase())
-      );
-      this.renderGrid(filtered);
+      icon='<rect x="62" y="30" width="56" height="72" rx="12" fill="'+fill+'" stroke="'+stroke+'" stroke-width="3"/>';
     }
+
+    var svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 200">'+
+      '<defs><linearGradient id="bg" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#0b0b0b"/><stop offset="100%" stop-color="#171717"/></linearGradient></defs>'+
+      '<rect width="180" height="200" fill="url(#bg)"/>'+
+      '<circle cx="142" cy="28" r="20" fill="'+fill+'" opacity=".14"/>'+
+      '<circle cx="34" cy="162" r="24" fill="'+fill+'" opacity=".08"/>'+
+      '<path d="M28 170h124" stroke="'+stroke+'" stroke-width="2" opacity=".08"/>'+
+      icon+
+      '</svg>';
+    return svgUri(svg);
   }
 
-  async uploadItem(input) {
-    const file = input.files[0];
-    if (!file) return;
-
-    this.renderLoading(); // Show loading state immediately
-    
-    // --- FIX: COMPRESS IMAGE BEFORE UPLOADING ---
-    const resizeImage = (file) => {
-      return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const img = new Image();
-          img.onload = () => {
-            const canvas = document.createElement('canvas');
-            const MAX_WIDTH = 800; // Optimal for OpenAI Vision
-            const scale = MAX_WIDTH / img.width;
-            canvas.width = MAX_WIDTH;
-            canvas.height = img.height * scale;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            // Convert to highly optimized JPEG
-            resolve(canvas.toDataURL('image/jpeg', 0.8)); 
-          };
-          img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
+  function render() {
+    var grid=$('mnc-grid'),empty=$('mnc-empty');
+    if(!grid)return;
+    var filtered=filter==='all'?closetItems:closetItems.filter(function(it){return(it.category||classify(it.label))===filter;});
+    var cats={};
+    closetItems.forEach(function(it){cats[it.category||classify(it.label)]=1;});
+    if($('mnc-total-count'))$('mnc-total-count').textContent=closetItems.length;
+    if($('mnc-cat-count'))$('mnc-cat-count').textContent=Object.keys(cats).length;
+    Array.from(grid.querySelectorAll('.mnc-item-card')).forEach(function(el){el.remove();});
+    if(!filtered.length){if(empty)empty.style.display='block';return;}
+    if(empty)empty.style.display='none';
+    filtered.forEach(function(item){
+      var cat=item.category||classify(item.label);
+      var card=document.createElement('div');
+      card.className='mnc-item-card';
+      var realIdx=closetItems.indexOf(item);
+      var artSrc = renderVectorArt(item, cat);
+      card.innerHTML='<img class="mnc-item-img" src="'+artSrc+'" alt="'+item.label+'">'+
+        '<div class="mnc-item-body"><span class="mnc-item-cat">'+(CAT[cat]||cat)+'</span>'+
+        '<p class="mnc-item-label">'+item.label+'</p>'+
+        (item.brand?'<p class="mnc-item-meta">'+item.brand+'</p>':'')+
+        '</div><button class="mnc-item-del" data-idx="'+realIdx+'">&#215;</button>';
+      grid.appendChild(card);
+    });
+    grid.querySelectorAll('.mnc-item-del').forEach(function(btn){
+      btn.addEventListener('click',function(e){
+        e.stopPropagation();
+        closetItems.splice(parseInt(btn.dataset.idx),1);
+        save();render();
       });
-    };
+    });
+  }
 
-    try {
-      const compressedBase64 = await resizeImage(file);
-      
-      const payload = {
-        action: 'add_item',
-        user_id: this.userId,
-        image: compressedBase64
+  // ── Filters ───────────────────────────────────────────────
+  function initFilters() {
+    document.querySelectorAll('.mnc-filter').forEach(function(btn){
+      btn.addEventListener('click',function(e){
+        e.preventDefault();
+        document.querySelectorAll('.mnc-filter').forEach(function(b){b.classList.remove('active');});
+        btn.classList.add('active');filter=btn.dataset.cat;render();
+      });
+    });
+  }
+
+  // ── Photo Upload + Real API ───────────────────────────────
+  function initPhoto() {
+    var snapBtn=$('mnc-snap-btn'),inp=$('mnc-photo-input'),scanUI=$('mnc-scan-ui');
+    var prev=$('mnc-preview-img'),status=$('mnc-scan-status'),detEl=$('mnc-detected-items');
+    var saveBtn=$('mnc-save-detected'),retake=$('mnc-retake-btn');
+    if(!snapBtn)return;
+    snapBtn.addEventListener('click',function(){inp&&inp.click();});
+    if(retake)retake.addEventListener('click',function(){
+      scanUI.style.display='none';snapBtn.style.display='';detected=[];if(inp)inp.value='';
+    });
+    if(inp)inp.addEventListener('change',function(e){
+      var f=e.target.files[0];if(!f)return;
+      var r=new FileReader();
+      r.onload=function(ev){
+        prev.src=ev.target.result;snapBtn.style.display='none';scanUI.style.display='block';
+        detected=[];if(detEl)detEl.innerHTML='';if(saveBtn)saveBtn.style.display='none';
+        if(status)status.textContent='\ud83d\udd0d Analysing with AI\u2026';
+        runScan(ev.target.result,status,detEl,saveBtn);
       };
+      r.readAsDataURL(f);
+    });
+    if(saveBtn)saveBtn.addEventListener('click',function(){
+      detected.forEach(function(it){if(!closetItems.find(function(c){return c.label===it.label;}))closetItems.push(it);});
+      save();render();
+      scanUI.style.display='none';snapBtn.style.display='';if(inp)inp.value='';detected=[];
+    });
+  }
 
-      const res = await fetch(this.api, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+  function runScan(src,statusEl,detEl,saveBtn) {
+    fetch(CLOTH_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:src})})
+    .then(function(r){return r.json();})
+    .then(function(data){
+      var apiItems=data.detected_items||[];
+      if(!apiItems.length)throw new Error('No items');
+      var catMap={'Topwear':'tops','Bottomwear':'bottoms','Outerwear':'outerwear','Footwear':'footwear','Accessory':'accessories','Dress':'dresses'};
+      apiItems.forEach(function(item,idx){
+        setTimeout(function(){
+          var it={label:item.name||'Clothing Item',category:catMap[item.category]||'tops',color:item.color||'',fit:item.fit||'',img:src,source:'photo_upload_ai',added_at:new Date().toISOString()};
+          detected.push(it);
+          if(detEl){var c=document.createElement('div');c.className='mnc-detected-chip';c.textContent='\ud83d\udc55 '+it.label+(it.color?' \u00b7 '+it.color:'');detEl.appendChild(c);}
+          if(statusEl)statusEl.textContent='\ud83d\udd0d Found: '+it.label+'\u2026';
+          if(idx===apiItems.length-1){if(statusEl)statusEl.textContent='\u2705 '+detected.length+' detected!';if(saveBtn)saveBtn.style.display='block';}
+        },idx*700);
       });
-      
-      const data = await res.json();
-      
-      if (data.success) {
-         await this.loadItems();
-         input.value = '';
-      } else {
-         alert('Upload Error: ' + data.error);
-         this.renderGrid(this.items);
+      if(data.person_analysis){try{var id=JSON.parse(localStorage.getItem('mn_identity')||'{}');var pa=data.person_analysis;if(pa.skin_tone)id.skin_mst=pa.skin_tone;if(pa.body_build)id.body_type=pa.body_build;localStorage.setItem('mn_identity',JSON.stringify(id));window.MN_IDENTITY=id;}catch(e){}}
+    })
+    .catch(function(){
+      var MOCK=[{label:'Top / T-Shirt',category:'tops'},{label:'Denim Jeans',category:'bottoms'},{label:'Sneakers',category:'footwear'}];
+      var i=0;var iv=setInterval(function(){
+        if(i>=2){clearInterval(iv);if(statusEl)statusEl.textContent='\u2705 '+detected.length+' detected!';if(saveBtn)saveBtn.style.display='block';return;}
+        var it=Object.assign({},MOCK[i],{img:src,source:'photo_upload',added_at:new Date().toISOString()});
+        detected.push(it);
+        if(detEl){var c=document.createElement('div');c.className='mnc-detected-chip';c.textContent='\ud83d\udc55 '+it.label;detEl.appendChild(c);}
+        if(statusEl)statusEl.textContent='\ud83d\udd0d Found: '+it.label+'\u2026';
+        i++;
+      },1000);
+    });
+  }
+
+  // ── Ghost Mode ────────────────────────────────────────────
+  function initGhost() {
+    var btn=$('mnc-ghost-btn'),form=$('mnc-ghost-form'),saveBtn=$('mnc-ghost-save');
+    if(!btn)return;
+    btn.addEventListener('click',function(){
+      form.style.display=form.style.display==='none'?'block':'none';
+      btn.textContent=form.style.display==='none'?'Enter Ghost Mode':'\u2715 Cancel';
+      if(form.style.display==='none'){resetGhost();}
+    });
+
+    // Category pill selection
+    document.querySelectorAll('.mnc-cat-pill').forEach(function(p){
+      p.addEventListener('click',function(){
+        document.querySelectorAll('.mnc-cat-pill').forEach(function(x){x.classList.remove('sel');});
+        p.classList.add('sel');
+        ghost.cat=p.dataset.cat;
+        ghost.selectedItems=[];
+        renderItemTiles(ghost.cat);
+        renderSelectedPills();
+        var f=$('mnc-items-field');if(f)f.style.display='block';
+        if(saveBtn)saveBtn.style.display='none';
+      });
+    });
+
+    // Custom input
+    var customInp=$('mnc-ghost-custom');
+    if(customInp)customInp.addEventListener('keydown',function(e){
+      if(e.key==='Enter'&&this.value.trim()){
+        addSelectedItem(this.value.trim());
+        this.value='';
       }
-    } catch (err) {
-      console.error(err);
-      alert('Failed to upload item');
-      this.renderGrid(this.items);
-    }
-  }
+    });
 
-  async deleteItem(id) {
-    if(!confirm('Are you sure you want to remove this item?')) return;
-
-    // Optimistic removal
-    const oldItems = [...this.items];
-    this.items = this.items.filter(i => i.id !== id);
-    this.renderGrid(this.items);
-
-    try {
-      const res = await fetch(this.api, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'delete_item',
-          user_id: this.userId,
-          item_id: id
-        })
+    // Save
+    if(saveBtn)saveBtn.addEventListener('click',function(){
+      if(!ghost.selectedItems.length){alert('Please select at least one item.');return;}
+      ghost.selectedItems.forEach(function(it){
+        var newItem={label:it.brand?it.label+' \u00b7 '+it.brand:it.label,category:ghost.cat,brand:it.brand||'',source:'ghost_mode',added_at:new Date().toISOString(),img:''};
+        if(!closetItems.find(function(c){return c.label===newItem.label;}))closetItems.push(newItem);
       });
-      const data = await res.json();
-      if(!data.success) throw new Error(data.error);
-    } catch(e) {
-      alert('Could not delete item');
-      this.items = oldItems;
-      this.renderGrid(this.items);
+      save();render();
+      form.style.display='none';btn.textContent='Enter Ghost Mode';
+      resetGhost();
+    });
+
+    // Close inline brand menu on outside click
+    document.addEventListener('click',function(){
+      if(activeBrandPill!==null){
+        activeBrandPill=null;
+        renderSelectedPills();
+      }
+    });
+  }
+
+  function renderItemTiles(cat) {
+    var container=$('mnc-item-tiles');
+    if(!container)return;
+    container.innerHTML='';
+    var list=ITEMS[cat]||[];
+    list.forEach(function(name){
+      var tile=document.createElement('button');
+      tile.type='button';
+      tile.className='mnc-item-tile';
+      tile.textContent=name;
+      var isSelected=ghost.selectedItems.find(function(it){return it.label===name;});
+      if(isSelected)tile.classList.add('sel');
+      tile.addEventListener('click',function(e){
+        e.preventDefault();
+        var idx=ghost.selectedItems.findIndex(function(it){return it.label===name;});
+        if(idx>-1){ghost.selectedItems.splice(idx,1);tile.classList.remove('sel');}
+        else{ghost.selectedItems.push({label:name,brand:''});tile.classList.add('sel');}
+        renderSelectedPills();
+        if($('mnc-ghost-save'))$('mnc-ghost-save').style.display=ghost.selectedItems.length?'block':'none';
+      });
+      container.appendChild(tile);
+    });
+  }
+
+  function addSelectedItem(name) {
+    if(!ghost.selectedItems.find(function(it){return it.label===name;})){
+      ghost.selectedItems.push({label:name,brand:''});
+      renderSelectedPills();
+      renderItemTiles(ghost.cat);
+      if($('mnc-ghost-save'))$('mnc-ghost-save').style.display='block';
     }
   }
-}
 
-// Initialize
-window.MNCloset = new DigitalClosetManager();
+  function renderSelectedPills() {
+    var container=$('mnc-selected-pills');
+    var field=$('mnc-selected-field');
+    if(!container)return;
+    container.innerHTML='';
+    if(!ghost.selectedItems.length){if(field)field.style.display='none';return;}
+    if(field)field.style.display='block';
+    ghost.selectedItems.forEach(function(it,idx){
+      var wrap=document.createElement('div');
+      wrap.className='mnc-sel-pill-wrap';
+      wrap.addEventListener('click', function(e){ e.stopPropagation(); });
+
+      var pill=document.createElement('div');
+      pill.className='mnc-sel-pill';
+      var nameSpan=document.createElement('span');
+      nameSpan.className='mnc-sel-pill-name';
+      nameSpan.textContent=it.label;
+
+      var brandBtn=document.createElement('button');
+      brandBtn.type='button';
+      brandBtn.className='mnc-sel-pill-brand-btn';
+      brandBtn.innerHTML=(it.brand?it.brand:'BRAND')+' &#9660;';
+      brandBtn.addEventListener('click',function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        activeBrandPill = (activeBrandPill===idx ? null : idx);
+        renderSelectedPills();
+      });
+
+      var removeBtn=document.createElement('button');
+      removeBtn.type='button';
+      removeBtn.className='mnc-sel-pill-remove';
+      removeBtn.innerHTML='&#215;';
+      removeBtn.addEventListener('click',function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        if(activeBrandPill===idx) activeBrandPill=null;
+        ghost.selectedItems.splice(idx,1);
+        renderSelectedPills();
+        renderItemTiles(ghost.cat);
+        if($('mnc-ghost-save'))$('mnc-ghost-save').style.display=ghost.selectedItems.length?'block':'none';
+      });
+
+      pill.appendChild(nameSpan);
+      pill.appendChild(brandBtn);
+      pill.appendChild(removeBtn);
+      wrap.appendChild(pill);
+
+      if(activeBrandPill===idx){
+        wrap.style.zIndex='25';
+        var menu=document.createElement('div');
+        menu.className='mnc-brand-menu';
+
+        var hdr=document.createElement('div');
+        hdr.className='mnc-brand-menu-hdr';
+        hdr.textContent='Select Brand';
+        menu.appendChild(hdr);
+
+        var selectedBrand = it.brand || '';
+        TOP_BRANDS.forEach(function(brand){
+          var btn=document.createElement('button');
+          btn.type='button';
+          btn.className='mnc-brand-item';
+          btn.innerHTML=(selectedBrand===brand?'&#10003; ':'') + brand;
+          btn.addEventListener('click',function(e){
+            e.preventDefault();
+            e.stopPropagation();
+            ghost.selectedItems[idx].brand=brand;
+            activeBrandPill=null;
+            renderSelectedPills();
+          });
+          menu.appendChild(btn);
+        });
+
+        var customWrap=document.createElement('div');
+        customWrap.className='mnc-brand-custom-wrap';
+        var customInp=document.createElement('input');
+        customInp.className='mnc-brand-custom';
+        customInp.type='text';
+        customInp.placeholder='Type brand name…';
+        customInp.value=selectedBrand;
+        customInp.addEventListener('click', function(e){ e.stopPropagation(); });
+        customInp.addEventListener('input', function(){ ghost.selectedItems[idx].brand=this.value; });
+        customInp.addEventListener('keydown', function(e){
+          if(e.key==='Enter'){
+            e.preventDefault();
+            activeBrandPill=null;
+            renderSelectedPills();
+          }
+        });
+        customInp.addEventListener('blur', function(){
+          setTimeout(function(){
+            if(activeBrandPill===idx){
+              activeBrandPill=null;
+              renderSelectedPills();
+            }
+          }, 120);
+        });
+        customWrap.appendChild(customInp);
+        menu.appendChild(customWrap);
+        wrap.appendChild(menu);
+      }
+
+      container.appendChild(wrap);
+    });
+  }
+
+  function resetGhost() {
+    ghost={cat:'',selectedItems:[]};
+    document.querySelectorAll('.mnc-cat-pill').forEach(function(p){p.classList.remove('sel');});
+    var f=$('mnc-items-field');if(f)f.style.display='none';
+    var sf=$('mnc-selected-field');if(sf)sf.style.display='none';
+    var sb=$('mnc-ghost-save');if(sb)sb.style.display='none';
+    var tiles=$('mnc-item-tiles');if(tiles)tiles.innerHTML='';
+    var pills=$('mnc-selected-pills');if(pills)pills.innerHTML='';
+    var ci=$('mnc-ghost-custom');if(ci)ci.value='';
+  }
+
+  // Auto ghost mode via hash
+  if(window.location.hash==='#ghost-mode'){
+    window.addEventListener('DOMContentLoaded',function(){
+      var f=$('mnc-ghost-form'),b=$('mnc-ghost-btn');
+      if(f&&b){f.style.display='block';b.textContent='\u2715 Cancel';}
+      setTimeout(function(){var el=$('mnc-card-ghost');if(el)el.scrollIntoView({behavior:'smooth',block:'center'});},300);
+    });
+  }
+
+  window.addEventListener('mn-identity-updated',load);
+  window.addEventListener('storage',function(e){if(e.key==='mn_identity')load();});
+  document.addEventListener('DOMContentLoaded',function(){load();initFilters();initPhoto();initGhost();});
+})();
 </script>
 
 {% schema %}
 {
-  "name": "My Digital Closet",
-  "settings": [],
-  "presets": [
-    {
-      "name": "My Digital Closet"
-    }
-  ]
+  "name": "Digital Closet",
+  "tag": "div",
+  "class": "mn-closet-section"
 }
 {% endschema %}

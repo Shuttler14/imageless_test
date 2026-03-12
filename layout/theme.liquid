@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <title>
@@ -225,8 +225,16 @@
     }
   }
 </script>
-  {% unless template contains 'product' or template == 'index' %}
-    {% section 'MN-fashion-consultant' %}
-  {% endunless %}
+  {% section 'MN-fashion-consultant' %}
+
+  <script>
+    function mnOpenCloset(opts) {
+      window.location.href = (opts && opts.ghost) ? '/pages/my-closet#ghost-mode' : '/pages/my-closet';
+    }
+
+    function mnCloseCloset() {
+      return;
+    }
+  </script>
 </body>
 </html>

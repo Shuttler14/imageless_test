@@ -1,304 +1,338 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import {
+  Award,
   ShoppingBag,
-  Star,
-  Share2,
+  TrendingUp,
   Instagram,
   Youtube,
   Twitter,
   Linkedin,
   ExternalLink,
-} from "lucide-react";
+  MapPin,
+  Calendar,
+  Globe,
+} from 'lucide-react';
+import Image from 'next/image';
 import {
   Creator,
   DesignListing,
-  RANK_LADDER,
   StyleInfluenceRank,
-  SocialPlatform,
-} from "../types";
+} from '@/lib/types';
+import {
+  mockCreators,
+  mockDesignListings,
+  RANK_LABELS,
+  COMMISSION_TIERS,
+  formatCurrency,
+} from '@/lib/data';
 
-// ─── helpers ────────────────────────────────────────────────────────────────
-
-function getStyleRank(lifetimeEarnings: number): {
-  rank: StyleInfluenceRank;
-  emoji: string;
-  color: string;
-  nextRank?: { rank: StyleInfluenceRank; minEarnings: number };
-} {
-  let current = RANK_LADDER[0];
-  for (const tier of RANK_LADDER) {
-    if (lifetimeEarnings >= tier.min) current = tier;
-  }
-  const currentIdx = RANK_LADDER.indexOf(current);
-  const next = RANK_LADDER[currentIdx + 1];
-  return {
-    rank: current.rank,
-    emoji: current.emoji,
-    color: current.color,
-    nextRank: next ? { rank: next.rank, minEarnings: next.min } : undefined,
-  };
+interface CreatorProfileProps {
+  creatorId: string;
 }
 
-const SOCIAL_ICONS: Record<SocialPlatform, React.ReactNode> = {
-  instagram: <Instagram className="w-4 h-4" />,
-  youtube: <Youtube className="w-4 h-4" />,
-  twitter: <Twitter className="w-4 h-4" />,
-  linkedin: <Linkedin className="w-4 h-4" />,
-};
+export default function CreatorProfile({ creatorId }: CreatorProfileProps) {
+  const [creator, setCreator] = useState<Creator | null>(null);
+  const [listings, setListings] = useState<DesignListing[]>([]);
 
-function formatCompact(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
-  return n.toString();
-}
+  useEffect(() => {
+    const creatorData = mockCreators.find(c => c.id === creatorId || c.username === creatorId);
+    if (creatorData) {
+      setCreator(creatorData);
+      setListings(mockDesignListings.filter(l => l.creator_id === creatorData.id));
+    }
+  }, [creatorId]);
 
-// ─── Rank Badge ──────────────────────────────────────────────────────────────
-
-function RankBadge({ rank, emoji, color }: { rank: StyleInfluenceRank; emoji: string; color: string }) {
-  return (
-    <motion.div
-      initial={{ scale: 0.85, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      transition={{ type: "spring", stiffness: 260, damping: 22 }}
-      className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/15 bg-white/8 backdrop-blur-sm"
-    >
-      <span className="text-base">{emoji}</span>
-      <span className={`text-sm font-bold tracking-wide ${color}`}>{rank}</span>
-    </motion.div>
-  );
-}
-
-// ─── Design Card (Fashion-magazine editorial style) ───────────────────────────
-
-function DesignCard({
-  listing,
-  index,
-}: {
-  listing: DesignListing;
-  index: number;
-}) {
-  const [hovered, setHovered] = useState(false);
-
-  // Alternate taller cards in a masonry-style rhythm
-  const isTall = index % 3 === 1;
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.06, duration: 0.5, ease: "easeOut" }}
-      onHoverStart={() => setHovered(true)}
-      onHoverEnd={() => setHovered(false)}
-      className={`relative overflow-hidden rounded-2xl bg-zinc-900 border border-white/10 cursor-pointer group ${
-        isTall ? "row-span-2" : "row-span-1"
-      }`}
-    >
-      {/* 
-        CRITICAL VISUAL RULE:
-        We always use flux_editorial_image_url — the FLUX-generated Virtual Try-On
-        editorial image. This is NOT a flat product shot; it is a photorealistic
-        model/creator wearing the design in an editorial context.
-      */}
-      <div className={`relative w-full overflow-hidden ${isTall ? "aspect-[3/5]" : "aspect-[3/4]"}`}>
-        <motion.img
-          src={listing.flux_editorial_image_url}
-          alt={listing.title}
-          className="w-full h-full object-cover object-top"
-          animate={{ scale: hovered ? 1.06 : 1 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-        />
-
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
-
-        {/* Units sold badge */}
-        <div className="absolute top-3 right-3 flex items-center gap-1 bg-black/60 backdrop-blur-sm border border-white/10 rounded-full px-2.5 py-1 text-[10px] text-white font-semibold">
-          <ShoppingBag className="w-3 h-3" />
-          {formatCompact(listing.units_sold)} sold
-        </div>
-
-        {/* Bottom info */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 space-y-1">
-          <h3 className="text-sm font-bold text-white leading-tight line-clamp-2">{listing.title}</h3>
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-zinc-300">
-              ₹{listing.base_price.toLocaleString("en-IN")}
-            </span>
-            {listing.tags.slice(0, 2).map((tag) => (
-              <span key={tag} className="text-[10px] text-zinc-500 border border-zinc-700 rounded-full px-2 py-0.5">
-                #{tag}
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
-// ─── Profile Header ──────────────────────────────────────────────────────────
-
-function ProfileHeader({ creator }: { creator: Creator }) {
-  const rankData = getStyleRank(creator.earnings.lifetime_earnings);
-
-  return (
-    <div className="relative">
-      {/* Hero gradient backdrop */}
-      <div className="h-48 bg-gradient-to-br from-zinc-900 via-black to-zinc-900 border-b border-white/10" />
-
-      {/* Avatar */}
-      <div className="max-w-4xl mx-auto px-6">
-        <div className="-mt-16 flex flex-col sm:flex-row sm:items-end gap-5 pb-6 border-b border-white/10">
-          <div className="relative w-28 h-28 rounded-2xl border-2 border-white/20 overflow-hidden bg-zinc-800 shrink-0 shadow-2xl">
-            <img
-              src={creator.avatar_url}
-              alt={creator.display_name}
-              className="w-full h-full object-cover"
-            />
-            {creator.is_mega_influencer && (
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-yellow-900/80 to-transparent py-1.5 text-center text-[9px] text-yellow-300 font-bold tracking-widest uppercase">
-                Mega Creator
-              </div>
-            )}
-          </div>
-
-          <div className="flex-1 space-y-2 pt-4 sm:pt-0">
-            {/* Name + rank */}
-            <div className="flex flex-wrap items-center gap-3">
-              <h1 className="text-xl font-black text-white tracking-tight">
-                {creator.display_name}
-              </h1>
-              {creator.is_verified && (
-                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-              )}
-            </div>
-            <p className="text-sm text-zinc-500">@{creator.username}</p>
-
-            <RankBadge
-              rank={rankData.rank}
-              emoji={rankData.emoji}
-              color={rankData.color}
-            />
-
-            {/* Stats row */}
-            <div className="flex flex-wrap gap-6 pt-1 text-sm">
-              <div>
-                <span className="font-bold text-white">{formatCompact(creator.total_units_sold)}</span>
-                <span className="text-zinc-500 ml-1">pieces sold</span>
-              </div>
-              <div>
-                <span className="font-bold text-white">{creator.listings.filter((l) => l.is_active).length}</span>
-                <span className="text-zinc-500 ml-1">active drops</span>
-              </div>
-              {creator.social_accounts.map((s) => (
-                <div key={s.platform} className="flex items-center gap-1.5 text-zinc-400">
-                  {SOCIAL_ICONS[s.platform]}
-                  <span className="text-white font-semibold">{formatCompact(s.follower_count)}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Share button */}
-          <button className="flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-sm text-zinc-300 hover:bg-white/10 transition-colors self-start sm:self-auto">
-            <Share2 className="w-4 h-4" />
-            Share
-          </button>
-        </div>
-
-        {/* Bio */}
-        {creator.bio && (
-          <p className="py-4 text-sm text-zinc-400 max-w-xl leading-relaxed">{creator.bio}</p>
-        )}
-
-        {/* Next rank progress */}
-        {rankData.nextRank && (
-          <div className="pb-6 space-y-1.5">
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-zinc-600">
-                Progress to{" "}
-                <span className="text-zinc-300 font-semibold">{rankData.nextRank.rank}</span>
-              </span>
-              <span className="text-zinc-600">
-                ₹{creator.earnings.lifetime_earnings.toLocaleString("en-IN")} /{" "}
-                ₹{rankData.nextRank.minEarnings.toLocaleString("en-IN")}
-              </span>
-            </div>
-            <div className="h-1.5 rounded-full bg-zinc-800 overflow-hidden">
-              <motion.div
-                className="h-full rounded-full bg-gradient-to-r from-white/60 to-white"
-                initial={{ width: 0 }}
-                animate={{
-                  width: `${Math.min(
-                    100,
-                    (creator.earnings.lifetime_earnings / rankData.nextRank.minEarnings) * 100
-                  )}%`,
-                }}
-                transition={{ duration: 1.2, ease: "easeOut" }}
-              />
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// ─── Masonry Grid ────────────────────────────────────────────────────────────
-
-function MasonryGrid({ listings }: { listings: DesignListing[] }) {
-  const active = listings.filter((l) => l.is_active);
-  if (active.length === 0) {
+  if (!creator) {
     return (
-      <div className="flex flex-col items-center justify-center py-24 text-zinc-600 space-y-2">
-        <ShoppingBag className="w-8 h-8" />
-        <p className="text-sm">No active listings yet.</p>
+      <div className="min-h-screen bg-mn-dark flex items-center justify-center">
+        <div className="animate-pulse text-mn-teal">Loading profile...</div>
       </div>
     );
   }
 
+  const rankInfo = RANK_LABELS[creator.style_influence_rank];
+  const tierConfig = COMMISSION_TIERS[creator.commission_tier];
+
+  // Social platform icons
+  const socialIcons: Record<string, React.ElementType> = {
+    instagram: Instagram,
+    youtube: Youtube,
+    twitter: Twitter,
+    linkedin: Linkedin,
+  };
+
   return (
-    <div className="columns-2 sm:columns-3 lg:columns-4 gap-3 space-y-3">
-      {active.map((listing, i) => (
-        <div key={listing.id} className="break-inside-avoid mb-3">
-          <DesignCard listing={listing} index={i} />
+    <div className="min-h-screen bg-mn-dark text-white font-montserrat">
+      {/* Hero Header */}
+      <div className="relative">
+        {/* Background Gradient */}
+        <div className="absolute inset-0 h-96 bg-gradient-to-b from-mn-teal/20 via-transparent to-mn-dark" />
+
+        <div className="relative max-w-7xl mx-auto px-6 pt-12 pb-8">
+          {/* Back Link */}
+          <a
+            href="/featured-creators"
+            className="inline-flex items-center gap-2 text-gray-400 hover:text-mn-teal transition-colors mb-8"
+          >
+            <ExternalLink className="w-4 h-4 rotate-180" />
+            Back to Featured Creators
+          </a>
+
+          {/* Profile Header */}
+          <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
+            {/* Avatar */}
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="relative"
+            >
+              <div className="w-40 h-40 rounded-full border-4 border-mn-teal overflow-hidden shadow-2xl shadow-mn-teal/30">
+                <img
+                  src={creator.avatar_url}
+                  alt={creator.username}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              {creator.is_mega_influencer && (
+                <div className="absolute -bottom-2 -right-2 w-12 h-12 bg-gradient-to-r from-amber-400 to-yellow-500 rounded-full flex items-center justify-center shadow-lg">
+                  <Award className="w-6 h-6 text-black" />
+                </div>
+              )}
+            </motion.div>
+
+            {/* Info */}
+            <div className="flex-1 text-center md:text-left">
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.1 }}
+              >
+                <div className="flex flex-col md:flex-row items-center gap-4 mb-2">
+                  <h1 className="text-4xl md:text-5xl font-bold">
+                    @{creator.username}
+                  </h1>
+                  {creator.is_mega_influencer && (
+                    <span className="px-4 py-1 bg-gradient-to-r from-amber-400 to-yellow-500 text-black text-sm font-bold rounded-full">
+                      FEATURED CREATOR
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mb-4">
+                  {/* Rank Badge */}
+                  <span className="inline-flex items-center gap-2 px-4 py-2 bg-mn-card border border-mn-border rounded-full">
+                    <span className="text-xl">{rankInfo.emoji}</span>
+                    <span className="font-semibold">{rankInfo.title}</span>
+                  </span>
+
+                  {/* Commission Badge */}
+                  <span className="inline-flex items-center gap-2 px-4 py-2 bg-mn-teal/20 border border-mn-teal/40 rounded-full text-mn-teal font-semibold">
+                    {tierConfig.rate}% Commission
+                  </span>
+                </div>
+
+                <p className="text-gray-400 mb-6 max-w-xl">
+                  {rankInfo.description}. Creating fashion that speaks volumes.
+                </p>
+
+                {/* Stats */}
+                <div className="flex flex-wrap justify-center md:justify-start gap-6">
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-white">{formatCurrency(creator.lifetime_earnings)}</p>
+                    <p className="text-sm text-gray-500">Lifetime Earnings</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-white">{creator.total_items_sold}</p>
+                    <p className="text-sm text-gray-500">Items Sold</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-white">{listings.length}</p>
+                    <p className="text-sm text-gray-500">Designs</p>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Social Links */}
+            <motion.div
+              initial={{ x: 20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="flex flex-col gap-3"
+            >
+              {Object.entries(creator.social_links).map(([platform, account]) => {
+                const Icon = socialIcons[platform];
+                if (!Icon || !account) return null;
+                return (
+                  <a
+                    key={platform}
+                    href={`https://${platform}.com/${account.handle?.replace('@', '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 px-4 py-2 bg-mn-card border border-mn-border rounded-xl hover:border-mn-teal transition-colors"
+                  >
+                    <Icon className={`w-5 h-5 ${
+                      platform === 'instagram' ? 'text-pink-500' :
+                      platform === 'youtube' ? 'text-red-500' :
+                      platform === 'twitter' ? 'text-blue-400' :
+                      'text-blue-600'
+                    }`} />
+                    <span className="text-sm">{account.handle}</span>
+                    {account.verified && (
+                      <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full">
+                        Verified
+                      </span>
+                    )}
+                  </a>
+                );
+              })}
+            </motion.div>
+          </div>
         </div>
-      ))}
-    </div>
-  );
-}
+      </div>
 
-// ─── Main Public Profile Component ──────────────────────────────────────────
-
-interface CreatorProfileProps {
-  creator: Creator;
-}
-
-export default function CreatorProfile({ creator }: CreatorProfileProps) {
-  return (
-    <div className="min-h-screen bg-black text-white font-sans antialiased">
-      <ProfileHeader creator={creator} />
-
-      <div className="max-w-4xl mx-auto px-6 py-8 space-y-6">
-        {/* Section heading */}
-        <div className="flex items-center justify-between">
-          <h2 className="text-xs font-bold uppercase tracking-widest text-zinc-500">
-            Editorial Drops
+      {/* Designs Grid */}
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="mb-8"
+        >
+          <h2 className="text-2xl font-bold flex items-center gap-3">
+            <ShoppingBag className="w-6 h-6 text-mn-teal" />
+            Designs by @{creator.username}
           </h2>
-          <span className="text-xs text-zinc-600">
-            {creator.listings.filter((l) => l.is_active).length} designs
-          </span>
+          <p className="text-gray-400 mt-2">
+            Exclusive drops from this creator
+          </p>
+        </motion.div>
+
+        {/* Masonry Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {listings.map((listing, index) => (
+            <motion.div
+              key={listing.id}
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.1 * index }}
+              className="group relative"
+            >
+              {/* Card - Fashion Magazine Style */}
+              <div className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-gray-900">
+                {/* Editorial Image */}
+                <img
+                  src={listing.flux_editorial_image_url}
+                  alt={listing.title}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+
+                {/* Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80" />
+
+                {/* Premium Badge */}
+                <div className="absolute top-4 right-4">
+                  <span className="px-3 py-1 bg-black/50 backdrop-blur-sm text-xs font-semibold rounded-full text-white border border-white/10">
+                    {creator.commission_rate}% Commission
+                  </span>
+                </div>
+
+                {/* Content */}
+                <div className="absolute bottom-0 left-0 right-0 p-5">
+                  <h3 className="text-lg font-bold text-white mb-1 line-clamp-1">
+                    {listing.title}
+                  </h3>
+                  <p className="text-sm text-gray-300 mb-3 line-clamp-2">
+                    {listing.description}
+                  </p>
+
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-gray-500">Price</p>
+                      <p className="text-xl font-bold text-mn-teal">
+                        {formatCurrency(listing.price)}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs text-gray-500">Earnings</p>
+                      <p className="text-sm font-semibold text-green-400">
+                        +{formatCurrency(listing.estimated_earnings_per_sale)}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Sales Count */}
+                  <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between">
+                    <span className="text-xs text-gray-400">
+                      {listing.total_sales} sales
+                    </span>
+                    <span className={`text-xs px-2 py-1 rounded-full ${
+                      listing.status === 'active'
+                        ? 'bg-green-500/20 text-green-400'
+                        : 'bg-gray-500/20 text-gray-400'
+                    }`}>
+                      {listing.status}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Hover Overlay */}
+                <div className="absolute inset-0 bg-mn-teal/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              </div>
+            </motion.div>
+          ))}
         </div>
 
-        {/* 
-          MASONRY GRID — Each card uses flux_editorial_image_url.
-          These are photorealistic FLUX VTO editorial images,
-          NOT flat t-shirt product photos.
-        */}
-        <MasonryGrid listings={creator.listings} />
+        {listings.length === 0 && (
+          <div className="text-center py-20">
+            <ShoppingBag className="w-16 h-16 mx-auto text-gray-700 mb-4" />
+            <p className="text-gray-500">No designs available yet</p>
+          </div>
+        )}
+      </div>
+
+      {/* Footer Stats */}
+      <div className="border-t border-gray-800">
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <TrendingUp className="w-5 h-5 text-mn-teal" />
+                <span className="text-2xl font-bold">{formatCurrency(creator.lifetime_earnings)}</span>
+              </div>
+              <p className="text-sm text-gray-500">Lifetime Earnings</p>
+            </div>
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <ShoppingBag className="w-5 h-5 text-mn-purple" />
+                <span className="text-2xl font-bold">{creator.total_items_sold}</span>
+              </div>
+              <p className="text-sm text-gray-500">Items Sold</p>
+            </div>
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <Award className="w-5 h-5 text-mn-gold" />
+                <span className="text-2xl font-bold">{rankInfo.title}</span>
+              </div>
+              <p className="text-sm text-gray-500">Style Rank</p>
+            </div>
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <Calendar className="w-5 h-5 text-gray-400" />
+                <span className="text-2xl font-bold">
+                  {new Date(creator.created_at).toLocaleDateString('en-IN', {
+                    month: 'short',
+                    year: 'numeric'
+                  })}
+                </span>
+              </div>
+              <p className="text-sm text-gray-500">Member Since</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

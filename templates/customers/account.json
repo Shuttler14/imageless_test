@@ -14,6 +14,10 @@
       "disabled": true,
       "settings": {}
     },
+    "creator_portal": {
+      "type": "creator-account-portal",
+      "settings": {}
+    },
     "account_BPATeE": {
       "type": "account",
       "settings": {}
@@ -21,6 +25,7 @@
   },
   "order": [
     "placeholder",
+    "creator_portal",
     "account_BPATeE"
   ]
 }

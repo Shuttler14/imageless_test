@@ -18,10 +18,15 @@
       "type": "thank-you",
       "name": "Thank You",
       "settings": {}
+    },
+    "creator_post_purchase": {
+      "type": "creator-post-purchase-cta",
+      "settings": {}
     }
   },
   "order": [
     "placeholder",
-    "thank_you_6MdB6H"
+    "thank_you_6MdB6H",
+    "creator_post_purchase"
   ]
 }

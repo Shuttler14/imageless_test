@@ -1,0 +1,200 @@
+{% comment %}
+=================================================================================
+MY NARRATIVE - CREATOR STUDIO TAB (ACCOUNT PORTAL)
+=================================================================================
+Adds a "Creator Studio" tab/banner to the Shopify customer account page
+
+INTEGRATION:
+Add to your customers/account.liquid template:
+{% section 'creator-account-portal' %}
+
+OR render before the main account content:
+{% render 'creator-account-portal' %}
+
+=================================================================================
+{% endcomment %}
+
+{% assign customer = shop.customer %}
+{% assign is_creator = false %}
+
+{% if customer and customer.metafields.creator.registered == true %}
+  {% assign is_creator = true %}
+{% endif %}
+
+<style>
+  .mn-creator-account-portal {
+    font-family: 'Montserrat', sans-serif;
+    margin-bottom: 24px;
+  }
+
+  .mn-creator-studio-banner {
+    background: linear-gradient(135deg, rgba(57, 165, 150, 0.15), rgba(139, 92, 246, 0.1));
+    border: 1px solid rgba(57, 165, 150, 0.3);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .mn-creator-studio-banner:hover {
+    border-color: rgba(57, 165, 150, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(57, 165, 150, 0.15);
+  }
+
+  .mn-creator-studio-icon {
+    font-size: 32px;
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #39A596, #2dd4bf);
+    border-radius: 14px;
+    flex-shrink: 0;
+  }
+
+  .mn-creator-studio-content {
+    flex: 1;
+  }
+
+  .mn-creator-studio-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .mn-creator-badge-mini {
+    font-size: 10px;
+    padding: 3px 8px;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: #000;
+    border-radius: 10px;
+    font-weight: 700;
+  }
+
+  .mn-creator-studio-desc {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 0;
+  }
+
+  .mn-creator-studio-arrow {
+    font-size: 20px;
+    color: #39A596;
+    transition: transform 0.3s ease;
+  }
+
+  .mn-creator-studio-banner:hover .mn-creator-studio-arrow {
+    transform: translateX(4px);
+  }
+
+  /* Non-creator variant */
+  .mn-creator-join-banner {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(251, 191, 36, 0.1));
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .mn-creator-join-banner:hover {
+    border-color: rgba(139, 92, 246, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(139, 92, 246, 0.15);
+  }
+
+  .mn-creator-join-icon {
+    font-size: 32px;
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    border-radius: 14px;
+    flex-shrink: 0;
+  }
+
+  .mn-creator-join-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+
+  .mn-creator-join-desc {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 0;
+  }
+
+  .mn-creator-join-arrow {
+    font-size: 20px;
+    color: #8b5cf6;
+    transition: transform 0.3s ease;
+  }
+
+  .mn-creator-join-banner:hover .mn-creator-join-arrow {
+    transform: translateX(4px);
+  }
+</style>
+
+<div class="mn-creator-account-portal">
+  {% if customer and is_creator %}
+    {% comment %} Existing creator - show dashboard link {% endcomment %}
+    <a href="/account#creator-dashboard" class="mn-creator-studio-banner">
+      <div class="mn-creator-studio-icon">💼</div>
+      <div class="mn-creator-studio-content">
+        <h3 class="mn-creator-studio-title">
+          Creator Studio
+          {% if customer.metafields.creator.tier %}
+            <span class="mn-creator-badge-mini">{{ customer.metafields.creator.tier }}</span>
+          {% endif %}
+        </h3>
+        <p class="mn-creator-studio-desc">
+          View your dashboard, earnings, and manage your designs
+        </p>
+      </div>
+      <span class="mn-creator-studio-arrow">→</span>
+    </a>
+
+  {% elsif customer %}
+    {% comment %} Logged in but not a creator - show join CTA {% endcomment %}
+    <a href="/pages/become-creator" class="mn-creator-join-banner">
+      <div class="mn-creator-join-icon">✨</div>
+      <div class="mn-creator-studio-content">
+        <h3 class="mn-creator-join-title">Design & Earn</h3>
+        <p class="mn-creator-join-desc">
+          Turn your style into income. Join the creator economy today
+        </p>
+      </div>
+      <span class="mn-creator-join-arrow">→</span>
+    </a>
+
+  {% endif %}
+</div>
+
+{% schema %}
+{
+  "name": "Creator Account Portal",
+  "settings": [],
+  "presets": [
+    {
+      "name": "Creator Account Portal"
+    }
+  ]
+}
+{% endschema %}

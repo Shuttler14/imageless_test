@@ -51,7 +51,7 @@ const MNAIStylist = (() => {
     // Profile
     profileHeight: 172,
     profileFit: 'regular',
-    profileCompletion: 60,
+    profileCompletion: 0,
     // Gift mode
     giftMode: false,
     // Scanning
@@ -62,25 +62,27 @@ const MNAIStylist = (() => {
   // DATA: AESTHETICS (50/50 Men/Women)
   // 8 Men (_m) + 8 Women (_f) — 16 total styles
   const AESTHETICS = [
-    // MEN (8)
-    { id: 'old_money_m',    style: 'Old Money',           name: 'The Heritage Edit',    gender: 'M', accent: '#a8916e', img: 'https://images.unsplash.com/photo-1617196034183-421b4040ed20?w=400&h=533&fit=crop&crop=top' },
-    { id: 'street_m',       style: 'Street Style',        name: 'Urban Architect',      gender: 'M', accent: '#f59e0b', img: 'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=400&h=533&fit=crop&crop=top' },
-    { id: 'indo_western_m', style: 'Indo-Western Fusion', name: 'Desi Modernist',       gender: 'M', accent: '#ef4444', img: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=400&h=533&fit=crop&crop=top' },
-    { id: 'corporate_m',    style: 'Corporate Core',      name: 'Power Suit Era',       gender: 'M', accent: '#6366f1', img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=533&fit=crop&crop=top' },
-    { id: 'athleisure_m',   style: 'Athleisure',          name: 'Functional Minimal',   gender: 'M', accent: '#22c55e', img: 'https://images.unsplash.com/photo-1603252109303-2751441dd157?w=400&h=533&fit=crop&crop=top' },
-    { id: 'denimcore_m',    style: 'Denimcore',           name: 'Indigo Standard',      gender: 'M', accent: '#60a5fa', img: 'https://images.unsplash.com/photo-1516826957135-700dedea698c?w=400&h=533&fit=crop&crop=top' },
-    { id: 'resort_m',       style: 'Resort Casual',       name: 'Coastal Light',        gender: 'M', accent: '#fbbf24', img: 'https://images.unsplash.com/photo-1521335629791-ce4aec67dd53?w=400&h=533&fit=crop&crop=top' },
-    { id: 'techwear_m',     style: 'Techwear',            name: 'Utility Future',       gender: 'M', accent: '#94a3b8', img: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&h=533&fit=crop&crop=top' },
+    // MEN (8) — upload your image to Shopify Files with the exact filename shown in img path
+    // e.g. go to Shopify Admin → Content → Files → Upload → name it "style-old-money-m.jpg"
+    { id: 'old_money_m',    style: 'Old Money',           name: 'The Heritage Edit',    gender: 'M', accent: '#a8916e', img: window.MN_STYLE_IMGS?.old_money_m    || '' },
+    { id: 'street_m',       style: 'Street Style',        name: 'Urban Architect',      gender: 'M', accent: '#f59e0b', img: window.MN_STYLE_IMGS?.street_m        || '' },
+    { id: 'indo_western_m', style: 'Indo-Western Fusion', name: 'Desi Modernist',       gender: 'M', accent: '#ef4444', img: window.MN_STYLE_IMGS?.indo_western_m   || '' },
+    { id: 'corporate_m',    style: 'Corporate Core',      name: 'Power Suit Era',       gender: 'M', accent: '#6366f1', img: window.MN_STYLE_IMGS?.corporate_m      || '' },
+    { id: 'athleisure_m',   style: 'Athleisure',          name: 'Functional Minimal',   gender: 'M', accent: '#22c55e', img: window.MN_STYLE_IMGS?.athleisure_m     || '' },
+    { id: 'denimcore_m',    style: 'Denimcore',           name: 'Indigo Standard',      gender: 'M', accent: '#60a5fa', img: window.MN_STYLE_IMGS?.denimcore_m      || '' },
+    { id: 'resort_m',       style: 'Resort Casual',       name: 'Coastal Light',        gender: 'M', accent: '#fbbf24', img: window.MN_STYLE_IMGS?.resort_m         || '' },
+    { id: 'techwear_m',     style: 'Techwear',            name: 'Utility Future',       gender: 'M', accent: '#94a3b8', img: window.MN_STYLE_IMGS?.techwear_m       || '' },
 
-    // WOMEN (8)
-    { id: 'minimalist_f',   style: 'Minimalist',          name: 'The Edit',             gender: 'F', accent: '#e4e4e4', img: 'https://images.unsplash.com/photo-1485968579580-b6d095142e6e?w=400&h=533&fit=crop&crop=top' },
-    { id: 'y2k_f',          style: 'Y2K Chrome',          name: 'Millennial Glitch',    gender: 'F', accent: '#c0c0c0', img: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=533&fit=crop&crop=top' },
-    { id: 'cyberpunk_f',    style: 'Cyberpunk',           name: 'Neon Manifesto',       gender: 'F', accent: '#00ff87', img: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=400&h=533&fit=crop&crop=top' },
-    { id: 'casual_f',       style: 'Casual Essentials',   name: 'The Daily Uniform',    gender: 'F', accent: '#fb923c', img: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&h=533&fit=crop&crop=top' },
-    { id: 'quietlux_f',     style: 'Quiet Luxury',        name: 'Soft Power',           gender: 'F', accent: '#a3a3a3', img: 'https://images.unsplash.com/photo-1520975916090-3105956dac38?w=400&h=533&fit=crop&crop=top' },
-    { id: 'coquette_f',     style: 'Coquette',            name: 'Sugar & Satin',        gender: 'F', accent: '#f472b6', img: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=400&h=533&fit=crop&crop=top' },
-    { id: 'boho_f',         style: 'Boho',                name: 'Free Stitch',          gender: 'F', accent: '#f59e0b', img: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&h=533&fit=crop&crop=top' },
-    { id: 'power_suit_f',   style: 'Power Suit',          name: 'Boardroom Royale',     gender: 'F', accent: '#6366f1', img: 'https://images.unsplash.com/photo-1540574163026-643ea20ade25?w=400&h=533&fit=crop&crop=top' },
+    // WOMEN (8) — upload your image to Shopify Files with the exact filename shown in img path
+    // e.g. go to Shopify Admin → Content → Files → Upload → name it "style-minimalist-f.jpg"
+    { id: 'minimalist_f',   style: 'Minimalist',          name: 'The Edit',             gender: 'F', accent: '#e4e4e4', img: window.MN_STYLE_IMGS?.minimalist_f     || '' },
+    { id: 'y2k_f',          style: 'Y2K Chrome',          name: 'Millennial Glitch',    gender: 'F', accent: '#c0c0c0', img: window.MN_STYLE_IMGS?.y2k_f            || '' },
+    { id: 'cyberpunk_f',    style: 'Cyberpunk',           name: 'Neon Manifesto',       gender: 'F', accent: '#00ff87', img: window.MN_STYLE_IMGS?.cyberpunk_f      || '' },
+    { id: 'casual_f',       style: 'Casual Essentials',   name: 'The Daily Uniform',    gender: 'F', accent: '#fb923c', img: window.MN_STYLE_IMGS?.casual_f         || '' },
+    { id: 'quietlux_f',     style: 'Quiet Luxury',        name: 'Soft Power',           gender: 'F', accent: '#a3a3a3', img: window.MN_STYLE_IMGS?.quietlux_f       || '' },
+    { id: 'coquette_f',     style: 'Coquette',            name: 'Sugar & Satin',        gender: 'F', accent: '#f472b6', img: window.MN_STYLE_IMGS?.coquette_f       || '' },
+    { id: 'boho_f',         style: 'Boho',                name: 'Free Stitch',          gender: 'F', accent: '#f59e0b', img: window.MN_STYLE_IMGS?.boho_f           || '' },
+    { id: 'power_suit_f',   style: 'Power Suit',          name: 'Boardroom Royale',     gender: 'F', accent: '#6366f1', img: window.MN_STYLE_IMGS?.power_suit_f     || '' },
   ];
   // ── DATA: OCCASIONS ────────────────────────────────────────────────────
   const OCCASIONS = [
@@ -197,7 +199,7 @@ function renderStep0() {
       <div class="mnw-step-dots">
         <span class="mnw-dot mnw-dot-active"></span>
         <span class="mnw-dot"></span><span class="mnw-dot"></span>
-        <span class="mnw-dot"></span><span class="mnw-dot"></span><span class="mnw-dot"></span>
+        <span class="mnw-dot"></span>
       </div>
     </div>
   `);
@@ -217,7 +219,7 @@ function renderStep0() {
   });
 
   $('#mnw-step0-cta').addEventListener('click', () => {
-    if (state.gender) renderStep1();
+    if (state.gender) renderStep2();
   });
 }
 
@@ -256,7 +258,7 @@ function renderStep2() {
   setContent(`
     <div class="mnw-step">
       <div class="mnw-step-hdr">
-        <p class="mnw-step-num">02 / 05</p>
+        <p class="mnw-step-num">01 / 04</p>
         <h2 class="mnw-step-title">What kind of energy are we projecting?</h2>
         <p class="mnw-step-sub">Choose your favorites — pick as many as feel right.</p>
       </div>
@@ -265,8 +267,19 @@ function renderStep2() {
           const visibleAesthetics = state.gender ? AESTHETICS.filter(a => state.gender === 'men' ? a.gender === 'M' : a.gender === 'F') : AESTHETICS;
           return visibleAesthetics.map(a => `
           <button class="mnw-aesthetic-card" data-id="${a.id}" aria-label="${a.style}">
-            <img class="mnw-aesthetic-img" src="${a.img}" alt="${a.name}"
-                 onerror="this.src='https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400&h=533&fit=crop'"/>
+            ${a.img
+              ? `<img class="mnw-aesthetic-img" src="${a.img}" alt="${a.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+                 <div class="mnw-aesthetic-placeholder" style="display:none;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%)">
+                   <span class="mnw-placeholder-icon">${a.gender === 'M' ? '♂' : '♀'}</span>
+                   <span class="mnw-placeholder-label">${a.style}</span>
+                   <span class="mnw-placeholder-hint">Image coming soon</span>
+                 </div>`
+              : `<div class="mnw-aesthetic-placeholder" style="background:linear-gradient(135deg,${a.accent}22 0%,#0a0a0a 100%)">
+                   <span class="mnw-placeholder-icon">${a.gender === 'M' ? '♂' : '♀'}</span>
+                   <span class="mnw-placeholder-label">${a.style}</span>
+                   <span class="mnw-placeholder-hint">Upload image in Shopify Files<br>Filename: style-${a.id.replace(/_/g,'-')}.jpg</span>
+                 </div>`
+            }
             <div class="mnw-aesthetic-overlay">
               <p class="mnw-aesthetic-style" style="color:${a.accent}">${a.style}</p>
               <p class="mnw-aesthetic-name">${a.name}</p>
@@ -318,7 +331,7 @@ function renderStep3() {
   setContent(`
     <div class="mnw-step">
       <div class="mnw-step-hdr">
-        <p class="mnw-step-num">03 / 05</p>
+        <p class="mnw-step-num">02 / 04</p>
         <h2 class="mnw-step-title">Where are we taking this look?</h2>
         <p class="mnw-step-sub">Select all that apply to your lifestyle.</p>
       </div>
@@ -367,7 +380,7 @@ function renderStep4() {
   setContent(`
     <div class="mnw-step">
       <div class="mnw-step-hdr">
-        <p class="mnw-step-num">04 / 05</p>
+        <p class="mnw-step-num">03 / 04</p>
         <h2 class="mnw-step-title">Let's see the canvas.</h2>
         <p class="mnw-step-sub">Upload a quick selfie to ensure the fit and colors perfectly match your unique skin tone and proportions.</p>
       </div>
@@ -434,32 +447,65 @@ function renderStep5A() {
 
   // Map aesthetic -> vibe_id for Vercel pipeline
   const vibeMap = {
-    old_money_m:'quiet_luxury', street_m:'sarcastic_rizzler',
-    indo_western_m:'main_character', corporate_m:'caffeine_survivor',
-    minimalist_f:'quiet_luxury', y2k_f:'sarcastic_rizzler',
-    cyberpunk_f:'main_character', casual_f:'caffeine_survivor',
+    old_money_m: 'quiet_luxury', street_m: 'sarcastic_rizzler',
+    indo_western_m: 'main_character', corporate_m: 'caffeine_survivor',
+    athleisure_m: 'caffeine_survivor', denimcore_m: 'sarcastic_rizzler',
+    resort_m: 'main_character', techwear_m: 'main_character',
+    minimalist_f: 'quiet_luxury', y2k_f: 'sarcastic_rizzler',
+    cyberpunk_f: 'main_character', casual_f: 'caffeine_survivor',
+    quietlux_f: 'quiet_luxury', coquette_f: 'main_character',
+    boho_f: 'main_character', power_suit_f: 'caffeine_survivor',
   };
   const vibeId = vibeMap[state.selectedAesthetics[0]] || 'caffeine_survivor';
 
   // Map occasion -> occasion_id for Vercel pipeline
   const occMap = {
-    office:'office', date:'date_night', sangeet:'sangeet',
-    airport:'airport_look', gym:'date_night', college:'office',
-    pooja:'sangeet', casual:'date_night',
+    office: 'office', date: 'date_night', sangeet: 'sangeet',
+    airport: 'airport_look', gym: 'office', college: 'date_night',
+    pooja: 'sangeet', casual: 'date_night',
   };
   const occasionId = occMap[state.selectedOccasions[0]] || 'date_night';
 
   setContent(`
     <div class="mnw-step">
       <div class="mnw-step-hdr">
-        <p class="mnw-step-num">05 / 05</p>
+        <p class="mnw-step-num">04 / 04</p>
         <h2 class="mnw-step-title">Generating your main character look</h2>
         <p class="mnw-step-sub">AI is crafting a look for your skin tone, body type &amp; vibe.</p>
       </div>
       <div class="mnw-result-wrap" id="mnw-result-wrap">
-        <div id="mnw-loading-state" style="height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:rgba(255,255,255,0.03);border-radius:16px;border:1px solid rgba(255,255,255,0.08)">
-          <div style="width:40px;height:40px;border:3px solid rgba(57,165,150,0.2);border-top-color:#39A596;border-radius:50%;animation:mnw-spin 0.8s linear infinite"></div>
-          <p id="mnw-loading-text" style="font-size:13px;color:rgba(255,255,255,0.5);text-align:center;max-width:220px">Reading your style DNA...</p>
+        <div id="mnw-loading-state" class="mnw-cinema-loader">
+          <div class="mnw-cl-orb mnw-cl-orb1"></div>
+          <div class="mnw-cl-orb mnw-cl-orb2"></div>
+          <div class="mnw-cl-orb mnw-cl-orb3"></div>
+          <div class="mnw-cl-frame">
+            <span class="mnw-cl-corner mnw-cl-tl"></span>
+            <span class="mnw-cl-corner mnw-cl-tr"></span>
+            <span class="mnw-cl-corner mnw-cl-bl"></span>
+            <span class="mnw-cl-corner mnw-cl-br"></span>
+            <div class="mnw-cl-rings">
+              <div class="mnw-cl-ring mnw-cl-ring1"></div>
+              <div class="mnw-cl-ring mnw-cl-ring2"></div>
+              <div class="mnw-cl-ring mnw-cl-ring3"></div>
+              <div class="mnw-cl-center">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#39A596" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+              </div>
+            </div>
+            <div class="mnw-cl-scanline"></div>
+          </div>
+          <div class="mnw-cl-progress-wrap">
+            <div class="mnw-cl-progress-bar" id="mnw-cl-progress"></div>
+          </div>
+          <p class="mnw-cl-label" id="mnw-loading-text">Reading your style DNA...</p>
+          <div class="mnw-cl-steps">
+            <span class="mnw-cl-step mnw-cl-step-active" id="mnw-cls-0">Analyse</span>
+            <span class="mnw-cl-sep">&#8212;</span>
+            <span class="mnw-cl-step" id="mnw-cls-1">Match</span>
+            <span class="mnw-cl-sep">&#8212;</span>
+            <span class="mnw-cl-step" id="mnw-cls-2">Generate</span>
+            <span class="mnw-cl-sep">&#8212;</span>
+            <span class="mnw-cl-step" id="mnw-cls-3">Finalise</span>
+          </div>
         </div>
         <img class="mnw-result-img" id="mnw-result-img" alt="AI Generated Look" style="display:none"/>
         <span class="mnw-result-badge" id="mnw-result-badge" style="display:none">AI Generated</span>
@@ -480,10 +526,30 @@ function renderStep5A() {
     </div>
   `);
 
-  // Rotating loading messages
-  const msgs = ['Reading your style DNA...','Analysing skin tone & body type...','Matching your vibe...','FLUX is painting your outfit...','Final touches...'];
+  // Cinematic loader — rotating messages + progress bar + step indicators
+  const msgs = [
+    { text: 'Reading your style DNA...',         step: 0, pct: 10 },
+    { text: 'Analysing skin tone & body type...', step: 0, pct: 25 },
+    { text: 'Matching your aesthetic vibe...',    step: 1, pct: 45 },
+    { text: 'FLUX is painting your outfit...',    step: 2, pct: 68 },
+    { text: 'Composing your editorial look...',   step: 2, pct: 82 },
+    { text: 'Final touches...',                   step: 3, pct: 95 },
+  ];
   let mi = 0;
-  const msgInt = setInterval(() => { const el = $('#mnw-loading-text'); if (el && msgs[++mi]) el.textContent = msgs[mi]; }, 4000);
+  var setLoaderState = function(idx) {
+    var m = msgs[idx];
+    var el = $('#mnw-loading-text'); if (el) el.textContent = m.text;
+    var pb = $('#mnw-cl-progress');  if (pb) pb.style.width = m.pct + '%';
+    [0,1,2,3].forEach(function(i) {
+      var s = document.getElementById('mnw-cls-' + i);
+      if (!s) return;
+      s.classList.remove('mnw-cl-step-done', 'mnw-cl-step-active');
+      if (i < m.step)  s.classList.add('mnw-cl-step-done');
+      if (i === m.step) s.classList.add('mnw-cl-step-active');
+    });
+  };
+  setLoaderState(0);
+  const msgInt = setInterval(function() { if (msgs[++mi]) setLoaderState(mi); else clearInterval(msgInt); }, 3500);
 
   const rawBase64 = state.selfieBase64 ? state.selfieBase64.replace(/^data:image\/\w+;base64,/, '') : null;
   if (!rawBase64) {
@@ -495,12 +561,15 @@ function renderStep5A() {
 
   const userId = (window.MN_CONFIG && window.MN_CONFIG.customerId) ? String(window.MN_CONFIG.customerId) : 'guest_' + Math.random().toString(36).slice(2,9);
 
+  const abortCtrl = new AbortController();
+  const timeoutId = setTimeout(() => abortCtrl.abort(), 90000);
   fetch(API_URL, {
     method: 'POST',
+    signal: abortCtrl.signal,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ action:'full_pipeline', user_id:userId, occasion:occasionId, vibe_id:vibeId, user_image:rawBase64 }),
   })
-  .then(r => r.ok ? r.json() : r.json().then(d => Promise.reject(d.error || ('Server error ' + r.status))))
+  .then(r => { clearTimeout(timeoutId); return r.ok ? r.json() : r.json().then(d => Promise.reject(d.error || ('Server error ' + r.status))); })
   .then(data => {
     clearInterval(msgInt);
     if (!data.success) throw new Error(data.error || 'Pipeline failed');
@@ -535,7 +604,10 @@ function renderStep5A() {
     }
   })
   .catch(err => {
+    clearTimeout(timeoutId);
     clearInterval(msgInt);
+    const isTimeout = err && (err.name === 'AbortError' || String(err).includes('abort'));
+    if (isTimeout) err = 'Request timed out. The AI is taking too long - please try again.';
     console.error('[MN] Pipeline error:', err);
     const ls = $('#mnw-loading-state'), errEl = $('#mnw-api-error');
     if (ls) ls.style.display = 'none';
@@ -734,10 +806,25 @@ function updateClosetCount() {
 }
 
 function updateRing(pct) {
+  const safePct = Math.max(0, Math.min(100, Number(pct) || 0));
   const fill = document.querySelector('.mnw-ring-fill');
   const label = document.getElementById('mnw-ring-pct');
-  if (fill) fill.style.strokeDashoffset = Math.round(113 - (pct / 100) * 113);
-  if (label) label.textContent = pct + '%';
+  if (fill) fill.style.strokeDashoffset = Math.round(113 - (safePct / 100) * 113);
+  if (label) label.textContent = safePct + '%';
+}
+
+function syncWidgetProfileFromIdentity() {
+  try {
+    const saved = window.MN_IDENTITY || JSON.parse(localStorage.getItem('mn_identity') || '{}');
+    const pct = Number(saved.completion_pct || 0);
+    state.profileCompletion = pct;
+    updateRing(pct);
+    const closetCount = Number(saved.closet_count || (Array.isArray(saved.closet_items) ? saved.closet_items.length : 0) || 0);
+    state.closetCount = closetCount;
+    updateClosetCount();
+  } catch (e) {
+    updateRing(state.profileCompletion || 0);
+  }
 }
 
 // ── WIDGET EXPAND / COLLAPSE ──────────────────────────────
@@ -807,10 +894,14 @@ function initPersistentNav() {
   const drawerClose  = document.getElementById('mnw-drawer-close');
   const snapBtn      = document.getElementById('mnw-snap-pic');
 
-  if (closetChip && closetDrawer) {
-    closetChip.addEventListener('click', () => { closetDrawer.style.display = 'flex'; });
-    if (drawerClose) drawerClose.addEventListener('click', () => { closetDrawer.style.display = 'none'; });
-    closetDrawer.addEventListener('click', (e) => { if (e.target === closetDrawer) closetDrawer.style.display = 'none'; });
+  if (closetChip) {
+    closetChip.addEventListener('click', () => {
+      window.location.href = '/pages/my-closet';
+    });
+    if (closetDrawer && drawerClose) {
+      drawerClose.addEventListener('click', () => { closetDrawer.style.display = 'none'; });
+      closetDrawer.addEventListener('click', (e) => { if (e.target === closetDrawer) closetDrawer.style.display = 'none'; });
+    }
   }
   if (snapBtn) {
     snapBtn.addEventListener('click', () => {
@@ -852,7 +943,9 @@ function initWidget() {
   if (closeBtn)  closeBtn.addEventListener('click', collapseWidget);
 
   initPersistentNav();
-  updateRing(state.profileCompletion);
+  syncWidgetProfileFromIdentity();
+  window.addEventListener('mn-identity-updated', syncWidgetProfileFromIdentity);
+  window.addEventListener('storage', (e) => { if (e.key === 'mn_identity') syncWidgetProfileFromIdentity(); });
 
   // Auto-open after 3s on first visit
   if (!sessionStorage.getItem('mn_widget_seen')) {

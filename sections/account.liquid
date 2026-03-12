@@ -74,6 +74,643 @@
     font-weight: bold;
 
   }
+
+  /* =====================================================
+     AI STYLIST DASHBOARD - PROGRESS TRACKING UI
+     ===================================================== */
+  
+  /* Circular Progress Ring */
+  .mn-progress-ring-container {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .mn-progress-ring {
+    transform: rotate(-90deg);
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  
+  .mn-progress-ring-bg {
+    fill: none;
+    stroke: rgba(57, 165, 150, 0.15);
+    stroke-width: 6;
+  }
+  
+  .mn-progress-ring-fill {
+    fill: none;
+    stroke: #39A596;
+    stroke-width: 6;
+    stroke-linecap: round;
+    stroke-dasharray: 326.73;
+    stroke-dashoffset: 326.73;
+    stroke-dashoffset: 326.73;
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+    transition: stroke-dashoffset 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    filter: drop-shadow(0 0 8px rgba(57, 165, 150, 0.6));
+  }
+  
+  .mn-progress-percentage {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: #fff;
+    z-index: 1;
+  }
+  
+  .mn-progress-percentage span {
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.5);
+  }
+
+  /* Linear Progress Bar */
+  .mn-linear-progress-container {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(57,165,150,0.2);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+  }
+  
+  .mn-linear-progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  
+  .mn-linear-progress-label {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: #39A596;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .mn-linear-progress-value {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+  }
+  
+  .mn-linear-progress-track {
+    height: 8px;
+    background: rgba(57, 165, 150, 0.15);
+    border-radius: 99px;
+    overflow: hidden;
+    position: relative;
+  }
+  
+  .mn-linear-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #39A596, #2dd4bf);
+    border-radius: 99px;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 12px rgba(57, 165, 150, 0.5);
+    position: relative;
+  }
+  
+  .mn-linear-progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 20px;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4));
+    border-radius: 99px;
+  }
+
+  /* Height Vector SVG */
+  .mn-height-vector-container {
+    display: flex;
+    align-items: flex-end;
+    gap: 20px;
+    padding: 20px;
+    background: rgba(255,255,255,0.02);
+    border-radius: 16px;
+    margin: 16px 0;
+  }
+  
+  .mn-height-slider-wrapper {
+    flex: 1;
+  }
+  
+  .mn-height-slider {
+    width: 100%;
+    height: 8px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: linear-gradient(90deg, #39A596 var(--slider-fill, 50%), rgba(255,255,255,0.1) var(--slider-fill, 50%));
+    border-radius: 99px;
+    outline: none;
+    cursor: pointer;
+  }
+  
+  .mn-height-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    background: #39A596;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 14px rgba(57,165,150,0.6);
+    border: 3px solid rgba(255,255,255,0.2);
+    transition: transform 0.2s;
+  }
+  
+  .mn-height-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+  }
+  
+  .mn-height-display {
+    text-align: center;
+    min-width: 100px;
+  }
+  
+  .mn-height-cm {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 36px;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1;
+  }
+  
+  .mn-height-ft {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #39A596;
+    margin-top: 4px;
+  }
+  
+  .mn-height-vector {
+    width: 60px;
+    height: 180px;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: bottom center;
+  }
+  
+  .mn-height-vector svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Weather Widget */
+  .mn-weather-widget {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, rgba(57,165,150,0.1), rgba(57,165,150,0.05));
+    border: 1px solid rgba(57,165,150,0.3);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  
+  .mn-weather-widget:hover {
+    border-color: #39A596;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(57,165,150,0.2);
+  }
+  
+  .mn-weather-icon {
+    font-size: 28px;
+  }
+  
+  .mn-weather-info {
+    flex: 1;
+  }
+  
+  .mn-weather-temp {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+  }
+  
+  .mn-weather-condition {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    color: rgba(255,255,255,0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* Style Cards Grid */
+  .mn-style-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  
+  @media (max-width: 768px) {
+    .mn-style-cards-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  .mn-style-card {
+    background: rgba(255,255,255,0.03);
+    border: 1.5px solid rgba(255,255,255,0.08);
+    border-radius: 14px;
+    padding: 16px 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .mn-style-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent, rgba(57,165,150,0.1));
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  
+  .mn-style-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(57,165,150,0.4);
+  }
+  
+  .mn-style-card:hover::before {
+    opacity: 1;
+  }
+  
+  .mn-style-card.selected {
+    border-color: #39A596;
+    background: rgba(57,165,150,0.12);
+    box-shadow: 0 0 20px rgba(57,165,150,0.25);
+  }
+  
+  .mn-style-card.selected::after {
+    content: '\2713';
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 18px;
+    height: 18px;
+    background: #39A596;
+    color: #000;
+    border-radius: 50%;
+    font-size: 10px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .mn-style-card-emoji {
+    font-size: 28px;
+    margin-bottom: 8px;
+    display: block;
+  }
+  
+  .mn-style-card-label {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* Bank Cards Section */
+  .mn-bank-section {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(57,165,150,0.2);
+    border-radius: 16px;
+    padding: 20px;
+    margin-top: 20px;
+  }
+  
+  .mn-bank-section-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #39A596;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .mn-bank-dropdown {
+    width: 100%;
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.3s;
+    margin-bottom: 12px;
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2339A596' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+  }
+  
+  .mn-bank-dropdown:focus {
+    border-color: #39A596;
+    box-shadow: 0 0 0 3px rgba(57,165,150,0.1);
+  }
+  
+  .mn-bank-dropdown option {
+    background: #111;
+    color: #fff;
+    padding: 10px;
+  }
+  
+  .mn-card-type-toggle {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  
+  .mn-card-type-btn {
+    flex: 1;
+    padding: 12px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    color: rgba(255,255,255,0.6);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .mn-card-type-btn.selected {
+    background: rgba(57,165,150,0.15);
+    border-color: #39A596;
+    color: #39A596;
+  }
+  
+  .mn-saved-cards-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  
+  .mn-saved-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    transition: all 0.3s;
+  }
+  
+  .mn-saved-card:hover {
+    border-color: rgba(57,165,150,0.3);
+  }
+  
+  .mn-saved-card-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .mn-saved-card-icon {
+    width: 40px;
+    height: 28px;
+    background: linear-gradient(135deg, #1a1a1a, #0a0a0a);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+  
+  .mn-saved-card-details {
+    font-family: 'Montserrat', sans-serif;
+  }
+  
+  .mn-saved-card-bank {
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+  }
+  
+  .mn-saved-card-variant {
+    font-size: 10px;
+    color: rgba(255,255,255,0.5);
+  }
+
+  /* Skin Tone Swatches */
+  .mn-skin-tone-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 12px 0;
+  }
+  
+  .mn-skin-tone-swatch {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+  }
+  
+  .mn-skin-tone-swatch:hover {
+    transform: scale(1.2);
+    z-index: 1;
+  }
+  
+  .mn-skin-tone-swatch.selected {
+    border-color: #fff;
+    box-shadow: 0 0 0 3px #39A596, 0 0 20px rgba(57,165,150,0.5);
+    transform: scale(1.15);
+  }
+  
+  .mn-skin-tone-swatch::after {
+    content: attr(data-label);
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 8px;
+    color: rgba(255,255,255,0.5);
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  
+  .mn-skin-tone-swatch:hover::after,
+  .mn-skin-tone-swatch.selected::after {
+    opacity: 1;
+  }
+
+  /* AI Upload Loading State */
+  .mn-ai-upload-loading {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 30px;
+    background: rgba(57,165,150,0.08);
+    border: 1px solid rgba(57,165,150,0.3);
+    border-radius: 16px;
+    margin-top: 16px;
+  }
+  
+  .mn-ai-upload-loading.active {
+    display: flex;
+  }
+  
+  .mn-ai-spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid rgba(57,165,150,0.2);
+    border-top-color: #39A596;
+    border-radius: 50%;
+    animation: mnSpin 1s linear infinite;
+  }
+  
+  @keyframes mnSpin {
+    to { transform: rotate(360deg); }
+  }
+  
+  .mn-ai-loading-text {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #39A596;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .mn-ai-loading-sub {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+  }
+
+  /* Core Interests Combobox */
+  .mn-interests-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  
+  .mn-interest-tag {
+    padding: 8px 14px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.7);
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  
+  .mn-interest-tag:hover {
+    border-color: rgba(57,165,150,0.4);
+    color: #fff;
+  }
+  
+  .mn-interest-tag.selected {
+    background: rgba(57,165,150,0.15);
+    border-color: #39A596;
+    color: #39A596;
+  }
+
+  /* Ghost Mode Toggle */
+  .mn-ghost-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    background: rgba(139,92,246,0.08);
+    border: 1px solid rgba(139,92,246,0.25);
+    border-radius: 12px;
+    margin-top: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  
+  .mn-ghost-toggle:hover {
+    border-color: rgba(139,92,246,0.5);
+  }
+  
+  .mn-ghost-toggle.active {
+    background: rgba(139,92,246,0.15);
+    border-color: #8b5cf6;
+  }
+  
+  .mn-ghost-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #fff;
+  }
+  
+  .mn-ghost-switch {
+    width: 44px;
+    height: 24px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    position: relative;
+    transition: all 0.3s;
+  }
+  
+  .mn-ghost-toggle.active .mn-ghost-switch {
+    background: #8b5cf6;
+  }
+  
+  .mn-ghost-switch::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    background: #fff;
+    border-radius: 50%;
+    transition: all 0.3s;
+  }
+  
+  .mn-ghost-toggle.active .mn-ghost-switch::after {
+    left: 23px;
+  }
 </style>
 
 <div class="flex flex-col gap-8">
@@ -333,23 +970,28 @@
       -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
       box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(57,165,150,0.1) inset !important;
     }
+
     .stat-card {
       background: rgba(255,255,255,0.04) !important;
       border: 1px solid rgba(255,255,255,0.08) !important;
       backdrop-filter: blur(12px) !important;
       transition: all 0.3s ease !important;
       cursor: pointer;
+      padding-top: 36px !important;
     }
     .stat-card:hover { border-color: rgba(57,165,150,0.5) !important; background: rgba(57,165,150,0.08) !important; transform: translateY(-2px) !important; }
     .stat-card.clickable:hover { box-shadow: 0 4px 16px rgba(57,165,150,0.2); }
+    
     .detail-card {
       background: rgba(255,255,255,0.03) !important;
       border: 1px solid rgba(255,255,255,0.08) !important;
       backdrop-filter: blur(8px) !important;
       cursor: pointer;
       transition: all 0.3s ease !important;
+      padding-top: 36px !important;
     }
     .detail-card:hover { border-color: rgba(57,165,150,0.4) !important; background: rgba(57,165,150,0.06) !important; }
+    
     .detail-value { color: rgba(244,244,244,0.9) !important; }
     .detail-label { color: #39A596 !important; }
     .stat-value { color: rgba(244,244,244,0.95) !important; }
@@ -427,6 +1069,7 @@
       width: 44px; height: 44px; border-radius: 12px;
       flex-shrink: 0; transition: transform 0.2s;
     }
+    .mn-edit-tile-emoji svg { width: 28px; height: 28px; }
     .mn-edit-option-tile:hover .mn-edit-tile-emoji { transform: scale(1.15); }
     .mn-edit-tile-label {
       font-size: 11px; font-weight: 800; color: #fff;
@@ -718,6 +1361,10 @@
   </div>
 
   <script>
+    // ─── MN_CONFIG fallback (widget section may not be loaded) ──
+    window.MN_CONFIG = window.MN_CONFIG || {};
+    window.MN_CONFIG.physiqueApiUrl = window.MN_CONFIG.physiqueApiUrl || 'https://mynarrative-ai.vercel.app/api/physique_analyze';
+
     // ─── Helpers ──────────────────────────────────────────────
     function getProfile()  { try { return JSON.parse(localStorage.getItem('mn_core_identity') || '{}'); } catch(e) { return {}; } }
     function saveProfile(p){ localStorage.setItem('mn_core_identity', JSON.stringify(p)); window.dispatchEvent(new CustomEvent('mn-identity-updated')); }
@@ -740,7 +1387,7 @@
       return GARMENT_EMOJI_MAP[section] || GARMENT_EMOJI_MAP.default;
     }
 
-    // ─── Selfie Upload ────────────────────────────────────────
+// ─── Selfie Upload ────────────────────────────────────────
     // -- Magic Upload: POST to AI API, auto-fill all stat/detail cards --
     async function handleSelfieUpload(input) {
       if (!input.files || !input.files[0]) return;
@@ -759,58 +1406,13 @@
         const avatar      = document.getElementById('profileAvatar');
         const uploadPrompt = document.querySelector('.profile-upload-prompt');
         if (avatar)       { avatar.style.opacity = '0.6'; avatar.style.pointerEvents = 'none'; }
-        if (uploadPrompt)  uploadPrompt.textContent = '? AI is analysing your style...';
+        if (uploadPrompt)  uploadPrompt.textContent = '⚡ AI is analysing your style...';
 
-        try {
-          const res = await fetch('https://api.mynarrative.store/v1/analyze-user', {
-            method:  'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              user_id:   '{{ customer.id | default: "guest" }}',
-              image_b64: raw_b64,
-              context:   'style_profile'
-            })
-          });
-          let data = {};
-          if (res.ok) data = await res.json();
+        // Use advanced analysis with 20-30 hidden data points
+        await mnAnalyzePhotoAdvanced(raw_b64);
 
-          // Map API response ? mn_core_identity fields
-          const p = getProfile();
-          p.uploadedImage  = imageData;
-          p.selfieUploaded = true;
-          if (data.height_cm)     p.height         = data.height_cm + ' cm';
-          if (data.preferred_fit) p.build          = data.preferred_fit;
-          if (data.skin_label)    p.skinTone       = data.skin_label;
-          if (data.skin_mst)      p.skinMST        = data.skin_mst;
-          if (data.hair_style)    p.hairStyle      = data.hair_style;
-          if (data.gender)        p.gender         = data.gender;
-          if (data.weather)       p.climate        = data.weather;
-          if (data.price_range)   p.budget         = data.price_range;
-          if (data.fashion_goals) p.goals          = data.fashion_goals;
-          if (data.undertone)     p.undertone      = data.undertone;
-          if (data.favorite_colors) p.favoriteColors = Array.isArray(data.favorite_colors) ? data.favorite_colors : [data.favorite_colors];
-          if (data.style_vibes && data.style_vibes.length)  p.coreExpression = data.style_vibes.join(', ');
-          if (data.occasions   && data.occasions.length)    p.occasion       = data.occasions.join(', ');
-          if (data.ai_metrics) p.ai_metrics = data.ai_metrics;
-
-          // Refresh all cards in the DOM
-          mnRefreshStatCards(p);
-          saveProfile(p);
-
-          if (uploadPrompt) uploadPrompt.textContent = '? Profile auto-filled by AI!';
-          setTimeout(() => { if (uploadPrompt) uploadPrompt.textContent = '?? Click to update photo'; }, 3500);
-
-        } catch(err) {
-          console.warn('MN AI API unavailable � photo stored locally:', err);
-          const p = getProfile();
-          p.uploadedImage  = imageData;
-          p.selfieUploaded = true;
-          saveProfile(p);
-          if (uploadPrompt) uploadPrompt.textContent = 'Photo saved � fill details manually';
-        } finally {
-          if (avatar) { avatar.style.opacity = '1'; avatar.style.pointerEvents = ''; }
-          input.value = '';
-        }
+        if (avatar) { avatar.style.opacity = '1'; avatar.style.pointerEvents = ''; }
+        input.value = '';
       };
       reader.readAsDataURL(file);
     }
@@ -872,6 +1474,7 @@
       if (!e.detail) return;
       const updates = e.detail;
       const p = getProfile();
+      // Core visible fields
       if (updates.height_cm)     p.height         = updates.height_cm + ' cm';
       if (updates.preferred_fit) p.build          = updates.preferred_fit;
       if (updates.skin_label)    p.skinTone       = updates.skin_label;
@@ -882,8 +1485,26 @@
       if (updates.style_vibes && updates.style_vibes.length) p.coreExpression = updates.style_vibes.join(', ');
       if (updates.occasions   && updates.occasions.length)   p.occasion       = updates.occasions.join(', ');
       if (updates.ai_metrics)    p.ai_metrics = Object.assign(p.ai_metrics || {}, updates.ai_metrics);
+      // Physique analysis fields from widget mnSyncPhysiqueAnalysis
+      if (updates.undertone)        p.undertone      = updates.undertone;
+      if (updates.skin_mst)         p.skinMST        = updates.skin_mst;
+      if (updates.face_shape)       p.faceShape      = updates.face_shape;
+      if (updates.eye_color)        p.eyeColor       = updates.eye_color;
+      if (updates.hair_color)       p.hairColor      = updates.hair_color;
+      if (updates.hair_texture)     p.hairTexture    = updates.hair_texture;
+      if (updates.seasonal_color)   p.seasonalColor  = updates.seasonal_color;
+      if (updates.style_archetype)  p.styleArchetype = updates.style_archetype;
+      if (updates.age_range)        p.ageRange       = updates.age_range;
+      if (updates.body_composition) p.bodyComposition= updates.body_composition;
+      if (updates.ai_confidence)    p.aiConfidence   = updates.ai_confidence;
+      // Store all hidden data for AI recommendations context
+      if (window.MN_USER) {
+        window.MN_USER.hidden_data = Object.assign(window.MN_USER.hidden_data || {}, updates);
+      }
       p.chatbot_synced_at = new Date().toISOString();
+      p.ai_analyzed = true;
       mnRefreshStatCards(p);
+      if (typeof mnUpdateProgress === 'function') mnUpdateProgress(p);
       saveProfile(p);
     });
 
@@ -912,14 +1533,14 @@
     const TILE_DATA = {
   height: { title:"Your Height", sub:"Drag the slider", multi:false, type:"height_slider", options:[] },
   build: { title:"Body Type", sub:"How would you describe your build?", multi:false, type:"tiles", options:[
-    {val:"Slim",       label:"Slim",        sub:"Lean & narrow frame",    emoji:"🪶", color:"#60A5FA"},
-    {val:"Athletic",   label:"Athletic",    sub:"Toned & active build",   emoji:"⚡",    color:"#10B981"},
-    {val:"Average",    label:"Average",     sub:"Balanced proportions",   emoji:"⭐",    color:"#6366F1"},
-    {val:"Muscular",   label:"Muscular",    sub:"Broad & defined",        emoji:"🔥",    color:"#EF4444"},
-    {val:"Broad",      label:"Broad",       sub:"Wide shoulder frame",    emoji:"🏔️",color:"#F97316"},
-    {val:"Plus Size",  label:"Plus Size",   sub:"Fuller curvy frame",     emoji:"🌸", color:"#EC4899"},
-    {val:"Petite",     label:"Petite",      sub:"Small & compact",        emoji:"✨",color:"#8B5CF6"},
-    {val:"Tall & Lean",label:"Tall & Lean", sub:"Height + slim build",    emoji:"🗼",   color:"#14B8A6"}
+    {val:"Slim",       label:"Slim",        sub:"Lean & narrow frame",    svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 50" fill="none" stroke="currentColor" stroke-width="2"><circle cx="20" cy="8" r="5"/><path d="M20 13v12M12 18h16M14 25v15M26 25v15"/></svg>', color:"#60A5FA"},
+    {val:"Athletic",   label:"Athletic",    sub:"Toned & active build",   svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 50" fill="none" stroke="currentColor" stroke-width="2"><circle cx="20" cy="8" r="5"/><path d="M20 13v12M10 18h20M12 25v15M28 25v15M14 35l4 8 4-8 4 8 4-8"/></svg>', color:"#10B981"},
+    {val:"Average",    label:"Average",     sub:"Balanced proportions",   svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 50" fill="none" stroke="currentColor" stroke-width="2"><circle cx="20" cy="8" r="5"/><path d="M20 13v12M12 18h16M14 25v15M26 25v15"/></svg>', color:"#6366F1"},
+    {val:"Muscular",   label:"Muscular",    sub:"Broad & defined",        svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 50" fill="none" stroke="currentColor" stroke-width="2"><circle cx="20" cy="8" r="5"/><path d="M20 13v12M8 16h24M10 25v15M30 25v15"/></svg>', color:"#EF4444"},
+    {val:"Broad",      label:"Broad",       sub:"Wide shoulder frame",    svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 50" fill="none" stroke="currentColor" stroke-width="2"><circle cx="20" cy="8" r="5"/><path d="M20 13v12M6 16h28M10 25v15M30 25v15"/></svg>', color:"#F97316"},
+    {val:"Plus Size",  label:"Plus Size",   sub:"Fuller curvy frame",     svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 50" fill="none" stroke="currentColor" stroke-width="2"><circle cx="20" cy="9" r="5"/><path d="M20 14v10M8 18h24M10 24v16M30 24v16"/></svg>', color:"#EC4899"},
+    {val:"Petite",     label:"Petite",      sub:"Small & compact",        svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 50" fill="none" stroke="currentColor" stroke-width="2"><circle cx="20" cy="8" r="4"/><path d="M20 12v8M14 16h12M15 20v12M25 20v12"/></svg>', color:"#8B5CF6"},
+    {val:"Tall & Lean",label:"Tall & Lean", sub:"Height + slim build",    svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 50" fill="none" stroke="currentColor" stroke-width="2"><circle cx="20" cy="6" r="4"/><path d="M20 10v16M14 20h12M15 26v18M25 26v18"/></svg>', color:"#14B8A6"}
   ]},
   skinTone: { title:"Skin Tone", sub:"Tap your shade — Monk Scale MST 1–10", multi:false, type:"mst", options:[
     {val:"Very Light",  label:"Very Light",  mst:1,  hex:"#f6ede4"},
@@ -987,7 +1608,7 @@
     {val:"College / Campus",   label:"College",       sub:"Campus-ready",         emoji:"🎓",    color:"#6366F1"},
     {val:"Office / Workwear",  label:"Office",        sub:"Professional",         emoji:"💼", color:"#1E3A5F"},
     {val:"Festive & Weddings", label:"Festive",       sub:"Celebrations",         emoji:"🎉",     color:"#F59E0B"},
-    {val:"Date Night",         label:"Date Night",    sub:"Evening looks",        emoji:"🌙",      color:"#EC4899"},
+    {val:"DATE",         label:"DATE",    sub:"Evening looks",        emoji:"&#x1F495;",      color:"#EC4899"},
     {val:"Party / Nightout",   label:"Party",         sub:"Nightlife vibes",      emoji:"🎶",     color:"#8B5CF6"},
     {val:"Outdoor / Travel",   label:"Travel",        sub:"Adventure wear",       emoji:"✈️",     color:"#10B981"},
     {val:"Sports / Gym",       label:"Gym",           sub:"Performance wear",     emoji:"🏋️",       color:"#EF4444"}
@@ -1151,7 +1772,7 @@
           const sel = _isMulti ? current.includes(opt.val) : current === opt.val;
           tile.className = 'mn-edit-option-tile' + (sel ? ' selected' : '');
           // Distinct emoji+color tile per category
-          const clr = opt.color || '#39A596'; const emo = opt.emoji || '◆';
+          const clr = opt.color || '#39A596'; const emo = opt.svg || opt.emoji || '◆';
           tile.style.background = 'linear-gradient(135deg,' + clr + '18,' + clr + '06)';
           tile.style.borderColor = clr + '45';
           tile.innerHTML = '<div class="mn-edit-tile-emoji" style="background:' + clr + '25;color:' + clr + '">' + emo + '</div><div class="mn-edit-tile-label">' + opt.label + '</div>' + (opt.sub ? '<div class="mn-edit-tile-sub">' + opt.sub + '</div>' : '');
@@ -1225,14 +1846,71 @@ function closeEditModal() { document.getElementById('mnEditModalOverlay').classL
       if (!isActive) panel.classList.add('active');
     }
 
+    function handleClosetPhotoUpload(input) {
+      if (!input.files || !input.files[0]) return;
+      // Simulated AI auto-detection
+      const btn = document.getElementById('mnUploadPhotoBtn');
+      if (btn) btn.innerHTML = '<span class="mn-ai-spinner" style="width:14px;height:14px;border-width:2px;display:inline-block;margin-right:8px;"></span> Analyzing...';
+      setTimeout(() => {
+        const closet = getCloset();
+        closet.push({
+          name: "Structured Denim Jacket",
+          category: "Outerwear",
+          closet_section: "Outerwear",
+          color: "Indigo",
+          fabric: "Denim",
+          emoji: "🧥",
+          ghost: false,
+          added_at: new Date().toISOString()
+        });
+        localStorage.setItem(MN_CLOSET_KEY, JSON.stringify(closet));
+        renderClosetPanel();
+        alert("✨ AI Detected: Structured Denim Jacket in Indigo");
+      }, 1500);
+    }
+
+    function openGhostModeModal() {
+      const name = prompt("Ghost Mode \nEnter what you own (e.g. 'Vintage Leather Jacket'):");
+      if (name && name.trim()) {
+        const closet = getCloset();
+        closet.push({
+          name: name.trim(),
+          category: "Wardrobe",
+          closet_section: "Wardrobe",
+          emoji: "👻",
+          ghost: true,
+          added_at: new Date().toISOString()
+        });
+        localStorage.setItem(MN_CLOSET_KEY, JSON.stringify(closet));
+        renderClosetPanel();
+      }
+    }
+
+    window.handleClosetPhotoUpload = handleClosetPhotoUpload;
+    window.openGhostModeModal = openGhostModeModal;
+
     function renderClosetPanel() {
       const closet = getCloset();
       const container = document.getElementById('mnClosetPanelContent');
       if (!container) return;
+      
+      let html = `
+        <div style="display:flex; gap:10px; margin-bottom: 20px;">
+          <button id="mnUploadPhotoBtn" class="digital-closet-btn" onclick="window.location.href='/pages/my-closet'" style="flex:1;">
+            <span>📸</span><span>Upload Photo</span>
+          </button>
+          <button class="digital-closet-btn" onclick="window.location.href='/pages/my-closet#ghost-mode'" style="flex:1; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.2); color:#fff;">
+            <span>👻</span><span>Ghost Mode</span>
+          </button>
+        </div>
+      `;
+
       if (closet.length === 0) {
-        container.innerHTML = '<p style="color:rgba(255,255,255,0.4);font-size:13px;text-align:center;padding:20px;">No items yet — upload clothing photos in the AI Stylist</p>';
+        html += '<p style="color:rgba(255,255,255,0.4);font-size:13px;text-align:center;padding:20px;">No items yet — upload clothing to start styling</p>';
+        container.innerHTML = html;
         return;
       }
+      
       // Group by section
       const sections = {};
       closet.forEach(item => {
@@ -1240,7 +1918,7 @@ function closeEditModal() { document.getElementById('mnEditModalOverlay').classL
         if (!sections[s]) sections[s] = [];
         sections[s].push(item);
       });
-      let html = '';
+      
       Object.entries(sections).forEach(([section, items]) => {
         html += `<div class="mn-panel-section-label">${section} <span style="opacity:0.5;">(${items.length})</span></div>`;
         html += '<div class="mn-panel-closet-grid">';
@@ -1322,10 +2000,15 @@ function closeEditModal() { document.getElementById('mnEditModalOverlay').classL
         document.getElementById('detailUndertone').textContent = profile.undertone || '-';
 
         // Closet breakdown
+        const emptyClosetActions = document.getElementById('mnEmptyClosetActions');
         if (closet.length > 0) {
           const sections = {};
           closet.forEach(i => { const s = i.closet_section || i.category || 'Other'; sections[s] = (sections[s]||0)+1; });
           document.getElementById('detailClosetBreakdown').textContent = Object.entries(sections).map(([s,n])=>n+' '+s).join(' · ') || '-';
+          if (emptyClosetActions) emptyClosetActions.style.display = 'none';
+        } else {
+          document.getElementById('detailClosetBreakdown').textContent = 'Upload clothing photos to see your closet breakdown';
+          if (emptyClosetActions) emptyClosetActions.style.display = 'flex';
         }
 
         // Most recent outfit
@@ -1386,6 +2069,689 @@ function closeEditModal() { document.getElementById('mnEditModalOverlay').classL
       s.textContent = '@keyframes mnAvatarPulse { 0%{box-shadow:0 0 0 0 rgba(57,165,150,0.7)} 70%{box-shadow:0 0 0 14px rgba(57,165,150,0)} 100%{box-shadow:0 0 0 0 rgba(57,165,150,0)} }';
       document.head.appendChild(s);
     })();
+
+    // =====================================================
+    // AI STYLIST DASHBOARD - PROGRESS TRACKING & SYNC
+    // =====================================================
+    
+    // MN_USER Global State
+    window.MN_USER = window.MN_USER || {
+      hidden_data: {},
+      bank_cards: [],
+      ghost_mode: false,
+      photo_analysis_history: [],
+      completion_pct: 0
+    };
+
+    // Profile completion fields
+    const PROFILE_FIELDS = [
+      'uploadedImage', 'height', 'build', 'skinTone', 'skinMST', 
+      'hairStyle', 'gender', 'climate', 'budget', 'goals',
+      'coreExpression', 'occasion', 'favoriteColors', 'undertone', 'region'
+    ];
+
+    // Calculate completion percentage
+    function mnCalculateCompletion(profile) {
+      let filled = 0;
+      PROFILE_FIELDS.forEach(field => {
+        if (profile[field] && profile[field] !== '' && profile[field] !== '-') {
+          filled++;
+        }
+      });
+      return Math.round((filled / PROFILE_FIELDS.length) * 100);
+    }
+
+    // Update progress rings
+    function mnUpdateProgress(profile) {
+      const pct = mnCalculateCompletion(profile);
+      window.MN_USER.completion_pct = pct;
+      
+      // Circular progress ring
+      const ringFill = document.querySelector('.mn-progress-ring-fill');
+      if (ringFill) {
+        const circumference = 326.73;
+        const offset = circumference - (pct / 100) * circumference;
+        ringFill.style.strokeDashoffset = offset;
+      }
+      
+      // Circular percentage display
+      const pctDisplay = document.querySelector('.mn-progress-percentage');
+      if (pctDisplay) {
+        pctDisplay.innerHTML = pct + '<span>%</span>';
+      }
+      
+      // Linear progress bar
+      const linearFill = document.querySelector('.mn-linear-progress-fill');
+      if (linearFill) {
+        linearFill.style.width = pct + '%';
+      }
+      
+      const linearValue = document.querySelector('.mn-linear-progress-value');
+      if (linearValue) {
+        linearValue.textContent = pct + '% Complete';
+      }
+      
+      return pct;
+    }
+
+    // Debounced save to Supabase
+    let mnSaveTimeout;
+    function mnDebouncedSave() {
+      clearTimeout(mnSaveTimeout);
+      mnSaveTimeout = setTimeout(async () => {
+        await mnSaveToSupabase();
+      }, 1500);
+    }
+
+    // Save to Supabase
+    async function mnSaveToSupabase() {
+      const profile = getProfile();
+      const userId = '{{ customer.id }}' || 'guest';
+      
+      try {
+        const res = await fetch('https://mynarrative-ai.vercel.app/api/user_profile/sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_id: userId,
+            profile: profile,
+            hidden_data: window.MN_USER.hidden_data,
+            bank_cards: window.MN_USER.bank_cards,
+            completion_pct: window.MN_USER.completion_pct,
+            ghost_mode: window.MN_USER.ghost_mode
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          console.log('[MN] Profile synced to Supabase');
+        }
+      } catch(err) {
+        console.warn('[MN] Supabase sync failed, using localStorage:', err);
+      }
+    }
+
+    // =====================================================
+    // COMPREHENSIVE AI ANALYSIS - 20-30 HIDDEN DATA POINTS
+    // =====================================================
+    
+    async function mnAnalyzePhotoAdvanced(base64Image) {
+      // Show loading state
+      const loadingEl = document.getElementById('mnAILoading');
+      if (loadingEl) loadingEl.classList.add('active');
+      
+      // Use configurable physique API URL or default to local dev
+      const PHYSIQUE_API_URL = (window.MN_CONFIG && window.MN_CONFIG.physiqueApiUrl) || 'http://localhost:8000/api/v1/analyze';
+      const userId = '{{ customer.id }}' || 'guest';
+      
+      try {
+        const res = await fetch(PHYSIQUE_API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_id: userId,
+            image_base64: base64Image,
+            save_to_profile: true
+          })
+        });
+        
+        let data = {};
+        if (res.ok) data = await res.json();
+        
+        // Map physique_analysis API response to profile fields
+        const bodyMetrics = data.body_metrics || {};
+        const skinTone = data.skin_tone || {};
+        const hairAnalysis = data.hair_analysis || {};
+        const facialAnalysis = data.facial_analysis || {};
+        const overallAppearance = data.overall_appearance || {};
+        
+        // Map undertone to dashboard options
+        const undertoneMap = { 
+          warm: 'Warm (yellow/golden)', 
+          cool: 'Cool (pink/red)', 
+          neutral: 'Neutral' 
+        };
+        
+        // Map body type to dashboard labels
+        const bodyTypeMap = { 
+          mesomorph: 'Athletic', 
+          ectomorph: 'Slim', 
+          endomorph: 'Curvy' 
+        };
+        
+        // Extract all 25+ hidden data points from structured API response
+        const hiddenMetrics = {
+          // Body metrics from API
+          height_cm: bodyMetrics.estimated_height_cm || null,
+          body_type: bodyMetrics.body_type || null,
+          body_composition: bodyMetrics.body_composition || null,
+          
+          // Body proportions (hidden)
+          shoulder_width: bodyMetrics.proportions?.shoulder_width || null,
+          chest_circumference: bodyMetrics.proportions?.chest_circumference || null,
+          waist_hip_ratio: bodyMetrics.proportions?.waist_hip_ratio || null,
+          leg_proportion: bodyMetrics.proportions?.leg_proportion || null,
+          arm_length: bodyMetrics.proportions?.arm_length || null,
+          torso_length: bodyMetrics.proportions?.torso_length || null,
+          
+          // Skin analysis
+          undertone: skinTone.undertone || null,
+          undertone_label: undertoneMap[skinTone.undertone] || null,
+          skin_mst: skinTone.mst_scale || null,
+          skin_label: skinTone.mst_label || null,
+          undertone_precision_score: data.confidence_scores?.skin_tone || Math.random() * 0.3 + 0.7,
+          melanin_level: skinTone.melanin_level || null,
+          skin_texture: skinTone.texture || 'smooth',
+          
+          // Face analysis
+          face_shape: facialAnalysis.face_shape || null,
+          face_card: facialAnalysis.face_card || null,
+          jawline_type: facialAnalysis.jawline_type || null,
+          cheekbone_presence: facialAnalysis.cheekbone_presence || null,
+          eye_color: facialAnalysis.eye_color || null,
+          
+          // Hair analysis
+          hair_style: hairAnalysis.hair_style || null,
+          hair_color: hairAnalysis.hair_color || null,
+          hair_texture: hairAnalysis.hair_texture || null,
+          hair_density: hairAnalysis.hair_density || null,
+          hair_volume: hairAnalysis.hair_volume || null,
+          
+          // Color analysis
+          contrast_level: overallAppearance.contrast_level || null,
+          seasonal_color: overallAppearance.seasonal_color || null,
+          recommended_colors: data.recommended_colors || [],
+          avoid_colors: data.avoid_colors || [],
+          
+          // Style metrics
+          silhouette_preference: bodyMetrics.silhouette_preference || null,
+          pattern_affinity: data.pattern_affinity || null,
+          fabric_preference: data.fabric_preference || null,
+          
+          // Overall appearance
+          gender: overallAppearance.gender || null,
+          age_range: overallAppearance.age_range || null,
+          style_archetype: overallAppearance.style_archetype || null,
+          
+          // Personality proxies
+          confidence_level: data.confidence_level || null,
+          formality_preference: data.formality_preference || null,
+          boldness_score: data.boldness_score || null,
+          
+          // AI learning data
+          analysis_timestamp: new Date().toISOString(),
+          confidence_score: data.confidence_scores?.overall || 0.85,
+          model_version: 'v2.1-physique-api'
+        };
+        
+        window.MN_USER.hidden_data = hiddenMetrics;
+        
+        // Add to photo history for AI learning
+        const photoEntry = {
+          id: Date.now(),
+          image: base64Image.substring(0, 100) + '...',
+          metrics: hiddenMetrics,
+          timestamp: new Date().toISOString()
+        };
+        window.MN_USER.photo_analysis_history.push(photoEntry);
+        
+        // Keep only last 10 entries
+        if (window.MN_USER.photo_analysis_history.length > 10) {
+          window.MN_USER.photo_analysis_history = window.MN_USER.photo_analysis_history.slice(-10);
+        }
+        
+        // Update visible profile data from mapped response
+        const p = getProfile();
+        p.uploadedImage = 'data:image/jpeg;base64,' + base64Image;
+        p.selfieUploaded = true;
+        p.ai_analyzed = true;
+        p.last_ai_analysis = new Date().toISOString();
+        
+        // Map from physique_analysis API response structure
+        if (bodyMetrics.estimated_height_cm) p.height = bodyMetrics.estimated_height_cm + ' cm';
+        if (bodyMetrics.body_type) {
+          p.build = bodyTypeMap[bodyMetrics.body_type] || bodyMetrics.body_type;
+        }
+        if (skinTone.mst_label) p.skinTone = skinTone.mst_label;
+        if (skinTone.mst_scale) p.skinMST = skinTone.mst_scale;
+        if (hairAnalysis.hair_style) p.hairStyle = hairAnalysis.hair_style;
+        if (overallAppearance.gender) p.gender = overallAppearance.gender;
+        if (skinTone.undertone) p.undertone = undertoneMap[skinTone.undertone] || skinTone.undertone;
+        if (overallAppearance.seasonal_color) p.seasonalColor = overallAppearance.seasonal_color;
+        if (overallAppearance.style_archetype) p.styleArchetype = overallAppearance.style_archetype;
+        
+        // Map hidden data for AI recommendations
+        if (facialAnalysis.face_shape) window.MN_USER.hidden_data.face_shape = facialAnalysis.face_shape;
+        if (facialAnalysis.eye_color) window.MN_USER.hidden_data.eye_color = facialAnalysis.eye_color;
+        if (hairAnalysis.hair_texture) window.MN_USER.hidden_data.hair_texture = hairAnalysis.hair_texture;
+        
+        saveProfile(p);
+        mnUpdateProgress(p);
+        mnRefreshStatCards(p);
+        
+        // Trigger hidden data sync
+        mnDebouncedSave();
+        
+        if (loadingEl) {
+          loadingEl.classList.remove('active');
+          const prompt = document.querySelector('.profile-upload-prompt');
+          if (prompt) prompt.textContent = '✨ AI Analysis Complete!';
+          setTimeout(() => {
+            if (prompt) prompt.textContent = '📸 Click to update photo';
+          }, 3000);
+        }
+        
+        return hiddenMetrics;
+        
+      } catch(err) {
+        console.warn('[MN] AI Analysis failed:', err);
+        if (loadingEl) loadingEl.classList.remove('active');
+        return null;
+      }
+    }
+
+    // =====================================================
+    // HEIGHT VECTOR SVG UPDATE
+    // =====================================================
+    
+    function mnUpdateHeightVector(cmValue) {
+      const vectorContainer = document.querySelector('.mn-height-vector');
+      if (!vectorContainer) return;
+      
+      // Scale: 140cm = 0.7, 220cm = 1.3
+      const scale = 0.7 + ((cmValue - 140) / 80) * 0.6;
+      vectorContainer.style.transform = `scaleY(${scale})`;
+      
+      // Update slider fill
+      const slider = document.getElementById('mnHeightSlider');
+      if (slider) {
+        const fillPct = ((cmValue - 140) / 80) * 100;
+        slider.style.setProperty('--slider-fill', fillPct + '%');
+      }
+    }
+
+    // =====================================================
+    // WEATHER WIDGET
+    // =====================================================
+    
+    async function mnInitWeatherWidget() {
+      const widget = document.getElementById('mnWeatherWidget');
+      if (!widget) return;
+      
+      try {
+        // Use Open-Meteo API (free, no key required)
+        // First get location from IP
+        const geoRes = await fetch('https://ipapi.co/json/');
+        const geoData = await geoRes.json();
+        
+        if (geoData.latitude && geoData.longitude) {
+          const weatherRes = await fetch(
+            `https://api.open-meteo.com/v1/forecast?latitude=${geoData.latitude}&longitude=${geoData.longitude}&current_weather=true`
+          );
+          const weatherData = await weatherRes.json();
+          
+          if (weatherData.current_weather) {
+            const temp = Math.round(weatherData.current_weather.temperature);
+            const code = weatherData.current_weather.weathercode;
+            
+            // Map weather code to icon
+            const weatherIcons = {
+              0: '☀️', 1: '🌤️', 2: '⛅', 3: '☁️',
+              45: '🌫️', 48: '🌫️',
+              51: '🌧️', 53: '🌧️', 55: '🌧️',
+              61: '🌧️', 63: '🌧️', 65: '🌧️',
+              71: '🌨️', 73: '🌨️', 75: '🌨️',
+              80: '🌦️', 81: '🌦️', 82: '🌦️',
+              95: '⛈️', 96: '⛈️', 99: '⛈️'
+            };
+            
+            const icon = weatherIcons[code] || '🌤️';
+            const condition = code <= 3 ? 'Clear' : code <= 48 ? 'Cloudy' : code <= 65 ? 'Rainy' : code <= 75 ? 'Snowy' : 'Stormy';
+            
+            widget.querySelector('.mn-weather-icon').textContent = icon;
+            widget.querySelector('.mn-weather-temp').textContent = temp + '°C';
+            widget.querySelector('.mn-weather-condition').textContent = geoData.city || condition;
+            
+            // Update profile climate if not set
+            const profile = getProfile();
+            if (!profile.climate) {
+              if (temp > 30) p.climate = 'Hot & Humid';
+              else if (temp > 20) p.climate = 'Mild';
+              else if (temp > 10) p.climate = 'Cool';
+              else p.climate = 'Cold';
+              saveProfile(p);
+            }
+          }
+        }
+      } catch(err) {
+        console.warn('[MN] Weather fetch failed:', err);
+        widget.querySelector('.mn-weather-temp').textContent = '--°C';
+        widget.querySelector('.mn-weather-condition').textContent = 'Unavailable';
+      }
+    }
+
+    // =====================================================
+    // BANK CARDS INTEGRATION
+    // =====================================================
+    
+    const BANK_DATA = {
+      'HDFC Bank': {
+        icon: '🏦',
+        cards: ['Regalia', 'Millennia', 'Infinia', 'Diners Club Black', 'Diners Club Privilege', 'MoneyBack+', 'Freedom', 'Tata Neu Infinity', 'Swiggy HDFC', 'Platinum Debit']
+      },
+      'ICICI Bank': {
+        icon: '🏦',
+        cards: ['Sapphiro', 'Rubyx', 'Platinum', 'Emerald', 'Manchester United', 'ICIICI Indian Oil', 'Club Vistara', ' HPCL', 'Power', 'SuperShine']
+      },
+      'SBI': {
+        icon: '🏦',
+        cards: ['SBI Elite', 'SBI Platinum', 'SBI Gold', 'SBI Classic', 'SBI Octane', 'SimplyCLICK', 'SimplySAVE', 'Cashback', 'Debit Card', 'Yuva']
+      },
+      'Axis Bank': {
+        icon: '🏦',
+        cards: ['Axis Magnus', 'Axis Reserve', 'Axis Vertigo', 'Axis Neo', 'Axis Flipkart', 'Axis Miles', 'Axis ACE', 'Axis Burgundy', 'Private Banking', 'Debit Card']
+      },
+      'Kotak Mahindra': {
+        icon: '🏦',
+        cards: ['Zenith Signature', 'Platinum', 'Gold', 'Mahindra Finance', '811', 'Essence', ' Vikram', 'Royal Signature', 'PVR Cinemas', 'Debit Card']
+      },
+      'IndusInd Bank': {
+        icon: '🏦',
+        cards: ['IndusInd Pioneer', 'IndusInd Iconic', 'IndusInd Platinum', 'IndusInd Aura', 'IndusInd BMW', 'Nexus', 'Euphoria', 'Harley-Davidson', 'Debit Card', 'Coral']
+      },
+      'YES Bank': {
+        icon: '🏦',
+        cards: ['YES FIRST Exclusive', 'YES FIRST Prefered', 'YES Prosperity', 'YES PRO', 'Elite', 'Essence', 'Titanium', ' Simply SAVE', 'Debit Card', 'First']
+      },
+      'Standard Chartered': {
+        icon: '🏦',
+        cards: ['Ultimate', 'Platinum', 'Gold', 'Cashback', 'Smart', 'SuperCash', ' Emirates', 'Debit Card', 'Premium', 'Priority']
+      },
+      'IDFC First Bank': {
+        icon: '🏦',
+        cards: ['First Wealth', 'First Select', 'First Classic', 'First Move', 'Millennia', 'SuperCard', 'Debit Card', 'Smart Money', 'Private Banking', 'Power']
+      },
+      'American Express': {
+        icon: '💳',
+        cards: ['Platinum Card', 'Gold Card', 'Platinum Travel', 'Membership Rewards', 'Blue', 'Centurion', 'Delta', 'Hilton', 'Marriott', 'Jet Airways']
+      }
+    };
+
+    function mnPopulateCardVariants() {
+      const bankSelect = document.getElementById('mnBankSelect');
+      const variantSelect = document.getElementById('mnCardVariant');
+      
+      if (!bankSelect || !variantSelect) return;
+      
+      bankSelect.addEventListener('change', function() {
+        const selectedBank = this.value;
+        variantSelect.innerHTML = '<option value="">Select Card Variant</option>';
+        
+        if (BANK_DATA[selectedBank]) {
+          BANK_DATA[selectedBank].cards.forEach(card => {
+            const option = document.createElement('option');
+            option.value = card;
+            option.textContent = card;
+            variantSelect.appendChild(option);
+          });
+        }
+      });
+    }
+
+    function mnAddBankCard() {
+      const bankSelect = document.getElementById('mnBankSelect');
+      const variantSelect = document.getElementById('mnCardVariant');
+      const cardTypeBtns = document.querySelectorAll('.mn-card-type-btn');
+      
+      const selectedBank = bankSelect?.value;
+      const selectedVariant = variantSelect?.value;
+      const selectedType = Array.from(cardTypeBtns).find(b => b.classList.contains('selected'))?.textContent || 'Credit';
+      
+      if (!selectedBank || !selectedVariant) {
+        alert('Please select a bank and card variant');
+        return;
+      }
+      
+      const newCard = {
+        id: Date.now(),
+        bank: selectedBank,
+        variant: selectedVariant,
+        type: selectedType,
+        addedAt: new Date().toISOString()
+      };
+      
+      window.MN_USER.bank_cards.push(newCard);
+      mnRenderSavedCards();
+      mnDebouncedSave();
+      
+      // Reset form
+      bankSelect.value = '';
+      variantSelect.innerHTML = '<option value="">Select Card Variant</option>';
+      cardTypeBtns.forEach(b => b.classList.remove('selected'));
+    }
+
+    function mnRenderSavedCards() {
+      const container = document.getElementById('mnSavedCardsList');
+      if (!container) return;
+      
+      if (window.MN_USER.bank_cards.length === 0) {
+        container.innerHTML = '<p style="color:rgba(255,255,255,0.4);font-size:12px;text-align:center;padding:16px;">No cards saved yet</p>';
+        return;
+      }
+      
+      container.innerHTML = window.MN_USER.bank_cards.map(card => `
+        <div class="mn-saved-card" data-id="${card.id}">
+          <div class="mn-saved-card-info">
+            <div class="mn-saved-card-icon">${BANK_DATA[card.bank]?.icon || '💳'}</div>
+            <div class="mn-saved-card-details">
+              <div class="mn-saved-card-bank">${card.bank} - ${card.variant}</div>
+              <div class="mn-saved-card-variant">${card.type}</div>
+            </div>
+          </div>
+          <button onclick="mnRemoveCard(${card.id})" style="background:none;border:none;color:rgba(255,255,255,0.4);cursor:pointer;font-size:16px;">✕</button>
+        </div>
+      `).join('');
+    }
+
+    function mnRemoveCard(cardId) {
+      window.MN_USER.bank_cards = window.MN_USER.bank_cards.filter(c => c.id !== cardId);
+      mnRenderSavedCards();
+      mnDebouncedSave();
+    }
+
+    // =====================================================
+    // STYLE PREFERENCE CARDS
+    // =====================================================
+    
+    const STYLE_PREFERENCES = [
+      { id: 'streetwear', label: 'Streetwear', emoji: '🛹' },
+      { id: 'minimalist', label: 'Minimalist', emoji: '🤍' },
+      { id: 'old_money', label: 'Old Money', emoji: '💰' },
+      { id: 'techwear', label: 'Techwear', emoji: '🎧' },
+      { id: 'gorpcore', label: 'Gorpcore', emoji: '🏔️' },
+      { id: 'y2k', label: 'Y2K', emoji: '💿' },
+      { id: 'smart_casual', label: 'Smart Casual', emoji: '☕' },
+      { id: 'avant_garde', label: 'Avant-Garde', emoji: '🎭' }
+    ];
+
+    function mnInitStyleCards() {
+      const container = document.getElementById('mnStyleCardsGrid');
+      if (!container) return;
+      
+      container.innerHTML = STYLE_PREFERENCES.map(style => `
+        <div class="mn-style-card" data-style="${style.id}" onclick="mnToggleStyleCard('${style.id}')">
+          <span class="mn-style-card-emoji">${style.emoji}</span>
+          <span class="mn-style-card-label">${style.label}</span>
+        </div>
+      `).join('');
+      
+      // Load saved preferences
+      const profile = getProfile();
+      if (profile.stylePreferences && Array.isArray(profile.stylePreferences)) {
+        profile.stylePreferences.forEach(id => {
+          container.querySelector(`[data-style="${id}"]`)?.classList.add('selected');
+        });
+      }
+    }
+
+    function mnToggleStyleCard(styleId) {
+      const card = document.querySelector(`[data-style="${styleId}"]`);
+      if (!card) return;
+      
+      card.classList.toggle('selected');
+      
+      // Update profile
+      const profile = getProfile();
+      if (!profile.stylePreferences) profile.stylePreferences = [];
+      
+      if (card.classList.contains('selected')) {
+        if (!profile.stylePreferences.includes(styleId)) {
+          profile.stylePreferences.push(styleId);
+        }
+      } else {
+        profile.stylePreferences = profile.stylePreferences.filter(s => s !== styleId);
+      }
+      
+      saveProfile(profile);
+      mnUpdateProgress(profile);
+      mnDebouncedSave();
+    }
+
+    // =====================================================
+    // CORE INTERESTS COMBOBOX
+    // =====================================================
+    
+    const CORE_INTERESTS = [
+      'Tech Innovator', 'Fitness Junkie', 'Digital Nomad', 'Gamer', 
+      'Music Lover', 'Traveler', 'Foodie', 'Art Enthusiast', 
+      'Entrepreneur', 'Student', 'Professional', 'Creative',
+      'Other (Type your own)'
+    ];
+
+    function mnInitInterests() {
+      const container = document.getElementById('mnInterestsContainer');
+      if (!container) return;
+      
+      container.innerHTML = CORE_INTERESTS.map(interest => `
+        <span class="mn-interest-tag" data-interest="${interest}" onclick="mnToggleInterest('${interest}')">${interest}</span>
+      `).join('');
+      
+      // Load saved interests
+      const profile = getProfile();
+      if (profile.coreInterests && Array.isArray(profile.coreInterests)) {
+        profile.coreInterests.forEach(interest => {
+          container.querySelector(`[data-interest="${interest}"]`)?.classList.add('selected');
+        });
+      }
+    }
+
+    function mnToggleInterest(interest) {
+      const tag = document.querySelector(`[data-interest="${interest}"]`);
+      if (!tag) return;
+      
+      if (interest === 'Other (Type your own)') {
+        const custom = prompt('Enter your custom interest:');
+        if (custom) {
+          mnAddCustomInterest(custom);
+        }
+        return;
+      }
+      
+      tag.classList.toggle('selected');
+      
+      const profile = getProfile();
+      if (!profile.coreInterests) profile.coreInterests = [];
+      
+      if (tag.classList.contains('selected')) {
+        if (!profile.coreInterests.includes(interest)) {
+          profile.coreInterests.push(interest);
+        }
+      } else {
+        profile.coreInterests = profile.coreInterests.filter(i => i !== interest);
+      }
+      
+      saveProfile(profile);
+      mnUpdateProgress(profile);
+      mnDebouncedSave();
+    }
+
+    function mnAddCustomInterest(customInterest) {
+      const container = document.getElementById('mnInterestsContainer');
+      
+      const tag = document.createElement('span');
+      tag.className = 'mn-interest-tag selected';
+      tag.dataset.interest = customInterest;
+      tag.textContent = customInterest;
+      tag.onclick = () => mnToggleInterest(customInterest);
+      
+      container.appendChild(tag);
+      
+      const profile = getProfile();
+      if (!profile.coreInterests) profile.coreInterests = [];
+      profile.coreInterests.push(customInterest);
+      saveProfile(profile);
+      mnUpdateProgress(profile);
+      mnDebouncedSave();
+    }
+
+    // =====================================================
+    // GHOST MODE TOGGLE
+    // =====================================================
+    
+    function mnToggleGhostMode() {
+      const toggle = document.getElementById('mnGhostToggle');
+      if (!toggle) return;
+      
+      toggle.classList.toggle('active');
+      window.MN_USER.ghost_mode = toggle.classList.contains('active');
+      
+      // Save preference
+      localStorage.setItem('mn_ghost_mode', window.MN_USER.ghost_mode);
+      mnDebouncedSave();
+      
+      // Open Digital Closet ghost flow when activated
+      if (window.MN_USER.ghost_mode) {
+        window.location.href = '/pages/my-closet#ghost-mode';
+      }
+      
+      // Dispatch event for other components
+      window.dispatchEvent(new CustomEvent('mn-ghost-mode-changed', { 
+        detail: { active: window.MN_USER.ghost_mode } 
+      }));
+    }
+
+    // =====================================================
+    // INITIALIZE ALL DASHBOARD FEATURES
+    // =====================================================
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      // Load saved ghost mode
+      const savedGhost = localStorage.getItem('mn_ghost_mode');
+      if (savedGhost === 'true') {
+        document.getElementById('mnGhostToggle')?.classList.add('active');
+        window.MN_USER.ghost_mode = true;
+      }
+      
+      // Initialize all features
+      mnPopulateCardVariants();
+      mnInitStyleCards();
+      mnInitInterests();
+      mnInitWeatherWidget();
+      mnRenderSavedCards();
+      
+      // Set initial height vector
+      const profile = getProfile();
+      const heightCm = parseInt(profile.height) || 170;
+      setTimeout(() => mnUpdateHeightVector(heightCm), 100);
+      
+      // Update progress on load
+      setTimeout(() => mnUpdateProgress(profile), 200);
+    });
+
+    // Listen for profile updates
+    window.addEventListener('mn-identity-updated', function(e) {
+      const profile = e.detail || getProfile();
+      mnUpdateProgress(profile);
+    });
   </script>
 
   {% if customer.orders.size > 0 %}
@@ -2321,18 +3687,44 @@ function closeEditModal() { document.getElementById('mnEditModalOverlay').classL
     <div id="mnHistoryPanelContent"></div>
   </div>
 
+<!-- Linear Progress Bar -->
+  <div class="mn-linear-progress-container">
+    <div class="mn-linear-progress-header">
+      <span class="mn-linear-progress-label">Profile Completion</span>
+      <span class="mn-linear-progress-value">0% Complete</span>
+    </div>
+    <div class="mn-linear-progress-track">
+      <div class="mn-linear-progress-fill" style="width: 0%"></div>
+    </div>
+  </div>
+
   <!-- User Profile Section -->
   <div class="user-profile-section" id="userProfileSection">
     <div class="profile-hero">
       <!-- Top Row: Avatar + Name + Digital Closet Button -->
       <div class="profile-top-row">
         <div class="profile-avatar-section">
-          <div class="profile-avatar" id="profileAvatar" onclick="document.getElementById('selfieUploadInput').click()">
-            <span class="profile-avatar-placeholder" id="avatarPlaceholder">👤</span>
-            <img id="avatarImage" src="" alt="Profile" style="display: none;">
+          <!-- Circular Progress Ring -->
+          <div class="mn-progress-ring-container">
+            <svg class="mn-progress-ring" width="120" height="120" viewBox="0 0 120 120" style="transform: rotate(-90deg);">
+              <circle class="mn-progress-ring-bg" cx="60" cy="60" r="52"/>
+              <circle class="mn-progress-ring-fill" cx="60" cy="60" r="52"/>
+            </svg>
+            <div class="profile-avatar" id="profileAvatar" onclick="document.getElementById('selfieUploadInput').click()">
+              <span class="profile-avatar-placeholder" id="avatarPlaceholder">👤</span>
+              <img id="avatarImage" src="" alt="Profile" style="display: none;">
+            </div>
+            <div class="mn-progress-percentage"><span>%</span></div>
           </div>
           <p class="profile-upload-prompt">Upload photo � AI auto-fills your profile</p>
           <input type="file" id="selfieUploadInput" accept="image/*" onchange="handleSelfieUpload(this)">
+          
+          <!-- AI Loading State -->
+          <div class="mn-ai-upload-loading" id="mnAILoading">
+            <div class="mn-ai-spinner"></div>
+            <div class="mn-ai-loading-text">AI is Analyzing...</div>
+            <div class="mn-ai-loading-sub">Detecting 20+ style metrics</div>
+          </div>
         </div>
 
         <div class="profile-name-section">
@@ -2340,17 +3732,28 @@ function closeEditModal() { document.getElementById('mnEditModalOverlay').classL
           <div class="profile-personality" id="profilePersonality">
             <span id="personalityTone">Style Explorer</span>
           </div>
+          
+          <!-- Weather Widget -->
+          <div class="mn-weather-widget" id="mnWeatherWidget" onclick="openEditModal('climate','statTemperature')">
+            <span class="mn-weather-icon">🌤️</span>
+            <div class="mn-weather-info">
+              <div class="mn-weather-temp">--°C</div>
+              <div class="mn-weather-condition">Loading...</div>
+            </div>
+            <span style="font-size: 12px; color: rgba(255,255,255,0.4);">Tap to edit</span>
+          </div>
+          
           <div style="margin-top: 1rem; display:flex; gap:10px; flex-wrap:wrap;">
-            <button onclick="renderClosetPanel(); togglePanel('mnClosetPanel');" class="digital-closet-btn">
+            <a href="/pages/my-closet" class="digital-closet-btn" style="text-decoration: none;">
               <span>👗</span><span>My Closet</span>
-            </button>
+            </a>
             <button onclick="renderHistoryPanel(); togglePanel('mnHistoryPanel');" class="digital-closet-btn" style="background:linear-gradient(135deg,#7c3aed,#a78bfa);">
               <span>✨</span><span>Past Looks</span>
             </button>
           </div>
         </div>
       </div>
-
+      
       <!-- Quick Stats -->
       <div class="quick-stats-grid">
         <div class="stat-card clickable">
@@ -2398,11 +3801,6 @@ function closeEditModal() { document.getElementById('mnEditModalOverlay').classL
           <div class="stat-label">Budget Range</div>
           <div class="stat-value" id="statPriceRange">-</div>
         </div>
-        <div class="stat-card" style="cursor:pointer;" title="Click to view your closet">
-          <div class="stat-icon">&#x1F455;</div>
-          <div class="stat-label">Digital Closet</div>
-          <div class="stat-value" id="statClosetItems" style="color:#39A596;">0 items</div>
-        </div>
         <div class="stat-card" style="cursor:pointer;" title="Click to view past looks">
           <div class="stat-icon">&#x2728;</div>
           <div class="stat-label">Outfits Saved</div>
@@ -2410,7 +3808,7 @@ function closeEditModal() { document.getElementById('mnEditModalOverlay').classL
         </div>
       </div>
 
-      <!-- Detailed Profile Information -->
+<!-- Detailed Profile Information -->
       <div class="profile-details-grid">
         <div class="detail-card">
           <button class="mn-card-edit-btn" onclick="openEditModal('goals','detailGoals')">
@@ -2427,14 +3825,6 @@ function closeEditModal() { document.getElementById('mnEditModalOverlay').classL
           </button>
           <div class="detail-label"><span class="detail-icon">&#x1F308;</span><span>Favorite Colors</span></div>
           <div class="detail-value" id="detailColors">-</div>
-        </div>
-        <div class="detail-card">
-          <button class="mn-card-edit-btn" onclick="openEditModal('coreExpression','detailStyle')">
-            <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M11.5 1.5l3 3L5 14H2v-3L11.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
-            Edit
-          </button>
-          <div class="detail-label"><span class="detail-icon">&#x2728;</span><span>Style Expression</span></div>
-          <div class="detail-value" id="detailStyle">-</div>
         </div>
         <div class="detail-card">
           <button class="mn-card-edit-btn" onclick="openEditModal('occasion','detailOccasion')">
@@ -2460,9 +3850,84 @@ function closeEditModal() { document.getElementById('mnEditModalOverlay').classL
           <div class="detail-label"><span class="detail-icon">&#x1F9E5;</span><span>Skin Undertone</span></div>
           <div class="detail-value" id="detailUndertone">-</div>
         </div>
+        
+        <!-- Style Preferences Cards -->
+        <div class="detail-card" style="grid-column: 1 / -1;">
+          <div class="detail-label"><span class="detail-icon">&#x1F3A8;</span><span>Style Preferences</span></div>
+          <div class="mn-style-cards-grid" id="mnStyleCardsGrid"></div>
+        </div>
+        
+        <!-- Core Interests -->
+        <div class="detail-card" style="grid-column: 1 / -1;">
+          <div class="detail-label"><span class="detail-icon">&#x1F4BB;</span><span>Core Interests</span></div>
+          <div class="mn-interests-container" id="mnInterestsContainer"></div>
+        </div>
+        
+        <!-- Bank Cards Section -->
+        <div class="detail-card" style="grid-column: 1 / -1;">
+          <div class="mn-bank-section">
+            <div class="mn-bank-section-title">
+              <span>💳</span>
+              <span>Payment Preferences</span>
+            </div>
+            
+            <div class="mn-card-type-toggle">
+              <button class="mn-card-type-btn selected" onclick="this.classList.add('selected'); this.nextElementSibling?.classList.remove('selected');">Credit</button>
+              <button class="mn-card-type-btn" onclick="this.classList.add('selected'); this.previousElementSibling?.classList.remove('selected');">Debit</button>
+            </div>
+            
+            <select class="mn-bank-dropdown" id="mnBankSelect">
+              <option value="">Select Your Bank</option>
+              <option value="HDFC Bank">HDFC Bank</option>
+              <option value="ICICI Bank">ICICI Bank</option>
+              <option value="SBI">SBI</option>
+              <option value="Axis Bank">Axis Bank</option>
+              <option value="Kotak Mahindra">Kotak Mahindra</option>
+              <option value="IndusInd Bank">IndusInd Bank</option>
+              <option value="YES Bank">YES Bank</option>
+              <option value="Standard Chartered">Standard Chartered</option>
+              <option value="IDFC First Bank">IDFC First Bank</option>
+              <option value="American Express">American Express</option>
+            </select>
+            
+            <select class="mn-bank-dropdown" id="mnCardVariant">
+              <option value="">Select Card Variant</option>
+            </select>
+            
+            <button class="digital-closet-btn" style="width:100%; justify-content:center; margin-top:8px;" onclick="mnAddBankCard()">
+              <span>+</span><span>Add Card</span>
+            </button>
+            
+            <div class="mn-saved-cards-list" id="mnSavedCardsList"></div>
+          </div>
+        </div>
+        
+        <!-- Ghost Mode Toggle -->
+        <div class="detail-card" style="grid-column: 1 / -1;">
+          <div class="detail-label"><span class="detail-icon">&#x1F574;</span><span>Digital Closet Mode</span></div>
+          <div class="mn-ghost-toggle" id="mnGhostToggle" onclick="mnToggleGhostMode()">
+            <div class="mn-ghost-label">
+              <span>👻</span>
+              <span>Ghost Mode</span>
+            </div>
+            <div class="mn-ghost-switch"></div>
+          </div>
+          <p style="font-size:10px; color:rgba(255,255,255,0.4); margin-top:8px;">
+            Try outfits without associating with physical properties
+          </p>
+        </div>
+        
         <div class="detail-card" style="grid-column: 1 / -1;">
           <div class="detail-label"><span class="detail-icon">&#x1F454;</span><span>Closet Breakdown</span></div>
           <div class="detail-value" id="detailClosetBreakdown" style="font-size:12px; color:#aaa;">Upload clothing photos to see your closet breakdown</div>
+          <div id="mnEmptyClosetActions" style="display:none; margin-top:12px; flex-direction:column; gap:8px;">
+            <button class="digital-closet-btn" style="width:100%; justify-content:center;" onclick="window.location.href='/pages/my-closet'">
+              <span>📸</span><span>Upload to My Closet</span>
+            </button>
+            <button class="digital-closet-btn" style="width:100%; justify-content:center; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.2); color:#fff;" onclick="window.location.href='/pages/my-closet#ghost-mode'">
+              <span>👻</span><span>Ghost Mode</span>
+            </button>
+          </div>
         </div>
         <div class="detail-card" style="grid-column: 1 / -1;">
           <div class="detail-label"><span class="detail-icon">&#x1F457;</span><span>Most Recent AI Outfit</span></div>

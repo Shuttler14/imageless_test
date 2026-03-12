@@ -1,0 +1,166 @@
+{% comment %}
+=================================================================================
+MY NARRATIVE - PRODUCT CREATOR BADGE (CROSS-SELLING)
+=================================================================================
+Displays a badge on product pages linking to the creator's featured page
+
+USAGE:
+Add to your product-template.liquid or product-info.liquid:
+{% section 'product-creator-badge' %}
+
+Or render in product page template:
+{% render 'product-creator-badge', product: product %}
+
+REQUIRED PRODUCT METAFIELDS:
+- product.creator_username (text): The creator's username
+- product.creator_avatar (image): Creator's avatar image
+
+=================================================================================
+{% endcomment %}
+
+{% comment %} Get creator info from product metafields {% endcomment %}
+{% assign creator_username = product.metafields.creator.username | default: section.settings.default_creator %}
+{% assign creator_avatar = product.metafields.creator.avatar | default: section.settings.default_avatar %}
+{% assign show_badge = true %}
+
+{% comment %} Override with section settings if metafields not set {% endcomment %}
+{% if creator_username == blank and section.settings.default_creator != blank %}
+  {% assign creator_username = section.settings.default_creator %}
+  {% assign show_badge = true %}
+{% endif %}
+
+{% if show_badge and creator_username != blank %}
+<style>
+  .mn-product-creator-badge {
+    font-family: 'Montserrat', sans-serif;
+    margin: 16px 0;
+    display: inline-flex;
+  }
+
+  .mn-creator-badge-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(245, 158, 11, 0.05));
+    border: 1px solid rgba(251, 191, 36, 0.3);
+    border-radius: 50px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .mn-creator-badge-link:hover {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.1));
+    border-color: rgba(251, 191, 36, 0.5);
+    transform: translateX(4px);
+  }
+
+  .mn-creator-badge-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid #fbbf24;
+    object-fit: cover;
+    background: rgba(251, 191, 36, 0.1);
+  }
+
+  .mn-creator-badge-text {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mn-creator-badge-label {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .mn-creator-badge-username {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fbbf24;
+  }
+
+  .mn-creator-badge-arrow {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.4);
+    transition: all 0.3s ease;
+  }
+
+  .mn-creator-badge-link:hover .mn-creator-badge-arrow {
+    color: #fbbf24;
+    transform: translateX(2px);
+  }
+
+  /* Variant: Small badge */
+  .mn-product-creator-badge.small .mn-creator-badge-link {
+    padding: 6px 12px;
+  }
+
+  .mn-product-creator-badge.small .mn-creator-badge-avatar {
+    width: 24px;
+    height: 24px;
+  }
+
+  .mn-product-creator-badge.small .mn-creator-badge-label {
+    display: none;
+  }
+</style>
+
+<div class="mn-product-creator-badge {% if section.settings.badge_style == 'small' %}small{% endif %}">
+  <a href="/creator/{{ creator_username }}" class="mn-creator-badge-link">
+    <img
+      class="mn-creator-badge-avatar"
+      src="{{ creator_avatar | default: 'https://api.dicebear.com/7.x/avataaars/svg?seed=' | append: creator_username }}"
+      alt="{{ creator_username }}"
+      onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed={{ creator_username }}'"
+    />
+    <span class="mn-creator-badge-text">
+      <span class="mn-creator-badge-label">Designed by</span>
+      <span class="mn-creator-badge-username">@{{ creator_username }}</span>
+    </span>
+    <span class="mn-creator-badge-arrow">→</span>
+  </a>
+</div>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Product Creator Badge",
+  "settings": [
+    {
+      "type": "text",
+      "id": "default_creator",
+      "label": "Default Creator Username",
+      "info": "Used when product doesn't have creator metafield set"
+    },
+    {
+      "type": "image_picker",
+      "id": "default_avatar",
+      "label": "Default Creator Avatar"
+    },
+    {
+      "type": "select",
+      "id": "badge_style",
+      "label": "Badge Style",
+      "options": [
+        {
+          "value": "normal",
+          "label": "Normal"
+        },
+        {
+          "value": "small",
+          "label": "Small (Compact)"
+        }
+      ],
+      "default": "normal"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product Creator Badge"
+    }
+  ]
+}
+{% endschema %}

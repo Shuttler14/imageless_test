@@ -1,0 +1,19 @@
+/*
+ * ------------------------------------------------------------
+ * CREATOR DASHBOARD PAGE TEMPLATE
+ * ------------------------------------------------------------
+ */
+
+{
+  "sections": {
+    "main": {
+      "type": "creator-dashboard",
+      "settings": {
+        "api_base_url": "https://api.mynarrative.store"
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}
