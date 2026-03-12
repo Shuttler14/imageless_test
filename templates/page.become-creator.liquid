@@ -1,0 +1,27 @@
+{% comment %}
+=================================================================================
+BECOME CREATOR PAGE TEMPLATE
+=================================================================================
+Landing page for new creator signups
+Access: /pages/become-creator
+=================================================================================
+{% endcomment %}
+
+<div class="become-creator-page">
+  {% section 'creator-dashboard' %}
+</div>
+
+{% schema %}
+{
+  "name": "Become Creator",
+  "templates": ["page"],
+  "settings": [
+    {
+      "type": "text",
+      "id": "api_base_url",
+      "label": "API Base URL",
+      "default": "https://api.mynarrative.store"
+    }
+  ]
+}
+{% endschema %}
