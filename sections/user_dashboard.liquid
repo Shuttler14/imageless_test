@@ -451,8 +451,8 @@
 <!-- Ghost Mode Modal -->
 <div class="mn-modal-overlay" id="mn-ghost-modal">
   <div class="mn-modal-box">
-    <div class="mn-modal-title">ðŸ‘» Ghost Mode</div>
-    <div class="mn-modal-sub">Describe a clothing item â€” AI generates an embedding without a photo.</div>
+    <div class="mn-modal-title">Ghost Mode</div>
+    <div class="mn-modal-sub">Describe a clothing item - AI generates an embedding without a photo.</div>
     <input type="text" class="mn-city-input" id="mn-ghost-input" style="width:100%;margin-bottom:10px" placeholder="E.g. Black Levis 501 Jeans, size 32..." />
     <select class="mn-select" id="mn-ghost-category" style="width:100%;margin-bottom:10px">
       <option value="">Category (optional)</option>
@@ -461,7 +461,7 @@
     </select>
     <div class="mn-modal-actions">
       <button class="mn-modal-cancel" onclick="document.getElementById('mn-ghost-modal').classList.remove('active')">Cancel</button>
-      <button class="mn-btn-teal" style="flex:1;border-radius:10px;font-family:var(--mn-font);font-size:13px" onclick="mnSubmitGhost()">Add to Closet ðŸ‘»</button>
+      <button class="mn-btn-teal" style="flex:1;border-radius:10px;font-family:var(--mn-font);font-size:13px" onclick="mnSubmitGhost()">Add to Closet</button>
     </div>
   </div>
 </div>
@@ -469,7 +469,7 @@
 <!-- Closet Upload Modal -->
 <div class="mn-modal-overlay" id="mn-closet-modal">
   <div class="mn-modal-box">
-    <div class="mn-modal-title">ðŸ“· Upload to Closet</div>
+    <div class="mn-modal-title">Upload to Closet</div>
     <div class="mn-modal-sub">AI will segment and catalog your clothing item automatically.</div>
     <div id="mn-closet-preview" style="display:none;margin-bottom:14px;text-align:center">
       <img id="mn-closet-preview-img" style="max-width:100%;max-height:200px;border-radius:12px;border:1px solid rgba(57,165,150,0.3)" />
@@ -495,14 +495,14 @@
     <div class="mn-wb-left">
       <div class="mn-wb-pulse"></div>
       <div>
-        <div class="mn-wb-title">ðŸ‘‹ Welcome to your Style Dashboard</div>
-        <div class="mn-wb-sub">Your AI stylist needs a few details to personalise your looks. Upload a photo below â€” AI fills everything automatically in seconds.</div>
+        <div class="mn-wb-title">Welcome to your Style Dashboard</div>
+        <div class="mn-wb-sub">Your AI stylist needs a few details to personalise your looks. Upload a photo below - AI fills everything automatically in seconds.</div>
       </div>
     </div>
     <button class="mn-wb-cta" onclick="document.getElementById('mn-magic-upload-input').click();document.getElementById('mn-welcome-banner').style.display='none'">
-      ðŸ“¸ Upload Photo Now
+      Upload Photo Now
     </button>
-    <button class="mn-wb-close" onclick="document.getElementById('mn-welcome-banner').style.display='none'" title="Dismiss">âœ•</button>
+    <button class="mn-wb-close" onclick="document.getElementById('mn-welcome-banner').style.display='none'" title="Dismiss">x</button>
   </div>
 </div>
 
@@ -664,7 +664,7 @@
       <div class="mn-dropzone-icon">ðŸª„</div>
       <div class="mn-dropzone-title">Upload an Outfit Pic â€” Let our AI auto-fill your style profile</div>
       <div class="mn-dropzone-sub">Drop a full-body photo or outfit flat-lay. Our AI reads skin tone, body type, hair style, preferred fit and more â€” filling all fields instantly.</div>
-      <div class="mn-dropzone-tag">âš¡ Powered by My Narrative AI Â· api.mynarrative.store</div>
+      <div class="mn-dropzone-tag">Powered by My Narrative AI - mynarrative-ai.vercel.app</div>
     </div>
     <input type="file" id="mn-magic-upload-input" accept="image/*" style="display:none" onchange="mnHandleMagicUpload(this.files[0])" />
   </div>
@@ -984,9 +984,9 @@
 const MN_STORE_KEY  = 'mn_identity';
 const MN_CLOSET_KEY = 'mn_digital_closet';
 const MN_HIST_KEY   = 'mn_outfit_history';
-const MN_AI_API     = 'https://api.mynarrative.store/v1/analyze-user';
-const MN_CLOSET_API = 'https://api.mynarrative.store/v1/closet-segment';
-const MN_GHOST_API  = 'https://api.mynarrative.store/v1/ghost-embed';
+const MN_AI_API     = 'https://mynarrative-ai.vercel.app/v1/analyze-user';
+const MN_CLOSET_API = 'https://mynarrative-ai.vercel.app/v1/closet-segment';
+const MN_GHOST_API  = 'https://mynarrative-ai.vercel.app/v1/ghost-embed';
 const WEATHER_KEY   = '{{ section.settings.weather_api_key | escape }}';
 const MN_CUSTOMER   = '{{ customer.id | default: "guest" }}';
 
@@ -1462,7 +1462,7 @@ async function mnSubmitGhost() {
 <script>
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // MAGIC UPLOAD â€” The AI Data Engine
-// POST image to api.mynarrative.store/v1/analyze-user
+// POST image to mynarrative-ai.vercel.app/v1/analyze-user
 // Response auto-populates visible fields AND all 30 hidden fields
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 async function mnHandleMagicUpload(file) {

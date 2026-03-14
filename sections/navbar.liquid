@@ -53,6 +53,102 @@ Updated:
   scrollbar-width: none; 
   -ms-overflow-style: none;
 }
+
+.drawer-glass-card {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(57,165,150,0.07));
+  border: 1px solid rgba(57,165,150,0.24);
+  border-radius: 18px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  text-align: left;
+  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease, background .2s ease;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 14px 35px rgba(0,0,0,0.28);
+  position: relative;
+  overflow: hidden;
+}
+
+.drawer-glass-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top left, rgba(57,165,150,0.20), transparent 45%);
+  pointer-events: none;
+}
+
+.drawer-glass-card:active,
+.drawer-glass-card:hover {
+  transform: translateY(-1px);
+  border-color: rgba(57,165,150,0.45);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 18px 40px rgba(57,165,150,0.14);
+}
+
+.drawer-glass-card__icon {
+  width: 46px;
+  height: 46px;
+  min-width: 46px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(57,165,150,0.18), rgba(255,255,255,0.06));
+  border: 1px solid rgba(57,165,150,0.22);
+  box-shadow: 0 0 24px rgba(57,165,150,0.16);
+  color: #fff;
+  position: relative;
+  z-index: 1;
+}
+
+.drawer-glass-card__icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* Emoji Icon Support */
+.drawer-glass-card--emoji .drawer-glass-card__icon {
+  background: linear-gradient(135deg, rgba(255,165,0,0.25), rgba(57,165,150,0.2));
+  border-color: rgba(255,165,0,0.35);
+  box-shadow: 0 0 20px rgba(255,165,0,0.2);
+}
+
+.emoji-icon,
+.menu-emoji {
+  font-size: 24px;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+.drawer-glass-card__copy {
+  position: relative;
+  z-index: 1;
+}
+
+.drawer-glass-card__title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.03em;
+}
+
+.drawer-glass-card__subtitle {
+  font-size: 11px;
+  color: rgba(255,255,255,0.66);
+  margin-top: 3px;
+  line-height: 1.4;
+}
+
+.drawer-glass-card__status {
+  margin-left: auto;
+  position: relative;
+  z-index: 1;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #39A596;
+}
 .drawer-content::-webkit-scrollbar { display: none; }
 
 /* Narrative Grid Section */
@@ -219,7 +315,10 @@ Updated:
 
 </style>
 
-<nav class="container max-w-screen-xl h-[60px] md:h-[75px] px-3 py-2 md:py-0 md:px-6 mx-auto flex items-center justify-between">
+{% assign nav_menu_handle = section.settings.menuLinks %}
+{% assign nav_menu = linklists[nav_menu_handle] %}
+
+<nav class="container max-w-screen-xl h-[60px] md:h-[75px] px-3 py-2 md:py-0 md:px-6 mx-auto flex items-center justify-between gap-4">
   
   <div class="flex flex-1 items-center gap-4 md:gap-7 h-full">
     
@@ -240,8 +339,23 @@ Updated:
          title="{% if customer %}My Account{% else %}Login / Sign Up{% endif %}">
         <i class="bi bi-heart"></i>
         <span data-wishlist-count class="absolute top-0 right-0 -mr-1 -mt-1 flex h-4 w-4 items-center justify-center rounded-full text-[9px] font-normal leading-none bg-[#39A596] text-white hidden">0</span>
-        </a>
+      </a>
     </div>
+
+    {% if nav_menu != blank and nav_menu.links.size > 0 %}
+      <ul class="hidden lg:flex items-center gap-5 xl:gap-7 h-full ml-2">
+        {% for link in nav_menu.links %}
+          <li>
+            <a
+              href="{{ link.url }}"
+              class="text-[11px] xl:text-xs uppercase tracking-[0.18em] text-white/85 hover:text-brand-green transition-colors duration-200 {% if link.active or link.current %}text-brand-green{% endif %}"
+            >
+              {{ link.title }}
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
   </div>
 
   {% if settings.navlogo != blank %}
@@ -280,23 +394,29 @@ Updated:
       <button class="text-xl text-white p-2" data-for="nav-close-btn"><i class="bi bi-x-lg"></i></button>
     </div>
     <div class="drawer-content">
-      <!-- AI Fashion Consultant Entry -->
+      {% if nav_menu != blank and nav_menu.links.size > 0 %}
+        <div class="mb-6 pb-5 border-b border-white/10">
+          <span class="narrative-grid-title !mb-4">Menu</span>
+          <ul class="flex flex-col gap-3">
+            {% for link in nav_menu.links %}
+              <li>
+                <a
+                  href="{{ link.url }}"
+                  class="block text-sm uppercase tracking-[0.18em] text-white/90 hover:text-brand-green transition-colors duration-200 {% if link.active or link.current %}text-brand-green{% endif %}"
+                  data-mobile-nav-link
+                >
+                  {{ link.title }}
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      <!-- AI Stylist + Creator Menu Cards -->
       <button
         id="drawer-ai-consultant-btn"
-        style="
-          width: 100%;
-          display: flex;
-          align-items: center;
-          gap: 14px;
-          background: linear-gradient(135deg, rgba(57,165,150,0.18), rgba(57,165,150,0.06));
-          border: 1px solid rgba(57,165,150,0.4);
-          border-radius: 16px;
-          padding: 14px 18px;
-          margin-bottom: 24px;
-          cursor: pointer;
-          text-align: left;
-          transition: background 0.2s, border-color 0.2s;
-        "
+        class="drawer-glass-card drawer-glass-card--emoji"
         onclick="
           document.getElementById('mobile-menu-drawer').classList.remove('active');
           document.getElementById('nav-overlay').classList.add('opacity-0');
@@ -304,18 +424,56 @@ Updated:
           document.body.style.overflow = '';
           if (window.MNAIStylist && window.MNAIStylist.expandWidget) {
             window.MNAIStylist.expandWidget();
+          } else {
+            window.location.href = '/pages/ai-studio';
           }
         "
       >
-        <div style="width:42px;height:42px;border-radius:50%;overflow:hidden;border:2px solid #39A596;flex-shrink:0;">
-          <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=80&h=80&fit=crop" style="width:100%;height:100%;object-fit:cover;" alt="AI Stylist" />
+        <div class="drawer-glass-card__icon drawer-glass-card__emoji" aria-hidden="true">
+          <span class="menu-emoji">🤖</span>
         </div>
-        <div>
-          <div style="font-size:13px;font-weight:700;color:#fff;letter-spacing:0.3px;">AI Fashion Consultant</div>
-          <div style="font-size:11px;color:#39A596;margin-top:2px;">Get personalized style advice →</div>
+        <div class="drawer-glass-card__copy">
+          <div class="drawer-glass-card__title">AI Stylist</div>
+          <div class="drawer-glass-card__subtitle">Get personalized fashion advice from your virtual stylist.</div>
         </div>
-        <span style="margin-left:auto;width:8px;height:8px;background:#22c55e;border-radius:50%;box-shadow:0 0 8px rgba(34,197,94,0.8);flex-shrink:0;"></span>
+        <span class="drawer-glass-card__status">Chat</span>
       </button>
+
+      <!-- Creator Dashboard -->
+      <a href="/pages/creator-dashboard" class="drawer-glass-card drawer-glass-card--emoji" data-mobile-nav-link>
+        <div class="drawer-glass-card__icon" aria-hidden="true">
+          <span class="menu-emoji">🎨</span>
+        </div>
+        <div class="drawer-glass-card__copy">
+          <div class="drawer-glass-card__title">Creator Dashboard</div>
+          <div class="drawer-glass-card__subtitle">Track earnings, manage designs, and view your creator stats.</div>
+        </div>
+        <span class="drawer-glass-card__status">Dashboard</span>
+      </a>
+
+      <!-- Featured Creators -->
+      <a href="/pages/featured-creators" class="drawer-glass-card drawer-glass-card--emoji" data-mobile-nav-link>
+        <div class="drawer-glass-card__icon" aria-hidden="true">
+          <span class="menu-emoji">⭐</span>
+        </div>
+        <div class="drawer-glass-card__copy">
+          <div class="drawer-glass-card__title">Featured Creators</div>
+          <div class="drawer-glass-card__subtitle">Discover top creators and their trending designs.</div>
+        </div>
+        <span class="drawer-glass-card__status">Explore</span>
+      </a>
+
+      <!-- Become a Creator -->
+      <a href="/pages/become-creator" class="drawer-glass-card drawer-glass-card--emoji" data-mobile-nav-link>
+        <div class="drawer-glass-card__icon" aria-hidden="true">
+          <span class="menu-emoji">🚀</span>
+        </div>
+        <div class="drawer-glass-card__copy">
+          <div class="drawer-glass-card__title">Become a Creator</div>
+          <div class="drawer-glass-card__subtitle">Join our creator program and start earning today.</div>
+        </div>
+        <span class="drawer-glass-card__status">Join Now</span>
+      </a>
 
       <span class="narrative-grid-title">Select Narrative</span>
       <div id="js-narrative-grid" class="narrative-grid">
@@ -406,6 +564,9 @@ document.addEventListener('DOMContentLoaded', function(){
   if(openBtn) openBtn.addEventListener('click', openMenu);
   if(closeBtn) closeBtn.addEventListener('click', closeMenu);
   if(navOverlay) navOverlay.addEventListener('click', closeMenu);
+  document.querySelectorAll('[data-mobile-nav-link]').forEach(link => {
+    link.addEventListener('click', closeMenu);
+  });
 
   // --- 3. EXACT UI LIVE SEARCH ---
   const searchInput = document.getElementById('live-search-input');

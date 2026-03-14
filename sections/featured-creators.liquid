@@ -187,10 +187,10 @@ Displays mega-influencer creators in a premium marketplace
 </style>
 
 <div class="mn-featured-creators">
-  <a href="/" class="mn-back-link">â† Back to Home</a>
+  <a href="/" class="mn-back-link">&larr; Back to Home</a>
 
   <div class="mn-featured-header">
-    <h1 class="mn-featured-title">ðŸ‘‘ Featured Creators</h1>
+    <h1 class="mn-featured-title">Featured Creators</h1>
     <p class="mn-featured-subtitle">
       Discover designs from our top-performing creators with massive social influence.
       Join the program to showcase your own creations!
@@ -213,19 +213,19 @@ Displays mega-influencer creators in a premium marketplace
 (function() {
   'use strict';
 
-  const API_BASE_URL = '{{ section.settings.api_base_url | default: "https://api.mynarrative.store" }}';
+  const API_BASE_URL = '{{ section.settings.api_base_url | default: "https://mynarrative-ai.vercel.app" }}';
 
   const RANK_LABELS = {
-    rookie_designer: { label: 'Rookie Designer', emoji: 'ðŸŒ±' },
-    emerging_talent: { label: 'Emerging Talent', emoji: 'â­' },
-    trendsetter: { label: 'Trendsetter', emoji: 'ðŸ”¥' },
-    style_architect: { label: 'Style Architect', emoji: 'ðŸ›ï¸' },
-    platform_icon: { label: 'Platform Icon', emoji: 'ðŸ‘‘' }
+    rookie_designer: { label: 'Rookie Designer', emoji: '' },
+    emerging_talent: { label: 'Emerging Talent', emoji: '' },
+    trendsetter: { label: 'Trendsetter', emoji: '' },
+    style_architect: { label: 'Style Architect', emoji: '' },
+    platform_icon: { label: 'Platform Icon', emoji: '' }
   };
 
   async function loadFeaturedCreators() {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/creators/featured`);
+      const response = await fetch(`${API_BASE_URL}/api/creator_economy?path=/api/creators/featured`);
       const data = await response.json();
 
       const grid = document.getElementById('mnCreatorGrid');
@@ -244,16 +244,16 @@ Displays mega-influencer creators in a premium marketplace
         const avatarUrl = creator.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${creator.username}`;
 
         return `
-          <div class="mn-creator-card" onclick="window.location.href='/creator/${creator.username}'">
+          <div class="mn-creator-card" onclick="window.location.href='/pages/featured-creators?creator=${creator.username}'">
             <span class="mn-creator-badge-mega">MEGA</span>
             <div class="mn-creator-avatar">
               <img src="${avatarUrl}" alt="${creator.username}" />
             </div>
             <h3 class="mn-creator-username">@${creator.username}</h3>
-            <p class="mn-creator-rank">${rank.emoji} ${rank.label}</p>
+            <p class="mn-creator-rank">${rank.emoji ? `${rank.emoji} ` : ''}${rank.label}</p>
             <div class="mn-creator-stats">
               <div class="mn-creator-stat">
-                <p class="mn-creator-stat-value">â‚¹${new Intl.NumberFormat('en-IN').format(creator.lifetime_earnings || 0)}</p>
+                <p class="mn-creator-stat-value">INR ${new Intl.NumberFormat('en-IN').format(creator.lifetime_earnings || 0)}</p>
                 <p class="mn-creator-stat-label">Earned</p>
               </div>
               <div class="mn-creator-stat">
@@ -286,7 +286,7 @@ Displays mega-influencer creators in a premium marketplace
       "type": "text",
       "id": "api_base_url",
       "label": "API Base URL",
-      "default": "https://api.mynarrative.store"
+      "default": "https://mynarrative-ai.vercel.app"
     }
   ],
   "presets": [

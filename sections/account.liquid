@@ -950,6 +950,52 @@
       gap: 0.3rem;
     }
 
+    .profile-stats-grid .stat-label,
+    .profile-stats-grid .stat-icon {
+      text-align: center;
+      justify-content: center;
+      align-self: center;
+    }
+
+    .profile-stats-grid .stat-label {
+      font-size: 11px;
+      line-height: 1.45;
+      padding-right: 0 !important;
+      margin: 0 auto 6px;
+    }
+
+    .profile-stats-grid .stat-icon {
+      font-size: 26px;
+      margin: 0 auto 10px;
+    }
+
+    .profile-details-grid > .detail-card:not([style*="grid-column: 1 / -1"]) .detail-label {
+      justify-content: center;
+      text-align: center;
+      padding-right: 0 !important;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 11px;
+      line-height: 1.35;
+    }
+
+    .profile-details-grid > .detail-card:not([style*="grid-column: 1 / -1"]) .detail-icon {
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    .profile-details-grid > .detail-card[style*="grid-column: 1 / -1"] .detail-label {
+      font-size: 13px;
+      gap: 10px;
+      margin-bottom: 10px;
+      align-items: center;
+    }
+
+    .profile-details-grid > .detail-card[style*="grid-column: 1 / -1"] .detail-icon {
+      font-size: 20px;
+      line-height: 1;
+    }
+
     .detail-value {
       font-size: 13px;
       color: #ffffff;
@@ -977,7 +1023,7 @@
       backdrop-filter: blur(12px) !important;
       transition: all 0.3s ease !important;
       cursor: pointer;
-      padding-top: 36px !important;
+      padding-top: 54px !important;
     }
     .stat-card:hover { border-color: rgba(57,165,150,0.5) !important; background: rgba(57,165,150,0.08) !important; transform: translateY(-2px) !important; }
     .stat-card.clickable:hover { box-shadow: 0 4px 16px rgba(57,165,150,0.2); }
@@ -988,26 +1034,78 @@
       backdrop-filter: blur(8px) !important;
       cursor: pointer;
       transition: all 0.3s ease !important;
-      padding-top: 36px !important;
+      padding-top: 54px !important;
     }
     .detail-card:hover { border-color: rgba(57,165,150,0.4) !important; background: rgba(57,165,150,0.06) !important; }
     
     .detail-value { color: rgba(244,244,244,0.9) !important; }
-    .detail-label { color: #39A596 !important; }
+    .detail-label { color: #39A596 !important; padding-right: 76px; }
     .stat-value { color: rgba(244,244,244,0.95) !important; }
-    .stat-label { color: rgba(244,244,244,0.5) !important; }
+    .stat-value.is-empty,
+    .detail-value.is-empty {
+      color: rgba(244,244,244,0.38) !important;
+      font-style: normal;
+    }
+    .stat-icon svg,
+    .detail-icon svg {
+      width: 20px;
+      height: 20px;
+      display: block;
+    }
+    .mn-edit-mst-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px 12px;
+    }
+    .mn-edit-mst-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 10px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.035);
+      cursor: pointer;
+      transition: all .25s ease;
+      min-height: 104px;
+      text-align: center;
+    }
+    .mn-edit-mst-card:hover,
+    .mn-edit-mst-card.selected {
+      border-color: rgba(57,165,150,0.5);
+      background: rgba(57,165,150,0.1);
+      box-shadow: 0 0 0 1px rgba(57,165,150,0.18), 0 18px 40px rgba(57,165,150,0.12);
+    }
+    .mn-edit-mst-dot {
+      width: 52px;
+      height: 52px;
+      border-radius: 999px;
+      border: 2px solid rgba(255,255,255,0.35);
+      box-shadow: inset 0 2px 10px rgba(255,255,255,0.08), 0 8px 20px rgba(0,0,0,0.18);
+    }
+    .mn-edit-mst-name {
+      font-size: 11px;
+      line-height: 1.35;
+      font-weight: 700;
+      color: rgba(255,255,255,0.86);
+      max-width: 100%;
+      word-break: break-word;
+    }
+    .stat-label { color: rgba(244,244,244,0.5) !important; padding-right: 76px; }
     .profile-name { color: #fff !important; }
 
     /* ── Edit Button (top-right of every card) ── */
     .mn-card-edit-btn {
       position: absolute;
-      top: 10px; right: 10px;
-      display: inline-flex; align-items: center; gap: 5px;
+      top: 12px; right: 12px;
+      display: inline-flex; align-items: center; gap: 4px;
       background: rgba(57,165,150,0.14);
       border: 1px solid rgba(57,165,150,0.4);
-      border-radius: 20px;
-      padding: 5px 12px;
-      font-size: 9px; font-weight: 900; letter-spacing: 0.08em;
+      border-radius: 18px;
+      padding: 5px 10px;
+      font-size: 8px; font-weight: 900; letter-spacing: 0.07em;
       color: #39A596; cursor: pointer;
       transition: all 0.2s; white-space: nowrap;
       font-family: 'Montserrat', sans-serif;
@@ -1026,8 +1124,14 @@
       box-shadow: 0 2px 10px rgba(57,165,150,0.25);
     }
     .mn-card-edit-btn svg { flex-shrink: 0; }
-    /* Cards need relative positioning */
-    .stat-card  { position: relative !important; }
+.stat-card, .detail-card { position: relative !important; }
+.mn-card-edit-btn { z-index: 20; min-width: 44px; min-height: 36px; }
+@media (hover: none) {
+  .mn-card-edit-btn {
+    opacity: 1 !important;
+    pointer-events: all !important;
+  }
+}
     .detail-card{ position: relative !important; }
 
     /* ── Upgraded Edit Modal ── */
@@ -1418,20 +1522,76 @@
     }
 
     // -- Refresh all stat/detail card DOM values from profile object --
+    function mnSetDisplayValue(id, value, emptyLabel = '') {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const normalized = Array.isArray(value) ? value.filter(Boolean).join(', ') : (value || '');
+      el.textContent = normalized || emptyLabel;
+      el.classList.toggle('is-empty', !normalized);
+    }
+
+    function mnSetActionLabel(buttonId, value) {
+      const btn = document.getElementById(buttonId);
+      if (!btn) return;
+      const hasValue = Array.isArray(value) ? value.filter(Boolean).length > 0 : !!value;
+      const label = btn.querySelector('.mn-card-action-label');
+      if (label) label.textContent = hasValue ? 'Edit' : 'Select';
+    }
+
+    function mnReplaceHeadingIcons() {
+      const map = {
+        statHeight: '📏',
+        statBodyType: '💪',
+        statSkinTone: '🎨',
+        statTemperature: '🌤️',
+        statPriceRange: '💸',
+        detailGoals: '🎯',
+        detailColors: '🌈',
+        detailStyle: '🧭',
+        detailOccasion: '📍',
+        detailRegion: '🗺️',
+        detailClosetBreakdown: '👕',
+        detailLastOutfit: '✨',
+        statClosetItems: '👚',
+        statOutfitsSaved: '🪄',
+        detailInterests: '💡',
+        detailClosetMode: '🧵'
+      };
+      Object.entries(map).forEach(([id, icon]) => {
+        const val = document.getElementById(id);
+        if (!val) return;
+        const card = val.closest('.stat-card, .detail-card');
+        if (!card) return;
+        const iconEl = card.querySelector('.stat-icon, .detail-icon');
+        if (iconEl) {
+          iconEl.innerHTML = '';
+          iconEl.textContent = icon;
+        }
+      });
+    }
+
     function mnRefreshStatCards(profile) {
-      const set = (id, val) => { const el = document.getElementById(id); if (el && val) el.textContent = val; };
-      set('statHeight',      profile.height    || '-');
-      set('statBodyType',    profile.build     || '-');
-      set('statSkinTone',    profile.skinTone  || '-');
-      set('statTemperature', profile.climate   || '-');
-      set('statPriceRange',  profile.budget    || '-');
-      set('detailGoals',     profile.goals     || '-');
-      set('detailStyle',     profile.coreExpression || '-');
-      set('detailOccasion',  profile.occasion  || '-');
-      set('detailUndertone', profile.undertone || '-');
-      set('detailRegion',    profile.region || profile.location || '-');
+      mnSetDisplayValue('statHeight', profile.height);
+      mnSetDisplayValue('statBodyType', profile.build || profile.bodyType);
+      mnSetDisplayValue('statSkinTone', profile.skinTone);
+      mnSetDisplayValue('statTemperature', profile.climate);
+      mnSetDisplayValue('statPriceRange', profile.budget);
+      mnSetDisplayValue('detailGoals', profile.goals);
+      mnSetDisplayValue('detailStyle', profile.coreExpression);
+      mnSetDisplayValue('detailOccasion', profile.occasion);
+      mnSetDisplayValue('detailRegion', profile.location || profile.region);
       const colors = profile.favoriteColors;
-      set('detailColors', Array.isArray(colors) ? colors.join(', ') : (colors || '-'));
+      mnSetDisplayValue('detailColors', Array.isArray(colors) ? colors.join(', ') : colors);
+
+      mnSetActionLabel('editStatHeight', profile.height);
+      mnSetActionLabel('editStatBodyType', profile.build || profile.bodyType);
+      mnSetActionLabel('editStatSkinTone', profile.skinTone);
+      mnSetActionLabel('editStatTemperature', profile.climate || profile.temperature);
+      mnSetActionLabel('editStatPriceRange', profile.budget || profile.priceRange);
+      mnSetActionLabel('editDetailGoals', profile.goals);
+      mnSetActionLabel('editDetailColors', colors);
+      mnSetActionLabel('editDetailOccasion', profile.occasion);
+      mnReplaceHeadingIcons();
     }
 
     // -- Handle arrival from widget profile ring click --
@@ -1486,7 +1646,6 @@
       if (updates.occasions   && updates.occasions.length)   p.occasion       = updates.occasions.join(', ');
       if (updates.ai_metrics)    p.ai_metrics = Object.assign(p.ai_metrics || {}, updates.ai_metrics);
       // Physique analysis fields from widget mnSyncPhysiqueAnalysis
-      if (updates.undertone)        p.undertone      = updates.undertone;
       if (updates.skin_mst)         p.skinMST        = updates.skin_mst;
       if (updates.face_shape)       p.faceShape      = updates.face_shape;
       if (updates.eye_color)        p.eyeColor       = updates.eye_color;
@@ -1533,14 +1692,14 @@
     const TILE_DATA = {
   height: { title:"Your Height", sub:"Drag the slider", multi:false, type:"height_slider", options:[] },
   build: { title:"Body Type", sub:"How would you describe your build?", multi:false, type:"tiles", options:[
-    {val:"Slim",       label:"Slim",        sub:"Lean & narrow frame",    svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 50" fill="none" stroke="currentColor" stroke-width="2"><circle cx="20" cy="8" r="5"/><path d="M20 13v12M12 18h16M14 25v15M26 25v15"/></svg>', color:"#60A5FA"},
-    {val:"Athletic",   label:"Athletic",    sub:"Toned & active build",   svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 50" fill="none" stroke="currentColor" stroke-width="2"><circle cx="20" cy="8" r="5"/><path d="M20 13v12M10 18h20M12 25v15M28 25v15M14 35l4 8 4-8 4 8 4-8"/></svg>', color:"#10B981"},
-    {val:"Average",    label:"Average",     sub:"Balanced proportions",   svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 50" fill="none" stroke="currentColor" stroke-width="2"><circle cx="20" cy="8" r="5"/><path d="M20 13v12M12 18h16M14 25v15M26 25v15"/></svg>', color:"#6366F1"},
-    {val:"Muscular",   label:"Muscular",    sub:"Broad & defined",        svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 50" fill="none" stroke="currentColor" stroke-width="2"><circle cx="20" cy="8" r="5"/><path d="M20 13v12M8 16h24M10 25v15M30 25v15"/></svg>', color:"#EF4444"},
-    {val:"Broad",      label:"Broad",       sub:"Wide shoulder frame",    svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 50" fill="none" stroke="currentColor" stroke-width="2"><circle cx="20" cy="8" r="5"/><path d="M20 13v12M6 16h28M10 25v15M30 25v15"/></svg>', color:"#F97316"},
-    {val:"Plus Size",  label:"Plus Size",   sub:"Fuller curvy frame",     svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 50" fill="none" stroke="currentColor" stroke-width="2"><circle cx="20" cy="9" r="5"/><path d="M20 14v10M8 18h24M10 24v16M30 24v16"/></svg>', color:"#EC4899"},
-    {val:"Petite",     label:"Petite",      sub:"Small & compact",        svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 50" fill="none" stroke="currentColor" stroke-width="2"><circle cx="20" cy="8" r="4"/><path d="M20 12v8M14 16h12M15 20v12M25 20v12"/></svg>', color:"#8B5CF6"},
-    {val:"Tall & Lean",label:"Tall & Lean", sub:"Height + slim build",    svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 50" fill="none" stroke="currentColor" stroke-width="2"><circle cx="20" cy="6" r="4"/><path d="M20 10v16M14 20h12M15 26v18M25 26v18"/></svg>', color:"#14B8A6"}
+    {val:"Slim",       label:"Slim",        sub:"Lean & narrow frame",    svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 50" fill="none"><circle cx="20" cy="8" r="4.5" stroke="currentColor" stroke-width="2"/><path d="M20 13v11M14 18h12M16 24v15M24 24v15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>', color:"#60A5FA"},
+    {val:"Athletic",   label:"Athletic",    sub:"Toned & active build",   svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 50" fill="none"><circle cx="20" cy="8" r="4.5" stroke="currentColor" stroke-width="2"/><path d="M20 13v10M11 18l9-2 9 2M14 24l-2 14M26 24l2 14M16 25h8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>', color:"#10B981"},
+    {val:"Average",    label:"Average",     sub:"Balanced proportions",   svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 50" fill="none"><circle cx="20" cy="8" r="4.5" stroke="currentColor" stroke-width="2"/><path d="M20 13v11M12.5 18h15M15 24v14M25 24v14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>', color:"#6366F1"},
+    {val:"Muscular",   label:"Muscular",    sub:"Broad & defined",        svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 50" fill="none"><circle cx="20" cy="8" r="4.5" stroke="currentColor" stroke-width="2"/><path d="M20 13v10M9 18l11-3 11 3M13 24l-1 14M27 24l1 14M16 25h8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>', color:"#EF4444"},
+    {val:"Broad",      label:"Broad",       sub:"Wide shoulder frame",    svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 50" fill="none"><circle cx="20" cy="8" r="4.5" stroke="currentColor" stroke-width="2"/><path d="M20 13v10M8 18h24M12.5 24v14M27.5 24v14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>', color:"#F97316"},
+    {val:"Plus Size",  label:"Plus Size",   sub:"Fuller curvy frame",     svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 50" fill="none"><circle cx="20" cy="8.5" r="4.5" stroke="currentColor" stroke-width="2"/><path d="M20 13v10M10 18c3-2 6-3 10-3s7 1 10 3M13 23c1 8 1 10 2 15M27 23c-1 8-1 10-2 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>', color:"#EC4899"},
+    {val:"Petite",     label:"Petite",      sub:"Small & compact",        svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 50" fill="none"><circle cx="20" cy="9" r="4" stroke="currentColor" stroke-width="2"/><path d="M20 13v8M14 17h12M15.5 21v11M24.5 21v11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>', color:"#8B5CF6"},
+    {val:"Tall & Lean",label:"Tall & Lean", sub:"Height + slim build",    svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 50" fill="none"><circle cx="20" cy="7" r="4" stroke="currentColor" stroke-width="2"/><path d="M20 11v15M14.5 18h11M16 24v16M24 24v16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>', color:"#14B8A6"}
   ]},
   skinTone: { title:"Skin Tone", sub:"Tap your shade — Monk Scale MST 1–10", multi:false, type:"mst", options:[
     {val:"Very Light",  label:"Very Light",  mst:1,  hex:"#f6ede4"},
@@ -1613,14 +1772,7 @@
     {val:"Outdoor / Travel",   label:"Travel",        sub:"Adventure wear",       emoji:"✈️",     color:"#10B981"},
     {val:"Sports / Gym",       label:"Gym",           sub:"Performance wear",     emoji:"🏋️",       color:"#EF4444"}
   ]},
-  region: { title:"Region / City", sub:"Where are you based? Helps with weather & local trends.", multi:false, type:"input", options:[] },
-  undertone: { title:"Skin Undertone", sub:"This determines which colours flatter you most", multi:false, type:"tiles", options:[
-    {val:"Warm (yellow/golden)", label:"Warm",     sub:"Gold, orange & reds work best",     emoji:"🌅", color:"#F59E0B"},
-    {val:"Cool (pink/bluish)",   label:"Cool",     sub:"Blues, purples & silver work best", emoji:"🌊",    color:"#60A5FA"},
-    {val:"Neutral (balanced)",   label:"Neutral",  sub:"Most colours work well for you",    emoji:"⚖️",  color:"#9CA3AF"},
-    {val:"Olive (green-ish)",    label:"Olive",    sub:"Earth tones & greens work best",    emoji:"🌿",    color:"#6B7C32"},
-    {val:"Not sure",             label:"Not Sure", sub:"Let the AI decide",                 emoji:"🤖",   color:"#39A596"}
-  ]}
+  region: { title:"Location Access", sub:"Allow location so we can personalize weather and city-aware recommendations.", multi:false, type:"location_access", options:[] }
 };
 
     // SVG icons replaced with emoji tiles
@@ -1641,41 +1793,42 @@
       document.getElementById('mnEditModalTitle').textContent = cfg.title;
       document.getElementById('mnEditModalSub').textContent   = cfg.sub;
       document.getElementById('mnEditCustomInput').value = _isMulti ? '' : (current || '');
-      document.getElementById('mnEditCustomInput').placeholder = cfg.type === 'input' ? 'Type your city or region...' : 'Or type a custom value...';
-      document.getElementById('mnEditCustomInput').style.display = (cfg.type === 'input' || cfg.options.length === 0) ? '' : 'none';
+      document.getElementById('mnEditCustomInput').placeholder = cfg.type === 'location_access' ? 'Location will be filled automatically after permission...' : 'Or type a custom value...';
+      document.getElementById('mnEditCustomInput').style.display = cfg.options.length === 0 ? '' : 'none';
+
+      if (cfg.type === 'location_access') {
+        document.getElementById('mnEditModalTitle').textContent = 'Location Access';
+        document.getElementById('mnEditModalSub').textContent = 'Allow location access to personalize weather and city-aware recommendations.';
+        grid.innerHTML = '<button type="button" class="mn-connect-btn" style="margin-top:8px;" onclick="mnRequestLocationAccess()">Allow Location Access</button>';
+        document.getElementById('mnEditCustomInput').style.display = 'none';
+        document.getElementById('mnEditModalOverlay').classList.add('active');
+        return;
+      }
 
       const grid = document.getElementById('mnEditChipGrid');
       grid.innerHTML = '';
       _selectedValues = _isMulti ? [...current] : [];
 
       if (cfg.type === 'mst') {
-        // Skin tone: large swatch circles + MST number
         grid.style.gridTemplateColumns = '1fr';
-        const row = document.createElement('div');
-        row.className = 'mn-edit-mst-row';
+        const mstGrid = document.createElement('div');
+        mstGrid.className = 'mn-edit-mst-grid';
         cfg.options.forEach(opt => {
-          const sw = document.createElement('div');
-          sw.className = 'mn-edit-mst-swatch' + (current === opt.val ? ' selected' : '');
-          sw.style.cssText = 'background:' + opt.hex + ';position:relative';
-          sw.title = 'MST ' + opt.mst + ' — ' + opt.label;
-          const num = document.createElement('span');
-          num.style.cssText = 'position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-size:8px;color:rgba(255,255,255,0.45);white-space:nowrap;font-weight:700';
-          num.textContent = opt.mst;
-          sw.appendChild(num);
-          sw.addEventListener('click', () => {
-            row.querySelectorAll('.mn-edit-mst-swatch').forEach(s => s.classList.remove('selected'));
-            sw.classList.add('selected');
-            document.getElementById('mnEditCustomInput').style.display = '';
+          const card = document.createElement('div');
+          card.className = 'mn-edit-mst-card' + (current === opt.val ? ' selected' : '');
+          card.innerHTML = `<div class="mn-edit-mst-dot" style="background:${opt.hex}"></div><div class="mn-edit-mst-name">${opt.label}</div>`;
+          card.addEventListener('click', () => {
+            mstGrid.querySelectorAll('.mn-edit-mst-card').forEach(s => s.classList.remove('selected'));
+            card.classList.add('selected');
             document.getElementById('mnEditCustomInput').value = opt.val;
           });
-          row.appendChild(sw);
+          mstGrid.appendChild(card);
         });
-        grid.appendChild(row);
+        grid.appendChild(mstGrid);
         const swatchLabel = document.createElement('div');
-        swatchLabel.style.cssText = 'font-size:11px;color:rgba(255,255,255,0.4);text-align:center;margin-top:26px;margin-bottom:4px';
-        swatchLabel.textContent = 'Tap your skin tone above';
+        swatchLabel.style.cssText = 'font-size:11px;color:rgba(255,255,255,0.5);text-align:center;margin-top:10px;margin-bottom:4px';
+        swatchLabel.textContent = 'Choose the tone closest to your skin';
         grid.appendChild(swatchLabel);
-        grid.style.gridTemplateColumns = '';
         document.getElementById('mnEditCustomInput').style.display = 'none';
 
       } else if (cfg.type === 'colors') {
@@ -1804,13 +1957,17 @@ function closeEditModal() { document.getElementById('mnEditModalOverlay').classL
       if (_isMulti) {
         if (customVal) { _selectedValues = [...new Set([..._selectedValues, ...customVal.split(',').map(s => s.trim()).filter(Boolean)])]; }
         p[_currentProfileKey] = _selectedValues;
-        const el = document.getElementById(_currentField);
-        if (el) el.textContent = _selectedValues.join(', ') || '-';
+        mnSetDisplayValue(_currentField, _selectedValues);
       } else {
+        if (_currentProfileKey === 'region') {
+          closeEditModal();
+          mnRequestLocationAccess();
+          return;
+        }
         // Get value from: custom input, or selected tile, or selected color tile, or selected mst swatch
         const selTile  = document.querySelector('#mnEditChipGrid .mn-edit-option-tile.selected');
         const selColor = document.querySelector('#mnEditChipGrid .mn-edit-color-tile.selected');
-        const selMST   = document.querySelector('#mnEditChipGrid .mn-edit-mst-swatch.selected');
+        const selMST   = document.querySelector('#mnEditChipGrid .mn-edit-mst-card.selected');
         const selChip  = document.querySelector('#mnEditChipGrid .mn-edit-chip.selected');
         // For tiles, find the val from TILE_DATA by matching label
         let val = customVal;
@@ -1830,9 +1987,9 @@ function closeEditModal() { document.getElementById('mnEditModalOverlay').classL
         if (!val && _currentProfileKey === 'budget' && _selectedValues.length) { val = _selectedValues[0]; }
         if (!val && selChip)  { val = selChip.textContent || ''; }
         p[_currentProfileKey] = val;
-        const el = document.getElementById(_currentField);
-        if (el) el.textContent = val || '-';
+        mnSetDisplayValue(_currentField, val);
       }
+      mnRefreshStatCards(p);
       saveProfile(p);
       closeEditModal();
     });
@@ -1961,7 +2118,7 @@ function closeEditModal() { document.getElementById('mnEditModalOverlay').classL
     }
 
     // ─── Load & Render ────────────────────────────────────────
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', async function() {
       try {
         const profile = getProfile();
         const closet  = getCloset();
@@ -1982,39 +2139,69 @@ function closeEditModal() { document.getElementById('mnEditModalOverlay').classL
         document.getElementById('personalityTone').textContent = profile.tone || profile.coreExpression || 'Style Explorer';
 
         // Quick stats
-        document.getElementById('statHeight').textContent       = profile.height ? profile.height + '' : '-';
-        document.getElementById('statBodyType').textContent     = profile.build || profile.bodyType || '-';
-        document.getElementById('statSkinTone').textContent     = profile.skinTone || '-';
-        document.getElementById('statTemperature').textContent  = profile.climate || profile.temperature || '-';
-        document.getElementById('statPriceRange').textContent   = profile.budget || profile.priceRange || '-';
+        mnSetDisplayValue('statHeight', profile.height ? profile.height + '' : '');
+        mnSetDisplayValue('statBodyType', profile.build || profile.bodyType);
+        mnSetDisplayValue('statSkinTone', profile.skinTone);
+        mnSetDisplayValue('statTemperature', profile.climate || profile.temperature);
+        mnSetDisplayValue('statPriceRange', profile.budget || profile.priceRange);
         document.getElementById('statClosetItems').textContent  = closet.length + ' items';
+        mnRefreshStatCards(profile);
         document.getElementById('statOutfitsSaved').textContent = history.length + ' looks';
 
         // Detail cards
-        document.getElementById('detailGoals').textContent    = profile.goals || profile.fashionGoals || profile.signal || '-';
+        document.getElementById('detailGoals').textContent    = profile.goals || profile.fashionGoals || profile.signal || '';
         const colors = profile.favoriteColors || profile.colors;
-        document.getElementById('detailColors').textContent   = Array.isArray(colors) ? colors.join(', ') : (colors || '-');
-        document.getElementById('detailStyle').textContent    = profile.coreExpression || profile.style || '-';
-        document.getElementById('detailOccasion').textContent = profile.occasion || (Array.isArray(profile.contexts) ? profile.contexts.join(', ') : '-');
-        document.getElementById('detailRegion').textContent   = profile.region || profile.location || profile.city || '-';
-        document.getElementById('detailUndertone').textContent = profile.undertone || '-';
+        document.getElementById('detailColors').textContent   = Array.isArray(colors) ? colors.join(', ') : (colors || '');
+        document.getElementById('detailStyle').textContent    = profile.coreExpression || profile.style || '';
+        document.getElementById('detailOccasion').textContent = profile.occasion || (Array.isArray(profile.contexts) ? profile.contexts.join(', ') : '');
+        document.getElementById('detailRegion').textContent   = profile.location || profile.region || profile.city || '';
+        mnRefreshStatCards(profile);
 
-        // Closet breakdown
+        // Closet breakdown → prefer Digital Closet source, then local closet fallback
         const emptyClosetActions = document.getElementById('mnEmptyClosetActions');
-        if (closet.length > 0) {
-          const sections = {};
-          closet.forEach(i => { const s = i.closet_section || i.category || 'Other'; sections[s] = (sections[s]||0)+1; });
-          document.getElementById('detailClosetBreakdown').textContent = Object.entries(sections).map(([s,n])=>n+' '+s).join(' · ') || '-';
-          if (emptyClosetActions) emptyClosetActions.style.display = 'none';
-        } else {
-          document.getElementById('detailClosetBreakdown').textContent = 'Upload clothing photos to see your closet breakdown';
-          if (emptyClosetActions) emptyClosetActions.style.display = 'flex';
+        try {
+          const userId = (window.Shopify && window.Shopify.customer && window.Shopify.customer.id) || null;
+          const resp   = await fetch(`https://mynarrative-ai.vercel.app/api/profile_manager?action=get_closet&user_id=${userId}`);
+          const data   = await resp.json();
+          const remoteItems = (data.success && Array.isArray(data.items)) ? data.items : [];
+          const closetItems = remoteItems.length ? remoteItems : closet;
+
+          if (closetItems.length) {
+            const counts = closetItems.reduce((acc, it) => {
+              const c = (it.closet_section || it.category || 'Items');
+              acc[c] = (acc[c] || 0) + 1;
+              return acc;
+            }, {});
+            const top = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,4);
+            document.getElementById('detailClosetBreakdown').textContent = top.map(([s,n]) => `${n} ${s}`).join(' · ');
+            if (emptyClosetActions) emptyClosetActions.style.display = 'none';
+          } else {
+            document.getElementById('detailClosetBreakdown').textContent = 'Upload clothing photos to see your closet breakdown';
+            if (emptyClosetActions) emptyClosetActions.style.display = 'flex';
+          }
+        } catch(err) {
+          if (closet.length) {
+            const counts = closet.reduce((acc, it) => {
+              const c = (it.closet_section || it.category || 'Items');
+              acc[c] = (acc[c] || 0) + 1;
+              return acc;
+            }, {});
+            const top = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,4);
+            document.getElementById('detailClosetBreakdown').textContent = top.map(([s,n]) => `${n} ${s}`).join(' · ');
+            if (emptyClosetActions) emptyClosetActions.style.display = 'none';
+          } else {
+            document.getElementById('detailClosetBreakdown').textContent = 'Upload clothing photos to see your closet breakdown';
+            if (emptyClosetActions) emptyClosetActions.style.display = 'flex';
+          }
         }
 
-        // Most recent outfit
+        // Most recent AI outfit → source from AI Stylist history / chat-generated looks
         if (history.length > 0) {
           const last = history[0];
-          document.getElementById('detailLastOutfit').textContent = last.direction || last.context || last.occasion || '-';
+          const lastSummary = [last.direction, last.context, last.occasion].filter(Boolean).join(' · ');
+          document.getElementById('detailLastOutfit').textContent = lastSummary || 'AI outfit ready in Stylist history';
+        } else {
+          document.getElementById('detailLastOutfit').textContent = 'No outfits generated yet — open the AI Stylist to create your first look';
         }
 
         // Wire stat cards to edit modal
@@ -2030,7 +2217,7 @@ function closeEditModal() { document.getElementById('mnEditModalOverlay').classL
         // Wire detail cards to edit modal
         const detailMap = [
           ['detailGoals','goals'],['detailColors','favoriteColors'],['detailStyle','coreExpression'],
-          ['detailOccasion','occasion'],['detailRegion','region'],['detailUndertone','undertone']
+          ['detailOccasion','occasion']
         ];
         detailMap.forEach(([elId, key]) => {
           const el = document.getElementById(elId);
@@ -2087,7 +2274,7 @@ function closeEditModal() { document.getElementById('mnEditModalOverlay').classL
     const PROFILE_FIELDS = [
       'uploadedImage', 'height', 'build', 'skinTone', 'skinMST', 
       'hairStyle', 'gender', 'climate', 'budget', 'goals',
-      'coreExpression', 'occasion', 'favoriteColors', 'undertone', 'region'
+      'coreExpression', 'occasion', 'favoriteColors', 'location'
     ];
 
     // Calculate completion percentage
@@ -2315,7 +2502,6 @@ function closeEditModal() { document.getElementById('mnEditModalOverlay').classL
         if (skinTone.mst_scale) p.skinMST = skinTone.mst_scale;
         if (hairAnalysis.hair_style) p.hairStyle = hairAnalysis.hair_style;
         if (overallAppearance.gender) p.gender = overallAppearance.gender;
-        if (skinTone.undertone) p.undertone = undertoneMap[skinTone.undertone] || skinTone.undertone;
         if (overallAppearance.seasonal_color) p.seasonalColor = overallAppearance.seasonal_color;
         if (overallAppearance.style_archetype) p.styleArchetype = overallAppearance.style_archetype;
         
@@ -3757,49 +3943,49 @@ function closeEditModal() { document.getElementById('mnEditModalOverlay').classL
       <!-- Quick Stats -->
       <div class="quick-stats-grid">
         <div class="stat-card clickable">
-          <button class="mn-card-edit-btn" onclick="event.stopPropagation();openEditModal('height','statHeight')">
+          <button class="mn-card-edit-btn" id="editStatHeight" type="button" onclick="event.stopImmediatePropagation(); openEditModal('height','statHeight')">
             <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M11.5 1.5l3 3L5 14H2v-3L11.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
-            Edit
+            <span class="mn-card-action-label">Select</span>
           </button>
-          <div class="stat-icon">&#x1F4CF;</div>
+          <div class="stat-icon">📏</div>
           <div class="stat-label">Height</div>
-          <div class="stat-value" id="statHeight">-</div>
+          <div class="stat-value is-empty" id="statHeight"></div>
         </div>
         <div class="stat-card clickable">
-          <button class="mn-card-edit-btn" onclick="event.stopPropagation();openEditModal('build','statBodyType')">
+          <button class="mn-card-edit-btn" id="editStatBodyType" type="button" onclick="event.stopImmediatePropagation(); openEditModal('build','statBodyType')">
             <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M11.5 1.5l3 3L5 14H2v-3L11.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
-            Edit
+            <span class="mn-card-action-label">Select</span>
           </button>
-          <div class="stat-icon">&#x1F4AA;</div>
+          <div class="stat-icon">💪</div>
           <div class="stat-label">Body Type</div>
-          <div class="stat-value" id="statBodyType">-</div>
+          <div class="stat-value is-empty" id="statBodyType"></div>
         </div>
         <div class="stat-card clickable">
-          <button class="mn-card-edit-btn" onclick="event.stopPropagation();openEditModal('skinTone','statSkinTone')">
+          <button class="mn-card-edit-btn" id="editStatSkinTone" type="button" onclick="event.stopImmediatePropagation(); openEditModal('skinTone','statSkinTone')">
             <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M11.5 1.5l3 3L5 14H2v-3L11.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
-            Edit
+            <span class="mn-card-action-label">Select</span>
           </button>
-          <div class="stat-icon">&#x1F3A8;</div>
+          <div class="stat-icon">🎨</div>
           <div class="stat-label">Skin Tone</div>
-          <div class="stat-value" id="statSkinTone">-</div>
+          <div class="stat-value is-empty" id="statSkinTone"></div>
         </div>
         <div class="stat-card clickable">
-          <button class="mn-card-edit-btn" onclick="event.stopPropagation();openEditModal('climate','statTemperature')">
+          <button class="mn-card-edit-btn" id="editStatTemperature" type="button" onclick="event.stopImmediatePropagation(); openEditModal('climate','statTemperature')">
             <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M11.5 1.5l3 3L5 14H2v-3L11.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
-            Edit
+            <span class="mn-card-action-label">Select</span>
           </button>
-          <div class="stat-icon">&#x1F321;&#xFE0F;</div>
+          <div class="stat-icon">🌤️</div>
           <div class="stat-label">Climate</div>
-          <div class="stat-value" id="statTemperature">-</div>
+          <div class="stat-value is-empty" id="statTemperature"></div>
         </div>
         <div class="stat-card clickable">
-          <button class="mn-card-edit-btn" onclick="event.stopPropagation();openEditModal('budget','statPriceRange')">
+          <button class="mn-card-edit-btn" id="editStatPriceRange" type="button" onclick="event.stopImmediatePropagation(); openEditModal('budget','statPriceRange')">
             <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M11.5 1.5l3 3L5 14H2v-3L11.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
-            Edit
+            <span class="mn-card-action-label">Select</span>
           </button>
-          <div class="stat-icon">&#x1F4B0;</div>
+          <div class="stat-icon">💸</div>
           <div class="stat-label">Budget Range</div>
-          <div class="stat-value" id="statPriceRange">-</div>
+          <div class="stat-value is-empty" id="statPriceRange"></div>
         </div>
         <div class="stat-card" style="cursor:pointer;" title="Click to view past looks">
           <div class="stat-icon">&#x2728;</div>
@@ -3811,55 +3997,38 @@ function closeEditModal() { document.getElementById('mnEditModalOverlay').classL
 <!-- Detailed Profile Information -->
       <div class="profile-details-grid">
         <div class="detail-card">
-          <button class="mn-card-edit-btn" onclick="openEditModal('goals','detailGoals')">
+          <button class="mn-card-edit-btn" id="editDetailGoals" type="button" onclick="event.stopImmediatePropagation(); openEditModal('goals','detailGoals')">
             <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M11.5 1.5l3 3L5 14H2v-3L11.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
-            Edit
+            <span class="mn-card-action-label">Select</span>
           </button>
-          <div class="detail-label"><span class="detail-icon">&#x1F3AF;</span><span>Fashion Goals</span></div>
-          <div class="detail-value" id="detailGoals">-</div>
+          <div class="detail-label"><span class="detail-icon">🎯</span><span>Fashion Goals</span></div>
+          <div class="detail-value is-empty" id="detailGoals"></div>
         </div>
         <div class="detail-card">
-          <button class="mn-card-edit-btn" onclick="openEditModal('favoriteColors','detailColors')">
+          <button class="mn-card-edit-btn" id="editDetailColors" type="button" onclick="event.stopImmediatePropagation(); openEditModal('favoriteColors','detailColors')">
             <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M11.5 1.5l3 3L5 14H2v-3L11.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
-            Edit
+            <span class="mn-card-action-label">Select</span>
           </button>
-          <div class="detail-label"><span class="detail-icon">&#x1F308;</span><span>Favorite Colors</span></div>
-          <div class="detail-value" id="detailColors">-</div>
+          <div class="detail-label"><span class="detail-icon">🌈</span><span>Favorite Colors</span></div>
+          <div class="detail-value is-empty" id="detailColors"></div>
         </div>
         <div class="detail-card">
-          <button class="mn-card-edit-btn" onclick="openEditModal('occasion','detailOccasion')">
+          <button class="mn-card-edit-btn" id="editDetailOccasion" type="button" onclick="event.stopImmediatePropagation(); openEditModal('occasion','detailOccasion')">
             <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M11.5 1.5l3 3L5 14H2v-3L11.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
-            Edit
+            <span class="mn-card-action-label">Select</span>
           </button>
-          <div class="detail-label"><span class="detail-icon">&#x1F4CD;</span><span>Go-to Occasion</span></div>
-          <div class="detail-value" id="detailOccasion">-</div>
+          <div class="detail-label"><span class="detail-icon">📍</span><span>Go-to Occasion</span></div>
+          <div class="detail-value is-empty" id="detailOccasion"></div>
         </div>
-        <div class="detail-card">
-          <button class="mn-card-edit-btn" onclick="openEditModal('region','detailRegion')">
-            <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M11.5 1.5l3 3L5 14H2v-3L11.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
-            Edit
-          </button>
-          <div class="detail-label"><span class="detail-icon">&#x1F5FA;&#xFE0F;</span><span>Region / City</span></div>
-          <div class="detail-value" id="detailRegion">-</div>
-        </div>
-        <div class="detail-card">
-          <button class="mn-card-edit-btn" onclick="openEditModal('undertone','detailUndertone')">
-            <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><path d="M11.5 1.5l3 3L5 14H2v-3L11.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
-            Edit
-          </button>
-          <div class="detail-label"><span class="detail-icon">&#x1F9E5;</span><span>Skin Undertone</span></div>
-          <div class="detail-value" id="detailUndertone">-</div>
-        </div>
-        
         <!-- Style Preferences Cards -->
         <div class="detail-card" style="grid-column: 1 / -1;">
-          <div class="detail-label"><span class="detail-icon">&#x1F3A8;</span><span>Style Preferences</span></div>
+          <div class="detail-label"><span class="detail-icon">🧭</span><span>Style Preferences</span></div>
           <div class="mn-style-cards-grid" id="mnStyleCardsGrid"></div>
         </div>
         
         <!-- Core Interests -->
         <div class="detail-card" style="grid-column: 1 / -1;">
-          <div class="detail-label"><span class="detail-icon">&#x1F4BB;</span><span>Core Interests</span></div>
+          <div class="detail-label"><span class="detail-icon">💡</span><span>Core Interests</span></div>
           <div class="mn-interests-container" id="mnInterestsContainer"></div>
         </div>
         
@@ -3904,7 +4073,7 @@ function closeEditModal() { document.getElementById('mnEditModalOverlay').classL
         
         <!-- Ghost Mode Toggle -->
         <div class="detail-card" style="grid-column: 1 / -1;">
-          <div class="detail-label"><span class="detail-icon">&#x1F574;</span><span>Digital Closet Mode</span></div>
+          <div class="detail-label"><span class="detail-icon">🧵</span><span>Digital Closet Mode</span></div>
           <div class="mn-ghost-toggle" id="mnGhostToggle" onclick="mnToggleGhostMode()">
             <div class="mn-ghost-label">
               <span>👻</span>
@@ -3918,8 +4087,8 @@ function closeEditModal() { document.getElementById('mnEditModalOverlay').classL
         </div>
         
         <div class="detail-card" style="grid-column: 1 / -1;">
-          <div class="detail-label"><span class="detail-icon">&#x1F454;</span><span>Closet Breakdown</span></div>
-          <div class="detail-value" id="detailClosetBreakdown" style="font-size:12px; color:#aaa;">Upload clothing photos to see your closet breakdown</div>
+          <div class="detail-label"><span class="detail-icon">👕</span><span>Closet Breakdown</span></div>
+          <div class="detail-value" id="detailClosetBreakdown" style="font-size:14px; line-height:1.6; color:#d7dee7;">Upload clothing photos to see your closet breakdown</div>
           <div id="mnEmptyClosetActions" style="display:none; margin-top:12px; flex-direction:column; gap:8px;">
             <button class="digital-closet-btn" style="width:100%; justify-content:center;" onclick="window.location.href='/pages/my-closet'">
               <span>📸</span><span>Upload to My Closet</span>
@@ -3930,8 +4099,8 @@ function closeEditModal() { document.getElementById('mnEditModalOverlay').classL
           </div>
         </div>
         <div class="detail-card" style="grid-column: 1 / -1;">
-          <div class="detail-label"><span class="detail-icon">&#x1F457;</span><span>Most Recent AI Outfit</span></div>
-          <div class="detail-value" id="detailLastOutfit" style="font-size:12px; font-style:italic; color:#aaa;">No outfits generated yet</div>
+          <div class="detail-label"><span class="detail-icon">✨</span><span>Most Recent AI Outfit</span></div>
+          <div class="detail-value" id="detailLastOutfit" style="font-size:14px; line-height:1.6; color:#d7dee7;">No outfits generated yet</div>
         </div>
       </div>
     </div>

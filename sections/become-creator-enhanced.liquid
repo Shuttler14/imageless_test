@@ -1,0 +1,674 @@
+{% comment %}
+=================================================================================
+MY NARRATIVE - BECOME A CREATOR PAGE (ENHANCED UI/UX)
+=================================================================================
+High-conversion landing page with stunning visuals and engaging UX
+=================================================================================
+{% endcomment %}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap');
+
+  :root {
+    --bc-primary: #39A596;
+    --bc-gold: #FFD700;
+    --bc-purple: #A855F7;
+    --bc-pink: #EC4899;
+    --bc-orange: #F97316;
+    --bc-dark: #0a0a0a;
+  }
+
+  .bc-page {
+    font-family: 'Montserrat', sans-serif;
+    background: linear-gradient(180deg, #050505 0%, #0a0a0a 50%, #0f0f0f 100%);
+    min-height: 100vh;
+    color: #fff;
+    padding: 0;
+    overflow-x: hidden;
+  }
+
+  /* Floating Shapes */
+  .bc-shapes {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .bc-shape {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    animation: float 20s ease-in-out infinite;
+  }
+
+  .bc-shape-1 {
+    width: 400px;
+    height: 400px;
+    background: rgba(57, 165, 150, 0.15);
+    top: -100px;
+    right: -100px;
+    animation-delay: 0s;
+  }
+
+  .bc-shape-2 {
+    width: 300px;
+    height: 300px;
+    background: rgba(168, 85, 247, 0.12);
+    bottom: 20%;
+    left: -50px;
+    animation-delay: -7s;
+  }
+
+  .bc-shape-3 {
+    width: 250px;
+    height: 250px;
+    background: rgba(249, 115, 22, 0.1);
+    top: 40%;
+    right: 10%;
+    animation-delay: -14s;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    25% { transform: translate(30px, -30px) scale(1.05); }
+    50% { transform: translate(-20px, 20px) scale(0.95); }
+    75% { transform: translate(20px, 10px) scale(1.02); }
+  }
+
+  /* Hero Section */
+  .bc-hero {
+    position: relative;
+    padding: 100px 20px 80px;
+    text-align: center;
+    z-index: 1;
+  }
+
+  .bc-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, rgba(57, 165, 150, 0.2), rgba(249, 115, 22, 0.2));
+    border: 1px solid rgba(57, 165, 150, 0.3);
+    padding: 10px 24px;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+    animation: fadeInDown 0.8s ease;
+  }
+
+  .bc-hero-badge span {
+    font-size: 18px;
+  }
+
+  .bc-hero-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(40px, 9vw, 80px);
+    font-weight: 800;
+    line-height: 1.05;
+    margin-bottom: 24px;
+    animation: fadeInUp 0.8s ease 0.2s both;
+  }
+
+  .bc-hero-title .highlight {
+    background: linear-gradient(135deg, var(--bc-primary), var(--bc-purple), var(--bc-pink), var(--bc-orange));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    background-size: 300% 300%;
+    animation: gradientShift 5s ease infinite;
+  }
+
+  @keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  .bc-hero-subtitle {
+    font-size: 20px;
+    color: rgba(255, 255, 255, 0.7);
+    max-width: 700px;
+    margin: 0 auto 48px;
+    line-height: 1.7;
+    animation: fadeInUp 0.8s ease 0.4s both;
+  }
+
+  /* Main CTA Button */
+  .bc-main-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+    background: linear-gradient(135deg, var(--bc-primary), #2d8a85);
+    color: #fff;
+    font-size: 20px;
+    font-weight: 700;
+    padding: 20px 48px;
+    border-radius: 60px;
+    text-decoration: none;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 10px 40px rgba(57, 165, 150, 0.35);
+    animation: fadeInUp 0.8s ease 0.6s both;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .bc-main-cta::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .bc-main-cta:hover::before {
+    left: 100%;
+  }
+
+  .bc-main-cta:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 20px 60px rgba(57, 165, 150, 0.45);
+  }
+
+  .bc-main-cta span {
+    font-size: 24px;
+  }
+
+  /* Features Section */
+  .bc-features {
+    padding: 80px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .bc-section-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 60px;
+  }
+
+  .bc-features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 28px;
+  }
+
+  .bc-feature-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    padding: 36px;
+    text-align: center;
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .bc-feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--bc-primary), var(--bc-purple));
+    transform: scaleX(0);
+    transition: transform 0.4s ease;
+  }
+
+  .bc-feature-card:hover {
+    transform: translateY(-8px);
+    border-color: rgba(57, 165, 150, 0.3);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  }
+
+  .bc-feature-card:hover::before {
+    transform: scaleX(1);
+  }
+
+  .bc-feature-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 20px;
+    margin: 0 auto 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    background: linear-gradient(135deg, rgba(57, 165, 150, 0.2), rgba(168, 85, 247, 0.2));
+    border: 1px solid rgba(57, 165, 150, 0.2);
+  }
+
+  .bc-feature-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .bc-feature-desc {
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.6);
+    line-height: 1.6;
+  }
+
+  /* How It Works */
+  .bc-how-it-works {
+    padding: 80px 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .bc-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    position: relative;
+  }
+
+  .bc-steps::before {
+    content: '';
+    position: absolute;
+    left: 40px;
+    top: 60px;
+    bottom: 60px;
+    width: 2px;
+    background: linear-gradient(180deg, var(--bc-primary), var(--bc-purple), var(--bc-pink));
+    opacity: 0.3;
+  }
+
+  .bc-step {
+    display: flex;
+    gap: 28px;
+    align-items: flex-start;
+  }
+
+  .bc-step-number {
+    width: 80px;
+    height: 80px;
+    min-width: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--bc-primary), #2d8a85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    box-shadow: 0 8px 32px rgba(57, 165, 150, 0.3);
+    position: relative;
+    z-index: 1;
+  }
+
+  .bc-step-content {
+    padding-top: 16px;
+  }
+
+  .bc-step-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .bc-step-desc {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.6);
+    line-height: 1.6;
+  }
+
+  /* Earnings Preview */
+  .bc-earnings {
+    padding: 80px 20px;
+    background: linear-gradient(180deg, transparent, rgba(57, 165, 150, 0.05));
+    position: relative;
+    z-index: 1;
+  }
+
+  .bc-earnings-inner {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .bc-earnings-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 48px;
+  }
+
+  .bc-earnings-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+
+  .bc-earnings-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 32px 24px;
+    text-align: center;
+  }
+
+  .bc-earnings-icon {
+    font-size: 40px;
+    margin-bottom: 16px;
+  }
+
+  .bc-earnings-amount {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+
+  .bc-earnings-card:nth-child(1) .bc-earnings-amount {
+    color: #CD7F32;
+  }
+
+  .bc-earnings-card:nth-child(2) .bc-earnings-amount {
+    color: #C0C0C0;
+  }
+
+  .bc-earnings-card:nth-child(3) .bc-earnings-amount {
+    color: var(--bc-gold);
+  }
+
+  .bc-earnings-label {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* Testimonials */
+  .bc-testimonials {
+    padding: 80px 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .bc-testimonial-card {
+    background: linear-gradient(135deg, rgba(57, 165, 150, 0.1), rgba(168, 85, 247, 0.05));
+    border: 1px solid rgba(57, 165, 150, 0.2);
+    border-radius: 24px;
+    padding: 40px;
+    text-align: center;
+  }
+
+  .bc-testimonial-quote {
+    font-size: 48px;
+    margin-bottom: 16px;
+  }
+
+  .bc-testimonial-text {
+    font-size: 20px;
+    line-height: 1.7;
+    margin-bottom: 24px;
+    font-style: italic;
+  }
+
+  .bc-testimonial-author {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  .bc-testimonial-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--bc-primary), var(--bc-purple));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+  }
+
+  .bc-testimonial-info {
+    text-align: left;
+  }
+
+  .bc-testimonial-name {
+    font-weight: 700;
+    font-size: 16px;
+  }
+
+  .bc-testimonial-role {
+    font-size: 14px;
+    color: var(--bc-primary);
+  }
+
+  /* Final CTA */
+  .bc-final-cta {
+    padding: 100px 20px;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .bc-final-cta-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(32px, 6vw, 56px);
+    font-weight: 800;
+    margin-bottom: 20px;
+  }
+
+  .bc-final-cta-subtitle {
+    font-size: 20px;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 40px;
+  }
+
+  /* Animations */
+  @keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .bc-hero { padding: 80px 16px 60px; }
+    .bc-main-cta { font-size: 18px; padding: 18px 36px; }
+    .bc-earnings-grid { grid-template-columns: 1fr; }
+    .bc-steps::before { left: 28px; }
+    .bc-step-number { width: 60px; height: 60px; min-width: 60px; font-size: 22px; }
+  }
+</style>
+
+<div class="bc-page">
+  <!-- Floating Background Shapes -->
+  <div class="bc-shapes">
+    <div class="bc-shape bc-shape-1"></div>
+    <div class="bc-shape bc-shape-2"></div>
+    <div class="bc-shape bc-shape-3"></div>
+  </div>
+
+  <!-- Hero Section -->
+  <section class="bc-hero">
+    <div class="bc-hero-badge">
+      <span>⚡</span> Limited Time Offer
+    </div>
+    <h1 class="bc-hero-title">
+      Turn Your <span class="highlight">Creativity</span><br>Into Income
+    </h1>
+    <p class="bc-hero-subtitle">
+      Join India's fastest-growing fashion creator platform. Design, share, and earn –
+      all in one place. No investment required, just your unique style vision.
+    </p>
+    <a href="/account/register" class="bc-main-cta">
+      <span>🚀</span> Start Creating Today
+    </a>
+  </section>
+
+  <!-- Features Section -->
+  <section class="bc-features">
+    <h2 class="bc-section-title">Why Creators Love Us</h2>
+
+    <div class="bc-features-grid">
+      <div class="bc-feature-card">
+        <div class="bc-feature-icon">💰</div>
+        <h3 class="bc-feature-title">Earn While You Create</h3>
+        <p class="bc-feature-desc">Every time someone purchases your design, you earn. It's that simple. No hidden fees.</p>
+      </div>
+
+      <div class="bc-feature-card">
+        <div class="bc-feature-icon">🎨</div>
+        <h3 class="bc-feature-title">Full Creative Freedom</h3>
+        <p class="bc-feature-desc">Your designs, your rules. We give you the canvas, you create the magic. No restrictions.</p>
+      </div>
+
+      <div class="bc-feature-card">
+        <div class="bc-feature-icon">📈</div>
+        <h3 class="bc-feature-title">Growth Analytics</h3>
+        <p class="bc-feature-desc">Track your sales, understand your audience, and grow your brand with real-time insights.</p>
+      </div>
+
+      <div class="bc-feature-card">
+        <div class="bc-feature-icon">🤝</div>
+        <h3 class="bc-feature-title">Brand Collaborations</h3>
+        <p class="bc-feature-desc">Top creators get featured and matched with big brands for exciting collaborations.</p>
+      </div>
+
+      <div class="bc-feature-card">
+        <div class="bc-feature-icon">🔰</div>
+        <h3 class="bc-feature-title">AI Design Assistant</h3>
+        <p class="bc-feature-desc">Get smart design suggestions and trend predictions from our AI styling engine.</p>
+      </div>
+
+      <div class="bc-feature-card">
+        <div class="bc-feature-icon">🌟</div>
+        <h3 class="bc-feature-title">Featured Placement</h3>
+        <p class="bc-feature-desc">Your best designs get showcased on our homepage and social media channels.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section class="bc-how-it-works">
+    <h2 class="bc-section-title">How It Works</h2>
+
+    <div class="bc-steps">
+      <div class="bc-step">
+        <div class="bc-step-number">1</div>
+        <div class="bc-step-content">
+          <h3 class="bc-step-title">Sign Up Free</h3>
+          <p class="bc-step-desc">Create your creator account in seconds. No subscription, no hidden charges – completely free to join.</p>
+        </div>
+      </div>
+
+      <div class="bc-step">
+        <div class="bc-step-number">2</div>
+        <div class="bc-step-content">
+          <h3 class="bc-step-title">Design & Upload</h3>
+          <p class="bc-step-desc">Use our easy design tools or upload your creations. Add descriptions and set your prices.</p>
+        </div>
+      </div>
+
+      <div class="bc-step">
+        <div class="bc-step-number">3</div>
+        <div class="bc-step-content">
+          <h3 class="bc-step-title">Share & Promote</h3>
+          <p class="bc-step-desc">Share your designs on social media. Use our promo tools to reach more buyers.</p>
+        </div>
+      </div>
+
+      <div class="bc-step">
+        <div class="bc-step-number">4</div>
+        <div class="bc-step-content">
+          <h3 class="bc-step-title">Get Paid</h3>
+          <p class="bc-step-desc">Withdraw your earnings directly to your bank account. Weekly payouts with no minimum.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Earnings Preview -->
+  <section class="bc-earnings">
+    <div class="bc-earnings-inner">
+      <h2 class="bc-earnings-title">What Top Creators Earn</h2>
+
+      <div class="bc-earnings-grid">
+        <div class="bc-earnings-card">
+          <div class="bc-earnings-icon">🥉</div>
+          <div class="bc-earnings-amount">₹25K</div>
+          <div class="bc-earnings-label">Monthly Avg</div>
+        </div>
+
+        <div class="bc-earnings-card">
+          <div class="bc-earnings-icon">🥈</div>
+          <div class="bc-earnings-amount">₹75K</div>
+          <div class="bc-earnings-label">Top 25%</div>
+        </div>
+
+        <div class="bc-earnings-card">
+          <div class="bc-earnings-icon">🥇</div>
+          <div class="bc-earnings-amount">₹2L+</div>
+          <div class="bc-earnings-label">Top Creators</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonial -->
+  <section class="bc-testimonials">
+    <div class="bc-testimonial-card">
+      <div class="bc-testimonial-quote">"</div>
+      <p class="bc-testimonial-text">
+        I never thought I could earn money doing what I love. My ethnic wear designs have reached
+        thousands of customers, and I'm now earning more than my day job!
+      </p>
+      <div class="bc-testimonial-author">
+        <div class="bc-testimonial-avatar">👩‍🎨</div>
+        <div class="bc-testimonial-info">
+          <div class="bc-testimonial-name">Meera Shenoy</div>
+          <div class="bc-testimonial-role">Creator since 2024 • ₹1.5L earned</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Final CTA -->
+  <section class="bc-final-cta">
+    <h2 class="bc-final-cta-title">Ready to Start Your Journey?</h2>
+    <p class="bc-final-cta-subtitle">Join 50,000+ creators already earning on My Narrative</p>
+    <a href="/account/register" class="bc-main-cta">
+      <span>✨</span> Create Your Account Now
+    </a>
+  </section>
+</div>
+
+{% schema %}
+{
+  "name": "Become Creator",
+  "settings": [],
+  "presets": [
+    {
+      "name": "Become Creator"
+    }
+  ]
+}
+{% endschema %}

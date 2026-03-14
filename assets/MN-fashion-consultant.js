@@ -158,8 +158,12 @@ const MNAIStylist = (() => {
   return {
     state, AESTHETICS, OCCASIONS, MOCK_WARDROBE, AFFILIATE_RECS,
     $, $$, INR, setContent, updateProgress, getGeneratedImg,
+    expandWidget
   };
 })();
+
+// Expose MNAIStylist globally for navbar access
+window.MNAIStylist = MNAIStylist;
 
 // ═══════════════════════════════════════════════════════════
 // STEP RENDERERS

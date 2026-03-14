@@ -77,7 +77,7 @@ PLACEMENT OPTIONS:
 
   {% if customer %}
     {% comment %} Logged in - show Creator Dashboard link {% endcomment %}
-    <a href="/account#creator-dashboard" class="mn-creator-utility-link">
+    <a href="/pages/creator-dashboard" class="mn-creator-utility-link">
       <span class="icon">&#128188;</span>
       <span>Creator Studio</span>
     </a>
@@ -85,7 +85,7 @@ PLACEMENT OPTIONS:
     {% comment %} Not logged in - show "Earn with Us" or "Creator Login" {% endcomment %}
 
     {% if section.settings.show_login_button %}
-      <a href="/account/login?return_url=/account#creator-dashboard" class="mn-creator-utility-link">
+      <a href="/account/login?return_url=/pages/creator-dashboard" class="mn-creator-utility-link">
         <span class="icon">&#10024;</span>
         <span>Creator Login</span>
       </a>

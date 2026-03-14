@@ -215,11 +215,11 @@ Add to index.json or homepage template:
 </div>
 
 <script>
-  const API_BASE_URL = '{{ section.settings.api_base_url | default: "https://api.mynarrative.store" }}';
+  const API_BASE_URL = '{{ section.settings.api_base_url | default: "https://mynarrative-ai.vercel.app" }}';
 
   async function loadTrendingCreators() {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/creators/featured?limit=10`);
+      const response = await fetch(`${API_BASE_URL}/api/creator_economy?path=/api/creators/featured`);
       const data = await response.json();
 
       const carousel = document.getElementById('mnTrendingCarousel');
@@ -290,7 +290,7 @@ Add to index.json or homepage template:
       "type": "text",
       "id": "api_base_url",
       "label": "API Base URL",
-      "default": "https://api.mynarrative.store"
+      "default": "https://mynarrative-ai.vercel.app"
     }
   ],
   "presets": [

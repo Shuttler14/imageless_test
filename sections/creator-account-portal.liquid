@@ -14,7 +14,6 @@ OR add to the account.liquid section file directly
 =================================================================================
 {% endcomment %}
 
-{% assign customer = shop.customer %}
 {% assign is_creator = false %}
 
 {% if customer and customer.metafields.creator.registered == true %}
@@ -150,13 +149,65 @@ OR add to the account.liquid section file directly
   .mn-creator-join-banner:hover .mn-creator-join-arrow {
     transform: translateX(4px);
   }
+
+  @media (max-width: 768px) {
+    .mn-creator-account-portal {
+      margin: 0 0 16px;
+      padding: 0 12px;
+    }
+
+    .mn-creator-studio-banner,
+    .mn-creator-join-banner {
+      display: flex !important;
+      width: 100%;
+      padding: 16px;
+      gap: 12px;
+      border-radius: 14px;
+      align-items: center;
+    }
+
+    .mn-creator-studio-icon,
+    .mn-creator-join-icon {
+      width: 48px;
+      height: 48px;
+      min-width: 48px;
+      font-size: 24px;
+      border-radius: 12px;
+    }
+
+    .mn-creator-studio-title,
+    .mn-creator-join-title {
+      font-size: 16px;
+      line-height: 1.2;
+      margin-bottom: 6px;
+    }
+
+    .mn-creator-studio-desc,
+    .mn-creator-join-desc {
+      font-size: 12px;
+      line-height: 1.45;
+      color: rgba(255, 255, 255, 0.72);
+    }
+
+    .mn-creator-studio-arrow,
+    .mn-creator-join-arrow {
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+  }
 </style>
 
 <div class="mn-creator-account-portal">
   {% if customer and is_creator %}
     {% comment %} Existing creator - show dashboard link {% endcomment %}
     <a href="/pages/creator-dashboard" class="mn-creator-studio-banner">
-      <div class="mn-creator-studio-icon">&#128188;</div>
+      <div class="mn-creator-studio-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M8 7V5.5C8 4.67 8.67 4 9.5 4h5C15.33 4 16 4.67 16 5.5V7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M4 9.5C4 8.67 4.67 8 5.5 8h13C19.33 8 20 8.67 20 9.5v7C20 17.33 19.33 18 18.5 18h-13C4.67 18 4 17.33 4 16.5v-7Z" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M10 12h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </div>
       <div class="mn-creator-studio-content">
         <h3 class="mn-creator-studio-title">
           Creator Studio
@@ -174,7 +225,12 @@ OR add to the account.liquid section file directly
   {% elsif customer %}
     {% comment %} Logged in but not a creator - show join CTA {% endcomment %}
     <a href="/pages/become-creator" class="mn-creator-join-banner">
-      <div class="mn-creator-join-icon">&#10024;</div>
+      <div class="mn-creator-join-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 4.5 13.9 9.1 18.5 11 13.9 12.9 12 17.5 10.1 12.9 5.5 11 10.1 9.1 12 4.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M18.5 4.5 19.2 6.3 21 7 19.2 7.7 18.5 9.5 17.8 7.7 16 7 17.8 6.3 18.5 4.5Z" fill="currentColor"/>
+        </svg>
+      </div>
       <div class="mn-creator-studio-content">
         <h3 class="mn-creator-join-title">Design &amp; Earn</h3>
         <p class="mn-creator-join-desc">
