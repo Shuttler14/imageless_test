@@ -1,0 +1,934 @@
+{% comment %}
+=================================================================================
+CREATOR ONBOARDING FLOW SECTION
+=================================================================================
+Converts signed-in users to creators with brand setup and social verification
+=================================================================================
+{% endcomment %}
+
+{% assign api_base_url = section.settings.api_base_url | default: 'https://mynarrative-ai.vercel.app' %}
+{% assign creator_api_base_url = section.settings.creator_api_base_url | default: 'https://creator-economy-api.vercel.app' %}
+{% assign is_logged_in = false %}
+{% if customer.id != blank %}
+  {% assign is_logged_in = true %}
+  {% assign user_id = customer.id %}
+  {% assign user_email = customer.email %}
+  {% assign user_name = customer.name %}
+  {% assign user_first_name = customer.first_name %}
+{% endif %}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap');
+
+  :root {
+    --cof-primary: #39A596;
+    --cof-primary-light: #4ECDC4;
+    --cof-purple: #A855F7;
+    --cof-pink: #EC4899;
+    --cof-gold: #FFD700;
+    --cof-orange: #F97316;
+    --cof-dark: #0a0a0a;
+  }
+
+  .cof-page {
+    font-family: 'Montserrat', sans-serif;
+    background: linear-gradient(180deg, #050505 0%, #0a0a0a 50%, #0f0f0f 100%);
+    min-height: 100vh;
+    color: #fff;
+    padding: 0;
+    overflow-x: hidden;
+  }
+
+  /* Container */
+  .cof-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 60px 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Progress Steps */
+  .cof-progress {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 48px;
+  }
+
+  .cof-progress-step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .cof-progress-dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .cof-progress-step.active .cof-progress-dot {
+    background: var(--cof-primary);
+    border-color: var(--cof-primary);
+  }
+
+  .cof-progress-step.completed .cof-progress-dot {
+    background: #22c55e;
+    border-color: #22c55e;
+  }
+
+  .cof-progress-line {
+    width: 60px;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .cof-progress-step.completed + .cof-progress-line,
+  .cof-progress-step.completed ~ .cof-progress-line {
+    background: var(--cof-primary);
+  }
+
+  .cof-progress-label {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    .cof-progress-label { display: block; }
+  }
+
+  /* Header */
+  .cof-header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .cof-header h1 {
+    font-size: 36px;
+    font-weight: 800;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, var(--cof-primary), var(--cof-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .cof-header p {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  /* Cards */
+  .cof-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    padding: 32px;
+    margin-bottom: 24px;
+  }
+
+  .cof-card-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  /* Brand Name Input */
+  .cof-input-group {
+    margin-bottom: 20px;
+  }
+
+  .cof-input-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .cof-input {
+    width: 100%;
+    padding: 16px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    font-size: 16px;
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+    transition: all 0.3s ease;
+  }
+
+  .cof-input:focus {
+    outline: none;
+    border-color: var(--cof-primary);
+    box-shadow: 0 0 20px rgba(57, 165, 150, 0.2);
+  }
+
+  .cof-input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+  }
+
+  /* Social Links */
+  .cof-social-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  @media (max-width: 600px) {
+    .cof-social-grid { grid-template-columns: 1fr; }
+  }
+
+  .cof-social-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .cof-social-card:hover {
+    border-color: rgba(57, 165, 150, 0.3);
+    transform: translateY(-2px);
+  }
+
+  .cof-social-card.connected {
+    border-color: #22c55e;
+    background: rgba(34, 197, 94, 0.05);
+  }
+
+  .cof-social-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+  }
+
+  .cof-social-icon.instagram { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+  .cof-social-icon.youtube { background: #FF0000; }
+  .cof-social-icon.twitter { background: #000; border: 1px solid #333; }
+  .cof-social-icon.linkedin { background: #0077B5; }
+
+  .cof-social-info { flex: 1; }
+  .cof-social-name { font-weight: 600; font-size: 15px; margin-bottom: 2px; }
+  .cof-social-handle { font-size: 13px; color: rgba(255, 255, 255, 0.5); }
+  .cof-social-status { font-size: 12px; color: #22c55e; }
+
+  .cof-social-input-wrapper {
+    display: none;
+    margin-top: 16px;
+  }
+
+  .cof-social-card.connecting .cof-social-input-wrapper { display: block; }
+
+  .cof-connect-btn {
+    background: var(--cof-primary);
+    color: #fff;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .cof-connect-btn:hover { background: #2d8a85; }
+  .cof-connect-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* CTA Button */
+  .cof-cta-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    padding: 20px 32px;
+    background: linear-gradient(135deg, var(--cof-primary), #2d8a85);
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    box-shadow: 0 10px 40px rgba(57, 165, 150, 0.3);
+  }
+
+  .cof-cta-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 50px rgba(57, 165, 150, 0.4);
+  }
+
+  .cof-cta-btn span { font-size: 24px; }
+
+  /* Products CTA Section - Eye Catching */
+  .cof-products-cta {
+    text-align: center;
+    padding: 60px 24px;
+    background: linear-gradient(135deg, rgba(57, 165, 150, 0.1), rgba(168, 85, 247, 0.05));
+    border-radius: 24px;
+    border: 1px solid rgba(57, 165, 150, 0.2);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cof-products-cta::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(57, 165, 150, 0.1) 0%, transparent 50%);
+    animation: pulse-bg 3s ease-in-out infinite;
+  }
+
+  @keyframes pulse-bg {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+  }
+
+  .cof-products-cta-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .cof-products-icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+    animation: bounce 2s ease-in-out infinite;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .cof-products-title {
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 12px;
+  }
+
+  .cof-products-subtitle {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 32px;
+  }
+
+  .cof-create-design-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 20px 48px;
+    background: linear-gradient(135deg, var(--cof-gold), #FFA500);
+    color: #000;
+    font-size: 20px;
+    font-weight: 700;
+    border-radius: 60px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 40px rgba(255, 215, 0, 0.3);
+    animation: glow 2s ease-in-out infinite;
+  }
+
+  @keyframes glow {
+    0%, 100% { box-shadow: 0 10px 40px rgba(255, 215, 0, 0.3); }
+    50% { box-shadow: 0 10px 60px rgba(255, 215, 0, 0.5); }
+  }
+
+  .cof-create-design-btn:hover {
+    transform: scale(1.05);
+  }
+
+  /* Profile Preview */
+  .cof-profile-preview {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 16px;
+    margin-top: 20px;
+  }
+
+  .cof-profile-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--cof-primary), var(--cof-purple));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+  }
+
+  .cof-profile-info h4 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .cof-profile-info p {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  /* Verification Badge */
+  .cof-verified-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-left: 8px;
+  }
+
+  /* Success State */
+  .cof-success {
+    text-align: center;
+    padding: 40px;
+  }
+
+  .cof-success-icon {
+    font-size: 80px;
+    margin-bottom: 20px;
+    animation: celebrate 0.5s ease;
+  }
+
+  @keyframes celebrate {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+  }
+
+  .cof-success h2 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #22c55e;
+  }
+
+  /* Celebration Animation */
+  .cof-celebration {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+    display: none;
+    overflow: hidden;
+  }
+
+  .cof-celebration.active { display: block; }
+
+  .cof-confetti {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    animation: cof-fall 3s ease-out forwards;
+  }
+
+  @keyframes cof-fall {
+    0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
+
+  .cof-verified-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, rgba(57, 165, 150, 0.95), rgba(168, 85, 247, 0.95));
+    border: 2px solid #FFD700;
+    border-radius: 24px;
+    padding: 40px;
+    text-align: center;
+    z-index: 10000;
+    animation: cof-popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    display: none;
+  }
+
+  .cof-verified-popup.active { display: block; }
+
+  @keyframes cof-popIn {
+    0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  }
+
+  .cof-verified-popup .icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+    animation: cof-bounce 1s ease infinite;
+  }
+
+  @keyframes cof-bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .cof-verified-popup h2 {
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 8px;
+    color: #fff;
+  }
+
+  .cof-verified-popup p {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 16px;
+  }
+
+  .cof-verified-popup .tier {
+    display: inline-block;
+    background: #FFD700;
+    color: #000;
+    padding: 8px 24px;
+    border-radius: 30px;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  /* Hidden */
+  .cof-hidden { display: none !important; }
+</style>
+
+<div class="cof-page">
+  <div class="cof-container">
+    {% unless is_logged_in %}
+      <!-- Not Logged In -->
+      <div class="cof-card" style="text-align: center;">
+        <div style="font-size: 48px; margin-bottom: 20px;">🎨</div>
+        <h2 style="font-size: 28px; font-weight: 700; margin-bottom: 12px;">Join as a Creator</h2>
+        <p style="color: rgba(255,255,255,0.6); margin-bottom: 24px;">Sign in to start your creator journey</p>
+        <a href="/account/login?redirect=/pages/creator-onboarding" class="cof-cta-btn" style="max-width: 300px;">
+          <span>🔐</span> Sign In
+        </a>
+      </div>
+    {% else %}
+      <!-- Onboarding Steps -->
+      <div class="cof-progress" id="cofProgress">
+        <div class="cof-progress-step active" data-step="1">
+          <div class="cof-progress-dot">1</div>
+          <span class="cof-progress-label">Brand</span>
+        </div>
+        <div class="cof-progress-line"></div>
+        <div class="cof-progress-step" data-step="2">
+          <div class="cof-progress-dot">2</div>
+          <span class="cof-progress-label">Connect</span>
+        </div>
+        <div class="cof-progress-line"></div>
+        <div class="cof-progress-step" data-step="3">
+          <div class="cof-progress-dot">3</div>
+          <span class="cof-progress-label">Create</span>
+        </div>
+      </div>
+
+      <!-- Step 1: Brand Setup -->
+      <div class="cof-card" id="cofStep1">
+        <h3 class="cof-card-title">🎨 Set Up Your Brand</h3>
+
+        <div class="cof-input-group">
+          <label>Your Brand Name</label>
+          <input type="text" class="cof-input" id="cofBrandName" placeholder="Enter your brand name" value="{{ user_first_name }}'s Designs">
+        </div>
+
+        <div class="cof-input-group">
+          <label>Username (auto-generated)</label>
+          <input type="text" class="cof-input" id="cofUsername" placeholder="your-brand-name" readonly>
+        </div>
+
+        <div class="cof-profile-preview" id="cofProfilePreview" style="display: none;">
+          <div class="cof-profile-avatar" id="cofProfileAvatar">{{ user_first_name | slice: 0 | upcase }}</div>
+          <div class="cof-profile-info">
+            <h4 id="cofPreviewName">{{ user_first_name }}'s Designs</h4>
+            <p>@<span id="cofPreviewUsername">brand-name</span></p>
+          </div>
+        </div>
+
+        <button class="cof-cta-btn" onclick="cofNextStep(2)">
+          Continue <span>→</span>
+        </button>
+      </div>
+
+      <!-- Step 2: Social Links -->
+      <div class="cof-card cof-hidden" id="cofStep2">
+        <h3 class="cof-card-title">🔗 Connect Your Socials</h3>
+        <div id="cofEliteBanner" class="cof-hidden" style="margin-bottom: 20px; padding: 16px 20px; background: linear-gradient(135deg, rgba(168,85,247,0.15), rgba(255,215,0,0.1)); border: 1px solid rgba(255,215,0,0.35); border-radius: 14px;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+            <span style="font-size: 20px;">👑</span>
+            <span style="font-size: 14px; font-weight: 700; color: var(--cof-gold); text-transform: uppercase; letter-spacing: 1px;">Elite Creator Application</span>
+          </div>
+          <p style="font-size: 13px; color: rgba(255,255,255,0.7); margin: 0;">You need to qualify on <strong style="color:#fff;">at least ONE</strong> platform: Instagram 500K+, YouTube 300K+, X/Twitter 200K+, or LinkedIn 150K+. Connect all accounts for maximum sales reach and marketing potential!</p>
+        </div>
+        <p style="color: rgba(255,255,255,0.6); margin-bottom: 24px;" id="cofSocialSubtext">Connect at least one platform to verify and unlock higher commissions</p>
+
+        <div class="cof-social-grid">
+          <!-- Instagram -->
+          <div class="cof-social-card" id="cofInstagramCard" onclick="cofToggleSocial('instagram')">
+            <div class="cof-social-icon instagram">📸</div>
+            <div class="cof-social-info">
+              <div class="cof-social-name">Instagram</div>
+              <div class="cof-social-handle" id="cofInstagramHandle">Not connected</div>
+            </div>
+            <div class="cof-social-status cof-hidden" id="cofInstagramStatus">✓ Connected</div>
+            <div class="cof-social-input-wrapper">
+              <input type="text" class="cof-input" id="cofInstagramInput" placeholder="@yourhandle">
+              <button class="cof-connect-btn" onclick="event.stopPropagation(); cofConnectSocial('instagram')">Connect</button>
+            </div>
+          </div>
+
+          <!-- YouTube -->
+          <div class="cof-social-card" id="cofYoutubeCard" onclick="cofToggleSocial('youtube')">
+            <div class="cof-social-icon youtube">▶️</div>
+            <div class="cof-social-info">
+              <div class="cof-social-name">YouTube</div>
+              <div class="cof-social-handle" id="cofYoutubeHandle">Not connected</div>
+            </div>
+            <div class="cof-social-status cof-hidden" id="cofYoutubeStatus">✓ Connected</div>
+            <div class="cof-social-input-wrapper">
+              <input type="text" class="cof-input" id="cofYoutubeInput" placeholder="@yourchannel">
+              <button class="cof-connect-btn" onclick="event.stopPropagation(); cofConnectSocial('youtube')">Connect</button>
+            </div>
+          </div>
+
+          <!-- Twitter -->
+          <div class="cof-social-card" id="cofTwitterCard" onclick="cofToggleSocial('twitter')">
+            <div class="cof-social-icon twitter">𝕏</div>
+            <div class="cof-social-info">
+              <div class="cof-social-name">X (Twitter)</div>
+              <div class="cof-social-handle" id="cofTwitterHandle">Not connected</div>
+            </div>
+            <div class="cof-social-status cof-hidden" id="cofTwitterStatus">✓ Connected</div>
+            <div class="cof-social-input-wrapper">
+              <input type="text" class="cof-input" id="cofTwitterInput" placeholder="@yourhandle">
+              <button class="cof-connect-btn" onclick="event.stopPropagation(); cofConnectSocial('twitter')">Connect</button>
+            </div>
+          </div>
+
+          <!-- LinkedIn -->
+          <div class="cof-social-card" id="cofLinkedinCard" onclick="cofToggleSocial('linkedin')">
+            <div class="cof-social-icon linkedin">💼</div>
+            <div class="cof-social-info">
+              <div class="cof-social-name">LinkedIn</div>
+              <div class="cof-social-handle" id="cofLinkedinHandle">Not connected</div>
+            </div>
+            <div class="cof-social-status cof-hidden" id="cofLinkedinStatus">✓ Connected</div>
+            <div class="cof-social-input-wrapper">
+              <input type="text" class="cof-input" id="cofLinkedinInput" placeholder="your-profile">
+              <button class="cof-connect-btn" onclick="event.stopPropagation(); cofConnectSocial('linkedin')">Connect</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top: 24px; display: flex; gap: 12px;">
+          <button class="cof-cta-btn" style="flex: 1;" onclick="cofNextStep(1)">
+            ← Back
+          </button>
+          <button class="cof-cta-btn" style="flex: 1;" onclick="cofCompleteOnboarding()">
+            Complete Setup <span>✓</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 3: Create First Design -->
+      <div class="cof-hidden" id="cofStep3">
+        <!-- Success State -->
+        <div class="cof-success" id="cofSuccess">
+          <div class="cof-success-icon">🎉</div>
+          <h2 id="cofSuccessTitle">You're All Set!</h2>
+          <p style="color: rgba(255,255,255,0.6); margin-bottom: 32px;" id="cofSuccessSubtitle">Your creator account is ready. Now let's bring your first design to life!</p>
+        </div>
+
+        <!-- Products CTA -->
+        <div class="cof-products-cta">
+          <div class="cof-products-cta-content">
+            <div class="cof-products-icon">🎨</div>
+            <h3 class="cof-products-title">Your store is empty — let's change that!</h3>
+            <p class="cof-products-subtitle">Every iconic creator brand started with a single design. Yours is waiting to be made.</p>
+            <a href="/pages/create-my-design" class="cof-create-design-btn" id="cofCreateDesignBtn">
+              <span>✨</span> Create My First Design
+            </a>
+            <p style="margin-top: 16px; font-size: 13px; color: rgba(255,255,255,0.4);">Takes less than 2 minutes &bull; Free to upload &bull; Start earning immediately</p>
+            <a href="/pages/creator-dashboard" style="display: inline-block; margin-top: 16px; font-size: 14px; color: var(--cof-primary); text-decoration: none; border-bottom: 1px solid rgba(57,165,150,0.4); padding-bottom: 2px;">Go to my Dashboard →</a>
+          </div>
+        </div>
+      </div>
+
+    {% endunless %}
+  </div>
+</div>
+
+<!-- Celebration Animation (single instance) -->
+<div class="cof-celebration" id="cofCelebration">
+  <div class="cof-confetti" style="left: 10%; background: #FFD700; animation-delay: 0s;"></div>
+  <div class="cof-confetti" style="left: 20%; background: #39A596; animation-delay: 0.1s;"></div>
+  <div class="cof-confetti" style="left: 30%; background: #A855F7; animation-delay: 0.2s;"></div>
+  <div class="cof-confetti" style="left: 40%; background: #EC4899; animation-delay: 0.3s;"></div>
+  <div class="cof-confetti" style="left: 50%; background: #F97316; animation-delay: 0.4s;"></div>
+  <div class="cof-confetti" style="left: 60%; background: #FFD700; animation-delay: 0.5s;"></div>
+  <div class="cof-confetti" style="left: 70%; background: #39A596; animation-delay: 0.6s;"></div>
+  <div class="cof-confetti" style="left: 80%; background: #A855F7; animation-delay: 0.7s;"></div>
+  <div class="cof-confetti" style="left: 90%; background: #EC4899; animation-delay: 0.8s;"></div>
+</div>
+
+<!-- Verified Popup (single instance) -->
+<div class="cof-verified-popup" id="cofVerifiedPopup">
+  <div class="icon">🎉</div>
+  <h2 id="cofPopupTitle">You're Verified!</h2>
+  <p id="cofPopupMsg">Welcome to the creator family</p>
+  <div class="tier" id="cofPopupTier">Creator</div>
+</div>
+
+<script>
+const COF_API = '{{ creator_api_base_url }}';
+const COF_USER_ID = '{{ user_id }}';
+
+let cofCurrentStep = 1;
+let cofConnectedSocials = {};
+
+// Detect elite mode from URL
+const cofUrlParams = new URLSearchParams(window.location.search);
+const cofIsElite = cofUrlParams.get('type') === 'elite';
+
+// On load: show elite banner if elite mode
+document.addEventListener('DOMContentLoaded', function() {
+  if (cofIsElite) {
+    const banner = document.getElementById('cofEliteBanner');
+    if (banner) banner.classList.remove('cof-hidden');
+    const subtext = document.getElementById('cofSocialSubtext');
+    if (subtext) subtext.textContent = 'Connect your platforms to verify your elite follower count. Any ONE qualifying platform is enough — connect all for maximum reach!';
+    // Update page header if present
+    const header = document.querySelector('.cof-header h1');
+    if (header) header.textContent = 'Apply as Elite Creator';
+    const headerP = document.querySelector('.cof-header p');
+    if (headerP) headerP.textContent = 'Verify your social following and unlock 30–45% commissions';
+    // Update complete button text
+    const completeBtn = document.querySelector('#cofStep2 .cof-cta-btn:last-child');
+    if (completeBtn) completeBtn.innerHTML = 'Verify & Apply as Elite <span>👑</span>';
+  }
+});
+
+// Update username as brand name changes
+document.getElementById('cofBrandName')?.addEventListener('input', function(e) {
+  const brandName = e.target.value;
+  const username = brandName.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+
+  document.getElementById('cofUsername').value = username;
+  document.getElementById('cofPreviewName').textContent = brandName || 'Your Brand';
+  document.getElementById('cofPreviewUsername').textContent = username || 'brand-name';
+
+  if (brandName) {
+    document.getElementById('cofProfilePreview').style.display = 'flex';
+    document.getElementById('cofProfileAvatar').textContent = brandName.charAt(0).toUpperCase();
+  }
+});
+
+function cofNextStep(step) {
+  if (cofCurrentStep === 1 && step === 2) {
+    const brandName = document.getElementById('cofBrandName').value.trim();
+    if (!brandName) {
+      alert('Please enter your brand name to continue');
+      return;
+    }
+  }
+
+  // Update progress indicators
+  document.querySelectorAll('.cof-progress-step').forEach((el, i) => {
+    el.classList.remove('active', 'completed');
+    if (i + 1 < step) el.classList.add('completed');
+    if (i + 1 === step) el.classList.add('active');
+  });
+
+  // Hide all steps
+  ['cofStep1','cofStep2','cofStep3'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.add('cof-hidden');
+  });
+
+  // Show target step
+  const target = document.getElementById('cofStep' + step);
+  if (target) target.classList.remove('cof-hidden');
+
+  cofCurrentStep = step;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function cofToggleSocial(platform) {
+  const key = platform.charAt(0).toUpperCase() + platform.slice(1);
+  const card = document.getElementById('cof' + key + 'Card');
+  if (!card || card.classList.contains('connected')) return;
+  card.classList.toggle('connecting');
+}
+
+async function cofConnectSocial(platform) {
+  const key = platform.charAt(0).toUpperCase() + platform.slice(1);
+  const input = document.getElementById('cof' + key + 'Input');
+  const handle = input ? input.value.trim() : '';
+
+  if (!handle) {
+    alert('Please enter your ' + platform + ' handle');
+    return;
+  }
+
+  const btn = input.nextElementSibling;
+  if (btn) { btn.disabled = true; btn.textContent = 'Verifying...'; }
+
+  try {
+    const resp = await fetch(COF_API + '/api/creator/verification/connect-social', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: COF_USER_ID, platform, handle })
+    });
+    const json = await resp.json();
+
+    if (json.success) {
+      const data = json.data || {};
+      cofConnectedSocials[platform] = { handle, followers: data.followers, verified: data.is_verified, commission_rate: data.commission_rate };
+      cofMarkSocialConnected(platform, handle, data.followers);
+    } else {
+      alert('Could not connect: ' + (json.error || 'Please try again'));
+      if (btn) { btn.disabled = false; btn.textContent = 'Connect'; }
+    }
+  } catch (e) {
+    // Demo/offline mode — mark as connected optimistically
+    cofConnectedSocials[platform] = { handle, verified: true };
+    cofMarkSocialConnected(platform, handle, null);
+  }
+}
+
+function cofMarkSocialConnected(platform, handle, followers) {
+  const key = platform.charAt(0).toUpperCase() + platform.slice(1);
+  const card = document.getElementById('cof' + key + 'Card');
+  const handleEl = document.getElementById('cof' + key + 'Handle');
+  const statusEl = document.getElementById('cof' + key + 'Status');
+  const btn = document.querySelector('#cof' + key + 'Card .cof-connect-btn');
+
+  if (card) { card.classList.remove('connecting'); card.classList.add('connected'); }
+  if (handleEl) handleEl.textContent = '@' + handle + (followers ? ' • ' + formatFollowers(followers) : '');
+  if (statusEl) statusEl.classList.remove('cof-hidden');
+  if (btn) btn.textContent = 'Connected ✓';
+}
+
+async function cofCompleteOnboarding() {
+  const brandName = document.getElementById('cofBrandName')?.value?.trim() || 'My Brand';
+  let tier = cofIsElite ? 'Elite Creator' : 'Creator';
+  let commissionRate = cofIsElite ? 35 : 15;
+
+  try {
+    const resp = await fetch(COF_API + '/api/creator/onboarding/complete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id: COF_USER_ID,
+        brand_name: brandName,
+        type: cofIsElite ? 'elite' : 'standard',
+        social_links: cofConnectedSocials,
+        primary_platform: Object.keys(cofConnectedSocials)[0] || null
+      })
+    });
+    const json = await resp.json();
+    if (json.success && json.data) {
+      tier = json.data.tier || tier;
+      commissionRate = json.data.commission_rate || commissionRate;
+    }
+  } catch (e) {
+    console.log('Onboarding API offline, using defaults');
+  }
+
+  // Advance to completion step
+  cofNextStep(3);
+
+  // Update success messaging based on tier
+  const titleEl = document.getElementById('cofSuccessTitle');
+  const subtitleEl = document.getElementById('cofSuccessSubtitle');
+  if (cofIsElite) {
+    if (titleEl) titleEl.textContent = "You're an Elite Creator! 👑";
+    if (subtitleEl) subtitleEl.textContent = 'Congratulations! Your application is under review. Now upload your first design to get started.';
+  }
+
+  // Fire confetti + popup
+  cofTriggerCelebration(tier, commissionRate);
+}
+
+function cofTriggerCelebration(tier, rate) {
+  const celebration = document.getElementById('cofCelebration');
+  const popup = document.getElementById('cofVerifiedPopup');
+  const tierEl = document.getElementById('cofPopupTier');
+  const titleEl = document.getElementById('cofPopupTitle');
+  const msgEl = document.getElementById('cofPopupMsg');
+
+  if (celebration) celebration.classList.add('active');
+  if (popup) popup.classList.add('active');
+  if (tierEl) tierEl.textContent = tier;
+  if (titleEl) titleEl.textContent = cofIsElite ? "Elite Status Verified! 👑" : "Welcome to the Family! 🎉";
+  if (msgEl) msgEl.textContent = rate ? 'You earn up to ' + rate + '% commission per sale' : 'Your creator journey begins now';
+
+  setTimeout(() => {
+    if (celebration) celebration.classList.remove('active');
+    if (popup) popup.classList.remove('active');
+  }, 3200);
+}
+
+function formatFollowers(num) {
+  if (!num) return '';
+  if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M followers';
+  if (num >= 1000) return (num / 1000).toFixed(0) + 'K followers';
+  return num + ' followers';
+}
+</script>
+
+{% schema %}
+{
+  "name": "Creator Onboarding Flow",
+  "settings": [
+    {
+      "type": "text",
+      "id": "api_base_url",
+      "label": "Main API Base URL",
+      "default": "https://mynarrative-ai.vercel.app"
+    },
+    {
+      "type": "text",
+      "id": "creator_api_base_url",
+      "label": "Creator Economy API Base URL",
+      "default": "https://creator-economy-api.vercel.app"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Creator Onboarding Flow"
+    }
+  ]
+}
+{% endschema %}

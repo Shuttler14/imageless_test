@@ -70,9 +70,31 @@
             {% endif %}
 
             {% if section.settings.collection_for != blank %}
-              {% assign section_product_type = section.settings.collection_for | downcase %}
-              {% assign product_type = product.type | downcase %}
-              {% if product_type == section_product_type %}
+              {% assign section_product_type = section.settings.collection_for | downcase | strip %}
+              {% assign normalized_section_type = section_product_type | replace: '-', ' ' %}
+              {% assign product_type = product.type | downcase | strip %}
+              {% assign normalized_product_type = product_type | replace: '-', ' ' %}
+              {% assign matches_section_type = false %}
+
+              {% if normalized_product_type == normalized_section_type %}
+                {% assign matches_section_type = true %}
+              {% elsif normalized_section_type == 'hoodies' and normalized_product_type contains 'hoodie' %}
+                {% assign matches_section_type = true %}
+              {% elsif normalized_section_type == 'hoodie' and normalized_product_type contains 'hoodie' %}
+                {% assign matches_section_type = true %}
+              {% elsif normalized_section_type == 't shirt' and normalized_product_type contains 't shirt' %}
+                {% assign matches_section_type = true %}
+              {% elsif normalized_section_type == 't shirt' and normalized_product_type contains 'tee' %}
+                {% assign matches_section_type = true %}
+              {% elsif normalized_section_type == 't shirts' and normalized_product_type contains 't shirt' %}
+                {% assign matches_section_type = true %}
+              {% elsif normalized_product_type contains normalized_section_type %}
+                {% assign matches_section_type = true %}
+              {% elsif normalized_section_type contains normalized_product_type and normalized_product_type != blank %}
+                {% assign matches_section_type = true %}
+              {% endif %}
+
+              {% if matches_section_type %}
                 <div class="swiper-slide">
                   {% render 'product-card', product: product, wishlist: true, super_lazy: use_radar, radar_class: radar_class %}
                 </div>

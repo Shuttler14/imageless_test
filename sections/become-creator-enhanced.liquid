@@ -1,674 +1,1453 @@
-{% comment %}
-=================================================================================
-MY NARRATIVE - BECOME A CREATOR PAGE (ENHANCED UI/UX)
-=================================================================================
-High-conversion landing page with stunning visuals and engaging UX
-=================================================================================
-{% endcomment %}
+<div class="bc-page">
+  <!-- Fixed background shapes -->
+  <div class="bc-bg-shape bc-bg-shape-teal"></div>
+  <div class="bc-bg-shape bc-bg-shape-purple"></div>
+
+  <!-- HERO SECTION -->
+  <section class="bc-hero">
+    <div class="bc-badge">&#x1F3A8; Design. Sell. Earn.</div>
+    <h1 class="bc-hero-title">
+      <span class="bc-hero-line1">Turn Creativity</span>
+      <span class="bc-hero-line2">Into Real Income</span>
+    </h1>
+    
+    <div class="bc-stat-strip">
+      <div class="bc-stat-item">
+        <span class="bc-stat-number">50K+</span>
+        <span class="bc-stat-label">Creators</span>
+      </div>
+      <span class="bc-stat-divider">&bull;</span>
+      <div class="bc-stat-item">
+        <span class="bc-stat-number">&#x20B9;2L/mo</span>
+        <span class="bc-stat-label">Top Earners</span>
+      </div>
+      <span class="bc-stat-divider">&bull;</span>
+      <div class="bc-stat-item">
+        <span class="bc-stat-number">Zero</span>
+        <span class="bc-stat-label">Investment</span>
+      </div>
+    </div>
+
+    <button class="bc-btn bc-btn-primary" onclick="openBcModal()">&#x2728; Start Creating Today</button>
+  </section>
+
+  <!-- SOCIAL PROOF MARQUEE -->
+  <section class="bc-social-proof">
+    <div class="bc-marquee-wrapper">
+      <div class="bc-marquee">
+        <div class="bc-avatar" style="background: #39A596;">A</div>
+        <div class="bc-avatar" style="background: #4ECDC4;">M</div>
+        <div class="bc-avatar" style="background: #A855F7;">S</div>
+        <div class="bc-avatar" style="background: #39A596;">R</div>
+        <div class="bc-avatar" style="background: #FFD700;">K</div>
+        <div class="bc-avatar" style="background: #A855F7;">P</div>
+        <div class="bc-avatar" style="background: #FF6B9D;">D</div>
+        <div class="bc-avatar" style="background: #39A596;">N</div>
+        <!-- Duplicates for seamless loop -->
+        <div class="bc-avatar" style="background: #39A596;">A</div>
+        <div class="bc-avatar" style="background: #4ECDC4;">M</div>
+        <div class="bc-avatar" style="background: #A855F7;">S</div>
+        <div class="bc-avatar" style="background: #39A596;">R</div>
+        <div class="bc-avatar" style="background: #FFD700;">K</div>
+        <div class="bc-avatar" style="background: #A855F7;">P</div>
+        <div class="bc-avatar" style="background: #FF6B9D;">D</div>
+        <div class="bc-avatar" style="background: #39A596;">N</div>
+      </div>
+    </div>
+    <div class="bc-social-proof-text">50K+ earning &rarr;</div>
+  </section>
+
+  <!-- EARNINGS STRIP -->
+  <section class="bc-earnings-strip">
+    <div class="bc-earning-card">
+      <div class="bc-earning-amount" style="color: #39A596;">&#x20B9;25K</div>
+      <div class="bc-earning-label">avg/month</div>
+    </div>
+    <div class="bc-earning-card">
+      <div class="bc-earning-amount">&#x20B9;75K</div>
+      <div class="bc-earning-label">top 25%</div>
+    </div>
+    <div class="bc-earning-card">
+      <div class="bc-earning-amount" style="color: #FFD700;">&#x20B9;2L+</div>
+      <div class="bc-earning-label">top creators</div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS FLOWCHART -->
+  <section class="bc-how-it-works">
+    <div class="bc-section-label">HOW IT WORKS</div>
+    <div class="bc-steps-flow">
+      <!-- Step 1: Sign Up -->
+      <div class="bc-step-node bc-animate">
+        <div class="bc-step-circle" style="border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.05);">
+          <span class="bc-step-icon">&#x1F4F1;</span>
+        </div>
+        <div class="bc-step-connector"></div>
+        <div class="bc-step-label">Sign Up</div>
+      </div>
+
+      <!-- Step 2: Design -->
+      <div class="bc-step-node bc-animate">
+        <div class="bc-step-circle" style="border-color: #39A596; background: rgba(57,165,150,0.15); box-shadow: 0 0 16px rgba(57,165,150,0.25);">
+          <span class="bc-step-icon">&#x1F3A8;</span>
+        </div>
+        <div class="bc-step-connector"></div>
+        <div class="bc-step-label">Design</div>
+      </div>
+
+      <!-- Step 3: Share -->
+      <div class="bc-step-node bc-animate">
+        <div class="bc-step-circle" style="border-color: #A855F7; background: rgba(168,85,247,0.15); box-shadow: 0 0 16px rgba(168,85,247,0.2);">
+          <span class="bc-step-icon">&#x1F4E3;</span>
+        </div>
+        <div class="bc-step-connector"></div>
+        <div class="bc-step-label">Share</div>
+      </div>
+
+      <!-- Step 4: Earn -->
+      <div class="bc-step-node bc-step-node--last bc-animate">
+        <div class="bc-step-circle" style="border-color: #FFD700; background: rgba(255,215,0,0.15); box-shadow: 0 0 16px rgba(255,215,0,0.25);">
+          <span class="bc-step-icon">&#x1F4B0;</span>
+        </div>
+        <div class="bc-step-label">Earn</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ELITE CREATOR SECTION -->
+  <section id="bcEliteSection" class="bc-elite-section">
+    <div class="bc-badge" style="border-color: rgba(255,215,0,0.5);">&#x1F451; Elite Creator Program</div>
+    <h2 class="bc-elite-title">For Creators With Influence</h2>
+    <p class="bc-elite-subtitle">Qualify on <strong style="color:#fff;">any ONE</strong> platform below to apply. Your exact commission (30&ndash;45%) is determined post-verification based on your reach and engagement.</p>
+
+    <!-- Platform Grid - each chip is clickable and triggers verification -->
+    <div class="bc-platform-grid">
+
+      <!-- Instagram -->
+      <div class="bc-platform-chip" id="bcChipInstagram" onclick="bcStartVerification('instagram')" role="button" tabindex="0" aria-label="Verify with Instagram">
+        <div class="bc-platform-icon">&#x1F4F8;</div>
+        <div class="bc-platform-name">Instagram</div>
+        <div class="bc-threshold-badge">500K+ followers</div>
+        <div class="bc-platform-commission">30&ndash;45% commission</div>
+        <div class="bc-chip-cta">Tap to Verify &rarr;</div>
+        <div class="bc-chip-status" id="bcStatusInstagram"></div>
+      </div>
+
+      <!-- YouTube -->
+      <div class="bc-platform-chip" id="bcChipYoutube" onclick="bcStartVerification('youtube')" role="button" tabindex="0" aria-label="Verify with YouTube">
+        <div class="bc-platform-icon">&#x1F3AC;</div>
+        <div class="bc-platform-name">YouTube</div>
+        <div class="bc-threshold-badge">300K+ subscribers</div>
+        <div class="bc-platform-commission">30&ndash;45% commission</div>
+        <div class="bc-chip-cta">Tap to Verify &rarr;</div>
+        <div class="bc-chip-status" id="bcStatusYoutube"></div>
+      </div>
+
+      <!-- X / Twitter -->
+      <div class="bc-platform-chip" id="bcChipTwitter" onclick="bcStartVerification('twitter')" role="button" tabindex="0" aria-label="Verify with X / Twitter">
+        <div class="bc-platform-icon">&#x1F426;</div>
+        <div class="bc-platform-name">X / Twitter</div>
+        <div class="bc-threshold-badge">200K+ followers</div>
+        <div class="bc-platform-commission">30&ndash;45% commission</div>
+        <div class="bc-chip-cta">Tap to Verify &rarr;</div>
+        <div class="bc-chip-status" id="bcStatusTwitter"></div>
+      </div>
+
+      <!-- LinkedIn -->
+      <div class="bc-platform-chip" id="bcChipLinkedin" onclick="bcStartVerification('linkedin')" role="button" tabindex="0" aria-label="Verify with LinkedIn">
+        <div class="bc-platform-icon">&#x1F4BC;</div>
+        <div class="bc-platform-name">LinkedIn</div>
+        <div class="bc-threshold-badge">150K+ followers</div>
+        <div class="bc-platform-commission">30&ndash;45% commission</div>
+        <div class="bc-chip-cta">Tap to Verify &rarr;</div>
+        <div class="bc-chip-status" id="bcStatusLinkedin"></div>
+      </div>
+
+    </div>
+
+    <p class="bc-elite-note">&#x2728; Qualify on any ONE &bull; Connect all for maximum sales reach &amp; marketing</p>
+
+    <!-- Verification modal (shown when chip is tapped) -->
+    <div id="bcVerifyModal" class="bc-verify-modal">
+      <div class="bc-verify-card">
+        <button class="bc-modal-close" onclick="bcCloseVerifyModal()">&times;</button>
+        <div id="bcVerifyIcon" class="bc-verify-icon"></div>
+        <h3 id="bcVerifyTitle" class="bc-verify-title">Verify Your Account</h3>
+        <p id="bcVerifySubtitle" class="bc-verify-subtitle">Enter your handle and we'll check your follower count via our secure backend.</p>
+        <div id="bcVerifyForm">
+          <div style="background:rgba(57,165,150,0.07);border:1px solid rgba(57,165,150,0.2);border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:rgba(255,255,255,0.6);line-height:1.6;">
+            &#x1F512; <strong style="color:#4ECDC4;">Secure OAuth connection</strong><br>
+            We connect via official API. We never see or store your password. You can revoke access anytime.
+          </div>
+          <button class="bc-btn bc-btn-primary" style="width:100%;justify-content:center;" onclick="bcSubmitVerification()">
+            &#x1F517; Connect Securely
+          </button>
+        </div>
+        <div id="bcVerifyResult" style="display:none;"></div>
+      </div>
+    </div>
+
+    <!-- Apply Button with Liquid logic -->
+    {% if customer %}
+      <div style="margin-top:16px;">
+        <a href="/pages/creator-onboarding?type=elite" class="bc-btn bc-btn-teal">Verify &amp; Apply as Elite &#x1F451;</a>
+        <p style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:8px;">Or tap any platform above to verify your follower count first</p>
+      </div>
+    {% else %}
+      <div style="margin-top:16px;">
+        <a href="/account/login?return_url=/pages/become-creator%23bcEliteSection" class="bc-btn bc-btn-teal">Create Account to Apply</a>
+        <p class="bc-login-note">You need a My Narrative account to apply as Elite Creator</p>
+      </div>
+    {% endif %}
+
+    <!-- Gold Divider -->
+    <div class="bc-gold-divider">
+      <div class="bc-gold-divider-line"></div>
+      <span class="bc-gold-divider-text">&#x2B50; INVITE ONLY &mdash; 50% COMMISSION</span>
+      <div class="bc-gold-divider-line"></div>
+    </div>
+
+    <!-- Mega Tier Collapsible Card -->
+    <div class="bc-mega-card">
+      <div class="bc-mega-header" onclick="toggleMegaTier()">
+        <div class="bc-mega-header-left">
+          <span class="bc-mega-crown">&#x1F451;</span>
+          <div class="bc-mega-title">Mega Influencer &mdash; Up to 50% Commission</div>
+        </div>
+        <span class="bc-mega-toggle">&#x2193;</span>
+      </div>
+      <div class="bc-mega-body">
+        <p class="bc-mega-description">For creators with 1M+ followers. Our highest-earning partnership.</p>
+        <form class="bc-mega-form" id="bcMegaForm">
+          <input type="text" placeholder="Your full name" required />
+          <input type="email" placeholder="your@email.com" required />
+          <select required>
+            <option value="">Select Platform</option>
+            <option value="instagram">Instagram</option>
+            <option value="youtube">YouTube</option>
+            <option value="x">X (Twitter)</option>
+            <option value="linkedin">LinkedIn</option>
+            <option value="other">Other</option>
+          </select>
+          <input type="text" placeholder="@yourhandle" required />
+          <input type="text" placeholder="e.g. 1,200,000" required />
+          <textarea placeholder="Tell us about your audience and why you want to partner with My Narrative..." rows="3" required></textarea>
+          <button type="submit" class="bc-btn bc-btn-gold" style="width: 100%;">&#x2728; Submit My Interest</button>
+        </form>
+        <div class="bc-mega-success" style="display: none;">
+          &#x1F389; Thank you! Our team will review your profile and reach out within 48 hours.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="bc-final-cta">
+    <p class="bc-final-cta-text">Ready to start earning?</p>
+    <a href="/account/register" class="bc-btn bc-btn-primary">&#x1F680; Create Your Account</a>
+  </section>
+
+  <!-- MODAL -->
+  <div id="bcPathModal" class="bc-modal">
+    <div class="bc-modal-card">
+      <button class="bc-modal-close" onclick="closeBcModal()">&times;</button>
+      <h2 class="bc-modal-title">Choose Your Path</h2>
+      
+      <!-- Creator Path -->
+      <div class="bc-modal-row">
+        <span class="bc-modal-icon">&#x1F3A8;</span>
+        <div class="bc-modal-content">
+          <div class="bc-modal-name">Creator</div>
+          <div class="bc-modal-desc">15% commission per sale</div>
+        </div>
+        <a href="/pages/creator-onboarding" class="bc-btn bc-btn-primary bc-btn-small">Apply &rarr;</a>
+      </div>
+
+      <!-- Elite Creator Path -->
+      <div class="bc-modal-row bc-modal-row-elite">
+        <span class="bc-modal-icon">&#x1F451;</span>
+        <div class="bc-modal-content">
+          <div class="bc-modal-name" style="color: #FFD700;">Elite Creator</div>
+          <div class="bc-modal-desc">30&ndash;50% commission</div>
+        </div>
+        <button class="bc-btn bc-btn-gold bc-btn-small" onclick="closeModalAndScroll()">Apply &rarr;</button>
+      </div>
+      <p class="bc-modal-note">Invite-only 50% tier for mega-influencers</p>
+    </div>
+  </div>
+</div>
 
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800;900&display=swap');
 
   :root {
     --bc-primary: #39A596;
+    --bc-primary-light: #4ECDC4;
     --bc-gold: #FFD700;
     --bc-purple: #A855F7;
-    --bc-pink: #EC4899;
-    --bc-orange: #F97316;
-    --bc-dark: #0a0a0a;
+    --bc-white: #FFFFFF;
+    --bc-text-muted: rgba(255, 255, 255, 0.55);
+    --bc-bg: #080808;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html, body {
+    overflow-x: hidden;
+    max-width: 100%;
   }
 
   .bc-page {
-    font-family: 'Montserrat', sans-serif;
-    background: linear-gradient(180deg, #050505 0%, #0a0a0a 50%, #0f0f0f 100%);
-    min-height: 100vh;
-    color: #fff;
-    padding: 0;
+    background: var(--bc-bg);
+    color: var(--bc-white);
+    font-family: Montserrat, sans-serif;
     overflow-x: hidden;
+    max-width: 100%;
+    position: relative;
+    z-index: 1;
   }
 
-  /* Floating Shapes */
-  .bc-shapes {
+  /* Fixed Background Shapes */
+  .bc-bg-shape {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 0;
-    overflow: hidden;
-  }
-
-  .bc-shape {
-    position: absolute;
     border-radius: 50%;
     filter: blur(80px);
-    animation: float 20s ease-in-out infinite;
+    opacity: 0.06;
+    z-index: 0;
+    pointer-events: none;
   }
 
-  .bc-shape-1 {
-    width: 400px;
-    height: 400px;
-    background: rgba(57, 165, 150, 0.15);
-    top: -100px;
-    right: -100px;
-    animation-delay: 0s;
+  .bc-bg-shape-teal {
+    width: 200px;
+    height: 200px;
+    background: var(--bc-primary-light);
+    top: -20px;
+    right: -20px;
   }
 
-  .bc-shape-2 {
-    width: 300px;
-    height: 300px;
-    background: rgba(168, 85, 247, 0.12);
-    bottom: 20%;
-    left: -50px;
-    animation-delay: -7s;
-  }
-
-  .bc-shape-3 {
-    width: 250px;
-    height: 250px;
-    background: rgba(249, 115, 22, 0.1);
-    top: 40%;
-    right: 10%;
-    animation-delay: -14s;
-  }
-
-  @keyframes float {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    25% { transform: translate(30px, -30px) scale(1.05); }
-    50% { transform: translate(-20px, 20px) scale(0.95); }
-    75% { transform: translate(20px, 10px) scale(1.02); }
+  .bc-bg-shape-purple {
+    width: 200px;
+    height: 200px;
+    background: var(--bc-purple);
+    bottom: -20px;
+    left: -20px;
   }
 
   /* Hero Section */
   .bc-hero {
-    position: relative;
-    padding: 100px 20px 80px;
+    padding: 44px 20px 36px;
     text-align: center;
+    position: relative;
     z-index: 1;
   }
 
-  .bc-hero-badge {
+  .bc-badge {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    background: linear-gradient(135deg, rgba(57, 165, 150, 0.2), rgba(249, 115, 22, 0.2));
-    border: 1px solid rgba(57, 165, 150, 0.3);
-    padding: 10px 24px;
+    gap: 6px;
+    padding: 8px 20px;
     border-radius: 50px;
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    margin-bottom: 32px;
-    animation: fadeInDown 0.8s ease;
-  }
-
-  .bc-hero-badge span {
-    font-size: 18px;
+    font-size: 11px;
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(57, 165, 150, 0.3);
+    margin-bottom: 20px;
   }
 
   .bc-hero-title {
-    font-family: 'Montserrat', sans-serif;
-    font-size: clamp(40px, 9vw, 80px);
-    font-weight: 800;
-    line-height: 1.05;
-    margin-bottom: 24px;
-    animation: fadeInUp 0.8s ease 0.2s both;
+    font-size: clamp(30px, 8vw, 52px);
+    font-weight: 900;
+    line-height: 1.1;
+    margin: 0 0 16px;
   }
 
-  .bc-hero-title .highlight {
-    background: linear-gradient(135deg, var(--bc-primary), var(--bc-purple), var(--bc-pink), var(--bc-orange));
+  .bc-hero-line1 {
+    display: block;
+    color: var(--bc-white);
+  }
+
+  .bc-hero-line2 {
+    display: block;
+    background: linear-gradient(135deg, var(--bc-primary), var(--bc-primary-light));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    background-size: 300% 300%;
-    animation: gradientShift 5s ease infinite;
   }
 
-  @keyframes gradientShift {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-  }
-
-  .bc-hero-subtitle {
-    font-size: 20px;
-    color: rgba(255, 255, 255, 0.7);
-    max-width: 700px;
-    margin: 0 auto 48px;
-    line-height: 1.7;
-    animation: fadeInUp 0.8s ease 0.4s both;
-  }
-
-  /* Main CTA Button */
-  .bc-main-cta {
-    display: inline-flex;
+  /* Stat Strip */
+  .bc-stat-strip {
+    display: flex;
+    justify-content: center;
     align-items: center;
     gap: 16px;
-    background: linear-gradient(135deg, var(--bc-primary), #2d8a85);
-    color: #fff;
-    font-size: 20px;
-    font-weight: 700;
-    padding: 20px 48px;
-    border-radius: 60px;
-    text-decoration: none;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 10px 40px rgba(57, 165, 150, 0.35);
-    animation: fadeInUp 0.8s ease 0.6s both;
-    position: relative;
+    flex-wrap: wrap;
+    margin: 16px 0 28px;
+  }
+
+  .bc-stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .bc-stat-number {
+    display: block;
+    font-weight: 900;
+    font-size: clamp(18px, 4vw, 24px);
+    color: var(--bc-white);
+  }
+
+  .bc-stat-label {
+    display: block;
+    font-size: 12px;
+    color: var(--bc-text-muted);
+    margin-top: 4px;
+  }
+
+  .bc-stat-divider {
+    color: var(--bc-text-muted);
+    font-size: 12px;
+  }
+
+  /* Social Proof Marquee */
+  .bc-social-proof {
+    padding: 12px 20px;
     overflow: hidden;
-  }
-
-  .bc-main-cta::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-    transition: left 0.5s ease;
-  }
-
-  .bc-main-cta:hover::before {
-    left: 100%;
-  }
-
-  .bc-main-cta:hover {
-    transform: translateY(-5px) scale(1.02);
-    box-shadow: 0 20px 60px rgba(57, 165, 150, 0.45);
-  }
-
-  .bc-main-cta span {
-    font-size: 24px;
-  }
-
-  /* Features Section */
-  .bc-features {
-    padding: 80px 20px;
-    max-width: 1200px;
-    margin: 0 auto;
+    display: flex;
+    gap: 12px;
+    align-items: center;
     position: relative;
     z-index: 1;
   }
 
-  .bc-section-title {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 32px;
-    font-weight: 700;
-    text-align: center;
-    margin-bottom: 60px;
-  }
-
-  .bc-features-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 28px;
-  }
-
-  .bc-feature-card {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 24px;
-    padding: 36px;
-    text-align: center;
-    transition: all 0.4s ease;
-    position: relative;
+  .bc-marquee-wrapper {
     overflow: hidden;
+    flex: 1;
+    min-width: 0;
+    height: 36px;
+    display: flex;
+    align-items: center;
   }
 
-  .bc-feature-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--bc-primary), var(--bc-purple));
-    transform: scaleX(0);
-    transition: transform 0.4s ease;
+  .bc-marquee {
+    display: flex;
+    gap: 12px;
+    animation: marquee 18s linear infinite;
   }
 
-  .bc-feature-card:hover {
-    transform: translateY(-8px);
-    border-color: rgba(57, 165, 150, 0.3);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
   }
 
-  .bc-feature-card:hover::before {
-    transform: scaleX(1);
-  }
-
-  .bc-feature-icon {
-    width: 80px;
-    height: 80px;
-    border-radius: 20px;
-    margin: 0 auto 24px;
+  .bc-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 36px;
-    background: linear-gradient(135deg, rgba(57, 165, 150, 0.2), rgba(168, 85, 247, 0.2));
-    border: 1px solid rgba(57, 165, 150, 0.2);
-  }
-
-  .bc-feature-title {
-    font-size: 22px;
     font-weight: 700;
-    margin-bottom: 12px;
+    font-size: 12px;
+    color: var(--bc-white);
+    flex-shrink: 0;
   }
 
-  .bc-feature-desc {
-    font-size: 15px;
-    color: rgba(255, 255, 255, 0.6);
-    line-height: 1.6;
+  .bc-social-proof-text {
+    font-size: 12px;
+    color: var(--bc-text-muted);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* Earnings Strip */
+  .bc-earnings-strip {
+    padding: 20px 20px;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .bc-earning-card {
+    flex: 1;
+    min-width: 0;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 14px 10px;
+    text-align: center;
+  }
+
+  .bc-earning-amount {
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--bc-white);
+    display: block;
+  }
+
+  .bc-earning-label {
+    font-size: 11px;
+    color: var(--bc-text-muted);
+    margin-top: 6px;
   }
 
   /* How It Works */
   .bc-how-it-works {
-    padding: 80px 20px;
-    max-width: 1000px;
-    margin: 0 auto;
+    padding: 28px 20px;
+    text-align: center;
     position: relative;
     z-index: 1;
   }
 
-  .bc-steps {
+  .bc-section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--bc-primary);
+    margin-bottom: 20px;
+    text-transform: uppercase;
+  }
+
+  .bc-steps-flow {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    max-width: 400px;
+    margin: 0 auto;
+    width: 100%;
+    gap: 0;
+  }
+
+  .bc-step-node {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 24px;
-    position: relative;
-  }
-
-  .bc-steps::before {
-    content: '';
-    position: absolute;
-    left: 40px;
-    top: 60px;
-    bottom: 60px;
-    width: 2px;
-    background: linear-gradient(180deg, var(--bc-primary), var(--bc-purple), var(--bc-pink));
-    opacity: 0.3;
-  }
-
-  .bc-step {
-    display: flex;
-    gap: 28px;
-    align-items: flex-start;
-  }
-
-  .bc-step-number {
-    width: 80px;
-    height: 80px;
-    min-width: 80px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--bc-primary), #2d8a85);
-    display: flex;
     align-items: center;
-    justify-content: center;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 28px;
-    font-weight: 800;
-    box-shadow: 0 8px 32px rgba(57, 165, 150, 0.3);
     position: relative;
-    z-index: 1;
   }
 
-  .bc-step-content {
-    padding-top: 16px;
-  }
-
-  .bc-step-title {
-    font-size: 24px;
-    font-weight: 700;
-    margin-bottom: 8px;
-  }
-
-  .bc-step-desc {
-    font-size: 16px;
-    color: rgba(255, 255, 255, 0.6);
-    line-height: 1.6;
-  }
-
-  /* Earnings Preview */
-  .bc-earnings {
-    padding: 80px 20px;
-    background: linear-gradient(180deg, transparent, rgba(57, 165, 150, 0.05));
-    position: relative;
-    z-index: 1;
-  }
-
-  .bc-earnings-inner {
-    max-width: 800px;
-    margin: 0 auto;
-    text-align: center;
-  }
-
-  .bc-earnings-title {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 36px;
-    font-weight: 700;
-    margin-bottom: 48px;
-  }
-
-  .bc-earnings-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
-  }
-
-  .bc-earnings-card {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 20px;
-    padding: 32px 24px;
-    text-align: center;
-  }
-
-  .bc-earnings-icon {
-    font-size: 40px;
-    margin-bottom: 16px;
-  }
-
-  .bc-earnings-amount {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 32px;
-    font-weight: 800;
-    margin-bottom: 8px;
-  }
-
-  .bc-earnings-card:nth-child(1) .bc-earnings-amount {
-    color: #CD7F32;
-  }
-
-  .bc-earnings-card:nth-child(2) .bc-earnings-amount {
-    color: #C0C0C0;
-  }
-
-  .bc-earnings-card:nth-child(3) .bc-earnings-amount {
-    color: var(--bc-gold);
-  }
-
-  .bc-earnings-label {
-    font-size: 14px;
-    color: rgba(255, 255, 255, 0.6);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-
-  /* Testimonials */
-  .bc-testimonials {
-    padding: 80px 20px;
-    max-width: 1000px;
-    margin: 0 auto;
-    position: relative;
-    z-index: 1;
-  }
-
-  .bc-testimonial-card {
-    background: linear-gradient(135deg, rgba(57, 165, 150, 0.1), rgba(168, 85, 247, 0.05));
-    border: 1px solid rgba(57, 165, 150, 0.2);
-    border-radius: 24px;
-    padding: 40px;
-    text-align: center;
-  }
-
-  .bc-testimonial-quote {
-    font-size: 48px;
-    margin-bottom: 16px;
-  }
-
-  .bc-testimonial-text {
-    font-size: 20px;
-    line-height: 1.7;
-    margin-bottom: 24px;
-    font-style: italic;
-  }
-
-  .bc-testimonial-author {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-  }
-
-  .bc-testimonial-avatar {
+  .bc-step-circle {
     width: 56px;
     height: 56px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--bc-primary), var(--bc-purple));
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
+    position: relative;
+    z-index: 1;
+    border: 2px solid;
+    transition: transform 0.3s ease;
+    cursor: pointer;
   }
 
-  .bc-testimonial-info {
-    text-align: left;
+  .bc-step-circle:hover {
+    transform: translateY(-3px);
   }
 
-  .bc-testimonial-name {
+  .bc-step-icon {
+    font-size: 20px;
+  }
+
+  .bc-step-connector {
+    position: absolute;
+    top: 27px;
+    left: 50%;
+    width: 100%;
+    height: 2px;
+    background-image: repeating-linear-gradient(
+      90deg,
+      rgba(57, 165, 150, 0.6) 0,
+      rgba(57, 165, 150, 0.6) 4px,
+      transparent 4px,
+      transparent 9px
+    );
+    z-index: 0;
+  }
+
+  .bc-step-node--last .bc-step-connector {
+    display: none;
+  }
+
+  .bc-step-label {
+    margin-top: 8px;
+    font-size: 10px;
     font-weight: 700;
-    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: rgba(255, 255, 255, 0.8);
   }
 
-  .bc-testimonial-role {
-    font-size: 14px;
+  /* Animation */
+  .bc-animate {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .bc-animate.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Elite Section */
+  .bc-elite-section {
+    padding: 32px 20px;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .bc-elite-title {
+    font-size: clamp(22px, 5vw, 32px);
+    font-weight: 800;
+    margin: 12px 0 8px;
+  }
+
+  .bc-elite-subtitle {
+    font-size: 13px;
+    color: var(--bc-text-muted);
+    margin-bottom: 20px;
+  }
+
+  /* Platform Grid */
+  .bc-platform-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    max-width: 380px;
+    margin: 0 auto 16px;
+  }
+
+  .bc-platform-chip {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 12px 8px;
+    text-align: center;
+  }
+
+  .bc-platform-icon {
+    font-size: 28px;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .bc-platform-name {
+    font-size: 12px;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .bc-threshold-badge {
+    font-size: 10px;
+    background: rgba(57, 165, 150, 0.15);
     color: var(--bc-primary);
+    border-radius: 50px;
+    padding: 2px 8px;
+    display: inline-block;
+    margin-bottom: 4px;
+  }
+
+  .bc-platform-commission {
+    font-size: 11px;
+    color: var(--bc-text-muted);
+  }
+
+  /* Chip interactive states */
+  .bc-platform-chip {
+    cursor: pointer;
+    transition: all 0.25s ease;
+    position: relative;
+  }
+
+  .bc-platform-chip:hover {
+    border-color: var(--bc-primary);
+    background: rgba(57,165,150,0.08);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(57,165,150,0.2);
+  }
+
+  .bc-platform-chip:focus {
+    outline: 2px solid var(--bc-primary);
+    outline-offset: 2px;
+  }
+
+  .bc-chip-cta {
+    font-size: 10px;
+    color: var(--bc-primary);
+    font-weight: 700;
+    margin-top: 6px;
+    letter-spacing: 0.3px;
+  }
+
+  .bc-chip-status {
+    font-size: 10px;
+    margin-top: 4px;
+    min-height: 14px;
+  }
+
+  .bc-platform-chip.bc-chip-verified {
+    border-color: var(--bc-primary);
+    background: rgba(57,165,150,0.1);
+  }
+
+  .bc-platform-chip.bc-chip-verified .bc-chip-cta {
+    color: var(--bc-primary);
+  }
+
+  .bc-platform-chip.bc-chip-failed {
+    border-color: rgba(239,68,68,0.5);
+  }
+
+  .bc-platform-chip.bc-chip-failed .bc-chip-cta {
+    color: #ef4444;
+  }
+
+  /* Verification modal */
+  .bc-verify-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.88);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    backdrop-filter: blur(4px);
+  }
+
+  .bc-verify-modal.open {
+    display: flex;
+  }
+
+  .bc-verify-card {
+    background: #111;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 20px;
+    padding: 28px 20px;
+    width: 100%;
+    max-width: 400px;
+    position: relative;
+    text-align: center;
+  }
+
+  .bc-verify-icon {
+    font-size: 36px;
+    margin-bottom: 12px;
+  }
+
+  .bc-verify-title {
+    font-size: 18px;
+    font-weight: 800;
+    margin: 0 0 8px;
+  }
+
+  .bc-verify-subtitle {
+    font-size: 12px;
+    color: var(--bc-text-muted);
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+
+  .bc-verify-input {
+    width: 100%;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 10px;
+    padding: 12px 14px;
+    color: #fff;
+    font-size: 15px;
+    font-family: Montserrat, sans-serif;
+    box-sizing: border-box;
+    outline: none;
+    text-align: center;
+  }
+
+  .bc-verify-input:focus {
+    border-color: var(--bc-primary);
+    box-shadow: 0 0 0 2px rgba(57,165,150,0.2);
+  }
+
+  .bc-verify-result-success {
+    background: rgba(57,165,150,0.12);
+    border: 1px solid rgba(57,165,150,0.35);
+    border-radius: 12px;
+    padding: 14px;
+    color: var(--bc-primary);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.5;
+  }
+
+  .bc-verify-result-fail {
+    background: rgba(239,68,68,0.1);
+    border: 1px solid rgba(239,68,68,0.3);
+    border-radius: 12px;
+    padding: 14px;
+    color: #ef4444;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .bc-elite-note {
+    font-size: 12px;
+    color: var(--bc-primary);
+    font-style: italic;
+    margin-bottom: 20px;
+  }
+
+  .bc-login-note {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.4);
+    margin-top: 8px;
+  }
+
+  /* Gold Divider */
+  .bc-gold-divider {
+    margin: 24px 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .bc-gold-divider-line {
+    flex: 1;
+    height: 1px;
+    background: rgba(255, 215, 0, 0.3);
+  }
+
+  .bc-gold-divider-text {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--bc-gold);
+    letter-spacing: 1.5px;
+    white-space: nowrap;
+    text-transform: uppercase;
+  }
+
+  /* Mega Tier Card */
+  .bc-mega-card {
+    border: 1px solid rgba(255, 215, 0, 0.4);
+    border-radius: 16px;
+    overflow: hidden;
+    background: rgba(255, 215, 0, 0.03);
+  }
+
+  .bc-mega-header {
+    padding: 14px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255, 215, 0, 0.02);
+  }
+
+  .bc-mega-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .bc-mega-crown {
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .bc-mega-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--bc-gold);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .bc-mega-toggle {
+    font-size: 14px;
+    color: var(--bc-gold);
+    flex-shrink: 0;
+    margin-left: 8px;
+    transition: transform 0.3s ease;
+  }
+
+  .bc-mega-card.expanded .bc-mega-toggle {
+    transform: rotate(180deg);
+  }
+
+  .bc-mega-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+    padding: 0 16px;
+  }
+
+  .bc-mega-card.expanded .bc-mega-body {
+    max-height: 600px;
+    padding: 0 16px 16px;
+  }
+
+  .bc-mega-description {
+    color: var(--bc-text-muted);
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+
+  .bc-mega-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .bc-mega-form input,
+  .bc-mega-form select,
+  .bc-mega-form textarea {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: var(--bc-white);
+    font-size: 14px;
+    font-family: Montserrat, sans-serif;
+    width: 100%;
+    box-sizing: border-box;
+    outline: none;
+  }
+
+  .bc-mega-form input:focus,
+  .bc-mega-form select:focus,
+  .bc-mega-form textarea:focus {
+    border-color: var(--bc-primary);
+    box-shadow: 0 0 0 2px rgba(57, 165, 150, 0.2);
+  }
+
+  .bc-mega-success {
+    padding: 16px;
+    background: rgba(57, 165, 150, 0.1);
+    border-radius: 10px;
+    color: var(--bc-primary);
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
   }
 
   /* Final CTA */
   .bc-final-cta {
-    padding: 100px 20px;
+    padding: 32px 20px;
     text-align: center;
     position: relative;
     z-index: 1;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
   }
 
-  .bc-final-cta-title {
-    font-family: 'Montserrat', sans-serif;
-    font-size: clamp(32px, 6vw, 56px);
-    font-weight: 800;
-    margin-bottom: 20px;
+  .bc-final-cta-text {
+    color: var(--bc-text-muted);
+    font-size: 13px;
+    margin-bottom: 12px;
   }
 
-  .bc-final-cta-subtitle {
+  /* Button Styles */
+  .bc-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 28px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: Montserrat, sans-serif;
+    cursor: pointer;
+    border: none;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .bc-btn-primary {
+    background: linear-gradient(135deg, var(--bc-primary), var(--bc-primary-light));
+    color: #000;
+    box-shadow: 0 0 20px rgba(57, 165, 150, 0.35);
+  }
+
+  .bc-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 28px rgba(57, 165, 150, 0.45);
+  }
+
+  .bc-btn-gold {
+    background: linear-gradient(135deg, var(--bc-gold), #F97316);
+    color: #000;
+  }
+
+  .bc-btn-gold:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 24px rgba(255, 215, 0, 0.3);
+  }
+
+  .bc-btn-teal {
+    background: rgba(57, 165, 150, 0.15);
+    color: var(--bc-primary);
+    border: 1px solid rgba(57, 165, 150, 0.4);
+  }
+
+  .bc-btn-teal:hover {
+    transform: translateY(-2px);
+    border-color: var(--bc-primary);
+    box-shadow: 0 0 16px rgba(57, 165, 150, 0.25);
+  }
+
+  .bc-btn-small {
+    padding: 8px 16px;
+    font-size: 12px;
+  }
+
+  /* Modal */
+  .bc-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    backdrop-filter: blur(2px);
+  }
+
+  .bc-modal.open {
+    display: flex;
+  }
+
+  .bc-modal-card {
+    background: #111;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 28px 20px;
+    width: 100%;
+    max-width: 420px;
+    position: relative;
+  }
+
+  .bc-modal-close {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
     font-size: 20px;
-    color: rgba(255, 255, 255, 0.6);
-    margin-bottom: 40px;
+    cursor: pointer;
+    padding: 4px 8px;
+    transition: color 0.2s;
   }
 
-  /* Animations */
-  @keyframes fadeInDown {
-    from { opacity: 0; transform: translateY(-30px); }
-    to { opacity: 1; transform: translateY(0); }
+  .bc-modal-close:hover {
+    color: var(--bc-white);
   }
 
-  @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
+  .bc-modal-title {
+    font-size: 22px;
+    font-weight: 800;
+    margin: 0 0 20px;
   }
 
-  /* Responsive */
-  @media (max-width: 768px) {
-    .bc-hero { padding: 80px 16px 60px; }
-    .bc-main-cta { font-size: 18px; padding: 18px 36px; }
-    .bc-earnings-grid { grid-template-columns: 1fr; }
-    .bc-steps::before { left: 28px; }
-    .bc-step-number { width: 60px; height: 60px; min-width: 60px; font-size: 22px; }
+  .bc-modal-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: 12px;
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .bc-modal-row-elite {
+    border-color: rgba(255, 215, 0, 0.3);
+  }
+
+  .bc-modal-icon {
+    font-size: 28px;
+    flex-shrink: 0;
+  }
+
+  .bc-modal-content {
+    flex: 1;
+    text-align: left;
+    min-width: 0;
+  }
+
+  .bc-modal-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--bc-white);
+  }
+
+  .bc-modal-desc {
+    font-size: 12px;
+    color: var(--bc-text-muted);
+    margin-top: 2px;
+  }
+
+  .bc-modal-note {
+    font-size: 11px;
+    color: var(--bc-text-muted);
+    text-align: center;
+    margin-top: 4px;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 640px) {
+    .bc-hero {
+      padding: 36px 16px 28px;
+    }
+
+    .bc-step-circle {
+      width: 44px;
+      height: 44px;
+    }
+
+    .bc-step-icon {
+      font-size: 18px;
+    }
+
+    .bc-step-connector {
+      top: 22px;
+    }
+
+    .bc-step-label {
+      font-size: 9px;
+    }
+
+    .bc-steps-flow {
+      max-width: 100%;
+    }
+
+    .bc-stat-number {
+      font-size: 18px;
+    }
+
+    .bc-mega-form input,
+    .bc-mega-form select,
+    .bc-mega-form textarea {
+      font-size: 16px;
+    }
+
+    .bc-platform-name {
+      font-size: 11px;
+    }
+
+    .bc-gold-divider-text {
+      font-size: 9px;
+      letter-spacing: 0.5px;
+    }
+
+    .bc-modal-card {
+      max-width: calc(100vw - 32px);
+      padding: 20px 16px;
+    }
   }
 </style>
 
-<div class="bc-page">
-  <!-- Floating Background Shapes -->
-  <div class="bc-shapes">
-    <div class="bc-shape bc-shape-1"></div>
-    <div class="bc-shape bc-shape-2"></div>
-    <div class="bc-shape bc-shape-3"></div>
-  </div>
+<script>
+  // Modal Functions
+  // -- Backend API base --
+  const BC_API = 'https://mynarrative-ai.vercel.app';
 
-  <!-- Hero Section -->
-  <section class="bc-hero">
-    <div class="bc-hero-badge">
-      <span>⚡</span> Limited Time Offer
-    </div>
-    <h1 class="bc-hero-title">
-      Turn Your <span class="highlight">Creativity</span><br>Into Income
-    </h1>
-    <p class="bc-hero-subtitle">
-      Join India's fastest-growing fashion creator platform. Design, share, and earn –
-      all in one place. No investment required, just your unique style vision.
-    </p>
-    <a href="/account/register" class="bc-main-cta">
-      <span>🚀</span> Start Creating Today
-    </a>
-  </section>
+  // -- Platform meta --
+  const BC_PLATFORMS = {
+    instagram: { icon: '&#x1F4F8;', name: 'Instagram',  threshold: 500000, label: '500K+ followers' },
+    youtube:   { icon: '&#x1F3AC;', name: 'YouTube',    threshold: 300000, label: '300K+ subscribers' },
+    twitter:   { icon: '&#x1F426;', name: 'X / Twitter', threshold: 200000, label: '200K+ followers' },
+    linkedin:  { icon: '&#x1F4BC;', name: 'LinkedIn',   threshold: 150000, label: '150K+ followers' }
+  };
 
-  <!-- Features Section -->
-  <section class="bc-features">
-    <h2 class="bc-section-title">Why Creators Love Us</h2>
+  let bcActivePlatform = null;
 
-    <div class="bc-features-grid">
-      <div class="bc-feature-card">
-        <div class="bc-feature-icon">💰</div>
-        <h3 class="bc-feature-title">Earn While You Create</h3>
-        <p class="bc-feature-desc">Every time someone purchases your design, you earn. It's that simple. No hidden fees.</p>
-      </div>
+  // -- Path Modal --
+  function openBcModal() {
+    document.getElementById('bcPathModal').classList.add('open');
+  }
 
-      <div class="bc-feature-card">
-        <div class="bc-feature-icon">🎨</div>
-        <h3 class="bc-feature-title">Full Creative Freedom</h3>
-        <p class="bc-feature-desc">Your designs, your rules. We give you the canvas, you create the magic. No restrictions.</p>
-      </div>
+  function closeBcModal() {
+    document.getElementById('bcPathModal').classList.remove('open');
+  }
 
-      <div class="bc-feature-card">
-        <div class="bc-feature-icon">📈</div>
-        <h3 class="bc-feature-title">Growth Analytics</h3>
-        <p class="bc-feature-desc">Track your sales, understand your audience, and grow your brand with real-time insights.</p>
-      </div>
+  function closeModalAndScroll() {
+    closeBcModal();
+    setTimeout(() => {
+      document.getElementById('bcEliteSection').scrollIntoView({ behavior: 'smooth' });
+    }, 200);
+  }
 
-      <div class="bc-feature-card">
-        <div class="bc-feature-icon">🤝</div>
-        <h3 class="bc-feature-title">Brand Collaborations</h3>
-        <p class="bc-feature-desc">Top creators get featured and matched with big brands for exciting collaborations.</p>
-      </div>
+  // -- Social Verification via Nango OAuth --
+  // Nango connect session - handled entirely by backend using NANGO_SECRET_KEY
 
-      <div class="bc-feature-card">
-        <div class="bc-feature-icon">🔰</div>
-        <h3 class="bc-feature-title">AI Design Assistant</h3>
-        <p class="bc-feature-desc">Get smart design suggestions and trend predictions from our AI styling engine.</p>
-      </div>
+  // Creator ID: use Shopify customer id if logged in, else a session fingerprint
+  const BC_CREATOR_ID = '{% if customer %}{{ customer.id }}{% else %}guest-' + Date.now() + '{% endif %}';
 
-      <div class="bc-feature-card">
-        <div class="bc-feature-icon">🌟</div>
-        <h3 class="bc-feature-title">Featured Placement</h3>
-        <p class="bc-feature-desc">Your best designs get showcased on our homepage and social media channels.</p>
-      </div>
-    </div>
-  </section>
+  // -- Social Verification --
+  function bcStartVerification(platform) {
+    bcActivePlatform = platform;
+    const meta = BC_PLATFORMS[platform];
+    if (!meta) return;
 
-  <!-- How It Works -->
-  <section class="bc-how-it-works">
-    <h2 class="bc-section-title">How It Works</h2>
+    // Populate the verify modal
+    document.getElementById('bcVerifyIcon').innerHTML = meta.icon;
+    document.getElementById('bcVerifyTitle').textContent = 'Connect ' + meta.name;
+    document.getElementById('bcVerifySubtitle').textContent =
+      'Click below to securely connect your ' + meta.name + ' account. We\'ll verify your follower count (' + meta.label + ' required) via OAuth - we never store your password.';
+    document.getElementById('bcVerifyForm').style.display = 'block';
+    document.getElementById('bcVerifyResult').style.display = 'none';
+    document.getElementById('bcVerifyResult').innerHTML = '';
 
-    <div class="bc-steps">
-      <div class="bc-step">
-        <div class="bc-step-number">1</div>
-        <div class="bc-step-content">
-          <h3 class="bc-step-title">Sign Up Free</h3>
-          <p class="bc-step-desc">Create your creator account in seconds. No subscription, no hidden charges – completely free to join.</p>
-        </div>
-      </div>
+    // Update button text
+    const btn = document.querySelector('#bcVerifyModal .bc-btn-primary');
+    if (btn) btn.innerHTML = '&#x1F517; Connect ' + meta.name + ' Securely';
 
-      <div class="bc-step">
-        <div class="bc-step-number">2</div>
-        <div class="bc-step-content">
-          <h3 class="bc-step-title">Design & Upload</h3>
-          <p class="bc-step-desc">Use our easy design tools or upload your creations. Add descriptions and set your prices.</p>
-        </div>
-      </div>
+    document.getElementById('bcVerifyModal').classList.add('open');
+  }
 
-      <div class="bc-step">
-        <div class="bc-step-number">3</div>
-        <div class="bc-step-content">
-          <h3 class="bc-step-title">Share & Promote</h3>
-          <p class="bc-step-desc">Share your designs on social media. Use our promo tools to reach more buyers.</p>
-        </div>
-      </div>
+  function bcCloseVerifyModal() {
+    document.getElementById('bcVerifyModal').classList.remove('open');
+    bcActivePlatform = null;
+  }
 
-      <div class="bc-step">
-        <div class="bc-step-number">4</div>
-        <div class="bc-step-content">
-          <h3 class="bc-step-title">Get Paid</h3>
-          <p class="bc-step-desc">Withdraw your earnings directly to your bank account. Weekly payouts with no minimum.</p>
-        </div>
-      </div>
-    </div>
-  </section>
+  async function bcSubmitVerification() {
+    const platform = bcActivePlatform;
+    const meta = BC_PLATFORMS[platform];
+    const btn = document.querySelector('#bcVerifyModal .bc-btn-primary');
+    const resultEl = document.getElementById('bcVerifyResult');
+    const formEl = document.getElementById('bcVerifyForm');
 
-  <!-- Earnings Preview -->
-  <section class="bc-earnings">
-    <div class="bc-earnings-inner">
-      <h2 class="bc-earnings-title">What Top Creators Earn</h2>
+    btn.disabled = true;
+    btn.innerHTML = '&#x23F3; Connecting...';
 
-      <div class="bc-earnings-grid">
-        <div class="bc-earnings-card">
-          <div class="bc-earnings-icon">🥉</div>
-          <div class="bc-earnings-amount">₹25K</div>
-          <div class="bc-earnings-label">Monthly Avg</div>
-        </div>
+    try {
+      // Step 1: Get Nango connect session token from our backend
+      const sessionRes = await fetch(
+        BC_API + '/api/social/connect?platform=' + platform + '&creator_id=' + encodeURIComponent(BC_CREATOR_ID)
+      );
+      const sessionJson = await sessionRes.json();
 
-        <div class="bc-earnings-card">
-          <div class="bc-earnings-icon">🥈</div>
-          <div class="bc-earnings-amount">₹75K</div>
-          <div class="bc-earnings-label">Top 25%</div>
-        </div>
+      if (!sessionJson.success) throw new Error(sessionJson.error || 'Could not initiate connection');
 
-        <div class="bc-earnings-card">
-          <div class="bc-earnings-icon">🥇</div>
-          <div class="bc-earnings-amount">₹2L+</div>
-          <div class="bc-earnings-label">Top Creators</div>
-        </div>
-      </div>
-    </div>
-  </section>
+      const connectURL = sessionJson.connectURL;
 
-  <!-- Testimonial -->
-  <section class="bc-testimonials">
-    <div class="bc-testimonial-card">
-      <div class="bc-testimonial-quote">"</div>
-      <p class="bc-testimonial-text">
-        I never thought I could earn money doing what I love. My ethnic wear designs have reached
-        thousands of customers, and I'm now earning more than my day job!
-      </p>
-      <div class="bc-testimonial-author">
-        <div class="bc-testimonial-avatar">👩‍🎨</div>
-        <div class="bc-testimonial-info">
-          <div class="bc-testimonial-name">Meera Shenoy</div>
-          <div class="bc-testimonial-role">Creator since 2024 • ₹1.5L earned</div>
-        </div>
-      </div>
-    </div>
-  </section>
+      if (sessionJson.mock) {
+        // Dev/demo mode - Nango keys not configured yet, show setup message
+        formEl.style.display = 'none';
+        resultEl.style.display = 'block';
+        resultEl.innerHTML = '<div class="bc-verify-result-fail" style="border-color:rgba(255,215,0,0.4);background:rgba(255,215,0,0.04);color:rgba(255,255,255,0.8);">' +
+          '&#x26A0;&#xFE0F; <strong style="color:#FFD700;">Setup Required</strong><br>' +
+          '<span style="font-size:12px;line-height:1.6;">OAuth verification requires Nango API key.<br>' +
+          'Please configure <code style="color:#4ECDC4;">NANGO_SECRET_KEY</code> in your Vercel environment variables.</span>' +
+          '</div>' +
+          '<a href="/pages/creator-onboarding?type=elite&platform=' + platform + '" class="bc-btn bc-btn-teal" style="width:100%;justify-content:center;margin-top:10px;display:flex;">' +
+          'Apply Manually &rarr;</a>';
+        btn.disabled = false;
+        btn.innerHTML = '&#x1F517; Connect ' + meta.name + ' Securely';
+        return;
+      }
 
-  <!-- Final CTA -->
-  <section class="bc-final-cta">
-    <h2 class="bc-final-cta-title">Ready to Start Your Journey?</h2>
-    <p class="bc-final-cta-subtitle">Join 50,000+ creators already earning on My Narrative</p>
-    <a href="/account/register" class="bc-main-cta">
-      <span>✨</span> Create Your Account Now
-    </a>
-  </section>
-</div>
+      // Step 2: Open OAuth popup directly (no Nango SDK needed - uses NANGO_SECRET_KEY on backend)
+      window.open(connectURL, 'nango-connect-' + platform, 'width=600,height=700,scrollbars=yes');
+
+      // Step 3: Nango webhook fires to /api/social/verify automatically.
+      // Poll /api/social/status to get the result.
+      btn.innerHTML = '&#x23F3; Verifying your account...';
+      const result = await bcPollVerificationStatus(platform);
+      bcHandleVerificationResult(platform, result);
+
+    } catch (err) {
+      console.error('Verification error:', err);
+      // Fallback: manual apply
+      formEl.style.display = 'none';
+      resultEl.style.display = 'block';
+      resultEl.innerHTML = '<div class="bc-verify-result-fail" style="border-color:rgba(255,215,0,0.3);background:rgba(255,215,0,0.05);color:rgba(255,255,255,0.7);">' +
+        '&#x26A0; Could not complete OAuth flow. ' + (err.message || '') + '<br>' +
+        '<span style="font-size:11px;">You can still apply \u2014 our team will manually verify within 24 hours.</span>' +
+        '</div>' +
+        '<a href="/pages/creator-onboarding?type=elite&platform=' + platform + '" class="bc-btn bc-btn-teal" style="width:100%;justify-content:center;margin-top:10px;display:flex;">' +
+        'Apply Manually &rarr;</a>';
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = '&#x1F517; Connect ' + (BC_PLATFORMS[bcActivePlatform || platform]?.name || '') + ' Securely';
+  }
+
+  async function bcPollVerificationStatus(platform) {
+    // Poll /api/social/status up to 12 times (every 2.5s = 30s max)
+    for (let i = 0; i < 12; i++) {
+      await new Promise(r => setTimeout(r, 2500));
+      try {
+        const res = await fetch(BC_API + '/api/social/status?creator_id=' + encodeURIComponent(BC_CREATOR_ID));
+        const json = await res.json();
+        if (json.success) {
+          const platformData = (json.platforms || []).find(p => p.platform === platform);
+          if (platformData && platformData.last_synced) return platformData;
+        }
+      } catch (e) { /* retry */ }
+    }
+    return null; // Timed out
+  }
+
+  function bcHandleVerificationResult(platform, platformData) {
+    const meta = BC_PLATFORMS[platform];
+    const formEl = document.getElementById('bcVerifyForm');
+    const resultEl = document.getElementById('bcVerifyResult');
+    formEl.style.display = 'none';
+    resultEl.style.display = 'block';
+
+    if (!platformData) {
+      // Timed out - webhook may still be processing
+      resultEl.innerHTML = '<div class="bc-verify-result-success" style="border-color:rgba(255,215,0,0.4);background:rgba(255,215,0,0.05);color:rgba(255,255,255,0.85);">' +
+        '&#x2705; Connected! We\'re verifying your account in the background.<br>' +
+        '<span style="font-size:12px;color:rgba(255,255,255,0.6);">This usually takes under a minute. You\'ll get an email once verified.</span>' +
+        '</div>' +
+        '<a href="/pages/creator-onboarding?type=elite&platform=' + platform + '" class="bc-btn bc-btn-primary" style="width:100%;justify-content:center;margin-top:12px;display:flex;">' +
+        'Continue Application &rarr;</a>';
+      bcMarkChip(platform, 'pending');
+      return;
+    }
+
+    const qualifies = platformData.qualifies_elite;
+    const followers = platformData.follower_count || 0;
+    const commissionRange = platformData.commission_range || '30-45%';
+    const commissionNote = platformData.commission_note || 'Final rate determined post-review';
+
+    if (qualifies) {
+      bcMarkChip(platform, 'verified', platformData.username);
+      resultEl.innerHTML = '<div class="bc-verify-result-success">' +
+        '&#x2728; Verified! You qualify for the Elite Creator program.<br>' +
+        '<strong style="font-size:14px;color:#4ECDC4;">' + commissionRange + ' commission</strong><br>' +
+        '<span style="font-size:12px;font-weight:400;color:rgba(255,255,255,0.65);">' + commissionNote + '</span>' +
+        '</div>' +
+        '<a href="/pages/creator-onboarding?type=elite&platform=' + platform + '" class="bc-btn bc-btn-primary" style="width:100%;justify-content:center;margin-top:12px;display:flex;">' +
+        'Apply as Elite Creator &#x1F451;</a>';
+    } else {
+      bcMarkChip(platform, 'failed');
+      const needed = meta.threshold >= 1000000
+        ? (meta.threshold / 1000000).toFixed(1) + 'M'
+        : (meta.threshold / 1000) + 'K';
+      const have = followers >= 1000 ? Math.round(followers / 1000) + 'K' : followers;
+      resultEl.innerHTML = '<div class="bc-verify-result-fail">' +
+        'Your ' + meta.name + ' has ' + have + ' followers. You need ' + needed + '+ to qualify.<br>' +
+        '<span style="font-size:11px;">Keep growing and apply again when you qualify!</span>' +
+        '</div>' +
+        '<button class="bc-btn bc-btn-teal" style="width:100%;justify-content:center;margin-top:10px;" onclick="bcCloseVerifyModal()">' +
+        'Try Another Platform</button>';
+    }
+  }
+
+  function bcMarkChip(platform, state, username) {
+    const key = platform.charAt(0).toUpperCase() + platform.slice(1);
+    const chip = document.getElementById('bcChip' + key);
+    const statusEl = document.getElementById('bcStatus' + key);
+    const ctaEl = chip ? chip.querySelector('.bc-chip-cta') : null;
+    if (!chip) return;
+    chip.classList.remove('bc-chip-verified', 'bc-chip-failed');
+    if (state === 'verified') {
+      chip.classList.add('bc-chip-verified');
+      if (ctaEl) ctaEl.innerHTML = '&#x2713; Verified';
+      if (statusEl) statusEl.innerHTML = '<span style="color:#39A596;font-size:10px;font-weight:700;">&#x2713; ' + (username ? '@' + username : 'Connected') + '</span>';
+    } else if (state === 'failed') {
+      chip.classList.add('bc-chip-failed');
+      if (ctaEl) ctaEl.textContent = 'Does not qualify';
+    } else if (state === 'pending') {
+      if (ctaEl) ctaEl.innerHTML = '&#x23F3; Verifying...';
+      if (statusEl) statusEl.innerHTML = '<span style="color:#FFD700;font-size:10px;">Checking...</span>';
+    }
+  }
+
+  // Close verify modal on overlay click
+  document.getElementById('bcVerifyModal')?.addEventListener('click', function(e) {
+    if (e.target === this) bcCloseVerifyModal();
+  });
+
+  // On load: check if any platforms already verified (returning user)
+  async function bcLoadExistingStatus() {
+    {% if customer %}
+    try {
+      const res = await fetch(BC_API + '/api/social/status?creator_id={{ customer.id }}');
+      const json = await res.json();
+      if (json.success && json.platforms) {
+        json.platforms.forEach(p => {
+          if (p.qualifies_elite) bcMarkChip(p.platform, 'verified', p.username);
+          else if (p.last_synced) bcMarkChip(p.platform, 'failed');
+        });
+      }
+    } catch (e) { /* silent */ }
+    {% endif %}
+  }
+  bcLoadExistingStatus();
+
+  // Mega Tier Toggle
+  function toggleMegaTier() {
+    const megaCard = document.querySelector('.bc-mega-card');
+    megaCard.classList.toggle('expanded');
+  }
+
+  // Mega Form Handler
+  function handleMegaForm(e) {
+    e.preventDefault();
+    const form = document.getElementById('bcMegaForm');
+    const successDiv = document.querySelector('.bc-mega-success');
+    form.style.display = 'none';
+    successDiv.style.display = 'block';
+  }
+
+  // Initialize on DOM Ready
+  document.addEventListener('DOMContentLoaded', function() {
+    // Intersection Observer for animations
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver(function(entries) {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, observerOptions);
+
+    const animElements = document.querySelectorAll('.bc-animate');
+    animElements.forEach(el => observer.observe(el));
+
+    // Check URL for type=elite parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('type') === 'elite') {
+      setTimeout(() => closeModalAndScroll(), 600);
+    }
+
+    // Mega form submission
+    const megaForm = document.getElementById('bcMegaForm');
+    if (megaForm) {
+      megaForm.addEventListener('submit', handleMegaForm);
+    }
+
+    // Close modal when clicking outside
+    const modal = document.getElementById('bcPathModal');
+    modal.addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeBcModal();
+      }
+    });
+  });
+</script>
 
 {% schema %}
-{
-  "name": "Become Creator",
-  "settings": [],
-  "presets": [
-    {
-      "name": "Become Creator"
-    }
-  ]
-}
+{"name":"Become Creator","settings":[],"presets":[{"name":"Become Creator"}]}
 {% endschema %}

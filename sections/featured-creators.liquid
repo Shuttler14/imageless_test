@@ -213,7 +213,7 @@ Displays mega-influencer creators in a premium marketplace
 (function() {
   'use strict';
 
-  const API_BASE_URL = '{{ section.settings.api_base_url | default: "https://mynarrative-ai.vercel.app" }}';
+  const API_BASE_URL = '{{ section.settings.creator_api_base_url | default: "https://creator-economy-api.vercel.app" }}';
 
   const RANK_LABELS = {
     rookie_designer: { label: 'Rookie Designer', emoji: '' },
@@ -284,9 +284,9 @@ Displays mega-influencer creators in a premium marketplace
   "settings": [
     {
       "type": "text",
-      "id": "api_base_url",
-      "label": "API Base URL",
-      "default": "https://mynarrative-ai.vercel.app"
+      "id": "creator_api_base_url",
+      "label": "Creator Economy API Base URL",
+      "default": "https://creator-economy-api.vercel.app"
     }
   ],
   "presets": [

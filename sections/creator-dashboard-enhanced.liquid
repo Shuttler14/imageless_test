@@ -18,6 +18,7 @@ SECTION CONFIGURATION
 ==================================================== {% endcomment %}
 
 {% assign api_base_url = section.settings.api_base_url | default: 'https://mynarrative-ai.vercel.app' %}
+{% assign creator_api_base_url = section.settings.creator_api_base_url | default: 'https://creator-economy-api.vercel.app' %}
 {% assign enable_debug = section.settings.enable_debug | default: false %}
 
 {% assign creator_id = customer.id | default: '' %}
@@ -564,6 +565,227 @@ SECTION CONFIGURATION
     color: rgba(255, 255, 255, 0.6);
   }
 
+  /* Products Section */
+  .cd-products-section {
+    margin-bottom: 40px;
+    animation: fadeInUp 0.8s ease 0.3s both;
+  }
+
+  .cd-products-card {
+    background: var(--cd-card-bg);
+    border: 1px solid var(--cd-border);
+    border-radius: 20px;
+    padding: 28px;
+  }
+
+  .cd-products-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+
+  .cd-products-count {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.05);
+    padding: 6px 14px;
+    border-radius: 20px;
+  }
+
+  /* Products Empty State - Beautiful Full-Width Card */
+  .cd-products-empty {
+    position: relative;
+    background: linear-gradient(135deg, rgba(20, 20, 30, 0.8), rgba(30, 20, 40, 0.8));
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    border-radius: 24px;
+    padding: 80px 60px;
+    text-align: center;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+  }
+
+  /* Gradient border effect */
+  .cd-products-empty::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, var(--cd-primary), var(--cd-purple));
+    border-radius: 24px;
+    padding: 2px;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .cd-products-empty::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    right: 2px;
+    bottom: 2px;
+    background: linear-gradient(135deg, rgba(20, 20, 30, 0.9), rgba(30, 20, 40, 0.9));
+    border-radius: 22px;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  /* Animated glow effect */
+  .cd-products-cta-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(57, 165, 150, 0.25) 0%, rgba(168, 85, 247, 0.15) 50%, transparent 100%);
+    animation: cdEmptyGlow 3s ease-in-out infinite;
+    filter: blur(60px);
+  }
+
+  @keyframes cdEmptyGlow {
+    0%, 100% { 
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 0.6;
+    }
+    50% { 
+      transform: translate(-50%, -50%) scale(1.15);
+      opacity: 0.9;
+    }
+  }
+
+  .cd-products-cta-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .cd-products-cta-icon {
+    font-size: 80px;
+    margin-bottom: 24px;
+    animation: cdEmojiBounce 2.5s ease-in-out infinite;
+    display: inline-block;
+  }
+
+  @keyframes cdEmojiBounce {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-15px) scale(1.1); }
+  }
+
+  .cd-products-empty h4 {
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, var(--cd-primary-light), var(--cd-gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.5px;
+  }
+
+  .cd-products-empty p {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.75);
+    margin-bottom: 36px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.7;
+    letter-spacing: 0.3px;
+  }
+
+  .cd-products-cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 18px 44px;
+    background: linear-gradient(135deg, var(--cd-gold), #FFA500);
+    color: #000;
+    font-size: 17px;
+    font-weight: 700;
+    border: none;
+    border-radius: 50px;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 8px 32px rgba(255, 215, 0, 0.35),
+                0 0 20px rgba(255, 215, 0, 0.2);
+    animation: cdPrimaryGlow 2s ease-in-out infinite;
+    cursor: pointer;
+  }
+
+  @keyframes cdPrimaryGlow {
+    0%, 100% { 
+      box-shadow: 0 8px 32px rgba(255, 215, 0, 0.35),
+                  0 0 20px rgba(255, 215, 0, 0.2);
+    }
+    50% { 
+      box-shadow: 0 12px 48px rgba(255, 215, 0, 0.5),
+                  0 0 30px rgba(255, 215, 0, 0.3);
+    }
+  }
+
+  .cd-products-cta-btn:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 15px 60px rgba(255, 215, 0, 0.6),
+                0 0 40px rgba(255, 215, 0, 0.4);
+  }
+
+  .cd-products-cta-btn:active {
+    transform: translateY(-1px) scale(1.02);
+  }
+
+  .cd-products-cta-btn span {
+    font-size: 22px;
+  }
+
+  /* Secondary CTA Button */
+  .cd-products-secondary-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 24px;
+    color: var(--cd-primary-light);
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    padding: 12px 28px;
+    border: 1px solid rgba(57, 165, 150, 0.3);
+    border-radius: 50px;
+    background: rgba(57, 165, 150, 0.05);
+  }
+
+  .cd-products-secondary-cta:hover {
+    background: rgba(57, 165, 150, 0.15);
+    border-color: rgba(57, 165, 150, 0.6);
+    transform: translateX(4px);
+  }
+
+  /* Helper text below button */
+  .cd-products-helper-text {
+    margin-top: 20px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.5);
+    letter-spacing: 0.5px;
+    line-height: 1.6;
+  }
+
+  .cd-products-helper-text strong {
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 600;
+  }
+
+  .cd-products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+  }
+
+  .cd-hidden { display: none !important; }
+
   /* Not Logged In State */
   .cd-not-logged {
     text-align: center;
@@ -705,6 +927,38 @@ SECTION CONFIGURATION
         </div>
       </div>
 
+      <!-- Products Section -->
+      <div class="cd-products-section" id="cdProductsSection">
+        <div class="cd-products-card">
+          <div class="cd-products-header">
+            <h3 class="cd-section-title">🎨 Your Products</h3>
+            <span class="cd-products-count" id="cdProductsCount">0 designs</span>
+          </div>
+
+          <!-- Empty State with Beautiful CTA -->
+          <div class="cd-products-empty" id="cdProductsEmpty">
+            <div class="cd-products-cta-glow"></div>
+            <div class="cd-products-cta-content">
+              <div class="cd-products-cta-icon">🎨</div>
+              <h4>Your Creative Journey Starts Here</h4>
+              <p>You haven't uploaded any designs yet. Every top creator started with their very first design — make yours count!</p>
+              <a href="/pages/create-my-design" class="cd-products-cta-btn">
+                <span>✨</span> Upload My First Design
+              </a>
+              <div class="cd-products-helper-text">
+                <strong>Takes less than 2 minutes</strong> • <strong>Free to upload</strong> • <strong>Start earning immediately</strong>
+              </div>
+              <a href="/collections/all" class="cd-products-secondary-cta">
+                Explore Design Inspiration →
+              </a>
+            </div>
+          </div>
+
+          <!-- Products Grid (hidden when empty) -->
+          <div class="cd-products-grid cd-hidden" id="cdProductsGrid"></div>
+        </div>
+      </div>
+
       <!-- Main Content -->
       <div class="cd-main-grid">
         <!-- Recent Orders -->
@@ -807,7 +1061,7 @@ SECTION CONFIGURATION
 
 <script>
 (function() {
-  const API_BASE = '{{ api_base_url }}';
+  const API_BASE = '{{ creator_api_base_url }}';
   const customerId = '{{ customer.id }}';
 
   if (!customerId) return;
@@ -957,7 +1211,72 @@ SECTION CONFIGURATION
   document.addEventListener('DOMContentLoaded', function() {
     loadCreatorStats();
     loadRecentOrders();
+    loadProducts();
+
+    // Check if coming from onboarding
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('new') === 'true') {
+      // Scroll to products section
+      setTimeout(() => {
+        const productsSection = document.getElementById('cdProductsSection');
+        if (productsSection) {
+          productsSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          // Add highlight effect
+          productsSection.querySelector('.cd-products-card').style.animation = 'pulse 1s ease 3';
+        }
+      }, 500);
+    }
   });
+
+  // Load products
+  async function loadProducts() {
+    try {
+      const resp = await fetch(API_BASE + '/api/creator/products?user_id=' + customerId);
+      const json = await resp.json();
+
+      const emptyState = document.getElementById('cdProductsEmpty');
+      const productsGrid = document.getElementById('cdProductsGrid');
+      const productsCount = document.getElementById('cdProductsCount');
+
+      if (json.success && json.data && json.data.length > 0) {
+        // Show products
+        if (emptyState) emptyState.classList.add('cd-hidden');
+        if (productsGrid) {
+          productsGrid.classList.remove('cd-hidden');
+          renderProducts(json.data);
+        }
+        if (productsCount) productsCount.textContent = json.data.length + ' design' + (json.data.length > 1 ? 's' : '');
+      } else {
+        // Show empty state with CTA
+        if (emptyState) emptyState.classList.remove('cd-hidden');
+        if (productsGrid) productsGrid.classList.add('cd-hidden');
+        if (productsCount) productsCount.textContent = '0 designs';
+      }
+    } catch (e) {
+      console.log('Products load error:', e);
+      // Show empty state on error
+      const emptyState = document.getElementById('cdProductsEmpty');
+      if (emptyState) emptyState.classList.remove('cd-hidden');
+    }
+  }
+
+  // Render products
+  function renderProducts(products) {
+    const grid = document.getElementById('cdProductsGrid');
+    if (!grid) return;
+
+    grid.innerHTML = products.map(product => `
+      <div class="cd-product-item">
+        <div class="cd-product-image">
+          <img src="${product.image || '/assets/placeholder.png'}" alt="${product.name}">
+        </div>
+        <div class="cd-product-info">
+          <h4>${product.name}</h4>
+          <p>₹${product.price} • ${product.sales || 0} sales</p>
+        </div>
+      </div>
+    `).join('');
+  }
 })();
 </script>
 
@@ -968,8 +1287,14 @@ SECTION CONFIGURATION
     {
       "type": "text",
       "id": "api_base_url",
-      "label": "API Base URL",
+      "label": "Main API Base URL",
       "default": "https://mynarrative-ai.vercel.app"
+    },
+    {
+      "type": "text",
+      "id": "creator_api_base_url",
+      "label": "Creator Economy API Base URL",
+      "default": "https://creator-economy-api.vercel.app"
     },
     {
       "type": "checkbox",

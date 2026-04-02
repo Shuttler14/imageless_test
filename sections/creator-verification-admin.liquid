@@ -1,0 +1,904 @@
+{% comment %}
+=================================================================================
+CREATOR VERIFICATION ADMIN SECTION
+=================================================================================
+Admin interface for reviewing creator applications with approve/reject actions
+=================================================================================
+{% endcomment %}
+
+{% assign api_base_url = section.settings.api_base_url | default: 'https://mynarrative-ai.vercel.app' %}
+{% assign creator_api_base_url = section.settings.creator_api_base_url | default: 'https://creator-economy-api.vercel.app' %}
+{% assign is_logged_in = false %}
+{% assign is_admin = false %}
+{% if customer.id != blank %}
+  {% assign is_logged_in = true %}
+  {% assign user_id = customer.id %}
+  {% assign user_email = customer.email %}
+  {% if customer.tags contains 'admin' or customer.tags contains 'Admin' %}
+    {% assign is_admin = true %}
+  {% endif %}
+{% endif %}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap');
+
+  :root {
+    --cv-primary: #39A596;
+    --cv-primary-light: #4ECDC4;
+    --cv-purple: #A855F7;
+    --cv-pink: #EC4899;
+    --cv-gold: #FFD700;
+    --cv-orange: #F97316;
+    --cv-dark: #0a0a0a;
+    --cv-success: #22c55e;
+    --cv-danger: #ef4444;
+    --cv-warning: #f59e0b;
+  }
+
+  .cv-page {
+    font-family: 'Montserrat', sans-serif;
+    background: linear-gradient(180deg, #050505 0%, #0a0a0a 50%, #0f0f0f 100%);
+    min-height: 100vh;
+    color: #fff;
+    padding: 0;
+    overflow-x: hidden;
+  }
+
+  .cv-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 40px 24px;
+  }
+
+  /* Header */
+  .cv-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .cv-header h1 {
+    font-size: 32px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--cv-primary), var(--cv-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .cv-stats {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .cv-stat-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 16px 24px;
+    text-align: center;
+    min-width: 120px;
+  }
+
+  .cv-stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--cv-primary);
+  }
+
+  .cv-stat-label {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* Filters */
+  .cv-filters {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+
+  .cv-filter-btn {
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  .cv-filter-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .cv-filter-btn.active {
+    background: var(--cv-primary);
+    border-color: var(--cv-primary);
+  }
+
+  /* Applications Grid */
+  .cv-applications {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 24px;
+  }
+
+  @media (max-width: 600px) {
+    .cv-applications { grid-template-columns: 1fr; }
+  }
+
+  .cv-application-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 24px;
+    transition: all 0.3s ease;
+  }
+
+  .cv-application-card:hover {
+    border-color: rgba(57, 165, 150, 0.3);
+    transform: translateY(-2px);
+  }
+
+  .cv-application-card.pending {
+    border-left: 4px solid var(--cv-warning);
+  }
+
+  .cv-application-card.approved {
+    border-left: 4px solid var(--cv-success);
+  }
+
+  .cv-application-card.rejected {
+    border-left: 4px solid var(--cv-danger);
+  }
+
+  /* Card Header */
+  .cv-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+  }
+
+  .cv-applicant-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .cv-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--cv-primary), var(--cv-purple));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 700;
+  }
+
+  .cv-applicant-details h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .cv-applicant-details p {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .cv-status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .cv-status-badge.pending {
+    background: rgba(245, 158, 11, 0.2);
+    color: var(--cv-warning);
+  }
+
+  .cv-status-badge.approved {
+    background: rgba(34, 197, 94, 0.2);
+    color: var(--cv-success);
+  }
+
+  .cv-status-badge.rejected {
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--cv-danger);
+  }
+
+  /* Card Body */
+  .cv-card-body {
+    margin-bottom: 20px;
+  }
+
+  .cv-info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .cv-info-row:last-child {
+    border-bottom: none;
+  }
+
+  .cv-info-label {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .cv-info-value {
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .cv-social-links {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .cv-social-tag {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    font-size: 12px;
+  }
+
+  /* Documents */
+  .cv-documents {
+    margin-top: 16px;
+  }
+
+  .cv-doc-title {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 8px;
+  }
+
+  .cv-doc-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .cv-doc-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: rgba(57, 165, 150, 0.1);
+    border: 1px solid rgba(57, 165, 150, 0.2);
+    border-radius: 8px;
+    font-size: 12px;
+    color: var(--cv-primary);
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .cv-doc-item:hover {
+    background: rgba(57, 165, 150, 0.2);
+  }
+
+  /* Card Actions */
+  .cv-card-actions {
+    display: flex;
+    gap: 12px;
+  }
+
+  .cv-btn {
+    flex: 1;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Montserrat', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .cv-btn-approve {
+    background: var(--cv-success);
+    color: #fff;
+  }
+
+  .cv-btn-approve:hover {
+    background: #16a34a;
+    transform: translateY(-2px);
+  }
+
+  .cv-btn-reject {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .cv-btn-reject:hover {
+    background: var(--cv-danger);
+    border-color: var(--cv-danger);
+  }
+
+  .cv-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+
+  /* Empty State */
+  .cv-empty {
+    text-align: center;
+    padding: 80px 24px;
+  }
+
+  .cv-empty-icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+    opacity: 0.5;
+  }
+
+  .cv-empty h3 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .cv-empty p {
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  /* Loading */
+  .cv-loading {
+    text-align: center;
+    padding: 60px;
+  }
+
+  .cv-spinner {
+    width: 48px;
+    height: 48px;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-top-color: var(--cv-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Modal */
+  .cv-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .cv-modal-overlay.active {
+    display: flex;
+  }
+
+  .cv-modal {
+    background: #1a1a1a;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 32px;
+    max-width: 500px;
+    width: 100%;
+  }
+
+  .cv-modal h3 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+
+  .cv-modal p {
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 24px;
+  }
+
+  .cv-form-group {
+    margin-bottom: 20px;
+  }
+
+  .cv-form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .cv-textarea {
+    width: 100%;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    resize: vertical;
+    min-height: 120px;
+  }
+
+  .cv-textarea:focus {
+    outline: none;
+    border-color: var(--cv-primary);
+  }
+
+  .cv-modal-actions {
+    display: flex;
+    gap: 12px;
+  }
+
+  .cv-btn-secondary {
+    flex: 1;
+    padding: 14px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  .cv-btn-primary {
+    flex: 1;
+    padding: 14px;
+    background: var(--cv-primary);
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  /* Access Denied */
+  .cv-access-denied {
+    text-align: center;
+    padding: 100px 24px;
+  }
+
+  .cv-access-denied-icon {
+    font-size: 80px;
+    margin-bottom: 24px;
+  }
+
+  .cv-access-denied h2 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .cv-access-denied p {
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 32px;
+  }
+
+  .cv-hidden { display: none !important; }
+</style>
+
+<div class="cv-page">
+  <div class="cv-container">
+    {% unless is_logged_in %}
+      <!-- Not Logged In -->
+      <div class="cv-access-denied">
+        <div class="cv-access-denied-icon">🔐</div>
+        <h2>Authentication Required</h2>
+        <p>Please sign in to access the verification dashboard</p>
+        <a href="/account/login?redirect=/pages/creator-verification" class="cv-btn cv-btn-primary" style="display: inline-block; text-decoration: none;">
+          Sign In
+        </a>
+      </div>
+    {% else %}
+      {% unless is_admin %}
+        <!-- Not Admin -->
+        <div class="cv-access-denied">
+          <div class="cv-access-denied-icon">🚫</div>
+          <h2>Access Denied</h2>
+          <p>You don't have permission to access this page</p>
+          <a href="/" class="cv-btn cv-btn-primary" style="display: inline-block; text-decoration: none;">
+            Go Home
+          </a>
+        </div>
+      {% else %}
+        <!-- Admin Dashboard -->
+        <div class="cv-header">
+          <h1>🔍 Creator Verification</h1>
+          <div class="cv-stats">
+            <div class="cv-stat-card">
+              <div class="cv-stat-value" id="cvStatPending">0</div>
+              <div class="cv-stat-label">Pending</div>
+            </div>
+            <div class="cv-stat-card">
+              <div class="cv-stat-value" id="cvStatApproved">0</div>
+              <div class="cv-stat-label">Approved</div>
+            </div>
+            <div class="cv-stat-card">
+              <div class="cv-stat-value" id="cvStatTotal">0</div>
+              <div class="cv-stat-label">Total</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="cv-filters">
+          <button class="cv-filter-btn active" data-filter="all" onclick="cvFilter('all')">All</button>
+          <button class="cv-filter-btn" data-filter="pending" onclick="cvFilter('pending')">Pending</button>
+          <button class="cv-filter-btn" data-filter="approved" onclick="cvFilter('approved')">Approved</button>
+          <button class="cv-filter-btn" data-filter="rejected" onclick="cvFilter('rejected')">Rejected</button>
+        </div>
+
+        <!-- Loading State -->
+        <div class="cv-loading" id="cvLoading">
+          <div class="cv-spinner"></div>
+          <p>Loading applications...</p>
+        </div>
+
+        <!-- Applications Grid -->
+        <div class="cv-applications cv-hidden" id="cvApplications"></div>
+
+        <!-- Empty State -->
+        <div class="cv-empty cv-hidden" id="cvEmpty">
+          <div class="cv-empty-icon">📋</div>
+          <h3>No Applications</h3>
+          <p>There are no creator applications to review</p>
+        </div>
+      {% endunless %}
+    {% endunless %}
+  </div>
+</div>
+
+<!-- Reject Modal -->
+<div class="cv-modal-overlay" id="cvRejectModal">
+  <div class="cv-modal">
+    <h3>❌ Reject Application</h3>
+    <p>Please provide a reason for rejection. This will be sent to the applicant.</p>
+    <div class="cv-form-group">
+      <label>Rejection Reason</label>
+      <textarea class="cv-textarea" id="cvRejectReason" placeholder="Explain why this application is being rejected..."></textarea>
+    </div>
+    <div class="cv-modal-actions">
+      <button class="cv-btn-secondary" onclick="cvCloseModal()">Cancel</button>
+      <button class="cv-btn-primary" style="background: var(--cv-danger);" onclick="cvConfirmReject()">Reject</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const CV_API = '{{ creator_api_base_url }}';
+const CV_ADMIN_ID = '{{ user_id }}';
+
+let cvApplications = [];
+let cvCurrentFilter = 'all';
+let cvSelectedApplication = null;
+
+// Load applications on page load
+document.addEventListener('DOMContentLoaded', function() {
+  cvLoadApplications();
+});
+
+async function cvLoadApplications() {
+  try {
+    const response = await fetch(`${CV_API}/api/creator/verification/applications`);
+    const data = await response.json();
+
+    if (data.success) {
+      cvApplications = data.applications || [];
+      cvRenderApplications();
+      cvUpdateStats();
+    } else {
+      // Demo data if API fails
+      cvApplications = [
+        {
+          id: 'app_001',
+          user_id: '12345',
+          name: 'John Doe',
+          email: 'john@example.com',
+          brand_name: "John's Designs",
+          status: 'pending',
+          social_links: { instagram: '@johndesigns', youtube: '@johnchannel' },
+          documents: [{ name: 'ID Proof', url: '#' }],
+          submitted_at: new Date().toISOString()
+        },
+        {
+          id: 'app_002',
+          user_id: '12346',
+          name: 'Jane Smith',
+          email: 'jane@example.com',
+          brand_name: "Jane's Art",
+          status: 'pending',
+          social_links: { instagram: '@janeart' },
+          documents: [{ name: 'ID Proof', url: '#' }, { name: 'Portfolio', url: '#' }],
+          submitted_at: new Date(Date.now() - 86400000).toISOString()
+        }
+      ];
+      cvRenderApplications();
+      cvUpdateStats();
+    }
+  } catch (e) {
+    console.error('Error loading applications:', e);
+    // Show demo data
+    document.getElementById('cvLoading').classList.add('cv-hidden');
+    document.getElementById('cvEmpty').classList.remove('cv-hidden');
+  }
+}
+
+function cvRenderApplications() {
+  const container = document.getElementById('cvApplications');
+  const loading = document.getElementById('cvLoading');
+  const empty = document.getElementById('cvEmpty');
+
+  loading.classList.add('cv-hidden');
+
+  const filtered = cvCurrentFilter === 'all'
+    ? cvApplications
+    : cvApplications.filter(app => app.status === cvCurrentFilter);
+
+  if (filtered.length === 0) {
+    container.classList.add('cv-hidden');
+    empty.classList.remove('cv-hidden');
+    return;
+  }
+
+  empty.classList.add('cv-hidden');
+  container.classList.remove('cv-hidden');
+
+  container.innerHTML = filtered.map(app => `
+    <div class="cv-application-card ${app.status}">
+      <div class="cv-card-header">
+        <div class="cv-applicant-info">
+          <div class="cv-avatar">${app.name.charAt(0).toUpperCase()}</div>
+          <div class="cv-applicant-details">
+            <h3>${app.name}</h3>
+            <p>${app.email}</p>
+          </div>
+        </div>
+        <span class="cv-status-badge ${app.status}">${app.status}</span>
+      </div>
+
+      <div class="cv-card-body">
+        <div class="cv-info-row">
+          <span class="cv-info-label">Brand Name</span>
+          <span class="cv-info-value">${app.brand_name}</span>
+        </div>
+        <div class="cv-info-row">
+          <span class="cv-info-label">Submitted</span>
+          <span class="cv-info-value">${cvFormatDate(app.submitted_at)}</span>
+        </div>
+
+        ${Object.keys(app.social_links || {}).length > 0 ? `
+          <div class="cv-social-links">
+            ${Object.entries(app.social_links).map(([platform, handle]) => `
+              <span class="cv-social-tag">
+                ${cvGetPlatformIcon(platform)} ${handle}
+              </span>
+            `).join('')}
+          </div>
+        ` : ''}
+
+        ${app.documents && app.documents.length > 0 ? `
+          <div class="cv-documents">
+            <div class="cv-doc-title">Documents</div>
+            <div class="cv-doc-list">
+              ${app.documents.map(doc => `
+                <a href="${doc.url}" class="cv-doc-item" target="_blank">
+                  📄 ${doc.name}
+                </a>
+              `).join('')}
+            </div>
+          </div>
+        ` : ''}
+      </div>
+
+      ${app.status === 'pending' ? `
+        <div class="cv-card-actions">
+          <button class="cv-btn cv-btn-approve" onclick="cvApprove('${app.id}')">
+            ✓ Approve
+          </button>
+          <button class="cv-btn cv-btn-reject" onclick="cvShowRejectModal('${app.id}')">
+            ✕ Reject
+          </button>
+        </div>
+      ` : ''}
+    </div>
+  `).join('');
+}
+
+function cvFilter(filter) {
+  cvCurrentFilter = filter;
+
+  // Update active button
+  document.querySelectorAll('.cv-filter-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.filter === filter);
+  });
+
+  cvRenderApplications();
+}
+
+function cvUpdateStats() {
+  const pending = cvApplications.filter(a => a.status === 'pending').length;
+  const approved = cvApplications.filter(a => a.status === 'approved').length;
+
+  document.getElementById('cvStatPending').textContent = pending;
+  document.getElementById('cvStatApproved').textContent = approved;
+  document.getElementById('cvStatTotal').textContent = cvApplications.length;
+}
+
+async function cvApprove(applicationId) {
+  const btn = event.target;
+  btn.disabled = true;
+  btn.textContent = 'Processing...';
+
+  try {
+    const response = await fetch(`${CV_API}/api/creator/verification/approve`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        application_id: applicationId,
+        admin_id: CV_ADMIN_ID
+      })
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      // Update local state
+      const app = cvApplications.find(a => a.id === applicationId);
+      if (app) app.status = 'approved';
+      cvRenderApplications();
+      cvUpdateStats();
+    } else {
+      alert('Error: ' + (data.error || 'Failed to approve'));
+      btn.disabled = false;
+      btn.textContent = '✓ Approve';
+    }
+  } catch (e) {
+    console.error('Error approving:', e);
+    // Demo mode
+    const app = cvApplications.find(a => a.id === applicationId);
+    if (app) app.status = 'approved';
+    cvRenderApplications();
+    cvUpdateStats();
+  }
+}
+
+function cvShowRejectModal(applicationId) {
+  cvSelectedApplication = applicationId;
+  document.getElementById('cvRejectModal').classList.add('active');
+}
+
+function cvCloseModal() {
+  document.getElementById('cvRejectModal').classList.remove('active');
+  document.getElementById('cvRejectReason').value = '';
+  cvSelectedApplication = null;
+}
+
+async function cvConfirmReject() {
+  const reason = document.getElementById('cvRejectReason').value.trim();
+
+  if (!reason) {
+    alert('Please provide a rejection reason');
+    return;
+  }
+
+  if (!cvSelectedApplication) return;
+
+  try {
+    const response = await fetch(`${CV_API}/api/creator/verification/reject`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        application_id: cvSelectedApplication,
+        admin_id: CV_ADMIN_ID,
+        reason: reason
+      })
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      const app = cvApplications.find(a => a.id === cvSelectedApplication);
+      if (app) app.status = 'rejected';
+      cvCloseModal();
+      cvRenderApplications();
+      cvUpdateStats();
+    } else {
+      alert('Error: ' + (data.error || 'Failed to reject'));
+    }
+  } catch (e) {
+    console.error('Error rejecting:', e);
+    // Demo mode
+    const app = cvApplications.find(a => a.id === cvSelectedApplication);
+    if (app) app.status = 'rejected';
+    cvCloseModal();
+    cvRenderApplications();
+    cvUpdateStats();
+  }
+}
+
+function cvFormatDate(dateString) {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function cvGetPlatformIcon(platform) {
+  const icons = {
+    instagram: '📸',
+    youtube: '▶️',
+    twitter: '𝕏',
+    linkedin: '💼',
+    tiktok: '🎵'
+  };
+  return icons[platform.toLowerCase()] || '🔗';
+}
+
+// Close modal on overlay click
+document.getElementById('cvRejectModal')?.addEventListener('click', function(e) {
+  if (e.target === this) cvCloseModal();
+});
+</script>
+
+{% schema %}
+{
+  "name": "Creator Verify",
+  "settings": [
+    {
+      "type": "text",
+      "id": "api_base_url",
+      "label": "Main API Base URL",
+      "default": "https://mynarrative-ai.vercel.app"
+    },
+    {
+      "type": "text",
+      "id": "creator_api_base_url",
+      "label": "Creator Economy API Base URL",
+      "default": "https://creator-economy-api.vercel.app"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Creator Verify"
+    }
+  ]
+}
+{% endschema %}
