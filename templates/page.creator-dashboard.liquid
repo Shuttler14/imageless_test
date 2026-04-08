@@ -8,5 +8,36 @@ Access: /pages/creator-dashboard
 {% endcomment %}
 
 <div class="creator-dashboard-page">
+
+  {% comment %}
+  ═══════════════════════════════════════════════════════════════
+  CREATOR STATS DASHBOARD — Financial overview (always visible)
+  Shows: Total Earnings | Designs Sold | Tier Badge | Progress Bar
+  Auto-refreshes every 60s. Fetches from /api/creator/earnings.
+  ═══════════════════════════════════════════════════════════════
+  {% endcomment %}
+  {%- if customer -%}
+  <div class="creator-stats-wrapper">
+    {% section 'creator-stats-dashboard' %}
+  </div>
+  {%- endif -%}
+
   {% section 'creator-dashboard-enhanced' %}
 </div>
+
+{% comment %}
+=================================================================================
+CREATOR LISTING DASHBOARD — Design-to-Earn Pipeline
+=================================================================================
+Renders the listing UI when a creator has a design ready to publish.
+Pass ?design_id=<uuid> as a URL param — the section reads it via Liquid.
+Access: /pages/creator-dashboard?design_id=<uuid>
+=================================================================================
+{% endcomment %}
+
+{%- assign design_id_param = request.parameters.design_id -%}
+{%- if design_id_param != blank -%}
+<div class="creator-listing-section-wrapper" data-design-id="{{ design_id_param | escape }}">
+  {% section 'creator-listing-dashboard' %}
+</div>
+{%- endif -%}

@@ -207,10 +207,22 @@ IMPORTANT: Only shows for customers who are NOT already creators
       </div>
     </div>
 
-    <a href="/pages/become-creator" class="mn-post-purchase-cta">
-      Start Earning
-      <span>&#8594;</span>
-    </a>
+    {%- comment -%}
+      CTA routing:
+      - If customer is already a registered creator → go straight to dashboard
+      - If not yet a creator → go to onboarding registration
+    {%- endcomment -%}
+    {%- if customer.metafields.creator.registered == true -%}
+      <a href="/pages/creator-dashboard" class="mn-post-purchase-cta">
+        Go to Dashboard
+        <span>&#8594;</span>
+      </a>
+    {%- else -%}
+      <a href="/account/register?return_to=/pages/creator-onboarding" class="mn-post-purchase-cta">
+        Start Earning
+        <span>&#8594;</span>
+      </a>
+    {%- endif -%}
   </div>
 </div>
 

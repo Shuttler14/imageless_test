@@ -1,4 +1,4 @@
-{% comment %}
+﻿{% comment %}
 =================================================================================
 MY NARRATIVE - CREATOR DASHBOARD SECTION (ENHANCED UI/UX)
 =================================================================================
@@ -17,8 +17,8 @@ USAGE:
 SECTION CONFIGURATION
 ==================================================== {% endcomment %}
 
-{% assign api_base_url = section.settings.api_base_url | default: 'https://mynarrative-ai.vercel.app' %}
-{% assign creator_api_base_url = section.settings.creator_api_base_url | default: 'https://creator-economy-api.vercel.app' %}
+{% assign api_base_url = section.settings.api_base_url | default: 'https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app' %}
+{% assign creator_api_base_url = section.settings.creator_api_base_url | default: 'https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app' %}
 {% assign enable_debug = section.settings.enable_debug | default: false %}
 
 {% assign creator_id = customer.id | default: '' %}
@@ -889,43 +889,203 @@ SECTION CONFIGURATION
       </div>
 
       <!-- Stats Grid -->
-      <div class="cd-stats-grid">
+      {%- comment -%}
+        Stats are populated dynamically from /api/creator/earnings?creator_id={{ customer.id }}
+        Removing Shopify Metafield dependency — all data comes from Supabase via the API.
+      {%- endcomment -%}
+      <div class="cd-stats-grid" id="cdStatsGrid">
+        <!-- Card 1: Total Earnings / Available Balance -->
         <div class="cd-stat-card">
           <div class="cd-stat-icon">💰</div>
-          <div class="cd-stat-label">Total Earnings</div>
-          <div class="cd-stat-value teal" id="cd-earnings">₹0</div>
-          <div class="cd-stat-change positive" id="cd-earnings-change">
-            <span>↑</span> +0% from last month
-          </div>
+          <div class="cd-stat-label">Available Balance</div>
+          <div class="cd-stat-value teal cd-loading" id="cd-earnings">—</div>
+          <div class="cd-stat-change positive" id="cd-earnings-change"></div>
         </div>
 
+        <!-- Card 2: Designs Sold -->
         <div class="cd-stat-card">
-          <div class="cd-stat-icon">👗</div>
-          <div class="cd-stat-label">Designs Sold</div>
-          <div class="cd-stat-value purple" id="cd-designs-sold">0</div>
-          <div class="cd-stat-change positive" id="cd-sales-change">
-            <span>↑</span> +0% from last month
-          </div>
+          <div class="cd-stat-icon">🛍️</div>
+          <div class="cd-stat-label">Total Sales</div>
+          <div class="cd-stat-value purple cd-loading" id="cd-designs-sold">—</div>
+          <div class="cd-stat-change positive" id="cd-sales-change"></div>
         </div>
 
+        <!-- Card 3: Lifetime Earnings -->
         <div class="cd-stat-card">
-          <div class="cd-stat-icon">⭐</div>
-          <div class="cd-stat-label">Total Rating</div>
-          <div class="cd-stat-value gold" id="cd-rating">0</div>
-          <div class="cd-stat-change positive" id="cd-rating-change">
-            <span>↑</span> +0 this month
-          </div>
+          <div class="cd-stat-icon">📈</div>
+          <div class="cd-stat-label">Lifetime Earnings</div>
+          <div class="cd-stat-value gold cd-loading" id="cd-lifetime-earnings">—</div>
+          <div class="cd-stat-change positive" id="cd-earnings-total-change"></div>
         </div>
 
+        <!-- Card 4: Creator Tier -->
         <div class="cd-stat-card">
-          <div class="cd-stat-icon">👥</div>
-          <div class="cd-stat-label">Followers</div>
-          <div class="cd-stat-value pink" id="cd-followers">0</div>
-          <div class="cd-stat-change positive" id="cd-followers-change">
-            <span>↑</span> +0 new
+          <div class="cd-stat-icon">🏆</div>
+          <div class="cd-stat-label">Current Tier</div>
+          <div class="cd-stat-value pink cd-loading" id="cd-tier">—</div>
+          <div class="cd-stat-change" id="cd-tier-progress"></div>
+        </div>
+
+        <!-- Card 5: Narrative Tokens (ai_credits) — Token Economy -->
+        <div class="cd-stat-card" id="cdTokensCard" style="border-color:rgba(57,165,150,0.25);">
+          <div class="cd-stat-icon" style="background:linear-gradient(135deg,rgba(57,165,150,0.2),rgba(57,165,150,0.1));border-color:rgba(57,165,150,0.3);">🪙</div>
+          <div class="cd-stat-label">Narrative Tokens</div>
+          <div class="cd-stat-value teal cd-loading" id="cd-tokens" style="color:#39A596">—</div>
+          <div class="cd-stat-change" id="cd-tokens-hint" style="color:rgba(255,255,255,0.45);font-size:11px;">+5 per sale · +10 sample kit</div>
+          <div id="cd-tokens-cta" style="display:none;margin-top:8px;">
+            <a href="/products/creator-sample-kit" style="color:#ef4444;font-size:12px;font-weight:700;text-decoration:none;">
+              ⚠️ 0 tokens — Get Sample Kit →
+            </a>
           </div>
         </div>
       </div>
+
+      <style>
+        /* Skeleton loading shimmer */
+        .cd-loading {
+          position: relative;
+          color: rgba(255,255,255,0.15) !important;
+        }
+        .cd-loading::after {
+          content: '';
+          position: absolute;
+          inset: -4px;
+          background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.08) 50%, transparent 100%);
+          animation: cdShimmer 1.4s ease infinite;
+        }
+        @keyframes cdShimmer {
+          0%   { transform: translateX(-100%); }
+          100% { transform: translateX(200%); }
+        }
+        /* Override 4-col grid to 5-col for the extra token card */
+        .cd-stats-grid {
+          grid-template-columns: repeat(5, 1fr) !important;
+        }
+        @media (max-width: 1280px) { .cd-stats-grid { grid-template-columns: repeat(3, 1fr) !important; } }
+        @media (max-width: 860px)  { .cd-stats-grid { grid-template-columns: repeat(2, 1fr) !important; } }
+        @media (max-width: 500px)  { .cd-stats-grid { grid-template-columns: 1fr !important; } }
+      </style>
+
+      <script>
+      (function() {
+        'use strict';
+        var CREATOR_API = 'https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app';
+        var CREATOR_ID  = '{{ customer.id }}';
+        var REFRESH_MS  = 60000;
+
+        var TIER_CFG = {
+          Bronze:  { icon: '🥉', color: '#CD7F32' },
+          Silver:  { icon: '🥈', color: '#C0C0C0' },
+          Gold:    { icon: '🥇', color: '#FFD700' },
+          Diamond: { icon: '💎', color: '#B9F2FF' },
+        };
+
+        function rupees(n) {
+          n = parseFloat(n) || 0;
+          if (n >= 100000) return '₹' + (n/100000).toFixed(1) + 'L';
+          if (n >= 1000)   return '₹' + (n/1000).toFixed(1)   + 'K';
+          return '₹' + n.toFixed(0);
+        }
+
+        function setText(id, val) {
+          var el = document.getElementById(id);
+          if (el) { el.textContent = val; el.classList.remove('cd-loading'); }
+        }
+
+        function setColor(id, color) {
+          var el = document.getElementById(id);
+          if (el) el.style.color = color;
+        }
+
+        function fetchAndPopulate() {
+          if (!CREATOR_ID) return;
+          fetch(CREATOR_API + '/api/creator/earnings?creator_id=' + CREATOR_ID, {
+            headers: { 'Accept': 'application/json' }
+          })
+          .then(function(r) { return r.json(); })
+          .then(function(data) {
+            var s = data.summary || data || {};
+
+            // Card 1 & 3: Earnings
+            var earned = s.total_earnings_rupees || s.lifetime_earnings || 0;
+            setText('cd-earnings',          rupees(earned));
+            setText('cd-lifetime-earnings', rupees(earned));
+
+            // Card 2: Sales
+            var sold = s.total_designs_sold || s.total_sales || 0;
+            setText('cd-designs-sold', sold.toLocaleString());
+
+            // Card 4: Tier
+            var tier    = s.creator_tier || 'Bronze';
+            var tierCfg = TIER_CFG[tier] || TIER_CFG.Bronze;
+            var tierEl  = document.getElementById('cd-tier');
+            if (tierEl) {
+              tierEl.textContent = tierCfg.icon + ' ' + tier;
+              tierEl.style.color = tierCfg.color;
+              tierEl.classList.remove('cd-loading');
+            }
+            var tp = s.tier_progress;
+            if (tp) {
+              var prog = document.getElementById('cd-tier-progress');
+              if (prog) {
+                prog.textContent = tp.next_tier
+                  ? tp.sales_to_next_tier + ' sales to ' + tp.next_tier
+                  : '💎 Top tier!';
+              }
+            }
+
+            // Update header tier badge if present
+            var badge = document.getElementById('cdHeaderTierBadge');
+            if (badge) {
+              badge.className = 'cd-tier-badge ' + tier.toLowerCase();
+              badge.innerHTML = tierCfg.icon + ' ' + tier;
+            }
+
+            // Card 5: Narrative Tokens
+            var credits = (s.ai_credits != null) ? s.ai_credits : (data.ai_credits != null ? data.ai_credits : null);
+            var tokEl   = document.getElementById('cd-tokens');
+            var tokCard = document.getElementById('cdTokensCard');
+            var tokCTA  = document.getElementById('cd-tokens-cta');
+
+            if (tokEl && credits !== null) {
+              tokEl.textContent = credits;
+              tokEl.classList.remove('cd-loading');
+              if (credits === 0) {
+                tokEl.style.color = '#ef4444';
+                if (tokCard) tokCard.style.borderColor = 'rgba(239,68,68,0.4)';
+                if (tokCTA)  tokCTA.style.display = 'block';
+              } else if (credits <= 1) {
+                tokEl.style.color = '#f59e0b';
+                if (tokCard) tokCard.style.borderColor = 'rgba(245,158,11,0.35)';
+              } else {
+                tokEl.style.color = '#39A596';
+              }
+            } else if (tokEl) {
+              // Pre-migration: show default 3
+              tokEl.textContent = '3';
+              tokEl.classList.remove('cd-loading');
+            }
+          })
+          .catch(function(e) {
+            console.warn('[MN] Earnings fetch failed:', e.message);
+            // Remove shimmer so page doesn't look broken
+            ['cd-earnings','cd-designs-sold','cd-lifetime-earnings','cd-tier','cd-tokens'].forEach(function(id) {
+              var el = document.getElementById(id);
+              if (el && el.textContent === '—') {
+                el.textContent = '–';
+                el.classList.remove('cd-loading');
+              }
+            });
+          });
+        }
+
+        if (CREATOR_ID) {
+          fetchAndPopulate();
+          setInterval(fetchAndPopulate, REFRESH_MS);
+        }
+        window.mnRefreshDashboard = fetchAndPopulate;
+      })();
+      </script>
 
       <!-- Products Section -->
       <div class="cd-products-section" id="cdProductsSection">
@@ -981,11 +1141,12 @@ SECTION CONFIGURATION
         <div class="cd-actions-card">
           <h3 class="cd-section-title">Quick Actions</h3>
           <div class="cd-action-list">
-            <a href="/pages/my-closet" class="cd-action-btn">
+            <!-- Upload Design → /pages/ai-studio (fixed from /pages/my-closet) -->
+            <a href="/pages/ai-studio" class="cd-action-btn">
               <div class="cd-action-icon upload">📤</div>
               <div class="cd-action-text">
-                <h4>Upload New Design</h4>
-                <p>Share your latest creation</p>
+                <h4>Upload Design</h4>
+                <p>Submit a new design to earn</p>
               </div>
             </a>
 
@@ -1288,13 +1449,13 @@ SECTION CONFIGURATION
       "type": "text",
       "id": "api_base_url",
       "label": "Main API Base URL",
-      "default": "https://mynarrative-ai.vercel.app"
+      "default": "https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app"
     },
     {
       "type": "text",
       "id": "creator_api_base_url",
       "label": "Creator Economy API Base URL",
-      "default": "https://creator-economy-api.vercel.app"
+      "default": "https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app"
     },
     {
       "type": "checkbox",

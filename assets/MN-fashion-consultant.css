@@ -411,6 +411,18 @@
     inset 0 1px 1px rgba(255, 255, 255, 0.1);
 }
 
+/* ── Auto-open attention pulse (fires 0.8s before expansion at 15s) ── */
+@keyframes mn-attention-bounce {
+  0%   { transform: scale(1);             box-shadow: 0 4px 20px rgba(57,165,150,0.3); }
+  25%  { transform: scale(1.12) translateY(-4px); box-shadow: 0 8px 32px rgba(57,165,150,0.55); }
+  50%  { transform: scale(1.06) translateY(-2px); box-shadow: 0 6px 24px rgba(57,165,150,0.4); }
+  75%  { transform: scale(1.1)  translateY(-3px); box-shadow: 0 8px 28px rgba(57,165,150,0.5); }
+  100% { transform: scale(1);             box-shadow: 0 4px 20px rgba(57,165,150,0.3); }
+}
+.mn-widget-attention {
+  animation: mn-attention-bounce 0.7s ease forwards !important;
+}
+
 /* ═══════════════════════════════════════════════════════════
    WIDGET CONTAINER
    ═══════════════════════════════════════════════════════════ */

@@ -1,0 +1,838 @@
+﻿{% liquid
+  assign heading = section.settings.heading
+  assign designs_per_page = section.settings.designs_per_page
+  assign api_endpoint = 'https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app/api/design/feed'
+%}
+
+<style>
+  :root {
+    --brand-color: #39A596;
+    --bg-dark: #0a0a0a;
+    --card-dark: #111;
+    --text-white: #ffffff;
+    --text-light: #ccc;
+    --border-color: #222;
+  }
+
+  .social-design-feed {
+    background-color: var(--bg-dark);
+    color: var(--text-white);
+    padding: 2rem 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+
+  .feed-heading {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+
+  .feed-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .sort-tabs {
+    display: flex;
+    gap: 1rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .sort-tab {
+    background: none;
+    border: none;
+    color: var(--text-light);
+    cursor: pointer;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    position: relative;
+    transition: color 0.2s;
+  }
+
+  .sort-tab:hover {
+    color: var(--brand-color);
+  }
+
+  .sort-tab.active {
+    color: var(--brand-color);
+  }
+
+  .sort-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: var(--brand-color);
+  }
+
+  .filter-dropdown {
+    background-color: var(--card-dark);
+    border: 1px solid var(--border-color);
+    color: var(--text-white);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.95rem;
+  }
+
+  .filter-dropdown:hover {
+    border-color: var(--brand-color);
+  }
+
+  .designs-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  @media (min-width: 768px) {
+    .designs-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .designs-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .design-card {
+    background-color: var(--card-dark);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .design-card:hover {
+    border-color: var(--brand-color);
+    transform: translateY(-2px);
+  }
+
+  .design-mockup-wrapper {
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%;
+    background-color: #000;
+    overflow: hidden;
+  }
+
+  .design-mockup {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .design-info {
+    padding: 1rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .design-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+    color: var(--text-white);
+  }
+
+  .creator-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  .creator-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: var(--brand-color);
+    object-fit: cover;
+  }
+
+  .creator-name {
+    color: var(--text-light);
+  }
+
+  .design-price {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--brand-color);
+    margin-bottom: 0.75rem;
+  }
+
+  .color-swatches {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .color-swatch {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    background-size: cover;
+    background-position: center;
+  }
+
+  .color-swatch:hover {
+    border-color: var(--brand-color);
+  }
+
+  .color-swatch.active {
+    border-color: var(--brand-color);
+    box-shadow: 0 0 0 1px var(--bg-dark), 0 0 0 3px var(--brand-color);
+  }
+
+  .add-to-cart-btn {
+    background-color: var(--brand-color);
+    color: var(--text-white);
+    border: none;
+    padding: 0.75rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: opacity 0.2s;
+    width: 100%;
+  }
+
+  .add-to-cart-btn:hover {
+    opacity: 0.9;
+  }
+
+  .add-to-cart-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .skeleton-card {
+    background-color: var(--card-dark);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .skeleton-image {
+    width: 100%;
+    padding-bottom: 100%;
+    background: linear-gradient(90deg, #1a1a1a 25%, #222 50%, #1a1a1a 75%);
+    background-size: 200% 100%;
+    animation: pulse 1.5s infinite;
+  }
+
+  .skeleton-text {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .skeleton-line {
+    height: 12px;
+    background: linear-gradient(90deg, #1a1a1a 25%, #222 50%, #1a1a1a 75%);
+    background-size: 200% 100%;
+    animation: pulse 1.5s infinite;
+    border-radius: 2px;
+  }
+
+  .skeleton-line-title {
+    height: 16px;
+    width: 80%;
+  }
+
+  .skeleton-line-creator {
+    height: 12px;
+    width: 60%;
+  }
+
+  .skeleton-line-price {
+    height: 20px;
+    width: 40%;
+    margin-top: 0.5rem;
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      background-position: 200% 0;
+    }
+    50% {
+      background-position: -200% 0;
+    }
+  }
+
+  .load-more-container {
+    text-align: center;
+    margin-top: 2rem;
+  }
+
+  .load-more-btn {
+    background-color: var(--brand-color);
+    color: var(--text-white);
+    border: none;
+    padding: 0.75rem 2rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: opacity 0.2s;
+  }
+
+  .load-more-btn:hover {
+    opacity: 0.9;
+  }
+
+  .load-more-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .error-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-light);
+  }
+
+  .error-message {
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+  }
+
+  .retry-btn {
+    background-color: var(--brand-color);
+    color: var(--text-white);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .retry-btn:hover {
+    opacity: 0.9;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-light);
+  }
+
+  .empty-state-message {
+    font-size: 1.1rem;
+  }
+
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-overlay.active {
+    display: flex;
+  }
+
+  .color-picker-modal {
+    background-color: var(--card-dark);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 2rem;
+    max-width: 400px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+
+  .modal-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+  }
+
+  .modal-colors {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .modal-color-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    transition: border-color 0.2s;
+  }
+
+  .modal-color-option:hover {
+    border-color: var(--brand-color);
+  }
+
+  .modal-color-option.selected {
+    border-color: var(--brand-color);
+    background-color: rgba(57, 165, 150, 0.1);
+  }
+
+  .modal-color-thumbnail {
+    width: 60px;
+    height: 60px;
+    border-radius: 4px;
+    background-size: cover;
+    background-position: center;
+    border: 1px solid var(--border-color);
+  }
+
+  .modal-color-label {
+    font-size: 0.8rem;
+    text-align: center;
+    color: var(--text-light);
+  }
+
+  .modal-close-btn {
+    background: none;
+    border: none;
+    color: var(--text-light);
+    font-size: 1.5rem;
+    cursor: pointer;
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+  }
+
+  .modal-close-btn:hover {
+    color: var(--text-white);
+  }
+
+  .cart-notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: var(--brand-color);
+    color: var(--text-white);
+    padding: 1rem 1.5rem;
+    border-radius: 4px;
+    z-index: 2000;
+    animation: slideIn 0.3s ease-out;
+    max-width: 300px;
+  }
+
+  @keyframes slideIn {
+    from {
+      transform: translateX(400px);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+</style>
+
+<div class="social-design-feed">
+  <h1 class="feed-heading">{{ heading }}</h1>
+
+  <div class="feed-controls">
+    <div class="sort-tabs">
+      <button class="sort-tab active" data-sort="latest">Latest</button>
+      <button class="sort-tab" data-sort="popular">Popular</button>
+      <button class="sort-tab" data-sort="trending">Trending</button>
+    </div>
+    <select class="filter-dropdown" id="filterDropdown">
+      <option value="all">All</option>
+      <option value="tshirt">T-Shirts</option>
+      <option value="hoodie">Hoodies</option>
+    </select>
+  </div>
+
+  <div class="designs-grid" id="designsGrid">
+    <!-- Skeleton loading state -->
+    {% for i in (1..12) %}
+      <div class="skeleton-card">
+        <div class="skeleton-image"></div>
+        <div class="skeleton-text">
+          <div class="skeleton-line skeleton-line-title"></div>
+          <div class="skeleton-line skeleton-line-creator"></div>
+          <div class="skeleton-line skeleton-line-price"></div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="load-more-container">
+    <button class="load-more-btn" id="loadMoreBtn" style="display: none;">Load More</button>
+  </div>
+
+  <div class="error-state" id="errorState" style="display: none;">
+    <p class="error-message">Failed to load designs. Please try again.</p>
+    <button class="retry-btn" id="retryBtn">Retry</button>
+  </div>
+
+  <div class="empty-state" id="emptyState" style="display: none;">
+    <p class="empty-state-message">No designs yet — be the first to publish!</p>
+  </div>
+</div>
+
+<div class="modal-overlay" id="colorPickerModal">
+  <div class="color-picker-modal">
+    <button class="modal-close-btn" id="closeModalBtn">&times;</button>
+    <h2 class="modal-title">Select a Color</h2>
+    <div class="modal-colors" id="modalColors"></div>
+  </div>
+</div>
+
+<script>
+  const API_ENDPOINT = '{{ api_endpoint }}';
+  const DESIGNS_PER_PAGE = {{ designs_per_page }};
+  let currentPage = 1;
+  let currentSort = 'latest';
+  let currentFilter = 'all';
+  let isLoading = false;
+  let hasMorePages = true;
+  let pendingDesignForCart = null;
+
+  // Initialize
+  document.addEventListener('DOMContentLoaded', function() {
+    fetchDesigns(true);
+    setupEventListeners();
+  });
+
+  function setupEventListeners() {
+    // Sort tabs
+    document.querySelectorAll('.sort-tab').forEach(tab => {
+      tab.addEventListener('click', function() {
+        document.querySelectorAll('.sort-tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        currentSort = this.dataset.sort;
+        currentPage = 1;
+        fetchDesigns(true);
+      });
+    });
+
+    // Filter dropdown
+    document.getElementById('filterDropdown').addEventListener('change', function() {
+      currentFilter = this.value;
+      currentPage = 1;
+      fetchDesigns(true);
+    });
+
+    // Load More button
+    document.getElementById('loadMoreBtn').addEventListener('click', function() {
+      currentPage++;
+      fetchDesigns(false);
+    });
+
+    // Retry button
+    document.getElementById('retryBtn').addEventListener('click', function() {
+      currentPage = 1;
+      fetchDesigns(true);
+    });
+
+    // Modal close
+    document.getElementById('closeModalBtn').addEventListener('click', closeColorPickerModal);
+    document.getElementById('colorPickerModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeColorPickerModal();
+      }
+    });
+
+    // Escape key closes modal
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeColorPickerModal();
+      }
+    });
+  }
+
+  function fetchDesigns(reset = false) {
+    if (isLoading) return;
+    isLoading = true;
+
+    const params = new URLSearchParams({
+      page: currentPage,
+      limit: DESIGNS_PER_PAGE,
+      sort: currentSort,
+      filter: currentFilter
+    });
+
+    fetch(`${API_ENDPOINT}?${params}`)
+      .then(response => {
+        if (!response.ok) throw new Error('API error');
+        return response.json();
+      })
+      .then(data => {
+        const grid = document.getElementById('designsGrid');
+        
+        if (reset) {
+          grid.innerHTML = '';
+        }
+
+        if (!data.designs || data.designs.length === 0) {
+          if (currentPage === 1) {
+            showEmptyState();
+          }
+          hasMorePages = false;
+        } else {
+          renderDesigns(data.designs);
+          hasMorePages = data.hasMore !== false;
+          showLoadMoreButton(hasMorePages);
+        }
+
+        document.getElementById('errorState').style.display = 'none';
+        isLoading = false;
+      })
+      .catch(error => {
+        console.error('Fetch error:', error);
+        if (currentPage === 1) {
+          showErrorState();
+        }
+        isLoading = false;
+      });
+  }
+
+  function renderDesigns(designs) {
+    const grid = document.getElementById('designsGrid');
+
+    designs.forEach(design => {
+      const card = createDesignCard(design);
+      grid.appendChild(card);
+    });
+  }
+
+  function createDesignCard(design) {
+    const card = document.createElement('div');
+    card.className = 'design-card';
+    card.dataset.design = JSON.stringify(design);
+
+    const mockupUrl = design.mockup_url || (design.variant_map && design.variant_map[0]?.mockup_url) || '';
+    const price = design.price_rupees || 0;
+    const creatorName = design.creator_name || 'Unknown Creator';
+    const creatorAvatar = design.creator_avatar || '';
+    const colors = design.variant_map || [];
+
+    card.innerHTML = `
+      <div class="design-mockup-wrapper">
+        <img src="${mockupUrl}" alt="${design.title}" class="design-mockup" data-mockup="${mockupUrl}">
+      </div>
+      <div class="design-info">
+        <h3 class="design-title">${escapeHtml(design.title)}</h3>
+        <div class="creator-info">
+          ${creatorAvatar ? `<img src="${creatorAvatar}" alt="${creatorName}" class="creator-avatar">` : '<div class="creator-avatar"></div>'}
+          <span class="creator-name">${escapeHtml(creatorName)}</span>
+        </div>
+        <div class="design-price">₹${price.toLocaleString('en-IN')}</div>
+        ${colors.length > 1 ? `
+          <div class="color-swatches">
+            ${colors.map((variant, idx) => `
+              <div class="color-swatch ${idx === 0 ? 'active' : ''}" 
+                   style="background-image: url('${variant.mockup_url}')" 
+                   data-variant-index="${idx}"
+                   title="${variant.color || 'Color ' + (idx + 1)}"></div>
+            `).join('')}
+          </div>
+        ` : ''}
+        <button class="add-to-cart-btn" data-design-uuid="${design.unique_product_id}">Add to Cart</button>
+      </div>
+    `;
+
+    // Color swatch click handlers
+    card.querySelectorAll('.color-swatch').forEach(swatch => {
+      swatch.addEventListener('click', function(e) {
+        e.preventDefault();
+        const variantIndex = parseInt(this.dataset.variantIndex);
+        const variant = design.variant_map[variantIndex];
+        
+        // Update active state
+        card.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+        this.classList.add('active');
+        
+        // Update mockup image
+        card.querySelector('.design-mockup').src = variant.mockup_url;
+      });
+    });
+
+    // Add to Cart button handler
+    card.querySelector('.add-to-cart-btn').addEventListener('click', function(e) {
+      e.preventDefault();
+      handleAddToCart(design, card);
+    });
+
+    return card;
+  }
+
+  function handleAddToCart(design, card) {
+    const colors = design.variant_map || [];
+    
+    if (colors.length > 1) {
+      pendingDesignForCart = { design, card };
+      showColorPickerModal(design, colors);
+    } else {
+      const color = colors[0]?.color || 'white';
+      const productType = design.product_type || 'tshirt';
+      addToCart(design.unique_product_id, design.title, design.creator_id, productType, color);
+    }
+  }
+
+  function showColorPickerModal(design, colors) {
+    const modalColors = document.getElementById('modalColors');
+    modalColors.innerHTML = '';
+
+    colors.forEach((variant, idx) => {
+      const option = document.createElement('div');
+      option.className = 'modal-color-option ' + (idx === 0 ? 'selected' : '');
+      option.innerHTML = `
+        <div class="modal-color-thumbnail" style="background-image: url('${variant.mockup_url}')"></div>
+        <span class="modal-color-label">${variant.color || 'Color ' + (idx + 1)}</span>
+      `;
+      option.addEventListener('click', function() {
+        const productType = design.product_type || 'tshirt';
+        addToCart(design.unique_product_id, design.title, design.creator_id, productType, variant.color || 'white');
+        closeColorPickerModal();
+      });
+      modalColors.appendChild(option);
+    });
+
+    document.getElementById('colorPickerModal').classList.add('active');
+  }
+
+  function closeColorPickerModal() {
+    document.getElementById('colorPickerModal').classList.remove('active');
+    pendingDesignForCart = null;
+  }
+
+  function addToCart(designUuid, title, creatorId, productType, color) {
+    const item = {
+      id: 12345678901, // Fixed variant ID for the shared product
+      quantity: 1,
+      properties: {
+        '_design_uuid': designUuid,
+        '_design_title': title,
+        '_creator_id': creatorId,
+        '_product_type': productType,
+        '_color': color
+      }
+    };
+
+    fetch('/cart/add.js', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        items: [item]
+      })
+    })
+    .then(response => {
+      if (!response.ok) throw new Error('Cart add failed');
+      return response.json();
+    })
+    .then(data => {
+      showCartNotification('Added to cart!');
+    })
+    .catch(error => {
+      console.error('Cart error:', error);
+      showCartNotification('Error adding to cart. Please try again.', true);
+    });
+  }
+
+  function showCartNotification(message, isError = false) {
+    const notification = document.createElement('div');
+    notification.className = 'cart-notification';
+    notification.textContent = message;
+    if (isError) {
+      notification.style.backgroundColor = '#ff4444';
+    }
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+      notification.remove();
+    }, 3000);
+  }
+
+  function showLoadMoreButton(show) {
+    document.getElementById('loadMoreBtn').style.display = show ? 'block' : 'none';
+  }
+
+  function showErrorState() {
+    document.getElementById('designsGrid').innerHTML = '';
+    document.getElementById('errorState').style.display = 'block';
+    document.getElementById('emptyState').style.display = 'none';
+    showLoadMoreButton(false);
+  }
+
+  function showEmptyState() {
+    document.getElementById('designsGrid').innerHTML = '';
+    document.getElementById('errorState').style.display = 'none';
+    document.getElementById('emptyState').style.display = 'block';
+    showLoadMoreButton(false);
+  }
+
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+</script>
+
+{% schema %}
+{
+  "name": "Social Design Feed",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Creator Designs"
+    },
+    {
+      "type": "range",
+      "id": "designs_per_page",
+      "label": "Designs per page",
+      "min": 6,
+      "max": 24,
+      "step": 6,
+      "default": 12
+    }
+  ],
+  "presets": [
+    {
+      "name": "Social Design Feed"
+    }
+  ]
+}
+{% endschema %}

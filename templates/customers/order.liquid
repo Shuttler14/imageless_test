@@ -175,6 +175,19 @@
     </div>
   </div>
 
+  {% comment %}
+  ============================================================
+  POST-PURCHASE CREATOR CTA
+  Shows below order details. Only visible to non-creators.
+  Converts buyers → creators. Routes to:
+    - /account/register?return_to=/pages/creator-onboarding (new creators)
+    - /pages/creator-dashboard (existing creators)
+  ============================================================
+  {% endcomment %}
+  <div class="mn-order-creator-cta" style="margin-top:2rem;">
+    {% section 'creator-post-purchase-cta' %}
+  </div>
+
 </section>
 
 <style>

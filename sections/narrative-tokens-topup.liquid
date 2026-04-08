@@ -1,0 +1,593 @@
+﻿{% comment %}
+=================================================================================
+NARRATIVE TOKENS TOP-UP PAGE — Razorpay Integration
+=================================================================================
+Allows creators to purchase Narrative Token bundles via Razorpay.
+Razorpay is already configured in Shopify's payment settings.
+
+HOW IT WORKS:
+1. Creator selects a token bundle (10, 25, or 50 tokens)
+2. Razorpay checkout opens (uses razorpay.com/v1/checkout.js)
+3. On payment success → POST to /api/creator/tokens/grant with payment_id
+4. Backend verifies payment with Razorpay API + credits the creator
+5. Redirect to /pages/ai-studio with success message
+
+PRICING:
+  Starter Pack  — 10 tokens — ₹99
+  Creator Pack  — 25 tokens — ₹199
+  Pro Pack      — 50 tokens — ₹349
+
+Page handle: narrative-tokens
+Add to a Shopify page via: Customize → Add section → "Narrative Tokens Top-Up"
+=================================================================================
+{% endcomment %}
+
+<div class="nt-page" id="ntPage">
+
+  <!-- ── Header ────────────────────────────────────────────── -->
+  <div class="nt-header">
+    <p class="nt-eyebrow">My Narrative Creator Economy</p>
+    <h1 class="nt-title">Narrative Tokens</h1>
+    <p class="nt-subtitle">
+      Your creative fuel. Generate AI designs, publish listings, and grow your brand.
+      Earn tokens through sales — or top up instantly below.
+    </p>
+
+    <!-- Current balance (fetched from API) -->
+    <div class="nt-balance-chip" id="ntBalanceChip" style="display:none;">
+      <span>🪙</span>
+      <span>Your balance:</span>
+      <strong id="ntBalanceCount" style="color:#39A596">–</strong>
+      <span style="color:rgba(255,255,255,0.5)">tokens</span>
+    </div>
+  </div>
+
+  <!-- ── How tokens work ───────────────────────────────────── -->
+  <div class="nt-how-grid">
+    <div class="nt-how-card">
+      <div class="nt-how-icon">🎨</div>
+      <h3>Generate Designs</h3>
+      <p>1 token = 1 AI design generation via the AI Studio</p>
+    </div>
+    <div class="nt-how-card">
+      <div class="nt-how-icon">💸</div>
+      <h3>Earn by Selling</h3>
+      <p>+5 tokens on every sale. Your designs fund your creativity.</p>
+    </div>
+    <div class="nt-how-card">
+      <div class="nt-how-icon">🧥</div>
+      <h3>Sample Kit Bonus</h3>
+      <p>Buy your own sample at wholesale cost — unlock +10 tokens.</p>
+    </div>
+    <div class="nt-how-card">
+      <div class="nt-how-icon">🪙</div>
+      <h3>Top Up Anytime</h3>
+      <p>Buy token bundles below. Instant credit via Razorpay.</p>
+    </div>
+  </div>
+
+  <!-- ── Bundle Cards ──────────────────────────────────────── -->
+  <h2 class="nt-bundles-title">Choose Your Bundle</h2>
+  <div class="nt-bundles-grid">
+
+    <!-- Starter -->
+    <div class="nt-bundle-card" data-tokens="10" data-amount="9900" data-label="Starter Pack">
+      <div class="nt-bundle-badge">Most Popular for Beginners</div>
+      <div class="nt-bundle-icon">🌱</div>
+      <h3 class="nt-bundle-name">Starter Pack</h3>
+      <div class="nt-bundle-tokens">10 <span>Tokens</span></div>
+      <div class="nt-bundle-price">₹99</div>
+      <div class="nt-bundle-per">₹9.90 / token</div>
+      <ul class="nt-bundle-perks">
+        <li>✓ 10 AI design generations</li>
+        <li>✓ No expiry</li>
+        <li>✓ Instant credit</li>
+      </ul>
+      <button class="nt-buy-btn" data-tokens="10" data-amount="9900" data-label="Starter Pack">
+        Buy for ₹99
+      </button>
+    </div>
+
+    <!-- Creator (featured) -->
+    <div class="nt-bundle-card nt-bundle-featured" data-tokens="25" data-amount="19900" data-label="Creator Pack">
+      <div class="nt-bundle-badge nt-badge-featured">Best Value</div>
+      <div class="nt-bundle-icon">🚀</div>
+      <h3 class="nt-bundle-name">Creator Pack</h3>
+      <div class="nt-bundle-tokens">25 <span>Tokens</span></div>
+      <div class="nt-bundle-price">₹199</div>
+      <div class="nt-bundle-per">₹7.96 / token — save 20%</div>
+      <ul class="nt-bundle-perks">
+        <li>✓ 25 AI design generations</li>
+        <li>✓ No expiry</li>
+        <li>✓ Priority processing</li>
+        <li>✓ Instant credit</li>
+      </ul>
+      <button class="nt-buy-btn nt-buy-btn-featured" data-tokens="25" data-amount="19900" data-label="Creator Pack">
+        Buy for ₹199
+      </button>
+    </div>
+
+    <!-- Pro -->
+    <div class="nt-bundle-card" data-tokens="50" data-amount="34900" data-label="Pro Pack">
+      <div class="nt-bundle-badge">For Power Creators</div>
+      <div class="nt-bundle-icon">💎</div>
+      <h3 class="nt-bundle-name">Pro Pack</h3>
+      <div class="nt-bundle-tokens">50 <span>Tokens</span></div>
+      <div class="nt-bundle-price">₹349</div>
+      <div class="nt-bundle-per">₹6.98 / token — save 30%</div>
+      <ul class="nt-bundle-perks">
+        <li>✓ 50 AI design generations</li>
+        <li>✓ No expiry</li>
+        <li>✓ Priority processing</li>
+        <li>✓ Dedicated support</li>
+        <li>✓ Instant credit</li>
+      </ul>
+      <button class="nt-buy-btn" data-tokens="50" data-amount="34900" data-label="Pro Pack">
+        Buy for ₹349
+      </button>
+    </div>
+
+  </div>
+
+  <!-- ── Success message (shown after payment) ────────────── -->
+  <div class="nt-success" id="ntSuccess" style="display:none;">
+    <div class="nt-success-icon">🎉</div>
+    <h2>Tokens Credited!</h2>
+    <p id="ntSuccessMsg">Your Narrative Tokens have been added to your account.</p>
+    <div class="nt-success-actions">
+      <a href="/pages/ai-studio" class="nt-cta-btn">Go to AI Studio →</a>
+      <a href="/pages/creator-dashboard" class="nt-cta-btn-secondary">View Dashboard</a>
+    </div>
+  </div>
+
+  <!-- ── FAQ ──────────────────────────────────────────────── -->
+  <div class="nt-faq">
+    <h2 class="nt-faq-title">Frequently Asked Questions</h2>
+    <div class="nt-faq-list">
+      <details class="nt-faq-item">
+        <summary>Do tokens expire?</summary>
+        <p>No. Your tokens never expire. Use them whenever you're ready to create.</p>
+      </details>
+      <details class="nt-faq-item">
+        <summary>Can I earn tokens without paying?</summary>
+        <p>Yes! You receive +5 tokens for every design sale, and +10 when you buy your own sample kit at wholesale price. Active creators rarely need to top up.</p>
+      </details>
+      <details class="nt-faq-item">
+        <summary>What if I don't use all my tokens?</summary>
+        <p>They stay in your account indefinitely. Share your designs, make sales, and earn more tokens automatically.</p>
+      </details>
+      <details class="nt-faq-item">
+        <summary>Is the payment secure?</summary>
+        <p>Yes. Payments are processed by Razorpay, India's leading payment gateway. We never store your card details.</p>
+      </details>
+      <details class="nt-faq-item">
+        <summary>How quickly are tokens credited?</summary>
+        <p>Instantly — the moment your payment is confirmed, tokens appear in your account and you can start generating.</p>
+      </details>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Styles ─────────────────────────────────────────────── -->
+<style>
+  .nt-page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 4rem 1.5rem 6rem;
+    font-family: 'Mulish', sans-serif;
+    color: white;
+  }
+
+  /* Header */
+  .nt-header { text-align: center; margin-bottom: 3rem; }
+  .nt-eyebrow {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: #39A596;
+    margin: 0 0 0.75rem;
+  }
+  .nt-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 800;
+    margin: 0 0 1rem;
+    background: linear-gradient(135deg, #fff 40%, #39A596);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .nt-subtitle {
+    color: rgba(255,255,255,0.6);
+    font-size: 1rem;
+    line-height: 1.7;
+    max-width: 600px;
+    margin: 0 auto 1.5rem;
+  }
+  .nt-balance-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(57,165,150,0.1);
+    border: 1px solid rgba(57,165,150,0.3);
+    border-radius: 2rem;
+    padding: 0.4rem 1rem;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+  }
+
+  /* How it works */
+  .nt-how-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 3.5rem;
+  }
+  @media (max-width: 900px) { .nt-how-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 500px) { .nt-how-grid { grid-template-columns: 1fr; } }
+
+  .nt-how-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 0.875rem;
+    padding: 1.25rem;
+    text-align: center;
+  }
+  .nt-how-icon { font-size: 2rem; margin-bottom: 0.6rem; }
+  .nt-how-card h3 { font-family:'Montserrat',sans-serif; font-size:0.9rem; font-weight:700; margin:0 0 0.4rem; }
+  .nt-how-card p  { color:rgba(255,255,255,0.5); font-size:0.8rem; line-height:1.5; margin:0; }
+
+  /* Bundle section */
+  .nt-bundles-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-align: center;
+    margin: 0 0 2rem;
+  }
+  .nt-bundles-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 4rem;
+  }
+  @media (max-width: 860px) { .nt-bundles-grid { grid-template-columns: 1fr; max-width: 400px; margin-left:auto; margin-right:auto; } }
+
+  .nt-bundle-card {
+    background: #111;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 1.25rem;
+    padding: 2rem 1.5rem;
+    position: relative;
+    text-align: center;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .nt-bundle-card:hover {
+    border-color: rgba(57,165,150,0.4);
+    transform: translateY(-4px);
+  }
+  .nt-bundle-featured {
+    border-color: #39A596;
+    background: linear-gradient(160deg, rgba(57,165,150,0.08), #111);
+    box-shadow: 0 0 40px rgba(57,165,150,0.15);
+  }
+  .nt-bundle-badge {
+    position: absolute;
+    top: -0.75rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 2rem;
+    padding: 0.2rem 0.75rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    font-family: 'Montserrat', sans-serif;
+    white-space: nowrap;
+    color: rgba(255,255,255,0.7);
+  }
+  .nt-badge-featured {
+    background: #39A596;
+    border-color: #39A596;
+    color: #000;
+  }
+  .nt-bundle-icon   { font-size: 2.5rem; margin-bottom: 0.75rem; }
+  .nt-bundle-name   { font-family:'Montserrat',sans-serif; font-size:1.1rem; font-weight:700; margin:0 0 0.5rem; }
+  .nt-bundle-tokens { font-size:2.5rem; font-weight:800; font-family:'Montserrat',sans-serif; line-height:1; margin:0 0 0.25rem; }
+  .nt-bundle-tokens span { font-size:1rem; font-weight:600; color:rgba(255,255,255,0.5); }
+  .nt-bundle-price  { font-size:1.75rem; font-weight:800; color:#39A596; margin:0.25rem 0; }
+  .nt-bundle-per    { font-size:0.75rem; color:rgba(255,255,255,0.4); margin:0 0 1.25rem; }
+  .nt-bundle-perks  { list-style:none; padding:0; margin:0 0 1.5rem; text-align:left; }
+  .nt-bundle-perks li {
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.65);
+    padding: 0.25rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .nt-bundle-perks li:last-child { border-bottom: none; }
+
+  .nt-buy-btn {
+    width: 100%;
+    padding: 0.875rem;
+    background: rgba(57,165,150,0.12);
+    border: 1px solid rgba(57,165,150,0.4);
+    border-radius: 0.75rem;
+    color: #39A596;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+  .nt-buy-btn:hover {
+    background: rgba(57,165,150,0.22);
+    transform: translateY(-1px);
+  }
+  .nt-buy-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+  .nt-buy-btn-featured {
+    background: #39A596;
+    color: #000;
+    border-color: #39A596;
+  }
+  .nt-buy-btn-featured:hover { background: #2a8a7f; }
+
+  /* Success */
+  .nt-success {
+    text-align: center;
+    padding: 3rem;
+    background: rgba(57,165,150,0.08);
+    border: 1px solid rgba(57,165,150,0.3);
+    border-radius: 1.25rem;
+    margin-bottom: 3rem;
+    animation: ntFadeIn 0.4s ease;
+  }
+  @keyframes ntFadeIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+  .nt-success-icon { font-size:3rem; margin-bottom:0.75rem; }
+  .nt-success h2   { font-family:'Montserrat',sans-serif; font-size:1.75rem; font-weight:800; margin:0 0 0.5rem; }
+  .nt-success p    { color:rgba(255,255,255,0.65); margin:0 0 1.5rem; }
+  .nt-success-actions { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; }
+  .nt-cta-btn {
+    padding: 0.75rem 1.5rem;
+    background: #39A596;
+    color: #000;
+    border-radius: 0.75rem;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 0.875rem;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .nt-cta-btn:hover { background: #2a8a7f; }
+  .nt-cta-btn-secondary {
+    padding: 0.75rem 1.5rem;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.7);
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .nt-cta-btn-secondary:hover { border-color:rgba(255,255,255,0.4); color:white; }
+
+  /* FAQ */
+  .nt-faq { max-width: 680px; margin: 0 auto; }
+  .nt-faq-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    text-align: center;
+    margin: 0 0 1.5rem;
+  }
+  .nt-faq-item {
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding: 1rem 0;
+  }
+  .nt-faq-item summary {
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: rgba(255,255,255,0.85);
+  }
+  .nt-faq-item summary::after {
+    content: '+';
+    color: #39A596;
+    font-size: 1.2rem;
+    line-height: 1;
+    transition: transform 0.2s;
+  }
+  .nt-faq-item[open] summary::after { content: '−'; }
+  .nt-faq-item p {
+    color: rgba(255,255,255,0.55);
+    font-size: 0.875rem;
+    line-height: 1.6;
+    margin: 0.75rem 0 0;
+  }
+</style>
+
+<!-- ── Razorpay checkout script ──────────────────────────── -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+(function() {
+  'use strict';
+
+  var CREATOR_API  = 'https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app';
+  var CREATOR_ID   = '{{ customer.id }}';
+  var CREATOR_NAME = '{{ customer.first_name | escape }} {{ customer.last_name | escape }}';
+  var CREATOR_EMAIL= '{{ customer.email | escape }}';
+
+  // Razorpay Key ID — set your live/test key here
+  // Get from: Razorpay Dashboard → Settings → API Keys
+  var RAZORPAY_KEY = '{{ shop.metafields.payments.razorpay_key_id | default: "rzp_test_REPLACE_WITH_YOUR_KEY" }}';
+
+  // ── Fetch current balance ───────────────────────────────
+  async function fetchBalance() {
+    if (!CREATOR_ID) return;
+    try {
+      var resp = await fetch(
+        CREATOR_API + '/api/creator/earnings/summary?creator_id=' + CREATOR_ID,
+        { headers: { 'Accept': 'application/json' } }
+      );
+      var data    = await resp.json();
+      var summary = data.summary || data || {};
+      var credits = summary.ai_credits;
+      if (credits != null) {
+        var chip  = document.getElementById('ntBalanceChip');
+        var count = document.getElementById('ntBalanceCount');
+        if (chip)  chip.style.display  = 'inline-flex';
+        if (count) count.textContent   = credits;
+      }
+    } catch(e) {
+      console.warn('[MN Tokens] Balance fetch failed:', e.message);
+    }
+  }
+
+  // ── Razorpay payment flow ──────────────────────────────
+  function openRazorpay(tokens, amountPaise, label) {
+    if (!CREATOR_ID) {
+      window.location.href = '/account/login?return_to=/pages/narrative-tokens';
+      return;
+    }
+
+    var options = {
+      key:         RAZORPAY_KEY,
+      amount:      amountPaise,       // Razorpay expects paise
+      currency:    'INR',
+      name:        'My Narrative',
+      description: label + ' — ' + tokens + ' Narrative Tokens',
+      image:       '{{ shop.url }}/cdn/shop/files/mn-logo.png',
+      prefill: {
+        name:  CREATOR_NAME.trim(),
+        email: CREATOR_EMAIL,
+      },
+      theme: { color: '#39A596' },
+      modal: {
+        ondismiss: function() {
+          // Re-enable all buy buttons on modal close
+          document.querySelectorAll('.nt-buy-btn').forEach(function(b) {
+            b.disabled    = false;
+            b.textContent = b.getAttribute('data-original-text') || b.textContent;
+          });
+        }
+      },
+      handler: function(response) {
+        // Payment succeeded — grant tokens
+        grantTokens(tokens, label, response.razorpay_payment_id, amountPaise);
+      }
+    };
+
+    var rzp = new Razorpay(options);
+    rzp.on('payment.failed', function(resp) {
+      console.error('[MN Tokens] Payment failed:', resp.error);
+      alert('Payment failed: ' + (resp.error.description || 'Please try again.'));
+      document.querySelectorAll('.nt-buy-btn').forEach(function(b) {
+        b.disabled = false;
+        b.textContent = b.getAttribute('data-original-text') || b.textContent;
+      });
+    });
+    rzp.open();
+  }
+
+  // ── Grant tokens after successful payment ──────────────
+  async function grantTokens(tokens, label, paymentId, amountPaise) {
+    try {
+      var resp = await fetch(CREATOR_API + '/api/creator/tokens/grant', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          creator_id:  CREATOR_ID,
+          tokens:      tokens,
+          payment_id:  paymentId,
+          amount_paise: amountPaise,
+          bundle_label: label,
+          source:      'razorpay_topup',
+        })
+      });
+
+      var result = await resp.json();
+
+      if (resp.ok && (result.success || result.new_balance != null)) {
+        var newBalance = result.new_balance || '?';
+        // Show success panel
+        var successDiv = document.getElementById('ntSuccess');
+        var successMsg = document.getElementById('ntSuccessMsg');
+        var bundles    = document.querySelector('.nt-bundles-grid');
+        if (successMsg) successMsg.textContent =
+          tokens + ' tokens added! Your new balance: ' + newBalance + ' tokens.';
+        if (successDiv) successDiv.style.display = 'block';
+        if (bundles)    bundles.style.display    = 'none';
+
+        // Update badge
+        var count = document.getElementById('ntBalanceCount');
+        if (count) count.textContent = newBalance;
+
+        // Scroll to success
+        if (successDiv) successDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        // Payment went through but grant API failed — show manual resolution
+        alert(
+          'Payment received (ID: ' + paymentId + ') but token credit failed. ' +
+          'Please contact support@mynarrative.store with your payment ID.'
+        );
+      }
+    } catch(e) {
+      console.error('[MN Tokens] Grant failed:', e);
+      alert(
+        'Payment received (ID: ' + paymentId + ') but our server had an error. ' +
+        'Please contact support@mynarrative.store — your tokens will be credited manually.'
+      );
+    }
+  }
+
+  // ── Wire up buy buttons ────────────────────────────────
+  document.querySelectorAll('.nt-buy-btn').forEach(function(btn) {
+    var originalText = btn.textContent;
+    btn.setAttribute('data-original-text', originalText);
+
+    btn.addEventListener('click', function() {
+      var tokens      = parseInt(this.getAttribute('data-tokens'), 10);
+      var amountPaise = parseInt(this.getAttribute('data-amount'), 10);
+      var label       = this.getAttribute('data-label') || 'Token Bundle';
+
+      // Disable button during payment
+      this.disabled    = true;
+      this.textContent = 'Opening payment...';
+
+      openRazorpay(tokens, amountPaise, label);
+    });
+  });
+
+  // ── Load balance on page load ──────────────────────────
+  fetchBalance();
+
+  // ── Check for success param (post-payment redirect) ────
+  var params = new URLSearchParams(window.location.search);
+  if (params.get('payment') === 'success') {
+    var successDiv = document.getElementById('ntSuccess');
+    if (successDiv) {
+      successDiv.style.display = 'block';
+      successDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Narrative Tokens Top-Up",
+  "settings": [],
+  "presets": [{ "name": "Narrative Tokens Top-Up" }]
+}
+{% endschema %}

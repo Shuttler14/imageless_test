@@ -1,0 +1,9 @@
+{
+  "sections": {
+    "main": {
+      "type": "narrative-tokens-topup",
+      "settings": {}
+    }
+  },
+  "order": ["main"]
+}

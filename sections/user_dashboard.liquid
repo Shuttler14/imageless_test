@@ -664,7 +664,7 @@
       <div class="mn-dropzone-icon">ðŸª„</div>
       <div class="mn-dropzone-title">Upload an Outfit Pic â€” Let our AI auto-fill your style profile</div>
       <div class="mn-dropzone-sub">Drop a full-body photo or outfit flat-lay. Our AI reads skin tone, body type, hair style, preferred fit and more â€” filling all fields instantly.</div>
-      <div class="mn-dropzone-tag">Powered by My Narrative AI - mynarrative-ai.vercel.app</div>
+      <div class="mn-dropzone-tag">Powered by My Narrative AI - creator-economy-e5xehp13q-aryans-projects-af8c9a95.vercel.app</div>
     </div>
     <input type="file" id="mn-magic-upload-input" accept="image/*" style="display:none" onchange="mnHandleMagicUpload(this.files[0])" />
   </div>
@@ -984,9 +984,9 @@
 const MN_STORE_KEY  = 'mn_identity';
 const MN_CLOSET_KEY = 'mn_digital_closet';
 const MN_HIST_KEY   = 'mn_outfit_history';
-const MN_AI_API     = 'https://mynarrative-ai.vercel.app/v1/analyze-user';
-const MN_CLOSET_API = 'https://mynarrative-ai.vercel.app/v1/closet-segment';
-const MN_GHOST_API  = 'https://mynarrative-ai.vercel.app/v1/ghost-embed';
+const MN_AI_API     = 'https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app/v1/analyze-user';
+const MN_CLOSET_API = 'https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app/v1/closet-segment';
+const MN_GHOST_API  = 'https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app/v1/ghost-embed';
 const WEATHER_KEY   = '{{ section.settings.weather_api_key | escape }}';
 const MN_CUSTOMER   = '{{ customer.id | default: "guest" }}';
 
@@ -1462,7 +1462,7 @@ async function mnSubmitGhost() {
 <script>
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // MAGIC UPLOAD â€” The AI Data Engine
-// POST image to mynarrative-ai.vercel.app/v1/analyze-user
+// POST image to creator-economy-e5xehp13q-aryans-projects-af8c9a95.vercel.app/v1/analyze-user
 // Response auto-populates visible fields AND all 30 hidden fields
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 async function mnHandleMagicUpload(file) {
@@ -1691,7 +1691,7 @@ async function mnSaveProfile() {
 
   // Optional: POST to your backend for server-side persistence
   try {
-    await fetch('https://mynarrative-ai.vercel.app/api/profile_manager', {
+    await fetch('https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app/api/profile_manager', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'save_profile', user_id: MN_CUSTOMER, profile: mnProfile })

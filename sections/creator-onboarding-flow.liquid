@@ -1,4 +1,4 @@
-{% comment %}
+﻿{% comment %}
 =================================================================================
 CREATOR ONBOARDING FLOW SECTION
 =================================================================================
@@ -6,8 +6,8 @@ Converts signed-in users to creators with brand setup and social verification
 =================================================================================
 {% endcomment %}
 
-{% assign api_base_url = section.settings.api_base_url | default: 'https://mynarrative-ai.vercel.app' %}
-{% assign creator_api_base_url = section.settings.creator_api_base_url | default: 'https://creator-economy-api.vercel.app' %}
+{% assign api_base_url = section.settings.api_base_url | default: 'https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app' %}
+{% assign creator_api_base_url = section.settings.creator_api_base_url | default: 'https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app' %}
 {% assign is_logged_in = false %}
 {% if customer.id != blank %}
   {% assign is_logged_in = true %}
@@ -519,6 +519,97 @@ Converts signed-in users to creators with brand setup and social verification
     font-weight: 700;
   }
 
+  /* Pending Design Card */
+  .cof-pending-card {
+    background: rgba(57,165,150,0.06);
+    border: 1px solid rgba(57,165,150,0.3);
+    border-radius: 1rem;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .cof-pending-header {
+    margin-bottom: 1rem;
+  }
+
+  .cof-pending-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(57,165,150,0.15);
+    color: #39A596;
+    border: 1px solid rgba(57,165,150,0.3);
+    border-radius: 2rem;
+    padding: 0.2rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .cof-pending-label {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: rgba(255,255,255,0.8);
+  }
+
+  .cof-pending-body {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .cof-pending-img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 0.5rem;
+    border: 2px solid rgba(57,165,150,0.3);
+    flex-shrink: 0;
+  }
+
+  .cof-pending-meta {
+    flex: 1;
+  }
+
+  .cof-pending-title {
+    margin: 0 0 0.25rem;
+    font-size: 1rem;
+    font-weight: 700;
+    color: white;
+  }
+
+  .cof-pending-sub {
+    margin: 0 0 0.75rem;
+    font-size: 0.875rem;
+    color: rgba(255,255,255,0.65);
+  }
+
+  .cof-publish-btn {
+    width: 100%;
+    background: #39A596;
+    color: #000;
+    border: none;
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    font-family: Montserrat, sans-serif;
+    font-weight: 700;
+    font-size: 0.875rem;
+    cursor: pointer;
+    margin-top: 0.75rem;
+    transition: all 0.2s;
+  }
+
+  .cof-publish-btn:hover {
+    background: #2d8a85;
+    transform: translateY(-2px);
+  }
+
+  .cof-publish-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
   /* Hidden */
   .cof-hidden { display: none !important; }
 </style>
@@ -559,13 +650,37 @@ Converts signed-in users to creators with brand setup and social verification
         <h3 class="cof-card-title">🎨 Set Up Your Brand</h3>
 
         <div class="cof-input-group">
-          <label>Your Brand Name</label>
-          <input type="text" class="cof-input" id="cofBrandName" placeholder="Enter your brand name" value="{{ user_first_name }}'s Designs">
+          <label>Your Name</label>
+          <input type="text" class="cof-input" id="cofBrandName" placeholder="Enter your full name" value="{{ user_name }}">
         </div>
 
         <div class="cof-input-group">
-          <label>Username (auto-generated)</label>
-          <input type="text" class="cof-input" id="cofUsername" placeholder="your-brand-name" readonly>
+          <label>Narrative Name</label>
+          <div style="font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 6px;">This is your public creator brand name</div>
+          <input type="text" class="cof-input" id="cofNarrativeName" placeholder="Your creative brand name" value="{{ user_first_name }}'s Designs">
+        </div>
+
+        <div class="cof-input-group">
+          <label>Username</label>
+          <input type="text" class="cof-input" id="cofUsername" placeholder="@your_username" pattern="[a-z0-9_]{3,20}">
+        </div>
+
+        <div class="cof-input-group">
+          <label>Tell your story</label>
+          <textarea class="cof-input" id="cofDescription" placeholder="Share your creator story in 200 characters or less" style="resize: vertical; min-height: 80px; font-family: 'Montserrat', sans-serif;" maxlength="200"></textarea>
+          <div style="font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 4px;"><span id="charCount">0</span>/200</div>
+        </div>
+
+        <div class="cof-input-group">
+          <label>Profile Picture</label>
+          <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <button type="button" class="cof-connect-btn" onclick="cofUseInstagramPhoto()" style="flex: 1; min-width: 200px;">📸 Use Instagram Photo</button>
+            <button type="button" class="cof-connect-btn" onclick="document.getElementById('cofPhotoUpload').click()" style="flex: 1; min-width: 200px;">📤 Upload Photo</button>
+          </div>
+          <input type="file" id="cofPhotoUpload" style="display: none;" accept="image/*" onchange="cofUploadPhoto(event)">
+          <div id="cofPhotoPreview" style="margin-top: 12px; display: none;">
+            <img id="cofPhotoImg" src="" alt="Profile preview" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid rgba(57,165,150,0.3);">
+          </div>
         </div>
 
         <div class="cof-profile-preview" id="cofProfilePreview" style="display: none;">
@@ -663,6 +778,22 @@ Converts signed-in users to creators with brand setup and social verification
 
       <!-- Step 3: Create First Design -->
       <div class="cof-hidden" id="cofStep3">
+        <!-- Pending Design Card -->
+        <div class="cof-pending-card" id="cofPendingCard" style="display:none;">
+          <div class="cof-pending-header">
+            <span class="cof-pending-badge">🎨 Pending Design</span>
+            <p class="cof-pending-label">You created a design! Publish it to start earning.</p>
+          </div>
+          <div class="cof-pending-body">
+            <img id="cofPendingImg" src="" alt="Your Design" class="cof-pending-img" />
+            <div class="cof-pending-meta">
+              <h3 id="cofPendingTitle" class="cof-pending-title">My Design</h3>
+              <p class="cof-pending-sub">Status: <span style="color:#f59e0b">● Draft</span></p>
+              <button class="cof-publish-btn" onclick="publishPendingDesign()">🚀 Publish your design to make it live to the world</button>
+            </div>
+          </div>
+        </div>
+
         <!-- Success State -->
         <div class="cof-success" id="cofSuccess">
           <div class="cof-success-icon">🎉</div>
@@ -710,6 +841,60 @@ Converts signed-in users to creators with brand setup and social verification
   <div class="tier" id="cofPopupTier">Creator</div>
 </div>
 
+<!-- SAMPLE KIT UPSELL MODAL (fires after publish) -->
+<div id="mnSampleKitModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:99999;align-items:center;justify-content:center;padding:1.5rem;backdrop-filter:blur(16px);" role="dialog" aria-modal="true">
+  <div style="background:#111;border:1px solid rgba(57,165,150,0.35);border-radius:1.25rem;padding:2.5rem 2rem;max-width:500px;width:100%;position:relative;max-height:90vh;overflow-y:auto;animation:skFadeIn 0.3s ease;">
+    <button onclick="closeSampleKitModal()" style="position:absolute;top:1rem;right:1rem;background:transparent;border:none;color:rgba(255,255,255,0.5);font-size:1.25rem;cursor:pointer;">✕</button>
+
+    <!-- Success header -->
+    <div style="text-align:center;margin-bottom:1.5rem;">
+      <div style="font-size:3rem;margin-bottom:0.5rem;">🚀</div>
+      <h2 style="font-family:Montserrat,sans-serif;font-size:1.5rem;font-weight:800;color:white;margin:0 0 0.5rem;">Your brand is live!</h2>
+      <p style="color:rgba(255,255,255,0.6);font-size:0.9rem;line-height:1.6;margin:0;">Customers can now discover and buy your design.</p>
+    </div>
+
+    <hr style="border:none;border-top:1px solid rgba(255,255,255,0.08);margin:1.25rem 0;">
+
+    <!-- Incentive banner -->
+    <div style="background:linear-gradient(135deg,rgba(57,165,150,0.15),rgba(57,165,150,0.05));border:1px solid rgba(57,165,150,0.3);border-radius:0.75rem;padding:0.875rem 1rem;margin-bottom:1.25rem;display:flex;align-items:flex-start;gap:0.75rem;">
+      <span style="font-size:1.25rem;">🪙</span>
+      <p style="margin:0;font-size:0.85rem;color:rgba(255,255,255,0.8);line-height:1.5;"><strong style="color:#39A596;">Unlock 10 more AI tokens</strong> and boost your sales by 5x with a physical sample.</p>
+    </div>
+
+    <!-- Upsell copy -->
+    <h3 style="font-family:Montserrat,sans-serif;font-size:1rem;font-weight:700;margin:0 0 0.5rem;">Want to make high-converting product videos?</h3>
+    <p style="color:rgba(255,255,255,0.65);font-size:0.875rem;line-height:1.6;margin:0 0 1.25rem;">Buy your physical sample now at wholesale cost. Creators with physical samples sell <strong>5x more</strong>.</p>
+
+    <!-- Product options -->
+    <div style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1rem;">
+      <!-- T-Shirt -->
+      <div style="background:#181818;border:1px solid #2a2a2a;border-radius:0.875rem;padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;transition:border-color 0.2s;" onmouseover="this.style.borderColor='#39A596'" onmouseout="this.style.borderColor='#2a2a2a'">
+        <div>
+          <div style="font-weight:700;margin-bottom:0.2rem;">👕 T-Shirt Sample</div>
+          <div style="font-size:1.1rem;font-weight:800;color:#39A596;">₹500 <span style="font-size:0.75rem;color:rgba(255,255,255,0.35);font-weight:400;text-decoration:line-through;">₹799+</span></div>
+          <div style="font-size:0.75rem;color:#39A596;font-weight:600;">+10 Narrative Tokens 🪙</div>
+        </div>
+        <button class="sk-add-btn" data-product="tshirt" data-price-paise="50000" onclick="addSampleToCart('tshirt',50000)" style="background:#39A596;color:#000;border:none;border-radius:0.5rem;padding:0.6rem 1.25rem;font-family:Montserrat,sans-serif;font-weight:700;font-size:0.8rem;cursor:pointer;white-space:nowrap;transition:background 0.2s;" onmouseover="this.style.background='#2a8a7f'" onmouseout="this.style.background='#39A596'">Add to Cart</button>
+      </div>
+      <!-- Hoodie -->
+      <div style="background:#181818;border:1px solid #2a2a2a;border-radius:0.875rem;padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;transition:border-color 0.2s;" onmouseover="this.style.borderColor='#39A596'" onmouseout="this.style.borderColor='#2a2a2a'">
+        <div>
+          <div style="font-weight:700;margin-bottom:0.2rem;">🧥 Hoodie Sample</div>
+          <div style="font-size:1.1rem;font-weight:800;color:#39A596;">₹900 <span style="font-size:0.75rem;color:rgba(255,255,255,0.35);font-weight:400;text-decoration:line-through;">₹1,499+</span></div>
+          <div style="font-size:0.75rem;color:#39A596;font-weight:600;">+10 Narrative Tokens 🪙</div>
+        </div>
+        <button class="sk-add-btn" data-product="hoodie" data-price-paise="90000" onclick="addSampleToCart('hoodie',90000)" style="background:#39A596;color:#000;border:none;border-radius:0.5rem;padding:0.6rem 1.25rem;font-family:Montserrat,sans-serif;font-weight:700;font-size:0.8rem;cursor:pointer;white-space:nowrap;transition:background 0.2s;" onmouseover="this.style.background='#2a8a7f'" onmouseout="this.style.background='#39A596'">Add to Cart</button>
+      </div>
+    </div>
+
+    <p style="font-size:0.75rem;color:rgba(255,255,255,0.3);text-align:center;margin:0 0 1rem;">Your exact design printed on the sample. Tokens credited when order ships.</p>
+    <button onclick="closeSampleKitModal()" style="display:block;width:100%;background:transparent;border:1px solid #333;color:rgba(255,255,255,0.45);border-radius:0.5rem;padding:0.6rem;font-size:0.875rem;cursor:pointer;">Maybe later</button>
+  </div>
+</div>
+<style>
+@keyframes skFadeIn { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+</style>
+
 <script>
 const COF_API = '{{ creator_api_base_url }}';
 const COF_USER_ID = '{{ user_id }}';
@@ -736,6 +921,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // Update complete button text
     const completeBtn = document.querySelector('#cofStep2 .cof-cta-btn:last-child');
     if (completeBtn) completeBtn.innerHTML = 'Verify & Apply as Elite <span>👑</span>';
+  }
+
+  // Load pending design
+  loadPendingDesign();
+
+  // Character counter for description
+  const descEl = document.getElementById('cofDescription');
+  if (descEl) {
+    descEl.addEventListener('input', function() {
+      document.getElementById('charCount').textContent = this.value.length;
+    });
   }
 });
 
@@ -906,6 +1102,221 @@ function formatFollowers(num) {
   if (num >= 1000) return (num / 1000).toFixed(0) + 'K followers';
   return num + ' followers';
 }
+
+// Load pending design from sessionStorage
+function loadPendingDesign() {
+  var raw = sessionStorage.getItem('mn_pending_design');
+
+  // ── FALLBACK: No pending design found ──────────────────
+  // If user reaches Step 3 (creator funnel) without a design in session,
+  // show a clean "no design" state with a CTA back to the studio.
+  if (!raw) {
+    var pendingCard = document.getElementById('cofPendingCard');
+    if (pendingCard) {
+      pendingCard.style.display = 'block';
+      pendingCard.style.borderColor = 'rgba(255,255,255,0.1)';
+      pendingCard.innerHTML = [
+        '<div style="text-align:center;padding:1.5rem 1rem;">',
+          '<div style="font-size:2.5rem;margin-bottom:0.75rem;">🎨</div>',
+          '<h3 style="font-family:Montserrat,sans-serif;font-size:1rem;font-weight:700;color:white;margin:0 0 0.5rem;">',
+            'No pending design found.',
+          '</h3>',
+          '<p style="color:rgba(255,255,255,0.5);font-size:0.875rem;line-height:1.5;margin:0 0 1.25rem;">',
+            'It looks like you haven\'t created a design yet — or your session expired.',
+          '</p>',
+          '<a href="/pages/ai-studio?intent=creator_ai" style="',
+            'display:inline-flex;align-items:center;gap:0.4rem;',
+            'background:#39A596;color:#000;text-decoration:none;',
+            'padding:0.75rem 1.5rem;border-radius:0.75rem;',
+            'font-family:Montserrat,sans-serif;font-weight:700;font-size:0.875rem;',
+            'transition:background 0.2s;',
+          '">',
+            '🤖 Create a Design with AI',
+          '</a>',
+          '<br><br>',
+          '<a href="/pages/ai-studio?intent=creator_upload" style="',
+            'color:#39A596;font-size:0.8rem;text-decoration:none;',
+          '">',
+            'or upload your own artwork →',
+          '</a>',
+        '</div>'
+      ].join('');
+    }
+    return;
+  }
+  // ── END FALLBACK ─────────────────────────────────────
+
+  try {
+    var d = JSON.parse(raw);
+    var card  = document.getElementById('cofPendingCard');
+    var img   = document.getElementById('cofPendingImg');
+    var title = document.getElementById('cofPendingTitle');
+    if (card)  card.style.display  = 'block';
+    if (img && d.image_url)   img.src          = d.image_url;
+    if (title && d.title)     title.textContent = d.title;
+  } catch(e) { console.warn('pending design parse error', e); }
+}
+
+// Publish pending design
+async function publishPendingDesign() {
+  var raw = sessionStorage.getItem('mn_pending_design');
+  if (!raw) return;
+  var d = JSON.parse(raw);
+  var btn = document.querySelector('.cof-publish-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Publishing...'; }
+
+  try {
+    var resp = await fetch('https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app/api/design/publish', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        design_id:       d.design_uuid,
+        creator_id:      '{{ user_id }}',
+        title:           d.title || 'My Design',
+        product_type:    'tshirt',
+        selected_colors: ['white','black'],
+        price_paise:     79900,
+        mockup_urls:     {}
+      })
+    });
+    var result = await resp.json();
+    if (resp.ok && result.status === 'published') {
+      // Clear pending design from session
+      sessionStorage.removeItem('mn_pending_design');
+      // Show sample kit modal
+      if (typeof window.openSampleKitModal === 'function') {
+        window.openSampleKitModal(result);
+      }
+      // Update card to show published
+      var card = document.getElementById('cofPendingCard');
+      if (card) {
+        card.style.borderColor = 'rgba(57,165,150,0.6)';
+        card.innerHTML += '<p style="color:#39A596;font-weight:700;margin-top:0.5rem">✅ Live! Share your design link.</p>';
+      }
+    } else {
+      if (btn) { btn.disabled = false; btn.textContent = '🚀 Publish your design to make it live to the world'; }
+      alert(result.error || 'Publish failed. Please try again.');
+    }
+  } catch(e) {
+    if (btn) { btn.disabled = false; btn.textContent = '🚀 Publish your design to make it live to the world'; }
+    alert('Network error. Please try again.');
+  }
+}
+
+// Profile photo upload
+async function cofUploadPhoto(event) {
+  var file = event.target.files[0];
+  if (!file) return;
+  
+  var formData = new FormData();
+  formData.append('photo', file);
+  formData.append('creator_id', COF_USER_ID);
+
+  try {
+    var resp = await fetch(COF_API + '/api/creator/profile/upload-photo', {
+      method: 'POST',
+      body: formData
+    });
+    var result = await resp.json();
+    if (result.success && result.photo_url) {
+      var img = document.getElementById('cofPhotoImg');
+      if (img) img.src = result.photo_url;
+      document.getElementById('cofPhotoPreview').style.display = 'block';
+    } else {
+      alert(result.error || 'Upload failed');
+    }
+  } catch(e) {
+    alert('Upload error: ' + e.message);
+  }
+}
+
+// Use Instagram photo
+function cofUseInstagramPhoto() {
+  // Check if Instagram is connected
+  if (!cofConnectedSocials.instagram) {
+    alert('Please connect Instagram first');
+    return;
+  }
+  
+  // In a real scenario, this would fetch the user's Instagram profile picture
+  // For now, show a placeholder
+  var igHandle = cofConnectedSocials.instagram.handle;
+  var photoUrl = 'https://api.instagram.com/user/' + igHandle + '/profile_pic.jpg';
+  
+  var img = document.getElementById('cofPhotoImg');
+  if (img) img.src = photoUrl;
+  document.getElementById('cofPhotoPreview').style.display = 'block';
+}
+
+// Sample Kit Modal Functions
+window.PUBLISH_RESULT_GLOBAL = null;
+
+function openSampleKitModal(publishResult) {
+  window.PUBLISH_RESULT_GLOBAL = publishResult || {};
+  var modal = document.getElementById('mnSampleKitModal');
+  if (modal) { modal.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+}
+
+function closeSampleKitModal() {
+  var modal = document.getElementById('mnSampleKitModal');
+  if (modal) { modal.style.display = 'none'; document.body.style.overflow = ''; }
+}
+
+async function addSampleToCart(productType, pricePaise) {
+  var pr = window.PUBLISH_RESULT_GLOBAL || {};
+  var variantMap = pr.variant_map || {};
+  var defaultColor = productType === 'tshirt' ? 'white' : 'black';
+  var variantInfo  = variantMap[defaultColor] || {};
+  var variantId    = variantInfo.variant_numeric || '';
+
+  var btn = document.querySelector('[data-product="' + productType + '"].sk-add-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Adding...'; }
+
+  if (!variantId) {
+    // Fallback: redirect to cart with product page
+    window.location.href = '/products/creator-sample-kit?variant=' + productType;
+    return;
+  }
+
+  var payload = {
+    items: [{
+      id: variantId,
+      quantity: 1,
+      properties: {
+        '_design_uuid':   pr.unique_product_id || '',
+        '_design_title':  pr.title || '',
+        '_creator_id':    '{{ user_id }}',
+        '_product_type':  productType,
+        '_color':         defaultColor,
+        '_is_sample_kit': 'true'
+      }
+    }]
+  };
+
+  try {
+    var resp = await fetch('/cart/add.js', {
+      method:  'POST',
+      headers: {'Content-Type': 'application/json'},
+      body:    JSON.stringify(payload)
+    });
+    if (resp.ok) {
+      if (btn) btn.textContent = '✅ Added!';
+      setTimeout(function() { window.location.href = '/cart'; }, 800);
+    } else {
+      var err = await resp.json();
+      if (btn) { btn.disabled = false; btn.textContent = err.description || 'Error'; }
+    }
+  } catch(e) {
+    if (btn) { btn.disabled = false; btn.textContent = 'Cart error'; }
+  }
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeSampleKitModal();
+});
+
+window.openSampleKitModal  = openSampleKitModal;
+window.closeSampleKitModal = closeSampleKitModal;
 </script>
 
 {% schema %}
@@ -916,13 +1327,13 @@ function formatFollowers(num) {
       "type": "text",
       "id": "api_base_url",
       "label": "Main API Base URL",
-      "default": "https://mynarrative-ai.vercel.app"
+      "default": "https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app"
     },
     {
       "type": "text",
       "id": "creator_api_base_url",
       "label": "Creator Economy API Base URL",
-      "default": "https://creator-economy-api.vercel.app"
+      "default": "https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app"
     }
   ],
   "presets": [

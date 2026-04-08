@@ -1,4 +1,4 @@
-<div class="bc-page">
+﻿<div class="bc-page">
   <!-- Fixed background shapes -->
   <div class="bc-bg-shape bc-bg-shape-teal"></div>
   <div class="bc-bg-shape bc-bg-shape-purple"></div>
@@ -28,7 +28,7 @@
       </div>
     </div>
 
-    <button class="bc-btn bc-btn-primary" onclick="openBcModal()">&#x2728; Start Creating Today</button>
+    <button class="bc-btn bc-btn-primary" onclick="openIntentModal()">&#x2728; Start Creating Today</button>
   </section>
 
   <!-- SOCIAL PROOF MARQUEE -->
@@ -244,7 +244,7 @@
   <!-- FINAL CTA -->
   <section class="bc-final-cta">
     <p class="bc-final-cta-text">Ready to start earning?</p>
-    <a href="/account/register" class="bc-btn bc-btn-primary">&#x1F680; Create Your Account</a>
+    <button class="bc-btn bc-btn-primary" onclick="openIntentModal()">&#x2728; Start Creating Today</button>
   </section>
 
   <!-- MODAL -->
@@ -1162,7 +1162,7 @@
 <script>
   // Modal Functions
   // -- Backend API base --
-  const BC_API = 'https://mynarrative-ai.vercel.app';
+  const BC_API = 'https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app';
 
   // -- Platform meta --
   const BC_PLATFORMS = {
@@ -1446,6 +1446,393 @@
       }
     });
   });
+</script>
+
+<!-- INTENT-BASED CREATOR MODAL -->
+<div id="bcIntentModal" class="bc-intent-modal">
+  <div class="bc-intent-modal-overlay" onclick="closeIntentModal()"></div>
+  <div class="bc-intent-modal-card">
+    <button class="bc-intent-modal-close" onclick="closeIntentModal()">✕</button>
+    <h2 class="bc-intent-modal-heading">How do you want to create?</h2>
+    <p class="bc-intent-modal-subtext">Choose your path. Both are free to start.</p>
+    
+    <div class="bc-intent-options">
+      <!-- Option 1: Upload Your Design -->
+      <!-- Hidden file input for native OS gallery/camera picker -->
+      <input type="file" id="bcDesignFileInput" accept="image/*"
+        style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;"
+        aria-hidden="true" />
+
+      <div class="bc-intent-option" onclick="document.getElementById('bcDesignFileInput').click()">
+        <div class="bc-intent-icon">📤</div>
+        <h3 class="bc-intent-option-heading">Upload Your Design</h3>
+        <p class="bc-intent-option-subtext">Already have a logo or artwork? Upload it for free.</p>
+        <button class="bc-intent-option-btn bc-intent-option-btn-secondary" id="bcUploadBtn"
+          onclick="event.stopPropagation(); document.getElementById('bcDesignFileInput').click()">
+          CHOOSE DESIGN
+        </button>
+      </div>
+
+      <!-- Option 2: Create with AI -->
+      <div class="bc-intent-option">
+        <div class="bc-intent-icon">🤖</div>
+        <h3 class="bc-intent-option-heading">Create with AI</h3>
+        <p class="bc-intent-option-subtext">Generate a custom design in 60 seconds. Uses 1 Narrative Token.</p>
+        <button class="bc-intent-option-btn bc-intent-option-btn-primary" onclick="window.location.href='/pages/ai-studio?intent=creator_ai'">Get Started</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .bc-intent-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 10002;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+
+  .bc-intent-modal.open {
+    display: flex;
+  }
+
+  .bc-intent-modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    z-index: -1;
+  }
+
+  .bc-intent-modal-card {
+    background: #111;
+    border: 1px solid rgba(57, 165, 150, 0.3);
+    border-radius: 1.25rem;
+    padding: 2rem 1.75rem;
+    max-width: 480px;
+    width: 100%;
+    position: relative;
+    z-index: 1;
+    animation: bcIntentSlideIn 0.3s ease;
+  }
+
+  @keyframes bcIntentSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Close button fix: 44×44px touch target, no overlap with heading */
+  .bc-intent-modal-close {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s;
+    font-weight: 400;
+    line-height: 1;
+    z-index: 10;
+    flex-shrink: 0;
+  }
+
+  .bc-intent-modal-close:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: #39A596;
+    color: #39A596;
+    transform: rotate(90deg);
+  }
+
+  /* Ensure heading has right-padding so text doesn't run under the close button */
+  .bc-intent-modal-heading {
+    padding-right: 3rem;
+  }
+
+  /* Mobile: 48×48px for easier tapping */
+  @media (max-width: 480px) {
+    .bc-intent-modal-close {
+      width: 48px;
+      height: 48px;
+      min-width: 48px;
+      min-height: 48px;
+      top: 0.5rem;
+      right: 0.5rem;
+    }
+  }
+
+  .bc-intent-modal-heading {
+    font-family: Montserrat, sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 0.5rem;
+    text-align: center;
+  }
+
+  .bc-intent-modal-subtext {
+    font-family: Montserrat, sans-serif;
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.65);
+    text-align: center;
+    margin: 0 0 1.75rem;
+  }
+
+  .bc-intent-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .bc-intent-option {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(57, 165, 150, 0.2);
+    border-radius: 1rem;
+    padding: 1.25rem 1rem;
+    text-align: center;
+    transition: all 0.25s ease;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .bc-intent-option:hover {
+    border-color: #39A596;
+    background: rgba(57, 165, 150, 0.08);
+    transform: translateY(-2px);
+  }
+
+  .bc-intent-icon {
+    font-size: 2.5rem;
+  }
+
+  .bc-intent-option-heading {
+    font-family: Montserrat, sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: white;
+    margin: 0;
+  }
+
+  .bc-intent-option-subtext {
+    font-family: Montserrat, sans-serif;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  .bc-intent-option-btn {
+    font-family: Montserrat, sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 0.7rem 1.2rem;
+    border-radius: 0.6rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    margin-top: auto;
+  }
+
+  .bc-intent-option-btn-primary {
+    background: linear-gradient(135deg, #39A596, #2dd4bf);
+    color: #000;
+    box-shadow: 0 0 16px rgba(57, 165, 150, 0.3);
+  }
+
+  .bc-intent-option-btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 0 24px rgba(57, 165, 150, 0.4);
+  }
+
+  .bc-intent-option-btn-secondary {
+    background: transparent;
+    color: #39A596;
+    border: 1px solid #39A596;
+  }
+
+  .bc-intent-option-btn-secondary:hover {
+    background: rgba(57, 165, 150, 0.1);
+    box-shadow: 0 0 12px rgba(57, 165, 150, 0.25);
+  }
+
+  @media (max-width: 640px) {
+    .bc-intent-modal-card {
+      padding: 1.5rem 1.25rem;
+    }
+
+    .bc-intent-options {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+
+    .bc-intent-modal-heading {
+      font-size: 1.25rem;
+    }
+
+    .bc-intent-option-btn {
+      font-size: 0.8rem;
+      padding: 0.6rem 1rem;
+    }
+  }
+</style>
+
+<script>
+  // ── Intent modal open/close ─────────────────────────────────
+  function openIntentModal() {
+    const modal = document.getElementById('bcIntentModal');
+    if (modal) {
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  function closeIntentModal() {
+    const modal = document.getElementById('bcIntentModal');
+    if (modal) {
+      modal.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+  }
+
+  // Close on Escape
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeIntentModal();
+  });
+
+  // ── Upload button: wire file input → OS gallery picker ──────
+  // When a file is selected, save it and route to ai-studio?intent=creator_upload
+  (function() {
+    var fileInput = document.getElementById('bcDesignFileInput');
+    if (!fileInput) return;
+
+    fileInput.addEventListener('change', function() {
+      var file = this.files && this.files[0];
+      if (!file) return;
+
+      var btn = document.getElementById('bcUploadBtn');
+      if (btn) { btn.textContent = '⏳ Loading...'; btn.disabled = true; }
+
+      // Read file and store in sessionStorage for the studio to pick up
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          var pendingUpload = {
+            data_url:   e.target.result,
+            file_name:  file.name,
+            file_type:  file.type,
+            intent:     'creator_upload',
+            created_at: new Date().toISOString()
+          };
+          sessionStorage.setItem('mn_pending_upload', JSON.stringify(pendingUpload));
+        } catch(err) {
+          console.warn('[MN] sessionStorage write failed:', err);
+        }
+        // Navigate to AI Studio in creator upload mode
+        window.location.href = '/pages/ai-studio?intent=creator_upload';
+      };
+      reader.onerror = function() {
+        if (btn) { btn.textContent = 'CHOOSE DESIGN'; btn.disabled = false; }
+        alert('Could not read the image. Please try again.');
+      };
+      reader.readAsDataURL(file);
+    });
+  })();
+
+  // ── Back-button state machine (second design prompt) ────────
+  // When user finishes first design and clicks "No" (decline second design),
+  // pressing browser Back should revert to the "second design" prompt
+  // rather than losing all context or navigating away entirely.
+  (function() {
+    var BC_STATES = {
+      INITIAL:               'bc_initial',
+      FIRST_DESIGN_DONE:     'bc_first_design_done',
+      SECOND_DESIGN_DECLINED:'bc_second_design_declined',
+    };
+
+    // Replace initial history entry so popstate fires correctly
+    history.replaceState({ bcState: BC_STATES.INITIAL }, '', window.location.href);
+
+    // Called by the studio when first design is complete (via postMessage or global)
+    window.bcMarkFirstDesignDone = function(designData) {
+      // Store design for recovery
+      try {
+        sessionStorage.setItem('bc_first_design', JSON.stringify(designData || {}));
+      } catch(e) {}
+      // Push state so back button lands here
+      history.pushState(
+        { bcState: BC_STATES.FIRST_DESIGN_DONE, design: designData },
+        '', window.location.href
+      );
+    };
+
+    // Called when user clicks "No" on second design prompt
+    window.bcDeclineSecondDesign = function() {
+      history.pushState(
+        { bcState: BC_STATES.SECOND_DESIGN_DECLINED },
+        '', window.location.href
+      );
+    };
+
+    // Render the second-design prompt inside the intent modal
+    function showSecondDesignPrompt() {
+      var card = document.querySelector('.bc-intent-modal-card');
+      if (!card) return;
+
+      var firstDesign = {};
+      try { firstDesign = JSON.parse(sessionStorage.getItem('bc_first_design') || '{}'); } catch(e) {}
+
+      card.innerHTML = [
+        '<button class="bc-intent-modal-close" onclick="closeIntentModal()">✕</button>',
+        firstDesign.image_url
+          ? '<div style="text-align:center;margin-bottom:1rem;"><img src="' + firstDesign.image_url + '" style="width:90px;height:90px;object-fit:cover;border-radius:0.75rem;border:2px solid rgba(57,165,150,0.4);" alt="First design"></div>'
+          : '<div style="text-align:center;font-size:2.5rem;margin-bottom:0.75rem;">🎨</div>',
+        '<h2 class="bc-intent-modal-heading" style="padding-right:3rem;">Create a second design?</h2>',
+        '<p class="bc-intent-modal-subtext">Your first design is saved. You can create another variation or go publish this one now.</p>',
+        '<div style="display:flex;flex-direction:column;gap:0.75rem;margin-top:1rem;">',
+          '<button class="bc-intent-option-btn bc-intent-option-btn-primary" style="width:100%;" onclick="window.location.href=\'/pages/ai-studio?intent=creator_ai\'">🎨 Yes, create another design</button>',
+          '<button class="bc-intent-option-btn bc-intent-option-btn-secondary" style="width:100%;" onclick="bcDeclineSecondDesign(); closeIntentModal(); window.location.href=\'/pages/creator-dashboard\'">No thanks, publish this design →</button>',
+        '</div>'
+      ].join('');
+    }
+
+    // Intercept browser back button
+    window.addEventListener('popstate', function(e) {
+      var state = e.state && e.state.bcState;
+
+      if (state === BC_STATES.FIRST_DESIGN_DONE ||
+          state === BC_STATES.SECOND_DESIGN_DECLINED) {
+        // User pressed back after declining second design
+        // Show the second-design prompt instead of navigating away
+        openIntentModal();
+        showSecondDesignPrompt();
+        console.log('[MN] Back intercepted — showing second design prompt');
+      }
+    });
+
+    // Expose showSecondDesignPrompt for external calls (e.g. from studio page)
+    window.bcShowSecondDesignPrompt = showSecondDesignPrompt;
+  })();
 </script>
 
 {% schema %}

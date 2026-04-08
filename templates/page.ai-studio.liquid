@@ -1,4 +1,573 @@
+﻿{% comment %}
+=================================================================================
+AI STUDIO — Token Gate
+=================================================================================
+Checks creator's Narrative Tokens BEFORE allowing design generation.
+- Fetches from /api/creator/earnings/summary on page load
+- If ai_credits = 0: shows upgrade overlay blocking the studio
+- If ai_credits > 0: shows token count badge and allows access
+- Pre-migration safe: if API returns no ai_credits field, allows access (default 3)
+=================================================================================
+{% endcomment %}
+
+{%- assign creator_id = customer.id | default: '' -%}
+
+<!-- Token Gate Overlay (hidden by default, shown if 0 tokens) -->
+<div id="mnTokenGateOverlay" style="
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.92);
+  z-index: 99998;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  backdrop-filter: blur(12px);
+">
+  <div style="
+    background: #111;
+    border: 1px solid rgba(239,68,68,0.4);
+    border-radius: 1.25rem;
+    padding: 2.5rem 2rem;
+    max-width: 480px;
+    width: 100%;
+    text-align: center;
+    animation: mnTokenGateIn 0.3s ease;
+  ">
+    <div style="font-size:3rem;margin-bottom:1rem;filter:grayscale(1)">🪙</div>
+    <h2 style="font-family:'Montserrat',sans-serif;font-size:1.5rem;font-weight:700;color:white;margin:0 0 0.75rem;">
+      0 Narrative Tokens
+    </h2>
+    <p style="color:rgba(255,255,255,0.65);font-size:0.9rem;line-height:1.6;margin:0 0 1.5rem;">
+      You need at least <strong style="color:#39A596">1 Narrative Token</strong> to generate a design.
+      Tokens are your creative fuel — earn them by selling designs or grab a bundle instantly.
+    </p>
+
+    <!-- Token earning options -->
+    <div style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1.5rem;">
+      <a href="/pages/narrative-tokens" style="
+        display:block;padding:0.875rem 1.5rem;
+        background:linear-gradient(135deg,#39A596,#2dd4bf);
+        color:#000;font-family:'Montserrat',sans-serif;font-weight:700;font-size:0.875rem;
+        text-transform:uppercase;letter-spacing:1px;border-radius:0.75rem;text-decoration:none;
+        transition:all 0.2s;
+      ">🪙 Buy Token Bundle</a>
+
+      <a href="/products/creator-sample-kit" style="
+        display:block;padding:0.875rem 1.5rem;
+        background:rgba(57,165,150,0.12);
+        border:1px solid rgba(57,165,150,0.35);
+        color:#39A596;font-family:'Montserrat',sans-serif;font-weight:600;font-size:0.875rem;
+        border-radius:0.75rem;text-decoration:none;
+      ">🧥 Buy Sample Kit (+10 tokens)</a>
+
+      <a href="/collections/all" style="
+        display:block;padding:0.75rem;
+        color:rgba(255,255,255,0.4);font-size:0.8rem;text-decoration:none;
+      ">Browse store to earn tokens via sales →</a>
+    </div>
+
+    <p style="color:rgba(255,255,255,0.25);font-size:0.75rem;margin:0;">
+      Tokens replenish: +5 per sale · +10 per sample kit purchase
+    </p>
+  </div>
+</div>
+
+<!-- Token Status Badge — fixed bottom-right, clear of content -->
+<div id="mnTokenBadge" style="
+  display: none;
+  position: fixed;
+  bottom: 1.25rem;
+  right: 1.25rem;
+  top: auto;
+  background: rgba(10,10,10,0.88);
+  border: 1px solid rgba(57,165,150,0.4);
+  border-radius: 2rem;
+  padding: 0.4rem 0.9rem 0.4rem 0.65rem;
+  font-size: 0.78rem;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  color: white;
+  z-index: 9985;
+  align-items: center;
+  gap: 0.4rem;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.5), 0 0 0 1px rgba(57,165,150,0.1);
+  cursor: pointer;
+  text-decoration: none;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: border-color 0.2s, box-shadow 0.2s;
+">
+  <span>🪙</span>
+  <span id="mnTokenBadgeCount" style="color:#39A596">–</span>
+  <span style="color:rgba(255,255,255,0.5);font-size:0.7rem">tokens</span>
+</div>
+
+<style>
+  @keyframes mnTokenGateIn {
+    from { opacity:0; transform:translateY(16px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+</style>
+
+<script>
+(function() {
+  'use strict';
+  var CREATOR_API = 'https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app';
+  var CREATOR_ID  = '{{ creator_id }}';
+  var overlay     = document.getElementById('mnTokenGateOverlay');
+  var badge       = document.getElementById('mnTokenBadge');
+  var badgeCount  = document.getElementById('mnTokenBadgeCount');
+
+  function applyTokenState(credits) {
+    if (credits === null || credits === undefined) {
+      // Pre-migration or API unavailable — allow access, show no badge
+      if (overlay) overlay.style.display = 'none';
+      return;
+    }
+
+    if (badgeCount) badgeCount.textContent = credits;
+
+    if (credits <= 0) {
+      // BLOCK studio access
+      if (overlay) overlay.style.display = 'flex';
+      if (badge)   badge.style.display = 'none';
+      // Also prevent any design generation button from firing
+      document.querySelectorAll(
+        '#ai-generate-btn, .generate-btn, [data-action="generate"], #generateBtn'
+      ).forEach(function(btn) {
+        btn.disabled = true;
+        btn.title    = 'Earn Narrative Tokens to generate designs';
+      });
+    } else {
+      // ALLOW — show token badge
+      if (overlay) overlay.style.display = 'none';
+      if (badge) {
+        badge.style.display = 'flex';
+        // Color by token level
+        if (badgeCount) {
+          badgeCount.style.color = credits <= 1 ? '#f59e0b' : '#39A596';
+        }
+        // Click badge → token top-up page
+        badge.onclick = function() { window.location.href = '/pages/narrative-tokens'; };
+      }
+    }
+  }
+
+  async function checkTokens() {
+    if (!CREATOR_ID) {
+      // Not logged in — redirect to login
+      applyTokenState(null);
+      return;
+    }
+    try {
+      var resp = await fetch(
+        CREATOR_API + '/api/creator/earnings/summary?creator_id=' + CREATOR_ID,
+        { headers: { 'Accept': 'application/json' } }
+      );
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      var data    = await resp.json();
+      var summary = data.summary || data || {};
+      var credits = (summary.ai_credits != null) ? summary.ai_credits : null;
+      applyTokenState(credits);
+    } catch (e) {
+      console.warn('[MN AI Studio] Token check failed — allowing access:', e.message);
+      applyTokenState(null); // fail open
+    }
+  }
+
+  // Run on DOMContentLoaded
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', checkTokens);
+  } else {
+    checkTokens();
+  }
+
+  // Expose so studio JS can call after generation to update count
+  window.mnUpdateTokenDisplay = applyTokenState;
+})();
+</script>
+
 <!-- AI Design Studio Page — header/footer isolation fix -->
+
+<!-- ═══════════════════════════════════════════════════════════════
+     TASK 1: Upload Button Fix + TASK 4: Back-Button State Machine
+     Injected via JS since {{ page.content }} renders the studio UI
+     ═══════════════════════════════════════════════════════════════ -->
+<script>
+(function() {
+  'use strict';
+
+  // ── TASK 1: Wire upload button to native file picker ────────────
+  // Finds any button with text "GET STARTED" in the studio and:
+  //   1. Changes text to "CHOOSE DESIGN"
+  //   2. Styles with #39A596 brand color
+  //   3. Wires to a hidden <input type="file"> for native OS gallery
+  function patchUploadButton() {
+    // Find all buttons/links that say "GET STARTED" (case-insensitive)
+    var allBtns = document.querySelectorAll('button, a, [role="button"], input[type="submit"]');
+    allBtns.forEach(function(btn) {
+      var text = (btn.textContent || btn.value || '').trim().toUpperCase();
+      if (text === 'GET STARTED' || text === 'GET STARTED →' || text === 'UPLOAD DESIGN') {
+
+        // Change button text
+        if (btn.tagName === 'INPUT') {
+          btn.value = 'CHOOSE DESIGN';
+        } else {
+          // Preserve any child elements (arrows, icons), just replace text node
+          var hasChildren = btn.children.length > 0;
+          if (hasChildren) {
+            // Replace first text node only
+            for (var i = 0; i < btn.childNodes.length; i++) {
+              if (btn.childNodes[i].nodeType === 3 && btn.childNodes[i].textContent.trim()) {
+                btn.childNodes[i].textContent = 'CHOOSE DESIGN ';
+                break;
+              }
+            }
+          } else {
+            btn.textContent = 'CHOOSE DESIGN';
+          }
+        }
+
+        // Apply #39A596 brand color styling
+        btn.style.cssText += ';background:#39A596 !important;color:#000 !important;border-color:#39A596 !important;';
+
+        // Create hidden file input if not already present
+        var fileInputId = 'mn-studio-file-input';
+        var existingInput = document.getElementById(fileInputId);
+        if (!existingInput) {
+          var fileInput = document.createElement('input');
+          fileInput.type = 'file';
+          fileInput.id = fileInputId;
+          fileInput.accept = 'image/*';
+          fileInput.style.cssText = 'position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;';
+          fileInput.setAttribute('aria-hidden', 'true');
+          document.body.appendChild(fileInput);
+
+          // When file selected, dispatch to studio's existing file handler
+          fileInput.addEventListener('change', function() {
+            var file = this.files[0];
+            if (!file) return;
+            // Try to find studio's own file input and dispatch to it
+            var studioInput = document.querySelector(
+              'input[type="file"]:not(#' + fileInputId + '), #mnw-selfie-input, #design-upload-input, .upload-input'
+            );
+            if (studioInput) {
+              // Transfer file to studio input via DataTransfer
+              try {
+                var dt = new DataTransfer();
+                dt.items.add(file);
+                studioInput.files = dt.files;
+                studioInput.dispatchEvent(new Event('change', { bubbles: true }));
+              } catch(e) {
+                // Fallback: dispatch change event directly on studio input
+                var event = new Event('change', { bubbles: true });
+                studioInput.dispatchEvent(event);
+              }
+            }
+            // Also store in sessionStorage for intent-based routing
+            var reader = new FileReader();
+            reader.onload = function(e) {
+              sessionStorage.setItem('mn_uploaded_design_url', e.target.result);
+              // If in creator intent mode, trigger mnOnDesignReady
+              if (window.MN_CREATOR_INTENT && typeof window.mnOnDesignReady === 'function') {
+                var designId = 'upload-' + Date.now();
+                window.mnOnDesignReady(designId, e.target.result, file.name.replace(/\.[^.]+$/, ''));
+              }
+            };
+            reader.readAsDataURL(file);
+          });
+        }
+
+        // Wire button click to open file picker
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          document.getElementById(fileInputId).click();
+        });
+
+        console.log('[MN] Upload button patched: GET STARTED → CHOOSE DESIGN');
+      }
+    });
+  }
+
+  // ── TASK 4: Back-Button State Machine ──────────────────────────
+  // Problem: browser back button resets the entire studio canvas,
+  //          losing the first design and dropping user to an empty state.
+  // Solution: Push a history entry when the first design is complete.
+  //           On popstate, intercept and revert to "second design" prompt
+  //           instead of navigating away from the page.
+
+  var MN_HISTORY_STATES = {
+    STUDIO_INITIAL:      'mn_studio_initial',
+    FIRST_DESIGN_DONE:   'mn_first_design_done',
+    SECOND_DESIGN_PROMPT:'mn_second_design_prompt',
+    SECOND_DESIGN_DONE:  'mn_second_design_done',
+  };
+
+  // Save the first completed design so back-nav can restore it
+  var mnFirstDesign = null;
+
+  // Push state when first design is complete
+  window.mnMarkFirstDesignComplete = function(designUuid, imageUrl, title) {
+    mnFirstDesign = { uuid: designUuid, imageUrl: imageUrl, title: title, ts: Date.now() };
+    sessionStorage.setItem('mn_first_design', JSON.stringify(mnFirstDesign));
+
+    // Push state so browser back button lands here instead of previous page
+    history.pushState(
+      { state: MN_HISTORY_STATES.FIRST_DESIGN_DONE, design: mnFirstDesign },
+      '',
+      window.location.href
+    );
+    console.log('[MN] History state pushed: first design complete');
+  };
+
+  // Push state when "second design" prompt is shown
+  window.mnShowSecondDesignPrompt = function() {
+    history.pushState(
+      { state: MN_HISTORY_STATES.SECOND_DESIGN_PROMPT },
+      '',
+      window.location.href
+    );
+    renderSecondDesignPrompt();
+  };
+
+  // Render the "second design" prompt UI
+  function renderSecondDesignPrompt() {
+    var first = mnFirstDesign
+      || JSON.parse(sessionStorage.getItem('mn_first_design') || 'null');
+
+    // Find the studio content container
+    var container = document.getElementById('mn-content-container')
+      || document.querySelector('.mn-studio-main, .studio-content, #studio-container');
+
+    if (!container) return;
+
+    container.innerHTML = [
+      '<div style="text-align:center;padding:2.5rem 1.5rem;max-width:480px;margin:0 auto;">',
+        first && first.imageUrl ? (
+          '<img src="' + first.imageUrl + '" alt="Your design" style="width:120px;height:120px;object-fit:cover;border-radius:0.75rem;border:2px solid rgba(57,165,150,0.4);margin-bottom:1.25rem;">'
+        ) : '',
+        '<div style="font-size:2rem;margin-bottom:0.75rem;">🎨</div>',
+        '<h2 style="font-family:Montserrat,sans-serif;font-size:1.25rem;font-weight:800;color:white;margin:0 0 0.5rem;">',
+          first ? 'Great design! Want to create a second one?' : 'Want to create another design?',
+        '</h2>',
+        '<p style="color:rgba(255,255,255,0.6);font-size:0.875rem;line-height:1.5;margin:0 0 1.5rem;">',
+          'Your first design is saved. You can create another variation or go publish this one.',
+        '</p>',
+        '<div style="display:flex;flex-direction:column;gap:0.75rem;">',
+          '<button id="mn-second-design-yes" style="',
+            'padding:0.875rem 1.5rem;background:#39A596;color:#000;border:none;',
+            'border-radius:0.75rem;font-family:Montserrat,sans-serif;font-weight:700;',
+            'font-size:0.875rem;cursor:pointer;width:100%;transition:background 0.2s;',
+          '">🎨 Yes, create another design</button>',
+          '<button id="mn-second-design-no" style="',
+            'padding:0.875rem 1.5rem;background:transparent;',
+            'border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.7);',
+            'border-radius:0.75rem;font-family:Montserrat,sans-serif;font-weight:600;',
+            'font-size:0.875rem;cursor:pointer;width:100%;transition:all 0.2s;',
+          '">No thanks, publish this design →</button>',
+        '</div>',
+      '</div>'
+    ].join('');
+
+    // Wire buttons
+    var yesBtn = document.getElementById('mn-second-design-yes');
+    var noBtn  = document.getElementById('mn-second-design-no');
+
+    if (yesBtn) yesBtn.addEventListener('click', function() {
+      // Start new design — go back to step 0
+      if (typeof renderStep0 === 'function') renderStep0();
+      else if (typeof window.MNAIStylist !== 'undefined') window.MNAIStylist.expandWidget();
+    });
+
+    if (noBtn) noBtn.addEventListener('click', function() {
+      // Publish the first design
+      if (window.MN_CREATOR_INTENT && typeof window.mnOnDesignReady === 'function' && mnFirstDesign) {
+        window.mnOnDesignReady(mnFirstDesign.uuid, mnFirstDesign.imageUrl, mnFirstDesign.title);
+      } else {
+        window.location.href = '/pages/creator-dashboard';
+      }
+    });
+  }
+
+  // ── popstate handler: intercept browser back ──────────────────
+  window.addEventListener('popstate', function(e) {
+    var historyState = e.state && e.state.state;
+
+    if (historyState === MN_HISTORY_STATES.FIRST_DESIGN_DONE ||
+        historyState === MN_HISTORY_STATES.SECOND_DESIGN_PROMPT) {
+      // User hit back after first design was done
+      // Revert to "second design" prompt — do NOT navigate away
+      e.preventDefault && e.preventDefault();
+
+      // Restore first design from session if lost in memory
+      if (!mnFirstDesign) {
+        mnFirstDesign = JSON.parse(sessionStorage.getItem('mn_first_design') || 'null');
+      }
+
+      renderSecondDesignPrompt();
+      console.log('[MN] Back intercepted — showing second design prompt');
+    }
+    // For all other states, allow normal back navigation
+  });
+
+  // ── Push initial state so popstate fires correctly ────────────
+  history.replaceState(
+    { state: MN_HISTORY_STATES.STUDIO_INITIAL },
+    '',
+    window.location.href
+  );
+
+  // ── Run upload button patch after DOM is ready ────────────────
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+      // Patch immediately + retry after content renders (React/Shopify sections may be async)
+      patchUploadButton();
+      setTimeout(patchUploadButton, 500);
+      setTimeout(patchUploadButton, 1500);
+    });
+  } else {
+    patchUploadButton();
+    setTimeout(patchUploadButton, 500);
+    setTimeout(patchUploadButton, 1500);
+  }
+
+  // ── MutationObserver: patch dynamically rendered upload buttons ──
+  var patchObserver = new MutationObserver(function(mutations) {
+    mutations.forEach(function(m) {
+      if (m.addedNodes.length) patchUploadButton();
+    });
+  });
+  if (document.body) {
+    patchObserver.observe(document.body, { childList: true, subtree: true });
+  } else {
+    document.addEventListener('DOMContentLoaded', function() {
+      patchObserver.observe(document.body, { childList: true, subtree: true });
+    });
+  }
+
+  // Expose state machine functions globally
+  window.MN_STUDIO_STATE = MN_HISTORY_STATES;
+  window.mnRenderSecondDesignPrompt = renderSecondDesignPrompt;
+})();
+</script>
+
+<!-- INTENT-BASED ROUTING -->
+<script>
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var intent = params.get('intent') || '';
+  var IS_CREATOR_INTENT = intent.indexOf('creator') !== -1;
+
+  // Store intent in sessionStorage so the studio JS can read it
+  if (IS_CREATOR_INTENT) {
+    sessionStorage.setItem('mn_creator_intent', intent);
+    sessionStorage.setItem('mn_creator_intent_ts', Date.now().toString());
+  }
+
+  // Show a subtle banner indicating creator mode
+  if (IS_CREATOR_INTENT) {
+    var banner = document.createElement('div');
+    banner.id = 'mnCreatorModeBanner';
+    // Elegant floating pill — not a full-width bar
+    banner.style.cssText = [
+      'position:fixed',
+      'top:12px',
+      'left:50%',
+      'transform:translateX(-50%)',
+      'z-index:9991',
+      'background:rgba(10,10,10,0.82)',
+      'border:1px solid rgba(57,165,150,0.5)',
+      'border-radius:2rem',
+      'padding:0.35rem 1rem 0.35rem 0.75rem',
+      'display:flex',
+      'align-items:center',
+      'gap:0.45rem',
+      'font-family:Montserrat,sans-serif',
+      'font-size:0.72rem',
+      'font-weight:700',
+      'color:#39A596',
+      'letter-spacing:0.04em',
+      'white-space:nowrap',
+      'backdrop-filter:blur(12px)',
+      '-webkit-backdrop-filter:blur(12px)',
+      'box-shadow:0 4px 20px rgba(0,0,0,0.4),0 0 0 1px rgba(57,165,150,0.15)',
+      'animation:mnBannerIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both',
+    ].join(';');
+    banner.innerHTML = '<span style="width:7px;height:7px;background:#39A596;border-radius:50%;display:inline-block;box-shadow:0 0 6px #39A596;animation:mnDotPulse 2s ease infinite;"></span>' +
+      '<span style="color:rgba(255,255,255,0.5);font-weight:600;">Creator Mode</span>';
+
+    // Add keyframes once
+    if (!document.getElementById('mnBannerStyles')) {
+      var s = document.createElement('style');
+      s.id = 'mnBannerStyles';
+      s.textContent = [
+        '@keyframes mnBannerIn{from{opacity:0;transform:translateX(-50%) translateY(-8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}',
+        '@keyframes mnDotPulse{0%,100%{opacity:1;box-shadow:0 0 6px #39A596}50%{opacity:0.5;box-shadow:0 0 3px #39A596}}',
+      ].join('');
+      document.head.appendChild(s);
+    }
+    document.body.prepend(banner);
+  }
+
+  // Override the studio's "Add to Cart" / "Buy Now" behavior when in creator intent
+  // Poll for the studio's submit/generate button and intercept it
+  window.MN_CREATOR_INTENT = IS_CREATOR_INTENT;
+
+  // This function is called by the studio when a design is ready
+  // The studio should call: window.mnOnDesignReady(design_uuid, image_url, title)
+  window.mnOnDesignReady = function(designUuid, imageUrl, title) {
+    if (!IS_CREATOR_INTENT) return; // let normal flow proceed
+
+    // Save design data to sessionStorage for the onboarding page
+    var designData = {
+      design_uuid:  designUuid || '',
+      image_url:    imageUrl   || '',
+      title:        title      || 'My Design',
+      intent:       intent,
+      created_at:   new Date().toISOString(),
+    };
+    sessionStorage.setItem('mn_pending_design', JSON.stringify(designData));
+
+    // Show a brief success message before redirecting
+    var overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:Montserrat,sans-serif;color:white;gap:1rem;';
+    overlay.innerHTML = '<div style="font-size:3rem">🎨</div>' +
+      '<h2 style="font-size:1.5rem;font-weight:800;margin:0">Design Saved!</h2>' +
+      '<p style="color:rgba(255,255,255,0.6);margin:0">Setting up your creator profile...</p>' +
+      '<div style="width:48px;height:48px;border:3px solid rgba(57,165,150,0.3);border-top-color:#39A596;border-radius:50%;animation:mnSpin 0.8s linear infinite"></div>';
+    var style = document.createElement('style');
+    style.textContent = '@keyframes mnSpin{to{transform:rotate(360deg)}}';
+    document.head.appendChild(style);
+    document.body.appendChild(overlay);
+
+    // Redirect to creator onboarding after 1.2s
+    setTimeout(function() {
+      window.location.href = '/pages/creator-onboarding?from=studio&intent=' + encodeURIComponent(intent);
+    }, 1200);
+  };
+
+  // Intercept any "Add to Cart" clicks when in creator intent mode
+  document.addEventListener('click', function(e) {
+    if (!IS_CREATOR_INTENT) return;
+    var target = e.target;
+    var isCartBtn = target.matches(
+      '[data-action="add-to-cart"], .add-to-cart, #addToCart, [name="add"], .btn-cart, .product-form__submit'
+    );
+    if (isCartBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      // If design data exists, redirect to onboarding
+      var pending = sessionStorage.getItem('mn_pending_design');
+      if (pending) {
+        window.location.href = '/pages/creator-onboarding?from=studio&intent=' + encodeURIComponent(intent);
+      }
+    }
+  }, true);
+})();
+</script>
+
 <style>
   /* Prevent the design studio content from breaking the theme header/footer */
   .mn-ai-studio-wrapper {

@@ -26,7 +26,10 @@
 
 const MNAIStylist = (() => {
 
-  const API_URL = window.MN_CONFIG?.apiUrl || 'https://mynarrative-ai.vercel.app/api/stylist_pipeline';
+  // NOTE: Stylist pipeline stays on mynarrative-ai.vercel.app (separate project, 10+ functions)
+// Creator economy endpoints use creator-economy-e5xehp13q-aryans-projects-af8c9a95.vercel.app
+const API_URL = window.MN_CONFIG?.apiUrl || 'https://mynarrative-ai.vercel.app/api/stylist_pipeline';
+const CREATOR_API_URL = window.MN_CONFIG?.creatorApiUrl || 'https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app';
 
   // ── STATE ──────────────────────────────────────────────────────────────
   const state = {
@@ -446,6 +449,22 @@ function renderStep4() {
 
 // ── STEP 5A: FLUX-GENERATED LOOK (simulated) ─────────────
 function renderStep5A() {
+  // Hide ALL back buttons when first design starts generating
+  // (user cannot go back mid-generation — would lose context)
+  // Back buttons reappear in renderStep5B/5C (second design phase)
+  ['mnw-s2-back','mnw-s3-back','mnw-s4-back'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  // Add a CSS rule to suppress any .mnw-btn-ghost back buttons during step5A
+  if (!document.getElementById('mn-hide-back-style')) {
+    var s = document.createElement('style');
+    s.id  = 'mn-hide-back-style';
+    s.textContent = '.mn-step5a-active .mnw-btn-ghost { display: none !important; }';
+    document.head.appendChild(s);
+  }
+  var content = document.getElementById('mn-content-container') || document.querySelector('.mnw-content');
+  if (content) content.classList.add('mn-step5a-active');
   state.step = 5; state.step5State = 'A';
   const selectedLabels = state.selectedAesthetics.map(id => AESTHETICS.find(a => a.id === id)?.style || id).join(' / ');
 
@@ -586,6 +605,30 @@ function renderStep5A() {
     const ls = $('#mnw-loading-state'), imgEl = $('#mnw-result-img'), badge = $('#mnw-result-badge');
     const info = $('#mnw-result-info'), ub = $('#mnw-upload-wardrobe'), title = $('#mnw-result-title');
 
+    // ── INTENT-BASED ROUTING HOOK ──────────────────────────
+    // If URL has ?intent=creator_ai or ?intent=creator_upload,
+    // fire window.mnOnDesignReady() instead of the retail UI.
+    const _urlParams   = new URLSearchParams(window.location.search);
+    const _intent      = _urlParams.get('intent') || '';
+    const _isCreator   = _intent.indexOf('creator') !== -1;
+    const _designUuid  = data.unique_product_id || data.design_uuid || data.session_id || userId || '';
+    const _designTitle = selectedLabels || 'My Narrative Design';
+
+    if (_isCreator && typeof window.mnOnDesignReady === 'function') {
+      // Mark first design complete for back-button state machine
+      if (typeof window.mnMarkFirstDesignComplete === 'function') {
+        window.mnMarkFirstDesignComplete(_designUuid, imgUrl || getGeneratedImg(), _designTitle);
+      }
+      window.mnOnDesignReady(_designUuid, imgUrl || getGeneratedImg(), _designTitle);
+      return; // stop retail UI from rendering
+    }
+
+    // Non-creator flow: mark first design complete for back-button state
+    if (typeof window.mnMarkFirstDesignComplete === 'function') {
+      window.mnMarkFirstDesignComplete(_designUuid, imgUrl || getGeneratedImg(), _designTitle);
+    }
+    // ── END INTENT HOOK ────────────────────────────────────
+
     if (imgUrl && imgEl) {
       imgEl.src = imgUrl;
       imgEl.onerror = () => { imgEl.src = 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=480&h=640&fit=crop'; };
@@ -633,6 +676,9 @@ function renderStep5A() {
 }
 // ── STEP 5B: SCANNING ANIMATION ──────────────────────────
 function renderStep5B() {
+  // First design complete — remove back suppression so back IS visible again
+  var content = document.getElementById('mn-content-container') || document.querySelector('.mnw-content');
+  if (content) content.classList.remove('mn-step5a-active');
   state.step5State = 'B'; state.scanVisibleItems = 0;
   setContent(`
     <div class="mnw-step">
@@ -836,8 +882,23 @@ function expandWidget() {
   state.isExpanded = true;
   const expanded  = document.getElementById('mn-widget-expanded');
   const minimized = document.getElementById('mn-widget-minimized');
-  if (expanded)  { expanded.style.display = 'flex'; expanded.removeAttribute('aria-hidden'); }
-  if (minimized) minimized.style.display = 'none';
+
+  if (expanded) {
+    // Smooth entrance animation — fade + slide up
+    expanded.style.display    = 'flex';
+    expanded.style.opacity    = '0';
+    expanded.style.transform  = 'translateY(20px) scale(0.97)';
+    expanded.style.transition = 'opacity 0.35s cubic-bezier(0.4,0,0.2,1), transform 0.35s cubic-bezier(0.4,0,0.2,1)';
+    expanded.removeAttribute('aria-hidden');
+    // Trigger reflow so transition plays
+    expanded.getBoundingClientRect();
+    expanded.style.opacity   = '1';
+    expanded.style.transform = 'translateY(0) scale(1)';
+  }
+  if (minimized) {
+    minimized.style.display = 'none';
+    minimized.classList.remove('mn-widget-attention');
+  }
   if (state.step <= 1 && !$('#mnw-step0-cta')) renderStep0();
 }
 
@@ -951,9 +1012,20 @@ function initWidget() {
   window.addEventListener('mn-identity-updated', syncWidgetProfileFromIdentity);
   window.addEventListener('storage', (e) => { if (e.key === 'mn_identity') syncWidgetProfileFromIdentity(); });
 
-  // Auto-open after 3s on first visit
+  // Auto-open after 15s on first visit — smooth animated entrance
   if (!sessionStorage.getItem('mn_widget_seen')) {
-    setTimeout(() => { expandWidget(); sessionStorage.setItem('mn_widget_seen', '1'); }, 3000);
+    setTimeout(() => {
+      // 1. Give the minimized bubble a "attention" pulse before expanding
+      if (minimized) {
+        minimized.style.display = 'flex';
+        minimized.classList.add('mn-widget-attention');
+      }
+      // 2. Brief pause so user sees the bubble, then smoothly expand
+      setTimeout(() => {
+        expandWidget();
+        sessionStorage.setItem('mn_widget_seen', '1');
+      }, 800);
+    }, 15000);
   } else {
     if (minimized) minimized.style.display = 'flex';
   }
