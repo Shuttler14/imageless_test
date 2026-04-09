@@ -1,4 +1,4 @@
-﻿/**
+/**
  * MY NARRATIVE — AI STYLIST WIDGET v3.0 (Main Character Flow)
  * ============================================================
  * The full 5-step "Main Character" onboarding flow inside the
@@ -140,6 +140,9 @@ const CREATOR_API_URL = window.MN_CONFIG?.creatorApiUrl || 'https://creator-econ
     const c = $('#mn-content-container');
     if (c) c.innerHTML = html;
     updateProgress();
+    // TASK 3: Scroll wrapper to top on every step transition
+    const wrapper = document.querySelector('.mn-ai-studio-wrapper');
+    if(wrapper) wrapper.scrollTo({top: 0, behavior: 'smooth'});
   };
 
   const updateProgress = () => {

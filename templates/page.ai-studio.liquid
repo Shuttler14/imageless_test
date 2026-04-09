@@ -1,4 +1,4 @@
-﻿{% comment %}
+{% comment %}
 =================================================================================
 AI STUDIO — Token Gate
 =================================================================================
@@ -526,6 +526,11 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
     });
 
     if (noBtn) noBtn.addEventListener('click', function() {
+      // TASK 6a: Force login redirect if user is not logged in
+      if (!window.isCustomerLoggedIn) {
+        window.location.href = '/account/login?return_url=' + encodeURIComponent(window.location.pathname + window.location.search);
+        return;
+      }
       history.pushState(
         { state: MN_HISTORY_STATES.SECOND_DESIGN_DONE },
         '',
@@ -962,6 +967,8 @@ document.addEventListener('DOMContentLoaded', function() {
       });
 
       if (!response.ok) {
+        // TASK 6b: Specific alert for cart errors to guide debugging
+        alert("Cart Error: Please ensure the correct Variant ID is set in page.ai-studio.liquid.");
         const errorText = await response.text();
         throw new Error(errorText || 'Failed to add sample kit to cart');
       }

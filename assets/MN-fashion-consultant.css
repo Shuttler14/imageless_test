@@ -6697,3 +6697,34 @@
   text-align: center;
   line-height: 1.4;
 }
+
+/* ═══════════════════════════════════════════════════════════
+   UX PATCHES — April 2026
+   ═══════════════════════════════════════════════════════════ */
+
+/* TASK 1: Vibe / Occasion Options — 2-column side-by-side grid */
+.ai-options-grid, .mnw-occasion-chips {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px !important;
+}
+
+/* TASK 2: Black Glassmorphism — Creator Mode pill + Back buttons */
+.mnw-btn-ghost, #mnCreatorModeBanner {
+    background: rgba(15, 15, 15, 0.85) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    color: #fff !important;
+    z-index: 9999 !important;
+}
+
+/* TASK 4: Fix touch scrolling on generated design image */
+.mnw-result-img, .mnw-result-wrap, .ai-generated-image-container {
+    touch-action: pan-y auto !important;
+    pointer-events: auto !important;
+}
+
+/* TASK 5: Hide vertical scrollbar for app-like feel */
+.mn-ai-studio-wrapper::-webkit-scrollbar { display: none; }
+.mn-ai-studio-wrapper { -ms-overflow-style: none; scrollbar-width: none; }
