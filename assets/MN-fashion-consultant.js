@@ -614,13 +614,16 @@ function renderStep5A() {
     const _designUuid  = data.unique_product_id || data.design_uuid || data.session_id || userId || '';
     const _designTitle = selectedLabels || 'My Narrative Design';
 
-    if (_isCreator && typeof window.mnOnDesignReady === 'function') {
+    if (_isCreator) {
       // Mark first design complete for back-button state machine
       if (typeof window.mnMarkFirstDesignComplete === 'function') {
         window.mnMarkFirstDesignComplete(_designUuid, imgUrl || getGeneratedImg(), _designTitle);
       }
-      window.mnOnDesignReady(_designUuid, imgUrl || getGeneratedImg(), _designTitle);
-      return; // stop retail UI from rendering
+      if (typeof window.mnShowSecondDesignPrompt === 'function') {
+        window.mnShowSecondDesignPrompt();
+      } else if (typeof window.mnRenderSecondDesignPrompt === 'function') {
+        window.mnRenderSecondDesignPrompt();
+      }
     }
 
     // Non-creator flow: mark first design complete for back-button state

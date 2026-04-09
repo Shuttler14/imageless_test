@@ -515,6 +515,43 @@ Admin interface for reviewing creator applications with approve/reject actions
   }
 
   .cv-hidden { display: none !important; }
+
+  .cv-ops-panel {
+    margin: 0 0 24px;
+    background: rgba(57, 165, 150, 0.08);
+    border: 1px solid rgba(57, 165, 150, 0.25);
+    border-radius: 16px;
+    padding: 16px;
+  }
+
+  .cv-ops-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--cv-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 10px;
+  }
+
+  .cv-ops-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .cv-ops-status {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .cv-ops-links a {
+    color: var(--cv-primary-light);
+    text-decoration: none;
+    margin-right: 12px;
+    font-size: 13px;
+    font-weight: 600;
+  }
 </style>
 
 <div class="cv-page">
@@ -566,6 +603,17 @@ Admin interface for reviewing creator applications with approve/reject actions
           <button class="cv-filter-btn" data-filter="pending" onclick="cvFilter('pending')">Pending</button>
           <button class="cv-filter-btn" data-filter="approved" onclick="cvFilter('approved')">Approved</button>
           <button class="cv-filter-btn" data-filter="rejected" onclick="cvFilter('rejected')">Rejected</button>
+        </div>
+
+        <div class="cv-ops-panel">
+          <div class="cv-ops-title">Fulfillment Ops</div>
+          <div class="cv-ops-row">
+            <button class="cv-btn cv-btn-approve" id="cvGangSheetBtn" onclick="cvGenerateGangSheet()">
+              Generate Today's DTF Gang Sheet
+            </button>
+            <span class="cv-ops-status" id="cvGangSheetStatus">Ready</span>
+          </div>
+          <div class="cv-ops-links cv-hidden" id="cvGangSheetLinks"></div>
         </div>
 
         <!-- Loading State -->
@@ -870,6 +918,50 @@ function cvGetPlatformIcon(platform) {
     tiktok: '🎵'
   };
   return icons[platform.toLowerCase()] || '🔗';
+}
+
+async function cvGenerateGangSheet() {
+  const btn = document.getElementById('cvGangSheetBtn');
+  const status = document.getElementById('cvGangSheetStatus');
+  const links = document.getElementById('cvGangSheetLinks');
+
+  if (!btn || !status || !links) return;
+  btn.disabled = true;
+  btn.textContent = 'Generating...';
+  status.textContent = 'Packing designs and building gang sheet...';
+  links.classList.add('cv-hidden');
+  links.innerHTML = '';
+
+  try {
+    const response = await fetch(`${CV_API}/api/fulfillment/generate_gang_sheet`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    const data = await response.json();
+
+    if (!response.ok || data.error) {
+      throw new Error(data.error || 'Gang sheet generation failed');
+    }
+
+    status.textContent = `Done. Packed ${data.count || 0} print jobs.`;
+    const html = [];
+    if (data.gang_sheet_png_url) {
+      html.push(`<a href="${data.gang_sheet_png_url}" target="_blank" rel="noopener">Download PNG</a>`);
+    }
+    if (data.gang_sheet_pdf_url) {
+      html.push(`<a href="${data.gang_sheet_pdf_url}" target="_blank" rel="noopener">Download PDF</a>`);
+    }
+    if (html.length) {
+      links.innerHTML = html.join('');
+      links.classList.remove('cv-hidden');
+    }
+  } catch (e) {
+    console.error('Gang sheet generation error:', e);
+    status.textContent = `Error: ${e.message || 'Request failed'}`;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Generate Today's DTF Gang Sheet";
+  }
 }
 
 // Close modal on overlay click

@@ -1103,9 +1103,26 @@ function formatFollowers(num) {
   return num + ' followers';
 }
 
-// Load pending design from sessionStorage
+function getPendingDesignRaw() {
+  var raw = localStorage.getItem('mn_pending_design');
+  if (!raw) return null;
+  try {
+    var parsed = JSON.parse(raw);
+    var ts = Number(parsed.saved_at || 0);
+    if (ts && (Date.now() - ts) > (2 * 60 * 60 * 1000)) {
+      localStorage.removeItem('mn_pending_design');
+      return null;
+    }
+    return JSON.stringify(parsed);
+  } catch (e) {
+    localStorage.removeItem('mn_pending_design');
+    return null;
+  }
+}
+
+// Load pending design from localStorage
 function loadPendingDesign() {
-  var raw = sessionStorage.getItem('mn_pending_design');
+  var raw = getPendingDesignRaw();
 
   // ── FALLBACK: No pending design found ──────────────────
   // If user reaches Step 3 (creator funnel) without a design in session,
@@ -1159,7 +1176,7 @@ function loadPendingDesign() {
 
 // Publish pending design
 async function publishPendingDesign() {
-  var raw = sessionStorage.getItem('mn_pending_design');
+  var raw = getPendingDesignRaw();
   if (!raw) return;
   var d = JSON.parse(raw);
   var btn = document.querySelector('.cof-publish-btn');
@@ -1181,8 +1198,8 @@ async function publishPendingDesign() {
     });
     var result = await resp.json();
     if (resp.ok && result.status === 'published') {
-      // Clear pending design from session
-      sessionStorage.removeItem('mn_pending_design');
+      // Clear pending design after publish
+      localStorage.removeItem('mn_pending_design');
       // Show sample kit modal
       if (typeof window.openSampleKitModal === 'function') {
         window.openSampleKitModal(result);

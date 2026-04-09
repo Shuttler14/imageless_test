@@ -95,6 +95,9 @@
 </head>
 
 <body>
+  <script>
+    window.isCustomerLoggedIn = {% if customer %}true{% else %}false{% endif %};
+  </script>
   {% render 'preloader-narrative' %}
   <main role="main" class="bg-black text-white">
     {% sections 'header-group' %}

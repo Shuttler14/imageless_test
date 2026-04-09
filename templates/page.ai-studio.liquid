@@ -12,6 +12,13 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
 
 {%- assign creator_id = customer.id | default: '' -%}
 
+<script>
+  window.ENV = Object.assign({}, window.ENV || {}, {
+    SUPABASE_URL: "{{ settings.supabase_url | default: '' | escape }}",
+    SUPABASE_ANON_KEY: "{{ settings.supabase_anon_key | default: '' | escape }}"
+  });
+</script>
+
 <!-- Token Gate Overlay (hidden by default, shown if 0 tokens) -->
 <div id="mnTokenGateOverlay" style="
   display: none;
@@ -113,6 +120,9 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
 <script>
 (function() {
   'use strict';
+  var pageParams = new URLSearchParams(window.location.search);
+  var pageIntent = pageParams.get('intent') || '';
+  var BYPASS_TOKENS_FOR_UPLOAD = pageIntent === 'creator_upload';
   var CREATOR_API = 'https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app';
   var CREATOR_ID  = '{{ creator_id }}';
   var overlay     = document.getElementById('mnTokenGateOverlay');
@@ -155,6 +165,10 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
   }
 
   async function checkTokens() {
+    if (BYPASS_TOKENS_FOR_UPLOAD) {
+      applyTokenState(null);
+      return;
+    }
     if (!CREATOR_ID) {
       // Not logged in — redirect to login
       applyTokenState(null);
@@ -197,6 +211,128 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
 <script>
 (function() {
   'use strict';
+  var SUPABASE_URL = (window.ENV && window.ENV.SUPABASE_URL) || '';
+  var SUPABASE_ANON_KEY = (window.ENV && window.ENV.SUPABASE_ANON_KEY) || '';
+
+  function savePendingDesign(designData) {
+    if (!designData) return;
+    var payload = Object.assign({}, designData, { saved_at: Date.now() });
+    try {
+      localStorage.setItem('mn_pending_design', JSON.stringify(payload));
+    } catch (err) {
+      console.warn('[MN] localStorage write failed for pending design', err);
+    }
+  }
+
+  function routeUploadToStudioFlow(file, publicUrl) {
+    var uploadedUrl = publicUrl || '';
+    var title = file && file.name ? file.name.replace(/\.[^.]+$/, '') : 'Uploaded Design';
+    var uploadPayload = {
+      file_name: file && file.name ? file.name : '',
+      file_type: file && file.type ? file.type : '',
+      file_size: file && file.size ? file.size : 0,
+      image_url: uploadedUrl,
+      asset_url: uploadedUrl,
+      title: title,
+      source: 'creator_upload',
+      uploaded_at: new Date().toISOString()
+    };
+
+    // Let any studio implementation consume this without forcing a full finish redirect.
+    window.mnUploadedDesign = uploadPayload;
+    window.dispatchEvent(new CustomEvent('mn:upload-design-ready', { detail: uploadPayload }));
+
+    if (window.state && typeof window.state === 'object') {
+      window.state.isUploadedDesign = true;
+      window.state.designSource = 'upload';
+      window.state.uploadedDesignUrl = uploadedUrl;
+      window.state.generatedImage = uploadedUrl;
+      window.state.uploadedDesignMeta = uploadPayload;
+    }
+
+    if (typeof window.goToStep === 'function') {
+      // Step 3 in this studio is Fabric Color + Placement in current flow.
+      window.goToStep(3);
+    } else if (typeof window.renderStep3 === 'function') {
+      window.renderStep3();
+    } else if (typeof window.MNAIStylist !== 'undefined' && typeof window.MNAIStylist.expandWidget === 'function') {
+      window.MNAIStylist.expandWidget();
+    }
+  }
+
+  function showUploadError() {
+    var message = 'Upload failed. Please ensure your file is a valid image under 15MB and try again.';
+    var errEl = document.getElementById('mn-upload-error');
+    if (!errEl) {
+      errEl = document.createElement('div');
+      errEl.id = 'mn-upload-error';
+      errEl.style.cssText = 'margin:10px 0 0;padding:10px 12px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.35);border-radius:10px;color:#fecaca;font-size:12px;line-height:1.45;text-align:center;';
+      var wrapper = document.querySelector('.mn-ai-studio-wrapper') || document.body;
+      if (wrapper) wrapper.prepend(errEl);
+    }
+    errEl.textContent = message;
+    errEl.style.display = 'block';
+  }
+
+  function clearUploadError() {
+    var errEl = document.getElementById('mn-upload-error');
+    if (errEl) errEl.style.display = 'none';
+  }
+
+  function buildUploadFileName(file) {
+    var typeParts = (file && file.type ? file.type : 'image/png').split('/');
+    var ext = (typeParts[1] || 'png').toLowerCase().replace(/[^a-z0-9]/g, '') || 'png';
+    var id = (window.crypto && window.crypto.randomUUID)
+      ? window.crypto.randomUUID()
+      : (Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8));
+    return 'custom_upload_' + id + '.' + ext;
+  }
+
+  async function uploadDesignAsset(file) {
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) throw new Error('missing_supabase_env');
+    if (!file || !file.type || file.type.indexOf('image/') !== 0 || file.size > (15 * 1024 * 1024)) {
+      throw new Error('invalid_file');
+    }
+    var fileName = buildUploadFileName(file);
+    var uploadUrl = SUPABASE_URL + '/storage/v1/object/creator_assets/' + encodeURIComponent(fileName);
+    var resp = await fetch(uploadUrl, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + SUPABASE_ANON_KEY,
+        apikey: SUPABASE_ANON_KEY,
+        'Content-Type': file.type
+      },
+      body: file
+    });
+    if (!resp.ok) throw new Error('supabase_upload_failed');
+    return SUPABASE_URL + '/storage/v1/object/public/creator_assets/' + fileName;
+  }
+
+  function consumePendingUploadFromIntent() {
+    var params = new URLSearchParams(window.location.search);
+    if ((params.get('intent') || '') !== 'creator_upload') return;
+    var raw = sessionStorage.getItem('mn_pending_upload');
+    if (!raw) return;
+    var pending = null;
+    try { pending = JSON.parse(raw); } catch (e) {}
+    sessionStorage.removeItem('mn_pending_upload');
+    if (!pending || !pending.data_url) return;
+
+    fetch(pending.data_url)
+      .then(function(r) { return r.blob(); })
+      .then(function(blob) {
+        var inferredName = pending.file_name || ('upload-' + Date.now() + '.png');
+        var inferredType = pending.file_type || blob.type || 'image/png';
+        var file = new File([blob], inferredName, { type: inferredType });
+        return uploadDesignAsset(file).then(function(publicUrl) {
+          clearUploadError();
+          routeUploadToStudioFlow(file, publicUrl);
+        });
+      })
+      .catch(function() {
+        showUploadError();
+      });
+  }
 
   // ── TASK 1: Wire upload button to native file picker ────────────
   // Finds any button with text "GET STARTED" in the studio and:
@@ -232,6 +368,19 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
         // Apply #39A596 brand color styling
         btn.style.cssText += ';background:#39A596 !important;color:#000 !important;border-color:#39A596 !important;';
 
+        // Add quality helper text under upload CTA once.
+        if (!btn.dataset.mnUploadHintPatched) {
+          btn.dataset.mnUploadHintPatched = '1';
+          var hintId = 'mn-upload-quality-hint';
+          if (!document.getElementById(hintId)) {
+            var hint = document.createElement('p');
+            hint.id = hintId;
+            hint.textContent = 'For perfect print quality, upload a high-resolution image with a transparent background.';
+            hint.style.cssText = 'margin:8px 0 0;font-size:12px;line-height:1.45;color:rgba(255,255,255,0.7);text-align:center;';
+            if (btn.parentNode) btn.parentNode.insertBefore(hint, btn.nextSibling);
+          }
+        }
+
         // Create hidden file input if not already present
         var fileInputId = 'mn-studio-file-input';
         var existingInput = document.getElementById(fileInputId);
@@ -248,6 +397,7 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
           fileInput.addEventListener('change', function() {
             var file = this.files[0];
             if (!file) return;
+            clearUploadError();
             // Try to find studio's own file input and dispatch to it
             var studioInput = document.querySelector(
               'input[type="file"]:not(#' + fileInputId + '), #mnw-selfie-input, #design-upload-input, .upload-input'
@@ -265,17 +415,11 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
                 studioInput.dispatchEvent(event);
               }
             }
-            // Also store in sessionStorage for intent-based routing
-            var reader = new FileReader();
-            reader.onload = function(e) {
-              sessionStorage.setItem('mn_uploaded_design_url', e.target.result);
-              // If in creator intent mode, trigger mnOnDesignReady
-              if (window.MN_CREATOR_INTENT && typeof window.mnOnDesignReady === 'function') {
-                var designId = 'upload-' + Date.now();
-                window.mnOnDesignReady(designId, e.target.result, file.name.replace(/\.[^.]+$/, ''));
-              }
-            };
-            reader.readAsDataURL(file);
+            uploadDesignAsset(file).then(function(publicUrl) {
+              routeUploadToStudioFlow(file, publicUrl);
+            }).catch(function() {
+              showUploadError();
+            });
           });
         }
 
@@ -382,6 +526,11 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
     });
 
     if (noBtn) noBtn.addEventListener('click', function() {
+      history.pushState(
+        { state: MN_HISTORY_STATES.SECOND_DESIGN_DONE },
+        '',
+        window.location.href
+      );
       // Publish the first design
       if (window.MN_CREATOR_INTENT && typeof window.mnOnDesignReady === 'function' && mnFirstDesign) {
         window.mnOnDesignReady(mnFirstDesign.uuid, mnFirstDesign.imageUrl, mnFirstDesign.title);
@@ -396,7 +545,8 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
     var historyState = e.state && e.state.state;
 
     if (historyState === MN_HISTORY_STATES.FIRST_DESIGN_DONE ||
-        historyState === MN_HISTORY_STATES.SECOND_DESIGN_PROMPT) {
+        historyState === MN_HISTORY_STATES.SECOND_DESIGN_PROMPT ||
+        historyState === MN_HISTORY_STATES.SECOND_DESIGN_DONE) {
       // User hit back after first design was done
       // Revert to "second design" prompt — do NOT navigate away
       e.preventDefault && e.preventDefault();
@@ -424,11 +574,13 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
     document.addEventListener('DOMContentLoaded', function() {
       // Patch immediately + retry after content renders (React/Shopify sections may be async)
       patchUploadButton();
+      consumePendingUploadFromIntent();
       setTimeout(patchUploadButton, 500);
       setTimeout(patchUploadButton, 1500);
     });
   } else {
     patchUploadButton();
+    consumePendingUploadFromIntent();
     setTimeout(patchUploadButton, 500);
     setTimeout(patchUploadButton, 1500);
   }
@@ -460,6 +612,21 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
   var intent = params.get('intent') || '';
   var IS_CREATOR_INTENT = intent.indexOf('creator') !== -1;
 
+  function setPendingDesign(designData) {
+    if (!designData) return;
+    var payload = Object.assign({}, designData, { saved_at: Date.now() });
+    try {
+      localStorage.setItem('mn_pending_design', JSON.stringify(payload));
+    } catch (e) {}
+  }
+
+  function isPendingDesignExpired(payload) {
+    if (!payload) return true;
+    var ts = Number(payload.saved_at || 0);
+    if (!ts) return false;
+    return (Date.now() - ts) > (2 * 60 * 60 * 1000);
+  }
+
   // Store intent in sessionStorage so the studio JS can read it
   if (IS_CREATOR_INTENT) {
     sessionStorage.setItem('mn_creator_intent', intent);
@@ -473,10 +640,10 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
     // Elegant floating pill — not a full-width bar
     banner.style.cssText = [
       'position:fixed',
-      'top:12px',
+      'top:72px',
       'left:50%',
       'transform:translateX(-50%)',
-      'z-index:9991',
+      'z-index:9988',
       'background:rgba(10,10,10,0.82)',
       'border:1px solid rgba(57,165,150,0.5)',
       'border-radius:2rem',
@@ -496,7 +663,7 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
       'animation:mnBannerIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both',
     ].join(';');
     banner.innerHTML = '<span style="width:7px;height:7px;background:#39A596;border-radius:50%;display:inline-block;box-shadow:0 0 6px #39A596;animation:mnDotPulse 2s ease infinite;"></span>' +
-      '<span style="color:rgba(255,255,255,0.5);font-weight:600;">Creator Mode</span>';
+      '<span style="color:rgba(255,255,255,0.5);font-weight:600;">' + (intent === 'creator_upload' ? 'Creator Upload' : 'Creator Mode') + '</span>';
 
     // Add keyframes once
     if (!document.getElementById('mnBannerStyles')) {
@@ -508,7 +675,15 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
       ].join('');
       document.head.appendChild(s);
     }
-    document.body.prepend(banner);
+    var wrapper = document.querySelector('.mn-ai-studio-wrapper');
+    if (wrapper) {
+      banner.style.position = 'absolute';
+      banner.style.left = '50%';
+      banner.style.transform = 'translateX(-50%)';
+      wrapper.prepend(banner);
+    } else {
+      document.body.prepend(banner);
+    }
   }
 
   // Override the studio's "Add to Cart" / "Buy Now" behavior when in creator intent
@@ -520,7 +695,7 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
   window.mnOnDesignReady = function(designUuid, imageUrl, title) {
     if (!IS_CREATOR_INTENT) return; // let normal flow proceed
 
-    // Save design data to sessionStorage for the onboarding page
+    // Save design data to localStorage for cross-domain auth resilience
     var designData = {
       design_uuid:  designUuid || '',
       image_url:    imageUrl   || '',
@@ -528,24 +703,13 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
       intent:       intent,
       created_at:   new Date().toISOString(),
     };
-    sessionStorage.setItem('mn_pending_design', JSON.stringify(designData));
+    setPendingDesign(designData);
 
-    // Show a brief success message before redirecting
-    var overlay = document.createElement('div');
-    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:Montserrat,sans-serif;color:white;gap:1rem;';
-    overlay.innerHTML = '<div style="font-size:3rem">🎨</div>' +
-      '<h2 style="font-size:1.5rem;font-weight:800;margin:0">Design Saved!</h2>' +
-      '<p style="color:rgba(255,255,255,0.6);margin:0">Setting up your creator profile...</p>' +
-      '<div style="width:48px;height:48px;border:3px solid rgba(57,165,150,0.3);border-top-color:#39A596;border-radius:50%;animation:mnSpin 0.8s linear infinite"></div>';
-    var style = document.createElement('style');
-    style.textContent = '@keyframes mnSpin{to{transform:rotate(360deg)}}';
-    document.head.appendChild(style);
-    document.body.appendChild(overlay);
-
-    // Redirect to creator onboarding after 1.2s
-    setTimeout(function() {
+    if (window.isCustomerLoggedIn) {
       window.location.href = '/pages/creator-onboarding?from=studio&intent=' + encodeURIComponent(intent);
-    }, 1200);
+      return;
+    }
+    window.location.href = '/account/register?return_to=/pages/creator-onboarding';
   };
 
   // Intercept any "Add to Cart" clicks when in creator intent mode
@@ -559,8 +723,14 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
       e.preventDefault();
       e.stopPropagation();
       // If design data exists, redirect to onboarding
-      var pending = sessionStorage.getItem('mn_pending_design');
-      if (pending) {
+      var pendingRaw = localStorage.getItem('mn_pending_design');
+      if (pendingRaw) {
+        var pendingParsed = null;
+        try { pendingParsed = JSON.parse(pendingRaw); } catch(e) {}
+        if (isPendingDesignExpired(pendingParsed)) {
+          localStorage.removeItem('mn_pending_design');
+          return;
+        }
         window.location.href = '/pages/creator-onboarding?from=studio&intent=' + encodeURIComponent(intent);
       }
     }
@@ -573,9 +743,17 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
   .mn-ai-studio-wrapper {
     position: relative;
     width: 100%;
+    min-height: 100dvh;
+    height: 100dvh;
+    overflow-y: auto;
     overflow-x: hidden;
     /* Reset any inherited fixed/absolute positioning from page content */
     isolation: isolate;
+    animation: fadeSlideUp 0.45s ease-out both;
+  }
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
   }
   /* Ensure the header stays on top of any z-index from studio content */
   #shopify-section-header,
@@ -743,44 +921,52 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Proceed to checkout
   document.getElementById('mnProceedToCheckout')?.addEventListener('click', async function() {
-    // Get the current design data from localStorage or state
-    const designData = JSON.parse(localStorage.getItem('mn_current_design') || '{}');
-    
-    if (!designData.imageUrl) {
+    // Pull design data from runtime state first, then local storage fallback.
+    const stateDesign = (typeof window !== 'undefined' && window.state) ? window.state : {};
+    const storedDesign = JSON.parse(localStorage.getItem('mn_current_design') || '{}');
+    const designData = {
+      uuid: stateDesign.design_uuid || stateDesign.designUuid || storedDesign.uuid || storedDesign.design_uuid || '',
+      imageUrl: stateDesign.imageUrl || stateDesign.image_url || storedDesign.imageUrl || storedDesign.image_url || ''
+    };
+
+    if (!designData.uuid || !designData.imageUrl) {
       alert('Please generate a design first');
       return;
     }
     
     this.disabled = true;
-    this.textContent = 'Creating Product...';
+    this.textContent = 'Adding Sample Kit...';
     
     try {
-      const response = await fetch('https://mynarrative-ai.vercel.app/api/shopify_product', {
+      // TODO: Replace placeholder variant ID with the real Shopify Variant ID
+      // for the "Creator Sample Kit" base product in this store.
+      const SAMPLE_KIT_VARIANT_ID = 48593020184756;
+
+      const response = await fetch('/cart/add.js', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
         body: JSON.stringify({
-          path: '/api/shopify/create_draft_product',
-          creator_id: '{{ customer.id }}',
-          title: designData.title || 'My Custom Design',
-          description: designData.description || 'AI-generated design',
-          image_url: designData.imageUrl,
-          price: 1299,
-          customer_id: '{{ customer.id }}'
+          items: [{
+            id: SAMPLE_KIT_VARIANT_ID,
+            quantity: 1,
+            properties: {
+              '_design_uuid': designData.uuid,
+              '_is_sample_kit': 'true',
+              'Design Image': designData.imageUrl
+            }
+          }]
         })
       });
-      
-      const result = await response.json();
-      
-      if (result.success && result.data.checkout_url) {
-        window.location.href = result.data.checkout_url;
-      } else if (result.success && result.data.variant_id) {
-        // Redirect to cart with the variant
-        window.location.href = `https://mynarrative.in/cart/${result.data.variant_id}:1`;
-      } else {
-        alert('Failed to create product. Please try again.');
-        this.disabled = false;
-        this.textContent = 'Proceed to Checkout';
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || 'Failed to add sample kit to cart');
       }
+
+      window.location.href = '/checkout';
     } catch (error) {
       console.error('Error:', error);
       alert('An error occurred. Please try again.');
@@ -893,9 +1079,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
       
-      // Clear data so it doesn't persist forever
-      localStorage.removeItem('mn_pending_design');
-      console.log("🗑️ Cleared localStorage");
+      // Clear only gift-mode payloads; keep creator pending designs intact.
+      if (data && data.slogan) {
+        localStorage.removeItem('mn_pending_design');
+        console.log("🗑️ Cleared gift payload from localStorage");
+      }
       
     } catch (e) {
       console.error("❌ Error loading gift context:", e);
