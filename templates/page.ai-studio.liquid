@@ -710,11 +710,16 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
     };
     setPendingDesign(designData);
 
-    if (window.isCustomerLoggedIn) {
+    // Hardcoded Liquid check — more reliable than window.isCustomerLoggedIn
+    var currentCustomerId = '{{ customer.id | default: "" }}';
+
+    if (currentCustomerId !== '') {
+      // User IS logged in
       window.location.href = '/pages/creator-onboarding?from=studio&intent=' + encodeURIComponent(intent);
-      return;
+    } else {
+      // User is NOT logged in
+      window.location.href = '/account/register?return_to=/pages/creator-onboarding';
     }
-    window.location.href = '/account/register?return_to=/pages/creator-onboarding';
   };
 
   // Intercept any "Add to Cart" clicks when in creator intent mode

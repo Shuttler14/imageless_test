@@ -6719,10 +6719,23 @@
     z-index: 9999 !important;
 }
 
-/* TASK 4: Fix touch scrolling on generated design image */
-.mnw-result-img, .mnw-result-wrap, .ai-generated-image-container {
+/* TASK 4 v2: Touch Scroll Sledgehammer — force vertical panning everywhere */
+/* Force vertical scrolling on everything inside the studio */
+.mn-ai-studio-wrapper, .mn-ai-studio-wrapper * {
     touch-action: pan-y auto !important;
+}
+
+/* Prevent invisible loaders/orbs from trapping touch events */
+.mnw-loading-state[style*="display: none"],
+.mnw-cinema-loader[style*="display: none"],
+.mnw-orb {
+    pointer-events: none !important;
+}
+
+/* Ensure the image wrapper specifically allows interaction */
+.mnw-result-wrap, .mnw-result-img {
     pointer-events: auto !important;
+    z-index: 10;
 }
 
 /* TASK 5: Hide vertical scrollbar for app-like feel */
