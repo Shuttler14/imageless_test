@@ -14,8 +14,8 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
 
 <script>
   window.ENV = Object.assign({}, window.ENV || {}, {
-    SUPABASE_URL: "{{ settings.supabase_url | default: '' | escape }}",
-    SUPABASE_ANON_KEY: "{{ settings.supabase_anon_key | default: '' | escape }}"
+    SUPABASE_URL: "https://grxvmsnssgktgqllfrfb.supabase.co",
+    SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdyeHZtc25zc2drdGdxbGxmcmZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMDE2NjUsImV4cCI6MjA4ODg3NzY2NX0.y19No3yN2P0MdoZSJG_wrUtI2mYk7EdQbwJKDq8U1Hs"
   });
 </script>
 
@@ -224,6 +224,59 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
     }
   }
 
+  function reinjectPlacementPreview(uploadedUrl) {
+    if (!uploadedUrl) return;
+    var selectors = [
+      '.placement-mockup-img', '#final-design-preview',
+      'img[data-role*="mockup"]', 'img[data-role*="preview"]',
+      '#step-3 img', '.mockup-preview img', '.design-preview img'
+    ];
+    selectors.forEach(function(sel) {
+      document.querySelectorAll(sel).forEach(function(node) {
+        if (node && node.tagName === 'IMG') {
+          node.src = uploadedUrl;
+          node.srcset = '';
+          node.setAttribute('data-upload-routed', '1');
+        }
+      });
+    });
+  }
+
+  /** Phantom-click "I HAVE MY OWN PREFERENCES" so upload flow skips AI-vs-manual gate inside Step 3. */
+  function startManualEditorBypass(uploadedUrl) {
+    var attempts = 0;
+    var maxAttempts = 25;
+    var tickMs = 100;
+    var bypassId = setInterval(function() {
+      attempts++;
+      var manualBtn = null;
+      var pool = document.querySelectorAll(
+        'button, a[href], [role="button"], .btn, .manual-mode-btn, .own-preferences-btn, [data-mode="manual"], [data-editor="manual"], [data-choice="manual"]'
+      );
+      for (var i = 0; i < pool.length; i++) {
+        var el = pool[i];
+        var raw = (el.textContent || el.innerText || el.getAttribute('aria-label') || '').toUpperCase().replace(/\s+/g, ' ').trim();
+        if (
+          raw.indexOf('OWN PREFERENCES') !== -1 ||
+          raw.indexOf('I HAVE MY OWN') !== -1 ||
+          (raw.indexOf('MY OWN') !== -1 && raw.indexOf('PREFERENCE') !== -1) ||
+          (raw.indexOf('MANUAL') !== -1 && (raw.indexOf('PLACEMENT') !== -1 || raw.indexOf('FABRIC') !== -1 || raw.indexOf('EDIT') !== -1))
+        ) {
+          manualBtn = el;
+          break;
+        }
+      }
+      if (manualBtn) {
+        try { manualBtn.click(); } catch (e) {}
+        clearInterval(bypassId);
+        setTimeout(function() { reinjectPlacementPreview(uploadedUrl); }, 50);
+        setTimeout(function() { reinjectPlacementPreview(uploadedUrl); }, 350);
+        return;
+      }
+      if (attempts >= maxAttempts) clearInterval(bypassId);
+    }, tickMs);
+  }
+
   function routeUploadToStudioFlow(file, publicUrl) {
     var uploadedUrl = publicUrl || '';
     var title = file && file.name ? file.name.replace(/\.[^.]+$/, '') : 'Uploaded Design';
@@ -242,21 +295,133 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
     window.mnUploadedDesign = uploadPayload;
     window.dispatchEvent(new CustomEvent('mn:upload-design-ready', { detail: uploadPayload }));
 
+    // Generic /pages/ai-studio visits: align URL + session so creator checkout & mnOnDesignReady work.
+    try {
+      var locUrl = new URL(window.location.href);
+      var curIntent = locUrl.searchParams.get('intent') || '';
+      if (curIntent.indexOf('creator') === -1) {
+        locUrl.searchParams.set('intent', 'creator_upload');
+        history.replaceState(history.state || {}, '', locUrl.toString());
+      }
+      sessionStorage.setItem('mn_creator_intent', 'creator_upload');
+      sessionStorage.setItem('mn_creator_intent_ts', Date.now().toString());
+      window.MN_CREATOR_INTENT = true;
+    } catch (eIntent) {}
+
     if (window.state && typeof window.state === 'object') {
       window.state.isUploadedDesign = true;
       window.state.designSource = 'upload';
       window.state.uploadedDesignUrl = uploadedUrl;
       window.state.generatedImage = uploadedUrl;
       window.state.uploadedDesignMeta = uploadPayload;
+      // Upload flow should bypass any AI token-debit path.
+      window.state.skipAiTokenCharge = true;
+      window.state.requiresAiToken = false;
     }
+
+    window.MN_BYPASS_AI_TOKEN_FOR_UPLOAD = true;
 
     if (typeof window.goToStep === 'function') {
       // Step 3 in this studio is Fabric Color + Placement in current flow.
       window.goToStep(3);
     } else if (typeof window.renderStep3 === 'function') {
       window.renderStep3();
-    } else if (typeof window.MNAIStylist !== 'undefined' && typeof window.MNAIStylist.expandWidget === 'function') {
-      window.MNAIStylist.expandWidget();
+    }
+
+    // Hard DOM routing fallback: force the upload flow into Fabric/Placement editor.
+    var routeAttempts = 0;
+    var routeMaxAttempts = 12;
+    var routeTickMs = 120;
+    var routeTimer = setInterval(function() {
+      routeAttempts++;
+
+      var step3 = document.querySelector('#step-3')
+        || document.querySelector('[data-step="3"]')
+        || document.querySelector('#studio-step-3')
+        || document.querySelector('.step-3')
+        || document.querySelector('.placement-editor-step');
+
+      // Hide upload/intro/middle screens so users do not see onboarding pages.
+      ['#step-0', '#step-1', '#step-2', '[data-step="0"]', '[data-step="1"]', '[data-step="2"]', '.studio-step-upload', '.studio-step-intro', '.studio-step-hook']
+        .forEach(function(sel) {
+          document.querySelectorAll(sel).forEach(function(el) {
+            el.style.display = 'none';
+            el.setAttribute('aria-hidden', 'true');
+          });
+        });
+
+      if (step3) {
+        step3.style.display = 'block';
+        step3.removeAttribute('aria-hidden');
+        step3.classList.remove('hidden', 'is-hidden');
+
+        // If any parent is hidden, reveal it so step 3 can render.
+        var parent = step3.parentElement;
+        while (parent && parent !== document.body) {
+          if (window.getComputedStyle(parent).display === 'none') parent.style.display = 'block';
+          parent = parent.parentElement;
+        }
+
+        // Force uploaded artwork into placement preview nodes.
+        var previewNodes = step3.querySelectorAll(
+          'img[data-role*="preview"], img[data-role*="mockup"], img[id*="preview"], img[id*="mockup"], .design-preview img, .mockup-preview img, img'
+        );
+        previewNodes.forEach(function(node) {
+          node.src = uploadedUrl;
+          node.srcset = '';
+          node.setAttribute('data-upload-routed', '1');
+        });
+
+        var canvas = step3.querySelector('canvas');
+        if (canvas && canvas.getContext) {
+          var ctx = canvas.getContext('2d');
+          var designImg = new Image();
+          designImg.crossOrigin = 'anonymous';
+          designImg.onload = function() {
+            try {
+              ctx.clearRect(0, 0, canvas.width, canvas.height);
+              ctx.drawImage(designImg, 0, 0, canvas.width, canvas.height);
+              canvas.setAttribute('data-upload-routed', '1');
+            } catch (e) {}
+          };
+          designImg.src = uploadedUrl;
+        }
+
+        // Nudge local step logic to recompute placement/fabric readiness.
+        if (typeof window.checkAIReady === 'function') window.checkAIReady();
+        step3.querySelectorAll('select, input[type="radio"], input[type="range"]').forEach(function(el) {
+          el.dispatchEvent(new Event('change', { bubbles: true }));
+          el.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+      }
+
+      if (step3 || routeAttempts >= routeMaxAttempts) {
+        clearInterval(routeTimer);
+      }
+    }, routeTickMs);
+
+    startManualEditorBypass(uploadedUrl);
+
+    // Ensure the proceed action is enabled for upload flow.
+    var proceedBtn = document.getElementById('ai-generate-btn')
+      || document.querySelector('[data-action="generate"], .generate-btn, #generateBtn');
+    if (proceedBtn) {
+      proceedBtn.setAttribute('data-upload-flow', '1');
+      proceedBtn.classList.add('ready');
+      proceedBtn.disabled = false;
+      if (!proceedBtn.dataset.mnUploadFlowBound) {
+        proceedBtn.dataset.mnUploadFlowBound = '1';
+        proceedBtn.addEventListener('click', function() {
+          if (window.state && typeof window.state === 'object') {
+            window.state.isUploadedDesign = true;
+            window.state.designSource = 'upload';
+            window.state.generatedImage = uploadedUrl;
+            window.state.skipAiTokenCharge = true;
+            window.state.requiresAiToken = false;
+          }
+          window.MN_BYPASS_AI_TOKEN_FOR_UPLOAD = true;
+        }, true);
+      }
     }
   }
 
@@ -617,6 +782,21 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
   var intent = params.get('intent') || '';
   var IS_CREATOR_INTENT = intent.indexOf('creator') !== -1;
 
+  /** Resolves creator mode after late route changes (e.g. custom upload syncs ?intent=creator_upload). */
+  function getEffectiveCreatorIntent() {
+    try {
+      var stored = sessionStorage.getItem('mn_creator_intent') || '';
+      if (stored.indexOf('creator') !== -1) return stored;
+    } catch (e) {}
+    try {
+      var fromUrl = new URLSearchParams(window.location.search).get('intent') || '';
+      if (fromUrl.indexOf('creator') !== -1) return fromUrl;
+    } catch (e2) {}
+    if (intent.indexOf('creator') !== -1) return intent;
+    if (window.MN_CREATOR_INTENT === true) return 'creator_upload';
+    return '';
+  }
+
   function setPendingDesign(designData) {
     if (!designData) return;
     var payload = Object.assign({}, designData, { saved_at: Date.now() });
@@ -698,14 +878,15 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
   // This function is called by the studio when a design is ready
   // The studio should call: window.mnOnDesignReady(design_uuid, image_url, title)
   window.mnOnDesignReady = function(designUuid, imageUrl, title) {
-    if (!IS_CREATOR_INTENT) return; // let normal flow proceed
+    var effIntent = getEffectiveCreatorIntent();
+    if (!effIntent) return;
 
     // Save design data to localStorage for cross-domain auth resilience
     var designData = {
       design_uuid:  designUuid || '',
       image_url:    imageUrl   || '',
       title:        title      || 'My Design',
-      intent:       intent,
+      intent:       effIntent,
       created_at:   new Date().toISOString(),
     };
     setPendingDesign(designData);
@@ -715,7 +896,7 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
 
     if (currentCustomerId !== '') {
       // User IS logged in
-      window.location.href = '/pages/creator-onboarding?from=studio&intent=' + encodeURIComponent(intent);
+      window.location.href = '/pages/creator-onboarding?from=studio&intent=' + encodeURIComponent(effIntent);
     } else {
       // User is NOT logged in
       window.location.href = '/account/register?return_to=/pages/creator-onboarding';
@@ -724,7 +905,8 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
 
   // Intercept any "Add to Cart" clicks when in creator intent mode
   document.addEventListener('click', function(e) {
-    if (!IS_CREATOR_INTENT) return;
+    var effIntent = getEffectiveCreatorIntent();
+    if (!effIntent) return;
     var target = e.target;
     var isCartBtn = target.matches(
       '[data-action="add-to-cart"], .add-to-cart, #addToCart, [name="add"], .btn-cart, .product-form__submit'
@@ -741,7 +923,7 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
           localStorage.removeItem('mn_pending_design');
           return;
         }
-        window.location.href = '/pages/creator-onboarding?from=studio&intent=' + encodeURIComponent(intent);
+        window.location.href = '/pages/creator-onboarding?from=studio&intent=' + encodeURIComponent(effIntent);
       }
     }
   }, true);
