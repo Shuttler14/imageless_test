@@ -43,6 +43,9 @@ const CREATOR_API_URL = window.MN_CONFIG?.creatorApiUrl || 'https://creator-econ
     selectedOccasions: [],
     // Step 4
     selfieBase64: null,
+    skinTone: null,    // 'Fair'|'Medium'|'Olive'|'Brown'|'Dark'|'Deep'
+    bodyShape: null,  // 'slim_athletic'|'average'|'muscular'|'plus_size'|'tall_lean'|'short_stocky'
+    sourcePreference: null, // 'my_narrative'|'global_market'
     // Step 5
     wardrobeBase64: null,
     closetItems: [],
@@ -268,7 +271,7 @@ function renderStep2() {
   setContent(`
     <div class="mnw-step">
       <div class="mnw-step-hdr">
-        <p class="mnw-step-num">01 / 04</p>
+        <p class="mnw-step-num">02 / 06</p>
         <h2 class="mnw-step-title">What kind of energy are we projecting?</h2>
         <p class="mnw-step-sub">Choose your favorites — pick as many as feel right.</p>
       </div>
@@ -341,7 +344,7 @@ function renderStep3() {
   setContent(`
     <div class="mnw-step">
       <div class="mnw-step-hdr">
-        <p class="mnw-step-num">02 / 04</p>
+        <p class="mnw-step-num">03 / 06</p>
         <h2 class="mnw-step-title">Where are we taking this look?</h2>
         <p class="mnw-step-sub">Select all that apply to your lifestyle.</p>
       </div>
@@ -381,7 +384,159 @@ function renderStep3() {
   });
 
   $('#mnw-s3-back').addEventListener('click', renderStep2);
-  $('#mnw-s3-next').addEventListener('click', renderStep4);
+  $('#mnw-s3-next').addEventListener('click', renderStep35);
+}
+
+// ── STEP 3.5: SKIN TONE + BODY SHAPE ─────────────────────
+function renderStep35() {
+  state.step = 3.5;
+  setContent(`
+    <div class="mnw-step">
+      <div class="mnw-step-hdr">
+        <p class="mnw-step-num">04 / 06</p>
+        <h2 class="mnw-step-title">Tell us a bit about yourself.</h2>
+        <p class="mnw-step-sub">This helps us match colors and fit to your unique features.</p>
+      </div>
+
+      <div class="mnw-skin-tone-section" style="margin-bottom:28px">
+        <p class="mnw-field-label" style="color:#a3a3a3;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px">Skin Tone</p>
+        <div class="mnw-option-chips" id="mnw-skin-tone-chips">
+          ${['Fair','Medium','Olive','Brown','Dark','Deep'].map(tone => `
+            <button class="mnw-occ-chip mnw-tone-chip" data-tone="${tone}">${tone}</button>
+          `).join('')}
+        </div>
+      </div>
+
+      <div class="mnw-body-shape-section">
+        <p class="mnw-field-label" style="color:#a3a3a3;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px">Body Shape &amp; Fitness</p>
+        <div class="mnw-body-shape-grid" id="mnw-body-shape-grid">
+          ${[
+            { id: 'slim_athletic', label: 'Slim / Athletic', icon: '🏃' },
+            { id: 'average',      label: 'Average / Medium', icon: '⚖️' },
+            { id: 'muscular',      label: 'Muscular / Broad', icon: '💪' },
+            { id: 'plus_size',     label: 'Plus Size / Curvy', icon: '✨' },
+            { id: 'tall_lean',     label: 'Tall &amp; Lean', icon: '📏' },
+            { id: 'short_stocky',  label: 'Short &amp; Stocky', icon: '🔳' },
+          ].map(shape => `
+            <button class="mnw-body-shape-btn" data-shape="${shape.id}">
+              <span class="mnw-body-shape-icon">${shape.icon}</span>
+              <span class="mnw-body-shape-label">${shape.label}</span>
+            </button>
+          `).join('')}
+        </div>
+      </div>
+
+      <div class="mnw-step-footer">
+        <button class="mnw-btn-ghost" id="mnw-s35-back">← Back</button>
+        <span class="mnw-sel-count" id="mnw-body-count">Both fields required</span>
+        <button class="mnw-cta mnw-cta-sm" id="mnw-s35-next" disabled>Next →</button>
+      </div>
+      <div class="mnw-step-dots">
+        <span class="mnw-dot mnw-dot-done"></span><span class="mnw-dot mnw-dot-done"></span>
+        <span class="mnw-dot mnw-dot-active"></span><span class="mnw-dot mnw-dot-active"></span>
+        <span class="mnw-dot mnw-dot-active"></span>
+      </div>
+    </div>
+  `);
+
+  $$('.mnw-tone-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      $$('.mnw-tone-chip').forEach(c => c.classList.remove('mnw-occ-active'));
+      chip.classList.add('mnw-occ-active');
+      state.skinTone = chip.dataset.tone;
+      validateStep35();
+    });
+  });
+
+  $$('.mnw-body-shape-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      $$('.mnw-body-shape-btn').forEach(b => b.classList.remove('mnw-shape-active'));
+      btn.classList.add('mnw-shape-active');
+      state.bodyShape = btn.dataset.shape;
+      validateStep35();
+    });
+  });
+
+  function validateStep35() {
+    const countEl = $('#mnw-body-count');
+    const nextBtn = $('#mnw-s35-next');
+    const ready = !!(state.skinTone && state.bodyShape);
+    if (countEl) countEl.textContent = ready ? 'Looking good!' : 'Both fields required';
+    if (nextBtn) nextBtn.disabled = !ready;
+  }
+
+  $('#mnw-s35-back').addEventListener('click', renderStep3);
+  $('#mnw-s35-next').addEventListener('click', renderStep36);
+}
+
+// ── STEP 3.6: SOURCE PREFERENCE ──────────────────────────
+function renderStep36() {
+  state.step = 3.6;
+  setContent(`
+    <div class="mnw-step">
+      <div class="mnw-step-hdr">
+        <p class="mnw-step-num">04 / 06</p>
+        <h2 class="mnw-step-title">Where should we source your look?</h2>
+        <p class="mnw-step-sub">Choose your shopping path — exclusive drops or global brands.</p>
+      </div>
+
+      <div class="mnw-source-grid" id="mnw-source-grid">
+        <button class="mnw-source-card" data-source="my_narrative" id="mnw-src-mn">
+          <div class="mnw-source-icon-wrap" style="background:linear-gradient(135deg,#39A59622,#0a0a0a)">
+            <span style="font-size:32px">✦</span>
+          </div>
+          <div class="mnw-source-info">
+            <p class="mnw-source-title">MY NARRATIVE</p>
+            <p class="mnw-source-sub">Exclusive Streetwear · Direct to You</p>
+          </div>
+          <div class="mnw-source-check" style="display:none">✓</div>
+        </button>
+
+        <button class="mnw-source-card" data-source="global_market" id="mnw-src-global">
+          <div class="mnw-source-icon-wrap" style="background:linear-gradient(135deg,#f59e0b22,#0a0a0a)">
+            <span style="font-size:28px">🌍</span>
+          </div>
+          <div class="mnw-source-info">
+            <p class="mnw-source-title">GLOBAL MARKET</p>
+            <p class="mnw-source-sub">Myntra · Zara · Amazon · Ajio</p>
+          </div>
+          <div class="mnw-source-check" style="display:none">✓</div>
+        </button>
+      </div>
+
+      <div class="mnw-step-footer">
+        <button class="mnw-btn-ghost" id="mnw-s36-back">← Back</button>
+        <span class="mnw-sel-count" id="mnw-source-count">Choose one to continue</span>
+        <button class="mnw-cta mnw-cta-sm" id="mnw-s36-next" disabled>Next →</button>
+      </div>
+      <div class="mnw-step-dots">
+        <span class="mnw-dot mnw-dot-done"></span><span class="mnw-dot mnw-dot-done"></span>
+        <span class="mnw-dot mnw-dot-done"></span><span class="mnw-dot mnw-dot-active"></span>
+        <span class="mnw-dot"></span>
+      </div>
+    </div>
+  `);
+
+  $$('.mnw-source-card').forEach(card => {
+    card.addEventListener('click', () => {
+      $$('.mnw-source-card').forEach(c => {
+        c.classList.remove('mnw-source-selected');
+        const check = c.querySelector('.mnw-source-check');
+        if (check) check.style.display = 'none';
+      });
+      card.classList.add('mnw-source-selected');
+      const check = card.querySelector('.mnw-source-check');
+      if (check) check.style.display = 'flex';
+      state.sourcePreference = card.dataset.source;
+      const countEl = $('#mnw-source-count');
+      const nextBtn = $('#mnw-s36-next');
+      if (countEl) countEl.textContent = 'Looking good!';
+      if (nextBtn) nextBtn.disabled = false;
+    });
+  });
+
+  $('#mnw-s36-back').addEventListener('click', renderStep35);
+  $('#mnw-s36-next').addEventListener('click', renderStep4);
 }
 
 // ── STEP 4: CANVAS / SELFIE UPLOAD ───────────────────────
@@ -390,7 +545,7 @@ function renderStep4() {
   setContent(`
     <div class="mnw-step">
       <div class="mnw-step-hdr">
-        <p class="mnw-step-num">03 / 04</p>
+        <p class="mnw-step-num">05 / 06</p>
         <h2 class="mnw-step-title">Let's see the canvas.</h2>
         <p class="mnw-step-sub">Upload a quick selfie to ensure the fit and colors perfectly match your unique skin tone and proportions.</p>
       </div>
@@ -495,7 +650,7 @@ function renderStep5A() {
   setContent(`
     <div class="mnw-step">
       <div class="mnw-step-hdr">
-        <p class="mnw-step-num">04 / 04</p>
+        <p class="mnw-step-num">06 / 06</p>
         <h2 class="mnw-step-title">Generating your main character look</h2>
         <p class="mnw-step-sub">AI is crafting a look for your skin tone, body type &amp; vibe.</p>
       </div>
@@ -593,7 +748,7 @@ function renderStep5A() {
     method: 'POST',
     signal: abortCtrl.signal,
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action:'full_pipeline', user_id:userId, occasion:occasionId, vibe_id:vibeId, user_image:rawBase64 }),
+    body: JSON.stringify({ action:'full_pipeline', user_id:userId, occasion:occasionId, vibe_id:vibeId, user_image:rawBase64, skin_tone: state.skinTone, body_shape: state.bodyShape, sourcePreference: state.sourcePreference }),
   })
   .then(r => { clearTimeout(timeoutId); return r.ok ? r.json() : r.json().then(d => Promise.reject(d.error || ('Server error ' + r.status))); })
   .then(data => {

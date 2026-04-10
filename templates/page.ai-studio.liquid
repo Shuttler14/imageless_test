@@ -14,8 +14,8 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
 
 <script>
   window.ENV = Object.assign({}, window.ENV || {}, {
-    SUPABASE_URL: "{{ settings.supabase_url | default: '' | escape }}",
-    SUPABASE_ANON_KEY: "{{ settings.supabase_anon_key | default: '' | escape }}"
+    SUPABASE_URL: "YOUR_SUPABASE_URL_HERE",
+    SUPABASE_ANON_KEY: "YOUR_SUPABASE_ANON_KEY_HERE"
   });
 </script>
 
@@ -224,6 +224,59 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
     }
   }
 
+  function reinjectPlacementPreview(uploadedUrl) {
+    if (!uploadedUrl) return;
+    var selectors = [
+      '.placement-mockup-img', '#final-design-preview',
+      'img[data-role*="mockup"]', 'img[data-role*="preview"]',
+      '#step-3 img', '.mockup-preview img', '.design-preview img'
+    ];
+    selectors.forEach(function(sel) {
+      document.querySelectorAll(sel).forEach(function(node) {
+        if (node && node.tagName === 'IMG') {
+          node.src = uploadedUrl;
+          node.srcset = '';
+          node.setAttribute('data-upload-routed', '1');
+        }
+      });
+    });
+  }
+
+  /** Phantom-click "I HAVE MY OWN PREFERENCES" so upload flow skips AI-vs-manual gate inside Step 3. */
+  function startManualEditorBypass(uploadedUrl) {
+    var attempts = 0;
+    var maxAttempts = 25;
+    var tickMs = 100;
+    var bypassId = setInterval(function() {
+      attempts++;
+      var manualBtn = null;
+      var pool = document.querySelectorAll(
+        'button, a[href], [role="button"], .btn, .manual-mode-btn, .own-preferences-btn, [data-mode="manual"], [data-editor="manual"], [data-choice="manual"]'
+      );
+      for (var i = 0; i < pool.length; i++) {
+        var el = pool[i];
+        var raw = (el.textContent || el.innerText || el.getAttribute('aria-label') || '').toUpperCase().replace(/\s+/g, ' ').trim();
+        if (
+          raw.indexOf('OWN PREFERENCES') !== -1 ||
+          raw.indexOf('I HAVE MY OWN') !== -1 ||
+          (raw.indexOf('MY OWN') !== -1 && raw.indexOf('PREFERENCE') !== -1) ||
+          (raw.indexOf('MANUAL') !== -1 && (raw.indexOf('PLACEMENT') !== -1 || raw.indexOf('FABRIC') !== -1 || raw.indexOf('EDIT') !== -1))
+        ) {
+          manualBtn = el;
+          break;
+        }
+      }
+      if (manualBtn) {
+        try { manualBtn.click(); } catch (e) {}
+        clearInterval(bypassId);
+        setTimeout(function() { reinjectPlacementPreview(uploadedUrl); }, 50);
+        setTimeout(function() { reinjectPlacementPreview(uploadedUrl); }, 350);
+        return;
+      }
+      if (attempts >= maxAttempts) clearInterval(bypassId);
+    }, tickMs);
+  }
+
   function routeUploadToStudioFlow(file, publicUrl) {
     var uploadedUrl = publicUrl || '';
     var title = file && file.name ? file.name.replace(/\.[^.]+$/, '') : 'Uploaded Design';
@@ -242,22 +295,45 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
     window.mnUploadedDesign = uploadPayload;
     window.dispatchEvent(new CustomEvent('mn:upload-design-ready', { detail: uploadPayload }));
 
+    // Generic /pages/ai-studio visits: align URL + session so creator checkout & mnOnDesignReady work.
+    try {
+      var locUrl = new URL(window.location.href);
+      var curIntent = locUrl.searchParams.get('intent') || '';
+      if (curIntent.indexOf('creator') === -1) {
+        locUrl.searchParams.set('intent', 'creator_upload');
+        history.replaceState(history.state || {}, '', locUrl.toString());
+      }
+      sessionStorage.setItem('mn_creator_intent', 'creator_upload');
+      sessionStorage.setItem('mn_creator_intent_ts', Date.now().toString());
+      window.MN_CREATOR_INTENT = true;
+    } catch (eIntent) {}
+
     if (window.state && typeof window.state === 'object') {
       window.state.isUploadedDesign = true;
       window.state.designSource = 'upload';
       window.state.uploadedDesignUrl = uploadedUrl;
       window.state.generatedImage = uploadedUrl;
       window.state.uploadedDesignMeta = uploadPayload;
+      // Upload flow should bypass any AI token-debit path.
+      window.state.skipAiTokenCharge = true;
+      window.state.requiresAiToken = false;
     }
 
-    if (typeof window.goToStep === 'function') {
-      // Step 3 in this studio is Fabric Color + Placement in current flow.
-      window.goToStep(3);
-    } else if (typeof window.renderStep3 === 'function') {
-      window.renderStep3();
-    } else if (typeof window.MNAIStylist !== 'undefined' && typeof window.MNAIStylist.expandWidget === 'function') {
-      window.MNAIStylist.expandWidget();
-    }
+    window.MN_BYPASS_AI_TOKEN_FOR_UPLOAD = true;
+
+    // ── Dumb Terminal: redirect to isolated placement editor ────────
+    // routeUploadToStudioFlow is purely a passthrough — the
+    // creator-upload-studio.liquid section owns the full UI:
+    // color swatches, placement toggles, mockup, and checkout.
+    var uploadRedirectUrl = '/pages/ai-studio?intent=creator_upload&design_url='
+      + encodeURIComponent(uploadedUrl)
+      + '&design_title=' + encodeURIComponent(title);
+    window.location.href = uploadRedirectUrl;
+    return;
+
+    // The code below was the old phantom-click / DOM-hacking path.
+    // It is now superseded by the Liquid fork + dedicated section.
+    var _phantom = null; // placeholder — safe to remove in cleanup
   }
 
   function showUploadError() {
@@ -304,7 +380,12 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
       },
       body: file
     });
-    if (!resp.ok) throw new Error('supabase_upload_failed');
+    if (!resp.ok) {
+      let errorBody = {};
+      try { errorBody = await resp.json(); } catch(e) {}
+      console.error('[Supabase Upload Blocked]', resp.status, resp.statusText, errorBody);
+      throw new Error('supabase_upload_failed');
+    }
     return SUPABASE_URL + '/storage/v1/object/public/creator_assets/' + fileName;
   }
 
@@ -617,6 +698,120 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
   var intent = params.get('intent') || '';
   var IS_CREATOR_INTENT = intent.indexOf('creator') !== -1;
 
+  // ── creator_placement: land directly on the Fabric/Placement editor ──
+  if (intent === 'creator_placement') {
+    (function() {
+      var designUrl   = params.get('design_url')   || '';
+      var designTitle = params.get('design_title') || 'Uploaded Design';
+      var stored      = null;
+      try { stored = JSON.parse(sessionStorage.getItem('mn_upload_design') || 'null'); } catch(e) {}
+
+      // Hydrate state so AI token paths are blocked and upload flow is recognized.
+      if (window.state && typeof window.state === 'object') {
+        window.state.isUploadedDesign  = true;
+        window.state.designSource      = 'upload';
+        window.state.generatedImage    = designUrl || (stored && stored.image_url) || '';
+        window.state.uploadedDesignUrl = designUrl || (stored && stored.image_url) || '';
+        window.state.uploadedDesignMeta = stored || { image_url: designUrl, title: designTitle };
+        window.state.skipAiTokenCharge = true;
+        window.state.requiresAiToken    = false;
+      }
+      window.MN_BYPASS_AI_TOKEN_FOR_UPLOAD = true;
+      window.MN_CREATOR_INTENT = true;
+
+      // Store for mnOnDesignReady / checkout flow.
+      if (stored) {
+        sessionStorage.setItem('mn_pending_design', JSON.stringify(stored));
+      }
+
+      // Hide all step wrappers that would show the AI-vs-manual gate.
+      var hideSelectors = [
+        '#step-0', '#step-1', '#step-2',
+        '[data-step="0"]', '[data-step="1"]', '[data-step="2"]',
+        '.studio-step-upload', '.studio-step-intro', '.studio-step-hook',
+        '.step-ai-decide', '.ai-vs-manual-screen'
+      ];
+      hideSelectors.forEach(function(sel) {
+        document.querySelectorAll(sel).forEach(function(el) {
+          el.style.display = 'none';
+          el.setAttribute('aria-hidden', 'true');
+        });
+      });
+
+      // Force #step-3 (Fabric Color + Placement) visible and inject the uploaded image.
+      var forceStep3 = function() {
+        var step3 = document.querySelector('#step-3')
+          || document.querySelector('[data-step="3"]')
+          || document.querySelector('#studio-step-3')
+          || document.querySelector('.step-3')
+          || document.querySelector('.placement-editor-step');
+        if (!step3) return false;
+
+        step3.style.display = 'block';
+        step3.removeAttribute('aria-hidden');
+        step3.classList.remove('hidden', 'is-hidden');
+
+        // Un-hide any hidden parent so step 3 renders.
+        var p = step3.parentElement;
+        while (p && p !== document.body) {
+          if (window.getComputedStyle(p).display === 'none') p.style.display = '';
+          p = p.parentElement;
+        }
+
+        // Inject uploaded artwork into preview canvases / images.
+        var imgSrc = designUrl || (stored && stored.image_url) || '';
+        if (imgSrc) {
+          step3.querySelectorAll('img').forEach(function(img) {
+            img.src = imgSrc;
+            img.setAttribute('data-upload-routed', '1');
+          });
+          var canvas = step3.querySelector('canvas');
+          if (canvas && canvas.getContext) {
+            var ctx = canvas.getContext('2d');
+            var dImg = new Image();
+            dImg.crossOrigin = 'anonymous';
+            dImg.onload = function() {
+              try {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(dImg, 0, 0, canvas.width, canvas.height);
+              } catch(e) {}
+            };
+            dImg.src = imgSrc;
+          }
+        }
+
+        // Trigger re-evaluation of placement/fabric readiness.
+        if (typeof window.checkAIReady === 'function') window.checkAIReady();
+        step3.querySelectorAll('select, input[type="radio"], input[type="range"]').forEach(function(el) {
+          el.dispatchEvent(new Event('change', { bubbles: true }));
+          el.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+        return true;
+      };
+
+      // Try immediately and retry until step-3 renders (covers async studio mounting).
+      var attempts = 0, maxAttempts = 20, tickMs = 100;
+      var timer = setInterval(function() {
+        if (forceStep3() || ++attempts >= maxAttempts) clearInterval(timer);
+      }, tickMs);
+    })();
+  }
+
+  /** Resolves creator mode after late route changes (e.g. custom upload syncs ?intent=creator_upload). */
+  function getEffectiveCreatorIntent() {
+    try {
+      var stored = sessionStorage.getItem('mn_creator_intent') || '';
+      if (stored.indexOf('creator') !== -1) return stored;
+    } catch (e) {}
+    try {
+      var fromUrl = new URLSearchParams(window.location.search).get('intent') || '';
+      if (fromUrl.indexOf('creator') !== -1) return fromUrl;
+    } catch (e2) {}
+    if (intent.indexOf('creator') !== -1) return intent;
+    if (window.MN_CREATOR_INTENT === true) return 'creator_upload';
+    return '';
+  }
+
   function setPendingDesign(designData) {
     if (!designData) return;
     var payload = Object.assign({}, designData, { saved_at: Date.now() });
@@ -698,14 +893,15 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
   // This function is called by the studio when a design is ready
   // The studio should call: window.mnOnDesignReady(design_uuid, image_url, title)
   window.mnOnDesignReady = function(designUuid, imageUrl, title) {
-    if (!IS_CREATOR_INTENT) return; // let normal flow proceed
+    var effIntent = getEffectiveCreatorIntent();
+    if (!effIntent) return;
 
     // Save design data to localStorage for cross-domain auth resilience
     var designData = {
       design_uuid:  designUuid || '',
       image_url:    imageUrl   || '',
       title:        title      || 'My Design',
-      intent:       intent,
+      intent:       effIntent,
       created_at:   new Date().toISOString(),
     };
     setPendingDesign(designData);
@@ -715,7 +911,7 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
 
     if (currentCustomerId !== '') {
       // User IS logged in
-      window.location.href = '/pages/creator-onboarding?from=studio&intent=' + encodeURIComponent(intent);
+      window.location.href = '/pages/creator-onboarding?from=studio&intent=' + encodeURIComponent(effIntent);
     } else {
       // User is NOT logged in
       window.location.href = '/account/register?return_to=/pages/creator-onboarding';
@@ -724,7 +920,8 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
 
   // Intercept any "Add to Cart" clicks when in creator intent mode
   document.addEventListener('click', function(e) {
-    if (!IS_CREATOR_INTENT) return;
+    var effIntent = getEffectiveCreatorIntent();
+    if (!effIntent) return;
     var target = e.target;
     var isCartBtn = target.matches(
       '[data-action="add-to-cart"], .add-to-cart, #addToCart, [name="add"], .btn-cart, .product-form__submit'
@@ -741,7 +938,7 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
           localStorage.removeItem('mn_pending_design');
           return;
         }
-        window.location.href = '/pages/creator-onboarding?from=studio&intent=' + encodeURIComponent(intent);
+        window.location.href = '/pages/creator-onboarding?from=studio&intent=' + encodeURIComponent(effIntent);
       }
     }
   }, true);
@@ -794,6 +991,19 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
   }
 </style>
 
+{% comment %} =============================================================================
+CREATOR UPLOAD FLOW — Liquid URL Fork
+When ?intent=creator_upload is present, bypass the AI Stylist React studio entirely
+and render a dedicated, isolated placement/color editor section instead.
+================================================================================= {% endcomment %}
+{% assign is_upload_mode = false %}
+{% if request.url contains 'intent=creator_upload' %}
+  {% assign is_upload_mode = true %}
+{% endif %}
+
+{% if is_upload_mode %}
+  {% section 'creator-upload-studio' %}
+{% else %}
 <div class="mn-ai-studio-wrapper">
 {% assign is_logged_in = false %}
 {% if customer.id != blank %}
@@ -801,6 +1011,7 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
 {% endif %}
 {{ page.content }}
 </div>
+{% endif %}
 
 {% comment %} Buy-to-Publish Modal {% endcomment %}
 <div class="mn-modal-overlay" id="mnBuyToPublishModal">

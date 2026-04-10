@@ -1,0 +1,323 @@
+{% comment %}
+=================================================================================
+creator-upload-studio.liquid
+=================================================================================
+Isolated "Dumb Terminal" Placement Editor for the creator upload flow.
+Rendered by templates/page.ai-studio.liquid when ?intent=creator_upload is present.
+
+No AI Stylist, no state machine, no phantom clicks. Pure DOM wiring:
+  1. Read design_url from URL params
+  2. Inject it into the mockup preview
+  3. Wire color/placement toggles (Black / White / Grey  |  Front / Back)
+  4. Wire "Proceed" → add to cart, then redirect to checkout / login
+=================================================================================
+{% endcomment %}
+
+<style>
+  /* ── Isolated studio wrapper ─────────────────────────────────── */
+  .cus-wrapper {
+    position: relative;
+    width: 100%;
+    min-height: 100dvh;
+    height: 100dvh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #111;
+    font-family: "Montserrat", sans-serif;
+    box-sizing: border-box;
+    isolation: isolate;
+  }
+  .cus-inner {
+    width: 100%;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    text-align: center;
+  }
+
+  /* ── Title ───────────────────────────────────────────────────── */
+  .cus-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 6px;
+    letter-spacing: 0.02em;
+  }
+  .cus-subtitle {
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 32px;
+    line-height: 1.5;
+  }
+
+  /* ── Mockup ─────────────────────────────────────────────────── */
+  .cus-mockup-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto 28px;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #1a1a1a;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+  }
+  .cus-mockup-img {
+    width: 100%;
+    aspect-ratio: 4/5;
+    object-fit: cover;
+    display: block;
+    min-height: 360px;
+  }
+
+  /* ── Color swatches ───────────────────────────────────────────── */
+  .cus-colors {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .cus-color-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.45);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-right: 4px;
+  }
+  .cus-swatch {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: border-color 0.15s, transform 0.15s;
+    position: relative;
+  }
+  .cus-swatch.selected {
+    border-color: #39A596;
+    transform: scale(1.12);
+  }
+  .cus-swatch[data-color="black"]  { background: #111; }
+  .cus-swatch[data-color="white"]  { background: #f5f5f5; }
+  .cus-swatch[data-color="grey"]  { background: #777; }
+
+  /* ── Placement toggles ────────────────────────────────────────── */
+  .cus-placements {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 32px;
+  }
+  .cus-placement-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.45);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-right: 4px;
+  }
+  .cus-place-btn {
+    padding: 8px 22px;
+    border-radius: 100px;
+    border: 1.5px solid rgba(255,255,255,0.15);
+    background: transparent;
+    color: rgba(255,255,255,0.6);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: border-color 0.15s, color 0.15s, background 0.15s;
+  }
+  .cus-place-btn.selected {
+    border-color: #39A596;
+    background: rgba(57,165,150,0.12);
+    color: #39A596;
+  }
+
+  /* ── Proceed button ─────────────────────────────────────────── */
+  .cus-proceed {
+    display: inline-block;
+    width: 100%;
+    max-width: 380px;
+    padding: 16px;
+    background: #39A596;
+    color: #000;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.15s, opacity 0.15s;
+  }
+  .cus-proceed:hover { background: #2dd4bf; }
+  .cus-proceed:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  /* ── Error banner ───────────────────────────────────────────── */
+  .cus-error {
+    display: none;
+    margin: 12px auto 0;
+    max-width: 380px;
+    padding: 10px 16px;
+    background: rgba(239,68,68,0.12);
+    border: 1px solid rgba(239,68,68,0.3);
+    border-radius: 10px;
+    color: #fca5a5;
+    font-size: 12px;
+    line-height: 1.45;
+    text-align: center;
+  }
+</style>
+
+<div class="cus-wrapper">
+  <div class="cus-inner">
+
+    <div class="cus-title">Placement &amp; Color</div>
+    <div class="cus-subtitle">Choose how your design appears on the garment</div>
+
+    <!-- Mockup preview -->
+    <div class="cus-mockup-wrap">
+      <img
+        id="cus-mockup-img"
+        class="cus-mockup-img"
+        src=""
+        alt="Design preview"
+      />
+    </div>
+
+    <!-- Color swatches: Black / White / Grey -->
+    <div class="cus-colors">
+      <span class="cus-color-label">Color</span>
+      <button class="cus-swatch selected" data-color="black"  aria-label="Black" title="Black"></button>
+      <button class="cus-swatch"         data-color="white"  aria-label="White"  title="White"></button>
+      <button class="cus-swatch"         data-color="grey"   aria-label="Grey"   title="Grey"></button>
+    </div>
+
+    <!-- Placement toggles: Front / Back -->
+    <div class="cus-placements">
+      <span class="cus-placement-label">Placement</span>
+      <button class="cus-place-btn selected" data-placement="front">Front</button>
+      <button class="cus-place-btn"         data-placement="back">Back</button>
+    </div>
+
+    <!-- Proceed -->
+    <button class="cus-proceed" id="cus-proceed-btn">Proceed to Checkout</button>
+    <div class="cus-error" id="cus-error"></div>
+
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // ── 1. Hydrate from URL params ─────────────────────────────────
+  var params = new URLSearchParams(window.location.search);
+  var designUrl = params.get('design_url') || '';
+
+  // ── 2. Inject design into mockup ────────────────────────────────
+  var mockupImg = document.getElementById('cus-mockup-img');
+  if (mockupImg && designUrl) {
+    mockupImg.src = designUrl;
+  }
+
+  // ── 3. Color swatch selection ──────────────────────────────────
+  var swatches = document.querySelectorAll('.cus-swatch');
+  swatches.forEach(function(sw) {
+    sw.addEventListener('click', function() {
+      swatches.forEach(function(s) { s.classList.remove('selected'); });
+      sw.classList.add('selected');
+    });
+  });
+
+  // ── 4. Placement toggle ───────────────────────────────────────
+  var placeBtns = document.querySelectorAll('.cus-place-btn');
+  placeBtns.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      placeBtns.forEach(function(b) { b.classList.remove('selected'); });
+      btn.classList.add('selected');
+    });
+  });
+
+  // ── 5. Proceed → cart/add.js then checkout ─────────────────────
+  var proceedBtn = document.getElementById('cus-proceed-btn');
+  var errorEl    = document.getElementById('cus-error');
+
+  function showError(msg) {
+    if (errorEl) {
+      errorEl.textContent = msg;
+      errorEl.style.display = 'block';
+    }
+  }
+  function clearError() {
+    if (errorEl) {
+      errorEl.style.display = 'none';
+    }
+  }
+
+  proceedBtn.addEventListener('click', async function() {
+    var customerId = '{{ customer.id | default: "" }}';
+
+    // 5a. Gate: redirect to register if not logged in
+    if (!customerId || customerId === '') {
+      var returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+      window.location.href = '/account/register?return_url=' + returnUrl;
+      return;
+    }
+
+    clearError();
+    var btn = proceedBtn;
+    btn.disabled = true;
+    btn.textContent = 'Adding to Cart...';
+
+    // ── Variant ID for the base product (Creator Sample Kit) ──────
+    // TODO: confirm this matches the live Shopify variant in production.
+    var VARIANT_ID = 48593020184756;
+
+    try {
+      var resp = await fetch('/cart/add.js', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          items: [{
+            id: VARIANT_ID,
+            quantity: 1,
+            properties: {
+              '_design_url':    designUrl,
+              '_source':        'creator_upload',
+              '_placement':     document.querySelector('.cus-place-btn.selected')?.dataset.placement || 'front',
+              '_color':         document.querySelector('.cus-swatch.selected')?.dataset.color || 'black'
+            }
+          }]
+        })
+      });
+
+      if (!resp.ok) {
+        var errText = await resp.text();
+        console.error('[Creator Studio] Cart add failed:', resp.status, errText);
+        showError('Could not add to cart. Please try again or contact support.');
+        btn.disabled = false;
+        btn.textContent = 'Proceed to Checkout';
+        return;
+      }
+
+      window.location.href = '/checkout';
+
+    } catch(e) {
+      console.error('[Creator Studio] Cart exception:', e);
+      showError('An error occurred. Please try again.');
+      btn.disabled = false;
+      btn.textContent = 'Proceed to Checkout';
+    }
+  });
+})();
+</script>
