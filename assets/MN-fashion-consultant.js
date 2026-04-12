@@ -744,21 +744,25 @@ function renderStep5A() {
 
   const abortCtrl = new AbortController();
   const timeoutId = setTimeout(() => abortCtrl.abort(), 90000);
+  console.log('[MN] Sending pipeline request:', { occasionId, vibeId, skinTone: state.skinTone, bodyShape: state.bodyShape, sourcePreference: state.sourcePreference, imageSize: rawBase64 ? rawBase64.length : 0 });
   fetch(API_URL, {
     method: 'POST',
     signal: abortCtrl.signal,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ action:'full_pipeline', user_id:userId, occasion:occasionId, vibe_id:vibeId, user_image:rawBase64, skin_tone: state.skinTone, body_shape: state.bodyShape, sourcePreference: state.sourcePreference }),
   })
-  .then(r => { clearTimeout(timeoutId); return r.ok ? r.json() : r.json().then(d => Promise.reject(d.error || ('Server error ' + r.status))); })
+  .then(r => { clearTimeout(timeoutId); console.log('[MN] Response received:', r.status, r.ok); return r.ok ? r.json() : r.json().then(d => Promise.reject(d.error || ('Server error ' + r.status))); })
   .then(data => {
     clearInterval(msgInt);
+    console.log('[MN] Pipeline data success:', data.success, 'image:', data.editorial?.final_image_url ? 'present' : 'MISSING');
+    try {
     if (!data.success) throw new Error(data.error || 'Pipeline failed');
     state.pipelineResult = data;
     state.affiliateRecs = data.affiliate_upsells || [];
 
     const imgUrl = (data.editorial && data.editorial.final_image_url) ||
                    (data.final_image_base64 ? 'data:image/jpeg;base64,' + data.final_image_base64 : null);
+    console.log('[MN] imgUrl:', imgUrl ? 'SET (' + imgUrl.slice(0, 60) + '...)' : 'NULL');
 
     const ls = $('#mnw-loading-state'), imgEl = $('#mnw-result-img'), badge = $('#mnw-result-badge');
     const info = $('#mnw-result-info'), ub = $('#mnw-upload-wardrobe'), title = $('#mnw-result-title');
@@ -792,8 +796,9 @@ function renderStep5A() {
 
     if (imgUrl && imgEl) {
       imgEl.src = imgUrl;
-      imgEl.onerror = () => { imgEl.src = 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=480&h=640&fit=crop'; };
+      imgEl.onerror = () => { console.log('[MN] img onerror'); imgEl.src = 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=480&h=640&fit=crop'; };
       imgEl.onload = () => {
+        console.log('[MN] img onload fired');
         if (ls) ls.style.display = 'none';
         imgEl.style.display = 'block';
         if (badge) badge.style.display = 'block';
@@ -804,13 +809,21 @@ function renderStep5A() {
           const vl = (data.editorial && data.editorial.vibe && data.editorial.vibe.label) || selectedLabels || 'your vibe';
           title.textContent = 'This is your ' + bt + ' in ' + vl + ' energy.';
         }
+        // ── GLOBAL MARKET PATH A: Render affiliate upsells ────────────────
+        if (state.sourcePreference === 'global_market') {
+          renderAffiliateResults(data);
+        }
       };
     } else {
       if (ls) ls.style.display = 'none';
       if (info) info.style.display = 'block';
       if (ub) ub.style.display = 'flex';
-    }
-  })
+      // ── GLOBAL MARKET PATH A: Render affiliate upsells (no image) ──────
+      if (state.sourcePreference === 'global_market') {
+        renderAffiliateResults(data);
+      }
+    }  // close try
+  })  // close .then
   .catch(err => {
     clearTimeout(timeoutId);
     clearInterval(msgInt);
@@ -835,6 +848,79 @@ function renderStep5A() {
     }
   }, 300);
 }
+
+// ──────────────────────────────────────────────────────────────────────────────
+// GLOBAL MARKET PATH A: Render affiliate upsell results
+// Called after API returns affiliate_upsells[] in global_market mode
+// ──────────────────────────────────────────────────────────────────────────────
+function renderAffiliateResults(data) {
+  const affiliateRecs = data.affiliate_upsells || [];
+  if (!affiliateRecs.length) return;
+
+  // Color theory data from the pipeline response
+  const colorTheory = data.color_theory || {};
+  const mstLabel = colorTheory.mst_label || '';
+  const undertoneNote = colorTheory.undertone_note || '';
+  const bestColors = (colorTheory.best_colors || []).join(', ');
+
+  // Occasion & vibe labels
+  const occData = OCCASIONS.find(o => o.id === state.selectedOccasions[0]) || {};
+  const vibeLabel = state.selectedAesthetics.map(id => AESTHETICS.find(a => a.id === id)?.style || id).join(' / ');
+
+  const html = `
+    <div class="mn-shopping-section mn-fade-in" style="margin-top:16px;">
+      ${colorTheory.mst_value ? `
+      <div style="background:rgba(57,165,150,0.08);border:1px solid rgba(57,165,150,0.2);border-radius:10px;padding:12px 14px;margin-bottom:14px;">
+        <p style="font-size:10px;font-weight:800;color:#39A596;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px">Your Color Profile</p>
+        <p style="font-size:12px;color:rgba(255,255,255,0.75);margin-bottom:4px"><span style="color:#39A596;font-weight:700">${mstLabel}</span> skin tone · Best colors: <span style="color:#4fffd9">${bestColors}</span></p>
+        <p style="font-size:11px;color:rgba(255,255,255,0.5);font-style:italic">${undertoneNote}</p>
+      </div>
+      ` : ''}
+
+      <h4 style="font-size:13px;font-weight:800;color:#fff;margin-bottom:4px">Shop the Look</h4>
+      <p class="mn-shopping-subtitle">Complete your ${vibeLabel} vibe for ${occData.label || 'any occasion'}</p>
+
+      ${affiliateRecs.slice(0, 4).map(rec => `
+        <div class="mn-shopping-card" style="margin-bottom:10px;">
+          <div style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0">
+            <span class="mn-shopping-item-name" style="font-size:12px;font-weight:700;color:#fff;white-space:normal;word-break:break-word">${rec.product_name || rec.name || 'Product'}</span>
+            <span style="font-size:10px;color:rgba(255,255,255,0.45)">${rec.brand || rec.platform || 'Style'}</span>
+            ${rec.why || rec.gap_reason || rec.style_context ? `<span class="mn-shopping-item-reason" style="-webkit-line-clamp:2">${rec.why || rec.gap_reason || rec.style_context}</span>` : ''}
+            ${rec.bank_offer ? `<span style="font-size:10px;color:#4fffd9;margin-top:2px">${rec.bank_offer}</span>` : ''}
+          </div>
+          <div class="mn-shopping-links" style="flex-direction:column;align-items:flex-end;gap:6px">
+            ${rec.affiliate_url ? `
+              <a href="${rec.affiliate_url}" target="_blank" class="mn-shop-link" style="background:rgba(57,165,150,0.15);border:1px solid rgba(57,165,150,0.3);border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:5px;text-decoration:none;min-width:90px;justify-content:center">
+                <span style="font-size:14px">🛒</span>
+                <span style="display:flex;flex-direction:column;align-items:flex-start">
+                  <span style="font-size:11px;font-weight:800;color:#fff">${rec.platform || 'Shop'}</span>
+                  ${rec.price ? `<span style="font-size:10px;color:#4fffd9;font-weight:600">₹${rec.price.toLocaleString('en-IN')}</span>` : ''}
+                </span>
+              </a>
+            ` : ''}
+            ${rec.original_price && rec.discount_pct ? `
+              <div style="display:flex;align-items:center;gap:5px;padding:4px 8px;background:rgba(239,68,68,0.12);border-radius:6px">
+                <span style="font-size:10px;color:rgba(255,255,255,0.4);text-decoration:line-through">₹${rec.original_price.toLocaleString('en-IN')}</span>
+                <span style="font-size:11px;color:#ef4444;font-weight:800">${rec.discount_pct}% OFF</span>
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+
+  // Append after the upload wardrobe button
+  const ub = document.getElementById('mnw-upload-wardrobe');
+  if (ub) {
+    ub.insertAdjacentHTML('afterend', html);
+  } else {
+    // Fallback: append after dopamine box
+    const info = document.getElementById('mnw-result-info');
+    if (info) info.insertAdjacentHTML('afterend', html);
+  }
+}
+
 // ── STEP 5B: SCANNING ANIMATION ──────────────────────────
 function renderStep5B() {
   // First design complete — remove back suppression so back IS visible again
