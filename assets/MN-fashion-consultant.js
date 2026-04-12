@@ -167,7 +167,7 @@ const CREATOR_API_URL = window.MN_CONFIG?.creatorApiUrl || 'https://creator-econ
   return {
     state, AESTHETICS, OCCASIONS, MOCK_WARDROBE, AFFILIATE_RECS,
     $, $$, INR, setContent, updateProgress, getGeneratedImg,
-    expandWidget
+    expandWidget, API_URL
   };
 })();
 
@@ -177,7 +177,7 @@ window.MNAIStylist = MNAIStylist;
 // ═══════════════════════════════════════════════════════════
 // STEP RENDERERS
 // ═══════════════════════════════════════════════════════════
-const { state, AESTHETICS, OCCASIONS, MOCK_WARDROBE, AFFILIATE_RECS, $, $$, INR, setContent, updateProgress, getGeneratedImg } = MNAIStylist;
+const { state, AESTHETICS, OCCASIONS, MOCK_WARDROBE, AFFILIATE_RECS, $, $$, INR, setContent, updateProgress, getGeneratedImg, API_URL } = MNAIStylist;
 
 // ── STEP 0: GENDER SELECTOR ──────────────────────────────────
 function renderStep0() {
