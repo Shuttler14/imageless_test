@@ -755,7 +755,6 @@ function renderStep5A() {
   .then(data => {
     clearInterval(msgInt);
     console.log('[MN] Pipeline data success:', data.success, 'image:', data.editorial?.final_image_url ? 'present' : 'MISSING');
-    try {
     if (!data.success) throw new Error(data.error || 'Pipeline failed');
     state.pipelineResult = data;
     state.affiliateRecs = data.affiliate_upsells || [];
@@ -822,8 +821,8 @@ function renderStep5A() {
       if (state.sourcePreference === 'global_market') {
         renderAffiliateResults(data);
       }
-    }  // close try
-  })  // close .then
+    }
+  })
   .catch(err => {
     clearTimeout(timeoutId);
     clearInterval(msgInt);
