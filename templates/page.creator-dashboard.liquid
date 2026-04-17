@@ -35,7 +35,18 @@ Access: /pages/creator-dashboard?design_id=<uuid>
 =================================================================================
 {% endcomment %}
 
-{%- assign design_id_param = request.parameters.design_id -%}
+{%- comment -%}
+Shopify exposes query params via request.query_parameters (newer) or via the
+raw URL. Both lookups are included so legacy and current runtimes both work.
+{%- endcomment -%}
+{%- assign design_id_param = request.query_parameters.design_id | default: request.parameters.design_id -%}
+{%- if design_id_param == blank -%}
+  {%- assign raw_url = request.url | default: '' -%}
+  {%- if raw_url contains 'design_id=' -%}
+    {%- assign _parts = raw_url | split: 'design_id=' -%}
+    {%- assign design_id_param = _parts[1] | split: '&' | first | split: '#' | first -%}
+  {%- endif -%}
+{%- endif -%}
 {%- if design_id_param != blank -%}
 <div class="creator-listing-section-wrapper" data-design-id="{{ design_id_param | escape }}">
   {% section 'creator-listing-dashboard' %}

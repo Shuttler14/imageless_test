@@ -849,46 +849,43 @@ Converts signed-in users to creators with brand setup and social verification
     <!-- Success header -->
     <div style="text-align:center;margin-bottom:1.5rem;">
       <div style="font-size:3rem;margin-bottom:0.5rem;">🚀</div>
-      <h2 style="font-family:Montserrat,sans-serif;font-size:1.5rem;font-weight:800;color:white;margin:0 0 0.5rem;">Your brand is live!</h2>
-      <p style="color:rgba(255,255,255,0.6);font-size:0.9rem;line-height:1.6;margin:0;">Customers can now discover and buy your design.</p>
+      <h2 style="font-family:Montserrat,sans-serif;font-size:1.5rem;font-weight:800;color:white;margin:0 0 0.5rem;">Your design is live!</h2>
+      <p style="color:rgba(255,255,255,0.6);font-size:0.9rem;line-height:1.6;margin:0;">Customers can now discover and buy your t-shirt / hoodie on My Narrative.</p>
     </div>
 
     <hr style="border:none;border-top:1px solid rgba(255,255,255,0.08);margin:1.25rem 0;">
 
-    <!-- Incentive banner -->
+    <!-- 50% more sales banner -->
     <div style="background:linear-gradient(135deg,rgba(57,165,150,0.15),rgba(57,165,150,0.05));border:1px solid rgba(57,165,150,0.3);border-radius:0.75rem;padding:0.875rem 1rem;margin-bottom:1.25rem;display:flex;align-items:flex-start;gap:0.75rem;">
-      <span style="font-size:1.25rem;">🪙</span>
-      <p style="margin:0;font-size:0.85rem;color:rgba(255,255,255,0.8);line-height:1.5;"><strong style="color:#39A596;">Unlock 10 more AI tokens</strong> and boost your sales by 5x with a physical sample.</p>
+      <span style="font-size:1.25rem;">📈</span>
+      <p style="margin:0;font-size:0.85rem;color:rgba(255,255,255,0.85);line-height:1.5;">
+        Creators who <strong style="color:#39A596;">market their own t-shirt / hoodie</strong> by purchasing and wearing it see up to
+        <strong style="color:#39A596;">50% more sales</strong>.
+      </p>
     </div>
 
     <!-- Upsell copy -->
-    <h3 style="font-family:Montserrat,sans-serif;font-size:1rem;font-weight:700;margin:0 0 0.5rem;">Want to make high-converting product videos?</h3>
-    <p style="color:rgba(255,255,255,0.65);font-size:0.875rem;line-height:1.6;margin:0 0 1.25rem;">Buy your physical sample now at wholesale cost. Creators with physical samples sell <strong>5x more</strong>.</p>
+    <h3 style="font-family:Montserrat,sans-serif;font-size:1rem;font-weight:700;margin:0 0 0.5rem;">Buy your own design — at a creator-discounted rate.</h3>
+    <p style="color:rgba(255,255,255,0.65);font-size:0.875rem;line-height:1.6;margin:0 0 1.25rem;">
+      Wear it. Film it. Share it. Your fans see authenticity, your conversion rate climbs.
+    </p>
 
-    <!-- Product options -->
+    <!-- Buy Your Own Design — goes to the published product page with a creator discount -->
     <div style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1rem;">
-      <!-- T-Shirt -->
-      <div style="background:#181818;border:1px solid #2a2a2a;border-radius:0.875rem;padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;transition:border-color 0.2s;" onmouseover="this.style.borderColor='#39A596'" onmouseout="this.style.borderColor='#2a2a2a'">
-        <div>
-          <div style="font-weight:700;margin-bottom:0.2rem;">👕 T-Shirt Sample</div>
-          <div style="font-size:1.1rem;font-weight:800;color:#39A596;">₹500 <span style="font-size:0.75rem;color:rgba(255,255,255,0.35);font-weight:400;text-decoration:line-through;">₹799+</span></div>
-          <div style="font-size:0.75rem;color:#39A596;font-weight:600;">+10 Narrative Tokens 🪙</div>
-        </div>
-        <button class="sk-add-btn" data-product="tshirt" data-price-paise="50000" onclick="addSampleToCart('tshirt',50000)" style="background:#39A596;color:#000;border:none;border-radius:0.5rem;padding:0.6rem 1.25rem;font-family:Montserrat,sans-serif;font-weight:700;font-size:0.8rem;cursor:pointer;white-space:nowrap;transition:background 0.2s;" onmouseover="this.style.background='#2a8a7f'" onmouseout="this.style.background='#39A596'">Add to Cart</button>
-      </div>
-      <!-- Hoodie -->
-      <div style="background:#181818;border:1px solid #2a2a2a;border-radius:0.875rem;padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;transition:border-color 0.2s;" onmouseover="this.style.borderColor='#39A596'" onmouseout="this.style.borderColor='#2a2a2a'">
-        <div>
-          <div style="font-weight:700;margin-bottom:0.2rem;">🧥 Hoodie Sample</div>
-          <div style="font-size:1.1rem;font-weight:800;color:#39A596;">₹900 <span style="font-size:0.75rem;color:rgba(255,255,255,0.35);font-weight:400;text-decoration:line-through;">₹1,499+</span></div>
-          <div style="font-size:0.75rem;color:#39A596;font-weight:600;">+10 Narrative Tokens 🪙</div>
-        </div>
-        <button class="sk-add-btn" data-product="hoodie" data-price-paise="90000" onclick="addSampleToCart('hoodie',90000)" style="background:#39A596;color:#000;border:none;border-radius:0.5rem;padding:0.6rem 1.25rem;font-family:Montserrat,sans-serif;font-weight:700;font-size:0.8rem;cursor:pointer;white-space:nowrap;transition:background 0.2s;" onmouseover="this.style.background='#2a8a7f'" onmouseout="this.style.background='#39A596'">Add to Cart</button>
-      </div>
+      <a id="skBuyOwnDesignBtn" href="#" onclick="return buyOwnDesign(event)"
+         style="background:linear-gradient(135deg,#39A596,#2dd4bf);color:#000;text-decoration:none;
+                border-radius:0.875rem;padding:1rem 1.25rem;display:flex;align-items:center;
+                justify-content:space-between;gap:1rem;font-family:Montserrat,sans-serif;
+                font-weight:700;font-size:0.9rem;transition:transform 0.2s;">
+        <span>🛒 Buy my own design at creator-discounted rate</span>
+        <span style="font-size:1.1rem;">→</span>
+      </a>
+      <p id="skDiscountHint" style="font-size:0.7rem;color:rgba(255,255,255,0.4);text-align:center;margin:0.25rem 0 0;">
+        Discount code will be applied automatically at checkout.
+      </p>
     </div>
 
-    <p style="font-size:0.75rem;color:rgba(255,255,255,0.3);text-align:center;margin:0 0 1rem;">Your exact design printed on the sample. Tokens credited when order ships.</p>
-    <button onclick="closeSampleKitModal()" style="display:block;width:100%;background:transparent;border:1px solid #333;color:rgba(255,255,255,0.45);border-radius:0.5rem;padding:0.6rem;font-size:0.875rem;cursor:pointer;">Maybe later</button>
+    <button onclick="closeSampleKitModal()" style="display:block;width:100%;background:transparent;border:1px solid #333;color:rgba(255,255,255,0.45);border-radius:0.5rem;padding:0.6rem;font-size:0.875rem;cursor:pointer;margin-top:0.5rem;">Maybe later &mdash; stay on dashboard</button>
   </div>
 </div>
 <style>
@@ -1037,7 +1034,11 @@ function cofMarkSocialConnected(platform, handle, followers) {
 }
 
 async function cofCompleteOnboarding() {
-  const brandName = document.getElementById('cofBrandName')?.value?.trim() || 'My Brand';
+  const brandName      = document.getElementById('cofBrandName')?.value?.trim() || 'My Brand';
+  const narrativeName  = document.getElementById('cofNarrativeName')?.value?.trim() || (brandName + "'s Designs");
+  const usernameInput  = document.getElementById('cofUsername')?.value?.trim() || '';
+  const description    = document.getElementById('cofDescription')?.value?.trim() || '';
+  const profilePhotoUrl = (window.COF_PROFILE_PHOTO_URL || document.getElementById('cofPhotoImg')?.src || '').trim();
   let tier = cofIsElite ? 'Elite Creator' : 'Creator';
   let commissionRate = cofIsElite ? 35 : 15;
 
@@ -1048,6 +1049,12 @@ async function cofCompleteOnboarding() {
       body: JSON.stringify({
         user_id: COF_USER_ID,
         brand_name: brandName,
+        narrative_name: narrativeName,
+        username: usernameInput,
+        description: description,
+        bio: description,
+        profile_photo_url: profilePhotoUrl,
+        avatar_url: profilePhotoUrl,
         type: cofIsElite ? 'elite' : 'standard',
         social_links: cofConnectedSocials,
         primary_platform: Object.keys(cofConnectedSocials)[0] || null
@@ -1060,6 +1067,36 @@ async function cofCompleteOnboarding() {
     }
   } catch (e) {
     console.log('Onboarding API offline, using defaults');
+  }
+
+  // Fallback: also hit /api/creator/register to ensure basic fields land in `creators` table
+  try {
+    await fetch(COF_API + '/api/creator/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id: COF_USER_ID,
+        username: usernameInput || brandName.toLowerCase().replace(/[^a-z0-9]/g,'-'),
+        email: '{{ customer.email | default: "" }}',
+        narrative_name: narrativeName,
+        bio: description,
+        avatar_url: profilePhotoUrl
+      })
+    });
+  } catch(e) { /* non-fatal */ }
+
+  // If a pending design is present, skip celebration — go straight to dashboard
+  // where the draft shows with a Publish button.
+  var pendingRaw = getPendingDesignRaw();
+  var urlDesignId = new URLSearchParams(window.location.search).get('design_id') || '';
+  if (pendingRaw || urlDesignId) {
+    var design = {};
+    if (pendingRaw) { try { design = JSON.parse(pendingRaw); } catch(e) {} }
+    var designId = urlDesignId || design.design_uuid || design.design_id || '';
+    if (designId) {
+      window.location.href = '/pages/creator-dashboard?design_id=' + encodeURIComponent(designId) + '&first_time=1';
+      return;
+    }
   }
 
   // Advance to completion step
@@ -1104,18 +1141,28 @@ function formatFollowers(num) {
 }
 
 function getPendingDesignRaw() {
+  // Prefer localStorage (AI studio flow), fall back to sessionStorage (upload flow).
   var raw = localStorage.getItem('mn_pending_design');
+  var fromSession = false;
+  if (!raw) {
+    raw = sessionStorage.getItem('mn_pending_design');
+    fromSession = !!raw;
+  }
   if (!raw) return null;
   try {
     var parsed = JSON.parse(raw);
-    var ts = Number(parsed.saved_at || 0);
+    var ts = Number(parsed.saved_at || Date.parse(parsed.created_at || '') || 0);
     if (ts && (Date.now() - ts) > (2 * 60 * 60 * 1000)) {
-      localStorage.removeItem('mn_pending_design');
+      if (fromSession) sessionStorage.removeItem('mn_pending_design');
+      else localStorage.removeItem('mn_pending_design');
       return null;
     }
+    // Normalize uuid/id for consumers
+    parsed.design_uuid = parsed.design_uuid || parsed.design_id || parsed.id || '';
     return JSON.stringify(parsed);
   } catch (e) {
     localStorage.removeItem('mn_pending_design');
+    sessionStorage.removeItem('mn_pending_design');
     return null;
   }
 }
@@ -1151,7 +1198,7 @@ function loadPendingDesign() {
             '🤖 Create a Design with AI',
           '</a>',
           '<br><br>',
-          '<a href="/pages/ai-studio?intent=creator_upload" style="',
+          '<a href="/pages/placement-editor?intent=creator_upload" style="',
             'color:#39A596;font-size:0.8rem;text-decoration:none;',
           '">',
             'or upload your own artwork →',
@@ -1239,11 +1286,32 @@ async function cofUploadPhoto(event) {
       var img = document.getElementById('cofPhotoImg');
       if (img) img.src = result.photo_url;
       document.getElementById('cofPhotoPreview').style.display = 'block';
+      window.COF_PROFILE_PHOTO_URL = result.photo_url;
     } else {
-      alert(result.error || 'Upload failed');
+      // Fallback: show a local preview so the user still sees their photo,
+      // and send the photo along as a data URL when onboarding completes.
+      var reader = new FileReader();
+      reader.onload = function(ev) {
+        var img = document.getElementById('cofPhotoImg');
+        if (img) img.src = ev.target.result;
+        var preview = document.getElementById('cofPhotoPreview');
+        if (preview) preview.style.display = 'block';
+        window.COF_PROFILE_PHOTO_URL = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+      console.warn('[Creator Onboarding] Photo upload API unavailable, using local preview.');
     }
   } catch(e) {
-    alert('Upload error: ' + e.message);
+    // Same graceful fallback if the API is offline entirely
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      var img = document.getElementById('cofPhotoImg');
+      if (img) img.src = ev.target.result;
+      var preview = document.getElementById('cofPhotoPreview');
+      if (preview) preview.style.display = 'block';
+      window.COF_PROFILE_PHOTO_URL = ev.target.result;
+    };
+    reader.readAsDataURL(file);
   }
 }
 
@@ -1265,13 +1333,21 @@ function cofUseInstagramPhoto() {
   document.getElementById('cofPhotoPreview').style.display = 'block';
 }
 
-// Sample Kit Modal Functions
+// ── Publish result popup (linked product + discount code) ──────
 window.PUBLISH_RESULT_GLOBAL = null;
 
 function openSampleKitModal(publishResult) {
   window.PUBLISH_RESULT_GLOBAL = publishResult || {};
   var modal = document.getElementById('mnSampleKitModal');
   if (modal) { modal.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+
+  // If publish returned a discount code, surface it in the hint.
+  var hint = document.getElementById('skDiscountHint');
+  var code = publishResult && (publishResult.creator_discount_code || publishResult.discount_code);
+  if (hint && code) {
+    hint.innerHTML = 'Discount code <strong style="color:#39A596;letter-spacing:0.05em;">'
+      + String(code).toUpperCase() + '</strong> will be applied automatically at checkout.';
+  }
 }
 
 function closeSampleKitModal() {
@@ -1279,53 +1355,24 @@ function closeSampleKitModal() {
   if (modal) { modal.style.display = 'none'; document.body.style.overflow = ''; }
 }
 
-async function addSampleToCart(productType, pricePaise) {
+// Buy the creator's own listed design at a discounted creator rate.
+// Routes to the published product page (returned by /api/design/publish).
+function buyOwnDesign(event) {
+  if (event && event.preventDefault) event.preventDefault();
   var pr = window.PUBLISH_RESULT_GLOBAL || {};
-  var variantMap = pr.variant_map || {};
-  var defaultColor = productType === 'tshirt' ? 'white' : 'black';
-  var variantInfo  = variantMap[defaultColor] || {};
-  var variantId    = variantInfo.variant_numeric || '';
+  var productUrl = pr.product_url || pr.shopify_product_url || pr.productUrl || '';
+  var code = pr.creator_discount_code || pr.discount_code || '';
 
-  var btn = document.querySelector('[data-product="' + productType + '"].sk-add-btn');
-  if (btn) { btn.disabled = true; btn.textContent = 'Adding...'; }
-
-  if (!variantId) {
-    // Fallback: redirect to cart with product page
-    window.location.href = '/products/creator-sample-kit?variant=' + productType;
-    return;
+  // Fallback: if backend didn't return a product URL, land on the creator's dashboard.
+  if (!productUrl) {
+    productUrl = '/pages/creator-dashboard';
+  } else if (code) {
+    // Apply the discount code automatically via Shopify's built-in discount URL.
+    var sep = productUrl.indexOf('?') === -1 ? '?' : '&';
+    productUrl = productUrl + sep + 'discount=' + encodeURIComponent(code);
   }
-
-  var payload = {
-    items: [{
-      id: variantId,
-      quantity: 1,
-      properties: {
-        '_design_uuid':   pr.unique_product_id || '',
-        '_design_title':  pr.title || '',
-        '_creator_id':    '{{ user_id }}',
-        '_product_type':  productType,
-        '_color':         defaultColor,
-        '_is_sample_kit': 'true'
-      }
-    }]
-  };
-
-  try {
-    var resp = await fetch('/cart/add.js', {
-      method:  'POST',
-      headers: {'Content-Type': 'application/json'},
-      body:    JSON.stringify(payload)
-    });
-    if (resp.ok) {
-      if (btn) btn.textContent = '✅ Added!';
-      setTimeout(function() { window.location.href = '/cart'; }, 800);
-    } else {
-      var err = await resp.json();
-      if (btn) { btn.disabled = false; btn.textContent = err.description || 'Error'; }
-    }
-  } catch(e) {
-    if (btn) { btn.disabled = false; btn.textContent = 'Cart error'; }
-  }
+  window.location.href = productUrl;
+  return false;
 }
 
 document.addEventListener('keydown', function(e) {
@@ -1334,6 +1381,7 @@ document.addEventListener('keydown', function(e) {
 
 window.openSampleKitModal  = openSampleKitModal;
 window.closeSampleKitModal = closeSampleKitModal;
+window.buyOwnDesign        = buyOwnDesign;
 </script>
 
 {% schema %}

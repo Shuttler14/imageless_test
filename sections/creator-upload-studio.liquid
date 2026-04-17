@@ -5,11 +5,15 @@ creator-upload-studio.liquid
 Isolated "Dumb Terminal" Placement Editor for the creator upload flow.
 Rendered by templates/page.ai-studio.liquid when ?intent=creator_upload is present.
 
-No AI Stylist, no state machine, no phantom clicks. Pure DOM wiring:
-  1. Read design_url from URL params
-  2. Inject it into the mockup preview
-  3. Wire color/placement toggles (Black / White / Grey  |  Front / Back)
-  4. Wire "Proceed" → add to cart, then redirect to checkout / login
+Accepts the uploaded design from either:
+  - URL param: ?design_url=<public URL>
+  - sessionStorage: mn_pending_upload (written by become-creator-enhanced)
+
+Pipeline step:
+  - Show the design composited on the selected garment color/placement
+  - "Continue" saves the upload to Supabase (if not already), then redirects
+    to /pages/creator-onboarding-flow for first-run profile setup, where
+    the design lands in the dashboard as a draft (awaiting Publish).
 =================================================================================
 {% endcomment %}
 
@@ -63,13 +67,33 @@ No AI Stylist, no state machine, no phantom clicks. Pure DOM wiring:
     overflow: hidden;
     background: #1a1a1a;
     box-shadow: 0 8px 40px rgba(0,0,0,0.6);
-  }
-  .cus-mockup-img {
-    width: 100%;
     aspect-ratio: 4/5;
+  }
+  /* Garment blank (colored tee) fills the wrap */
+  .cus-garment-blank {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
     object-fit: cover;
+    background: #111;
     display: block;
-    min-height: 360px;
+  }
+  /* The user's design overlaid on the chest print area */
+  .cus-design-overlay {
+    position: absolute;
+    top: 28%;
+    left: 50%;
+    width: 38%;
+    max-width: 200px;
+    transform: translateX(-50%);
+    object-fit: contain;
+    pointer-events: none;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,0.25));
+  }
+  .cus-design-overlay.placement-back {
+    top: 26%;
+    width: 40%;
   }
 
   /* ── Color swatches ───────────────────────────────────────────── */
@@ -181,14 +205,23 @@ No AI Stylist, no state machine, no phantom clicks. Pure DOM wiring:
     <div class="cus-title">Placement &amp; Color</div>
     <div class="cus-subtitle">Choose how your design appears on the garment</div>
 
-    <!-- Mockup preview -->
-    <div class="cus-mockup-wrap">
+    <!-- Mockup preview: blank garment + design overlay -->
+    <div class="cus-mockup-wrap" id="cus-mockup-wrap">
       <img
-        id="cus-mockup-img"
-        class="cus-mockup-img"
-        src=""
-        alt="Design preview"
+        id="cus-garment-blank"
+        class="cus-garment-blank"
+        alt="T-shirt mockup"
+        src="{{ 'tshirt-mockup-black.png' | asset_url }}"
+        onerror="this.onerror=null;this.removeAttribute('src');this.style.background='#111';"
       />
+      <img
+        id="cus-design-overlay"
+        class="cus-design-overlay"
+        alt="Your uploaded design"
+        src=""
+      />
+      <!-- Legacy id kept so any external script that still targets it does not throw -->
+      <img id="cus-mockup-img" style="display:none;" alt="" aria-hidden="true" />
     </div>
 
     <!-- Color swatches: Black / White / Grey -->
@@ -206,9 +239,12 @@ No AI Stylist, no state machine, no phantom clicks. Pure DOM wiring:
       <button class="cus-place-btn"         data-placement="back">Back</button>
     </div>
 
-    <!-- Proceed -->
-    <button class="cus-proceed" id="cus-proceed-btn">Proceed to Checkout</button>
+    <!-- Continue to dashboard (save as draft) -->
+    <button class="cus-proceed" id="cus-proceed-btn">Continue &rarr; Save as Draft</button>
     <div class="cus-error" id="cus-error"></div>
+    <p style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:10px;">
+      Your design will be saved as a draft in your Creator Dashboard. Set up your profile next, then publish to earn.
+    </p>
 
   </div>
 </div>
@@ -217,106 +253,185 @@ No AI Stylist, no state machine, no phantom clicks. Pure DOM wiring:
 (function() {
   'use strict';
 
-  // ── 1. Hydrate from URL params ─────────────────────────────────
-  var params = new URLSearchParams(window.location.search);
-  var designUrl = params.get('design_url') || '';
+  // ── Backend API base (creator economy) ──────────────────────────
+  var CREATOR_API = (window.MN_CREATOR_API || 'https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app');
 
-  // ── 2. Inject design into mockup ────────────────────────────────
-  var mockupImg = document.getElementById('cus-mockup-img');
-  if (mockupImg && designUrl) {
-    mockupImg.src = designUrl;
+  // ── Supabase config (theme_settings -> window.ENV) ──────────────
+  var SUPABASE_URL      = (window.ENV && window.ENV.SUPABASE_URL)      || '{{ settings.supabase_url | default: "" }}';
+  var SUPABASE_ANON_KEY = (window.ENV && window.ENV.SUPABASE_ANON_KEY) || '{{ settings.supabase_anon_key | default: "" }}';
+
+  // ── DOM refs ────────────────────────────────────────────────────
+  var designOverlay = document.getElementById('cus-design-overlay');
+  var garmentBlank  = document.getElementById('cus-garment-blank');
+  var errorEl       = document.getElementById('cus-error');
+  var proceedBtn    = document.getElementById('cus-proceed-btn');
+
+  function showError(msg) { if (errorEl) { errorEl.textContent = msg; errorEl.style.display = 'block'; } }
+  function clearError() { if (errorEl) { errorEl.style.display = 'none'; } }
+
+  // ── 1. Hydrate the uploaded design ──────────────────────────────
+  //    Priority: ?design_url=<url>  >  sessionStorage.mn_pending_upload
+  var params    = new URLSearchParams(window.location.search);
+  var designUrl = params.get('design_url') || '';
+  var pending   = null;
+
+  if (!designUrl) {
+    try {
+      var raw = sessionStorage.getItem('mn_pending_upload');
+      if (raw) pending = JSON.parse(raw);
+    } catch (e) { /* ignore parse errors */ }
+    if (pending && pending.data_url) {
+      // Show the local data URL immediately — upload happens on Continue.
+      designUrl = pending.data_url;
+    }
   }
 
-  // ── 3. Color swatch selection ──────────────────────────────────
+  if (designOverlay && designUrl) {
+    designOverlay.src = designUrl;
+  } else if (designOverlay) {
+    // Fallback: surface a gentle hint instead of an empty mockup
+    designOverlay.alt = 'No design detected — please return to Become a Creator and upload again';
+  }
+
+  // ── 2. Color swatch selection ──────────────────────────────────
+  var GARMENT_BLANKS = {
+    black: '{{ "tshirt-mockup-black.png" | asset_url }}',
+    white: '{{ "tshirt-mockup-white.png" | asset_url }}',
+    grey:  '{{ "tshirt-mockup-grey.png"  | asset_url }}'
+  };
   var swatches = document.querySelectorAll('.cus-swatch');
   swatches.forEach(function(sw) {
     sw.addEventListener('click', function() {
       swatches.forEach(function(s) { s.classList.remove('selected'); });
       sw.classList.add('selected');
+      var color = sw.dataset.color || 'black';
+      if (garmentBlank && GARMENT_BLANKS[color]) {
+        garmentBlank.src = GARMENT_BLANKS[color];
+      }
     });
   });
 
-  // ── 4. Placement toggle ───────────────────────────────────────
+  // ── 3. Placement toggle ───────────────────────────────────────
   var placeBtns = document.querySelectorAll('.cus-place-btn');
   placeBtns.forEach(function(btn) {
     btn.addEventListener('click', function() {
       placeBtns.forEach(function(b) { b.classList.remove('selected'); });
       btn.classList.add('selected');
+      if (designOverlay) {
+        designOverlay.classList.remove('placement-front', 'placement-back');
+        designOverlay.classList.add('placement-' + (btn.dataset.placement || 'front'));
+      }
     });
   });
 
-  // ── 5. Proceed → cart/add.js then checkout ─────────────────────
-  var proceedBtn = document.getElementById('cus-proceed-btn');
-  var errorEl    = document.getElementById('cus-error');
-
-  function showError(msg) {
-    if (errorEl) {
-      errorEl.textContent = msg;
-      errorEl.style.display = 'block';
-    }
-  }
-  function clearError() {
-    if (errorEl) {
-      errorEl.style.display = 'none';
-    }
+  // ── 4. Upload helper: data URL / File → Supabase public URL ────
+  async function dataUrlToFile(dataUrl, fallbackName, fallbackType) {
+    var resp = await fetch(dataUrl);
+    var blob = await resp.blob();
+    var name = fallbackName || ('upload-' + Date.now() + '.png');
+    var type = fallbackType || blob.type || 'image/png';
+    return new File([blob], name, { type: type });
   }
 
+  async function uploadToSupabase(file) {
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+      // Supabase not configured in theme settings — return the file as a data URL.
+      // Backend will accept data_url too.
+      return null;
+    }
+    var ext = (file.name.split('.').pop() || 'png').toLowerCase();
+    var fileName = 'creator-uploads/' + Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.' + ext;
+    var url = SUPABASE_URL + '/storage/v1/object/creator_assets/' + fileName;
+    var resp = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+        'apikey': SUPABASE_ANON_KEY,
+        'Content-Type': file.type || 'image/png',
+        'x-upsert': 'true'
+      },
+      body: file
+    });
+    if (!resp.ok) {
+      console.error('[Creator Upload] Supabase upload failed', resp.status, await resp.text());
+      return null;
+    }
+    return SUPABASE_URL + '/storage/v1/object/public/creator_assets/' + fileName;
+  }
+
+  // ── 5. Continue → save draft via backend, go to onboarding flow ─
   proceedBtn.addEventListener('click', async function() {
     var customerId = '{{ customer.id | default: "" }}';
+    clearError();
 
-    // 5a. Gate: redirect to register if not logged in
-    if (!customerId || customerId === '') {
+    if (!customerId) {
       var returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
       window.location.href = '/account/register?return_url=' + returnUrl;
       return;
     }
 
-    clearError();
-    var btn = proceedBtn;
-    btn.disabled = true;
-    btn.textContent = 'Adding to Cart...';
-
-    // ── Variant ID for the base product (Creator Sample Kit) ──────
-    // TODO: confirm this matches the live Shopify variant in production.
-    var VARIANT_ID = 48593020184756;
+    proceedBtn.disabled = true;
+    proceedBtn.textContent = 'Saving...';
 
     try {
-      var resp = await fetch('/cart/add.js', {
+      var publicUrl = designUrl;
+
+      // If our source is the sessionStorage data URL, upload it to Supabase first.
+      if (pending && pending.data_url && designUrl === pending.data_url) {
+        var file = await dataUrlToFile(pending.data_url, pending.file_name, pending.file_type);
+        var uploaded = await uploadToSupabase(file);
+        if (uploaded) publicUrl = uploaded;
+      }
+
+      var placement = document.querySelector('.cus-place-btn.selected')?.dataset.placement || 'front';
+      var color     = document.querySelector('.cus-swatch.selected')?.dataset.color || 'black';
+
+      // Submit as a new draft design on the backend.
+      // Endpoint uses the simple submit path (design_feed.py → /api/designs/submit).
+      var submitResp = await fetch(CREATOR_API + '/api/designs/submit', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({
-          items: [{
-            id: VARIANT_ID,
-            quantity: 1,
-            properties: {
-              '_design_url':    designUrl,
-              '_source':        'creator_upload',
-              '_placement':     document.querySelector('.cus-place-btn.selected')?.dataset.placement || 'front',
-              '_color':         document.querySelector('.cus-swatch.selected')?.dataset.color || 'black'
-            }
-          }]
+          user_id:      customerId,
+          title:        'Untitled Upload',
+          design_file_url: publicUrl,
+          flat_image_url:  publicUrl,
+          source:       'creator_upload',
+          placement:    placement,
+          color:        color,
+          status:       'draft'
         })
       });
 
-      if (!resp.ok) {
-        var errText = await resp.text();
-        console.error('[Creator Studio] Cart add failed:', resp.status, errText);
-        showError('Could not add to cart. Please try again or contact support.');
-        btn.disabled = false;
-        btn.textContent = 'Proceed to Checkout';
-        return;
-      }
+      var submitJson = {};
+      try { submitJson = await submitResp.json(); } catch(e) {}
 
-      window.location.href = '/checkout';
+      // Clear the sessionStorage — we're done with it either way.
+      try { sessionStorage.removeItem('mn_pending_upload'); } catch(e) {}
 
-    } catch(e) {
-      console.error('[Creator Studio] Cart exception:', e);
-      showError('An error occurred. Please try again.');
-      btn.disabled = false;
-      btn.textContent = 'Proceed to Checkout';
+      var designId = (submitJson && (submitJson.design_id || submitJson.id)) || '';
+
+      // Preserve minimal context for the onboarding step.
+      try {
+        sessionStorage.setItem('mn_pending_design', JSON.stringify({
+          design_id: designId,
+          image_url: publicUrl,
+          placement: placement,
+          color:     color,
+          source:    'creator_upload',
+          created_at: new Date().toISOString()
+        }));
+      } catch (e) {}
+
+      // Route to onboarding flow (first-time profile setup) — passes design_id along.
+      var qs = 'from=upload&intent=creator_upload' + (designId ? '&design_id=' + encodeURIComponent(designId) : '');
+      window.location.href = '/pages/creator-onboarding?' + qs;
+
+    } catch (e) {
+      console.error('[Creator Upload] Continue failed:', e);
+      showError('Could not save your design. Please try again.');
+      proceedBtn.disabled = false;
+      proceedBtn.textContent = 'Continue → Save as Draft';
     }
   });
 })();

@@ -247,34 +247,11 @@
     <button class="bc-btn bc-btn-primary" onclick="openIntentModal()">&#x2728; Start Creating Today</button>
   </section>
 
-  <!-- MODAL -->
-  <div id="bcPathModal" class="bc-modal">
-    <div class="bc-modal-card">
-      <button class="bc-modal-close" onclick="closeBcModal()">&times;</button>
-      <h2 class="bc-modal-title">Choose Your Path</h2>
-      
-      <!-- Creator Path -->
-      <div class="bc-modal-row">
-        <span class="bc-modal-icon">&#x1F3A8;</span>
-        <div class="bc-modal-content">
-          <div class="bc-modal-name">Creator</div>
-          <div class="bc-modal-desc">15% commission per sale</div>
-        </div>
-        <a href="/pages/creator-onboarding" class="bc-btn bc-btn-primary bc-btn-small">Apply &rarr;</a>
-      </div>
-
-      <!-- Elite Creator Path -->
-      <div class="bc-modal-row bc-modal-row-elite">
-        <span class="bc-modal-icon">&#x1F451;</span>
-        <div class="bc-modal-content">
-          <div class="bc-modal-name" style="color: #FFD700;">Elite Creator</div>
-          <div class="bc-modal-desc">30&ndash;50% commission</div>
-        </div>
-        <button class="bc-btn bc-btn-gold bc-btn-small" onclick="closeModalAndScroll()">Apply &rarr;</button>
-      </div>
-      <p class="bc-modal-note">Invite-only 50% tier for mega-influencers</p>
-    </div>
-  </div>
+  {% comment %}
+    Legacy "Choose Your Path" modal (bcPathModal / openBcModal) removed —
+    the main CTA now uses openIntentModal() → Upload vs Create with AI.
+    Elite application is available directly in the Elite section above.
+  {% endcomment %}
 </div>
 
 <style>
@@ -1174,19 +1151,11 @@
 
   let bcActivePlatform = null;
 
-  // -- Path Modal --
-  function openBcModal() {
-    document.getElementById('bcPathModal').classList.add('open');
-  }
-
-  function closeBcModal() {
-    document.getElementById('bcPathModal').classList.remove('open');
-  }
-
+  // Scroll helper used by URL param ?type=elite
   function closeModalAndScroll() {
-    closeBcModal();
     setTimeout(() => {
-      document.getElementById('bcEliteSection').scrollIntoView({ behavior: 'smooth' });
+      var el = document.getElementById('bcEliteSection');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
     }, 200);
   }
 
@@ -1438,13 +1407,6 @@
       megaForm.addEventListener('submit', handleMegaForm);
     }
 
-    // Close modal when clicking outside
-    const modal = document.getElementById('bcPathModal');
-    modal.addEventListener('click', function(e) {
-      if (e.target === this) {
-        closeBcModal();
-      }
-    });
   });
 </script>
 
@@ -1720,8 +1682,25 @@
     if (e.key === 'Escape') closeIntentModal();
   });
 
+  // Auto-open the intent modal when the user arrives with the
+  // #bcIntentModal hash (e.g. from the "Create New Design" CTA on
+  // the creator dashboard). Also supports ?intent_modal=1.
+  (function() {
+    function maybeOpenFromHash() {
+      var viaHash  = (window.location.hash || '') === '#bcIntentModal';
+      var viaQuery = new URLSearchParams(window.location.search).get('intent_modal') === '1';
+      if (viaHash || viaQuery) openIntentModal();
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', maybeOpenFromHash);
+    } else {
+      maybeOpenFromHash();
+    }
+  })();
+
   // ── Upload button: wire file input → OS gallery picker ──────
-  // When a file is selected, save it and route to ai-studio?intent=creator_upload
+  // When a file is selected, save it and route DIRECTLY to the placement editor.
+  // No AI-studio detour — the upload flow is a first-class path of its own.
   (function() {
     var fileInput = document.getElementById('bcDesignFileInput');
     if (!fileInput) return;
@@ -1733,7 +1712,6 @@
       var btn = document.getElementById('bcUploadBtn');
       if (btn) { btn.textContent = '⏳ Loading...'; btn.disabled = true; }
 
-      // Read file and store in sessionStorage for the studio to pick up
       var reader = new FileReader();
       reader.onload = function(e) {
         try {
@@ -1745,11 +1723,14 @@
             created_at: new Date().toISOString()
           };
           sessionStorage.setItem('mn_pending_upload', JSON.stringify(pendingUpload));
+          // Also flag creator intent so any downstream gate treats this as a creator path.
+          sessionStorage.setItem('mn_creator_intent', 'creator_upload');
+          sessionStorage.setItem('mn_creator_intent_ts', Date.now().toString());
         } catch(err) {
           console.warn('[MN] sessionStorage write failed:', err);
         }
-        // Navigate to AI Studio in creator upload mode
-        window.location.href = '/pages/ai-studio?intent=creator_upload';
+        // Land the user DIRECTLY on the placement editor page.
+        window.location.href = '/pages/placement-editor?intent=creator_upload';
       };
       reader.onerror = function() {
         if (btn) { btn.textContent = 'CHOOSE DESIGN'; btn.disabled = false; }

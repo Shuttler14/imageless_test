@@ -1141,12 +1141,21 @@ SECTION CONFIGURATION
         <div class="cd-actions-card">
           <h3 class="cd-section-title">Quick Actions</h3>
           <div class="cd-action-list">
-            <!-- Upload Design → /pages/ai-studio (fixed from /pages/my-closet) -->
-            <a href="/pages/ai-studio" class="cd-action-btn">
+            <!-- Upload Design → goes straight to the placement editor (no AI detour) -->
+            <a href="/pages/placement-editor?intent=creator_upload" class="cd-action-btn">
               <div class="cd-action-icon upload">📤</div>
               <div class="cd-action-text">
                 <h4>Upload Design</h4>
                 <p>Submit a new design to earn</p>
+              </div>
+            </a>
+
+            <!-- Create with AI -->
+            <a href="/pages/ai-studio?intent=creator_ai" class="cd-action-btn">
+              <div class="cd-action-icon upload">🤖</div>
+              <div class="cd-action-text">
+                <h4>Create with AI</h4>
+                <p>Generate a custom design in seconds</p>
               </div>
             </a>
 

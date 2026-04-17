@@ -322,7 +322,7 @@ Updated:
   
   <div class="flex flex-1 items-center gap-4 md:gap-7 h-full">
     
-    <button class="md:hidden flex items-center justify-center" data-for="nav-open-btn">
+    <button class="lg:hidden flex items-center justify-center" data-for="nav-open-btn">
       {% render 'icons', icon: 'menu', height: '24px', width: '24px' %}
     </button>
 
@@ -384,7 +384,7 @@ Updated:
     </li>
   </ul>
 
-  <div id="mobile-menu-drawer" class="mobile-menu-drawer md:hidden">
+  <div id="mobile-menu-drawer" class="mobile-menu-drawer lg:hidden">
     <div class="drawer-header">
       {% if customer %}
         <a href="{{ routes.account_url }}" class="border border-gray-600 rounded px-4 py-1.5 text-sm font-semibold text-white">Hi, {{ customer.first_name }}</a>
@@ -451,6 +451,18 @@ Updated:
         <span class="drawer-glass-card__status">Dashboard</span>
       </a>
 
+      <!-- Discover (creator design feed) -->
+      <a href="/pages/discover" class="drawer-glass-card drawer-glass-card--emoji" data-mobile-nav-link>
+        <div class="drawer-glass-card__icon" aria-hidden="true">
+          <span class="menu-emoji">🧭</span>
+        </div>
+        <div class="drawer-glass-card__copy">
+          <div class="drawer-glass-card__title">Discover</div>
+          <div class="drawer-glass-card__subtitle">Browse the social feed of designs from My Narrative creators.</div>
+        </div>
+        <span class="drawer-glass-card__status">Feed</span>
+      </a>
+
       <!-- Featured Creators -->
       <a href="/pages/featured-creators" class="drawer-glass-card drawer-glass-card--emoji" data-mobile-nav-link>
         <div class="drawer-glass-card__icon" aria-hidden="true">
@@ -487,7 +499,7 @@ Updated:
   </div>
 </nav>
 
-<div id="nav-overlay" class="md:hidden fixed top-0 left-0 w-screen h-screen bg-[rgba(0,0,0,0.6)] z-[40] hidden opacity-0 transition-opacity duration-300"></div>
+<div id="nav-overlay" class="lg:hidden fixed top-0 left-0 w-screen h-screen bg-[rgba(0,0,0,0.6)] z-[40] hidden opacity-0 transition-opacity duration-300"></div>
 
 <div class="bg-black text-white fixed top-0 w-screen h-dvh md:max-h-[80vh] p-4 md:p-6 flex-col z-[60]" data-for="search-slide">
   <div>

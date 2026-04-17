@@ -1121,9 +1121,9 @@ SECTION CONFIGURATION
         </div>
       </div>
 
-      {% comment %} Quick Actions {% endcomment %}
+      {% comment %} Quick Actions — route back through the creator intent modal {% endcomment %}
       <div class="mn-actions-row">
-        <a href="/pages/ai-studio" class="mn-action-btn mn-action-btn-primary">
+        <a href="/pages/become-creator#bcIntentModal" class="mn-action-btn mn-action-btn-primary">
           Create New Design
         </a>
         <a href="/pages/featured-creators" class="mn-action-btn mn-action-btn-secondary">
@@ -1185,7 +1185,7 @@ SECTION CONFIGURATION
             <div class="mn-empty-state-icon">🎨</div>
             <h3 class="mn-empty-state-title">Your Canvas is Empty</h3>
             <p class="mn-empty-state-desc">Let's change that. Create your first design and start earning up to 45% commission on every sale.</p>
-            <a href="/pages/ai-studio" class="mn-empty-state-cta">Create Your First Design (AI Assisted)</a>
+            <a href="/pages/ai-studio?intent=creator_ai" class="mn-empty-state-cta">Create Your First Design (AI Assisted)</a>
           </div>
         </div>
 
@@ -1241,13 +1241,17 @@ SECTION CONFIGURATION
         </div>
       </div>
 
-      {% comment %} Quick Actions {% endcomment %}
+      {% comment %}
+        Quick Actions — "Add New Design" routes back to the intent modal so the
+        creator can pick AI vs Upload again. Removed /pages/creator-designs
+        (template does not exist).
+      {% endcomment %}
       <div class="mn-actions-row">
-        <a href="/pages/creator-designs" class="mn-action-btn mn-action-btn-primary">
+        <a href="/pages/become-creator#bcIntentModal" class="mn-action-btn mn-action-btn-primary">
           Add New Design
         </a>
-        <a href="/pages/my-closet" class="mn-action-btn mn-action-btn-secondary">
-          My Digital Closet
+        <a href="/pages/discover" class="mn-action-btn mn-action-btn-secondary">
+          Discover Feed
         </a>
         <a href="/pages/featured-creators" class="mn-action-btn mn-action-btn-secondary">
           Featured Creators

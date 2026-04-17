@@ -1,0 +1,49 @@
+{% comment %}
+=================================================================================
+PLACEMENT EDITOR — Direct upload → canvas, no AI-studio detour
+=================================================================================
+This template is the landing page for the "Upload your design" path of the
+creator pipeline. It renders the `creator-upload-studio` section directly, so
+users never bounce through /pages/ai-studio (which is reserved for the
+AI-assisted design flow).
+
+Flow:
+  /pages/become-creator
+    → user picks "Upload your design" + file picker
+    → file is stashed in sessionStorage as `mn_pending_upload`
+    → redirect here: /pages/placement-editor?intent=creator_upload
+    → creator-upload-studio reads the pending upload, shows canvas,
+      lets user pick color + placement, then saves a draft and routes to
+      /pages/creator-onboarding.
+
+Create the Shopify Page with handle `placement-editor` and assign this template.
+=================================================================================
+{% endcomment %}
+
+<script>
+  window.ENV = Object.assign({}, window.ENV || {}, {
+    SUPABASE_URL: "{{ settings.supabase_url | default: '' | escape }}",
+    SUPABASE_ANON_KEY: "{{ settings.supabase_anon_key | default: '' | escape }}"
+  });
+</script>
+
+{% section 'creator-upload-studio' %}
+
+<style>
+  /* Keep Shopify header/footer visible and layered above section content */
+  #shopify-section-header,
+  .site-header,
+  header[role="banner"],
+  .header-wrapper,
+  #shopify-section-group-header-group {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 9999 !important;
+  }
+  #shopify-section-footer,
+  footer[role="contentinfo"],
+  .site-footer {
+    position: relative !important;
+    z-index: 1 !important;
+  }
+</style>

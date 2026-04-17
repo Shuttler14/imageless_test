@@ -1,0 +1,118 @@
+{% comment %}
+=================================================================================
+CREATOR PROFILE PAGE TEMPLATE
+=================================================================================
+Public-facing creator profile at /pages/creator-profile?handle=<username>
+Renders a creator's narrative name, profile photo, bio and grid of their
+published designs. Data is fetched client-side from:
+  GET /api/creator/profile?user_id=<handle>
+  GET /api/designs/creator?user_id=<handle>
+=================================================================================
+{% endcomment %}
+
+{%- assign handle_param = request.query_parameters.handle | default: request.parameters.handle -%}
+{%- if handle_param == blank -%}
+  {%- assign raw_url = request.url | default: '' -%}
+  {%- if raw_url contains 'handle=' -%}
+    {%- assign _parts = raw_url | split: 'handle=' -%}
+    {%- assign handle_param = _parts[1] | split: '&' | first | split: '#' | first -%}
+  {%- endif -%}
+{%- endif -%}
+
+<div class="creator-profile-page" data-handle="{{ handle_param | escape }}">
+  <div class="cp-inner">
+    <div class="cp-header">
+      <img class="cp-avatar" id="cpAvatar" src="" alt="Creator avatar" />
+      <div class="cp-meta">
+        <h1 class="cp-name" id="cpName">Loading…</h1>
+        <p class="cp-handle" id="cpHandle">@{{ handle_param | escape | default: '' }}</p>
+        <p class="cp-bio"    id="cpBio"></p>
+      </div>
+    </div>
+
+    <h2 class="cp-section-title">Designs</h2>
+    <div class="cp-grid" id="cpGrid">
+      <div class="cp-empty" id="cpEmpty">Loading designs…</div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .creator-profile-page { background:#0a0a0a; color:#fff; min-height:100vh; padding:48px 16px 64px; font-family:Montserrat,sans-serif; }
+  .cp-inner { max-width:980px; margin:0 auto; }
+  .cp-header { display:flex; gap:20px; align-items:center; margin-bottom:32px; flex-wrap:wrap; }
+  .cp-avatar { width:96px; height:96px; border-radius:50%; object-fit:cover; background:#222; border:3px solid rgba(57,165,150,0.3); }
+  .cp-name { font-size:28px; font-weight:800; margin:0 0 4px; }
+  .cp-handle { color:rgba(255,255,255,0.55); font-size:14px; margin:0 0 6px; }
+  .cp-bio { color:rgba(255,255,255,0.75); font-size:14px; max-width:540px; margin:0; line-height:1.5; }
+  .cp-section-title { font-size:18px; font-weight:700; margin:24px 0 16px; }
+  .cp-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:14px; }
+  .cp-card { background:#111; border:1px solid #222; border-radius:14px; overflow:hidden; display:block; text-decoration:none; color:inherit; transition:border-color 0.2s; }
+  .cp-card:hover { border-color:#39A596; }
+  .cp-card img { width:100%; aspect-ratio:1/1; object-fit:cover; display:block; }
+  .cp-card-title { padding:10px 12px; font-size:13px; font-weight:600; }
+  .cp-empty { grid-column:1/-1; color:rgba(255,255,255,0.5); text-align:center; padding:40px 0; font-size:14px; }
+</style>
+
+<script>
+(function() {
+  var CREATOR_API = 'https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app';
+  var root = document.querySelector('.creator-profile-page');
+  var handle = (root && root.dataset.handle) || '';
+
+  function esc(s) { return (s == null ? '' : String(s)).replace(/[&<>"']/g, function(c) {
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  }); }
+
+  function render(profile, designs) {
+    var avatar = document.getElementById('cpAvatar');
+    var nameEl = document.getElementById('cpName');
+    var handleEl = document.getElementById('cpHandle');
+    var bioEl  = document.getElementById('cpBio');
+    var grid   = document.getElementById('cpGrid');
+
+    var displayName = (profile && (profile.narrative_name || profile.brand_name || profile.username)) || handle || 'Creator';
+    var avatarUrl   = (profile && (profile.avatar_url || profile.profile_photo_url)) || '';
+
+    if (nameEl)   nameEl.textContent   = displayName;
+    if (handleEl) handleEl.textContent = '@' + (profile && profile.username || handle);
+    if (bioEl)    bioEl.textContent    = (profile && profile.bio) || '';
+    if (avatar)   avatar.src           = avatarUrl || ('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96"><rect width="96" height="96" fill="%23222"/><text x="50%" y="54%" text-anchor="middle" fill="%2339A596" font-family="Montserrat" font-size="40" font-weight="800">' + esc(displayName.charAt(0).toUpperCase()) + '</text></svg>');
+
+    if (!designs || !designs.length) {
+      grid.innerHTML = '<div class="cp-empty">This creator hasn\u2019t published any designs yet.</div>';
+      return;
+    }
+    grid.innerHTML = designs.map(function(d) {
+      var img   = d.flux_editorial_image_url || d.flat_image_url || d.image_url || '';
+      var title = d.title || 'Untitled';
+      var url   = d.shopify_product_url || d.product_url || ('/products/' + (d.handle || ''));
+      return [
+        '<a class="cp-card" href="', esc(url), '">',
+          '<img src="', esc(img), '" alt="', esc(title), '" loading="lazy" />',
+          '<div class="cp-card-title">', esc(title), '</div>',
+        '</a>'
+      ].join('');
+    }).join('');
+  }
+
+  if (!handle) {
+    render(null, []);
+    document.getElementById('cpName').textContent = 'Creator not found';
+    return;
+  }
+
+  Promise.all([
+    fetch(CREATOR_API + '/api/creator/profile?user_id=' + encodeURIComponent(handle))
+      .then(function(r){return r.json();}).catch(function(){return {};}),
+    fetch(CREATOR_API + '/api/designs/creator?user_id=' + encodeURIComponent(handle))
+      .then(function(r){return r.json();}).catch(function(){return { designs: [] };})
+  ]).then(function(results) {
+    var profileJson = results[0] || {};
+    var designsJson = results[1] || {};
+    var profile = profileJson.profile || profileJson.creator || profileJson.data || profileJson;
+    var designs = designsJson.designs || designsJson.data || [];
+    render(profile, designs);
+  });
+})();
+</script>

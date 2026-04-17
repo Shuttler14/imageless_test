@@ -1,0 +1,14 @@
+{
+  "sections": {
+    "discover_feed": {
+      "type": "social-design-feed",
+      "settings": {
+        "heading": "Discover — designs from My Narrative creators",
+        "designs_per_page": 24
+      }
+    }
+  },
+  "order": [
+    "discover_feed"
+  ]
+}

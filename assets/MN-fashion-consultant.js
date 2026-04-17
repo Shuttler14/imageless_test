@@ -9,7 +9,7 @@
  *   Step 2  — Aesthetic Grid (8 cards, 50/50 Men/Women)
  *   Step 3  — Occasion Chips (8 occasions)
  *   Step 4  — Canvas / Selfie Upload
- *   Step 5A — FLUX-generated look (simulated)
+ *   Step 5A — Curated look (stylist pipeline)
  *   Step 5B — Wardrobe scanning animation
  *   Step 5C — Dopamine hook ("Damn, those jeans are a vibe")
  *   Step 5D — Red Gap upsell + Bank discount affiliate link
@@ -29,6 +29,7 @@ const MNAIStylist = (() => {
   // NOTE: Stylist pipeline stays on mynarrative-ai.vercel.app (separate project, 10+ functions)
 // Creator economy endpoints use creator-economy-e5xehp13q-aryans-projects-af8c9a95.vercel.app
 const API_URL = window.MN_CONFIG?.apiUrl || 'https://mynarrative-ai.vercel.app/api/stylist_pipeline';
+const FASHION_CONSULTANT_URL = window.MN_CONFIG?.fashionConsultantUrl || 'https://mynarrative-ai.vercel.app/api/fashion_consultant';
 const CREATOR_API_URL = window.MN_CONFIG?.creatorApiUrl || 'https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app';
 
   // ── STATE ──────────────────────────────────────────────────────────────
@@ -60,9 +61,14 @@ const CREATOR_API_URL = window.MN_CONFIG?.creatorApiUrl || 'https://creator-econ
     profileCompletion: 0,
     // Gift mode
     giftMode: false,
+    currentContext: null,
+    selectedSlogan: null,
     // Scanning
     scanVisibleItems: 0,
   };
+
+  const GIFT_RECIPIENTS = ['Boyfriend', 'Girlfriend', 'Husband', 'Wife', 'Brother', 'Sister', 'Best Friend', 'Parent'];
+  const GIFT_OCCASIONS = ['Birthday', 'Anniversary', 'Wedding', 'Valentine', 'Festive', 'Thank You', 'Long Distance', 'Just Because'];
 
   
   // DATA: AESTHETICS (50/50 Men/Women)
@@ -112,26 +118,26 @@ const CREATOR_API_URL = window.MN_CONFIG?.creatorApiUrl || 'https://creator-econ
 
   // ── DATA: AFFILIATE CATALOGUE (hardcoded mock — no scraping) ──────────
   const AFFILIATE_RECS = {
-    default: { item: 'White Chunky Sneakers', brand: 'Nike',   platform: 'Myntra',
+    default: { item: 'White sneakers', brand: 'Nike', platform: 'Myntra',
       price: 8999, original: 12999, off: 31,
       img: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200&h=250&fit=crop',
-      url: 'https://www.myntra.com/nike-chunky-sneakers?aff=mynarrative',
-      offer: 'No card offer. Flat ₹200 off on Myntra Pay.' },
-    HDFC: { item: 'White Chunky Sneakers',   brand: 'Nike',   platform: 'Myntra',
+      url: 'https://www.myntra.com/casual-shoes/nike/nike-men-white-court-vision-low-sneakers/19529524/buy',
+      offer: 'Myntra · from ₹8,999' },
+    HDFC: { item: 'White sneakers', brand: 'Nike', platform: 'Myntra',
       price: 8499, original: 12999, off: 35,
       img: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200&h=250&fit=crop',
-      url: 'https://www.myntra.com/nike-chunky-sneakers?aff=mynarrative&bank=hdfc',
-      offer: '🏦 Save ₹500 extra with HDFC Credit Card. Code: HDFC500' },
-    SBI:  { item: 'White Chunky Sneakers',   brand: 'Adidas', platform: 'Amazon',
+      url: 'https://www.myntra.com/casual-shoes/nike/nike-men-white-court-vision-low-sneakers/19529524/buy',
+      offer: 'HDFC · extra ₹500 off' },
+    SBI:  { item: 'White sneakers', brand: 'Adidas', platform: 'Amazon',
       price: 7999, original: 11999, off: 33,
       img: 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=200&h=250&fit=crop',
-      url: 'https://www.amazon.in/adidas-chunky-sneakers?tag=mynarrative-21',
-      offer: '🏦 10% cashback with SBI SimplyCLICK card. Max ₹1500.' },
-    ICICI:{ item: 'White Platform Sneakers', brand: 'Puma',   platform: 'Myntra',
+      url: 'https://www.amazon.in/dp/B09QW5V7V6',
+      offer: 'Amazon · SBI cashback' },
+    ICICI:{ item: 'Platform sneakers', brand: 'Puma', platform: 'Myntra',
       price: 6999, original: 9999, off: 30,
       img: 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=200&h=250&fit=crop',
-      url: 'https://www.myntra.com/puma-platform?aff=mynarrative&bank=icici',
-      offer: '🏦 5% cashback with ICICI Amazon Pay card. No min spend.' },
+      url: 'https://www.myntra.com/sports-shoes/puma/puma-unisex-white-smashic-sneakers/18252620/buy',
+      offer: 'ICICI · cashback eligible' },
   };
 
   // ── UTILITIES ──────────────────────────────────────────────────────────
@@ -167,7 +173,7 @@ const CREATOR_API_URL = window.MN_CONFIG?.creatorApiUrl || 'https://creator-econ
   return {
     state, AESTHETICS, OCCASIONS, MOCK_WARDROBE, AFFILIATE_RECS,
     $, $$, INR, setContent, updateProgress, getGeneratedImg,
-    expandWidget, API_URL
+    expandWidget, API_URL, FASHION_CONSULTANT_URL
   };
 })();
 
@@ -177,7 +183,82 @@ window.MNAIStylist = MNAIStylist;
 // ═══════════════════════════════════════════════════════════
 // STEP RENDERERS
 // ═══════════════════════════════════════════════════════════
-const { state, AESTHETICS, OCCASIONS, MOCK_WARDROBE, AFFILIATE_RECS, $, $$, INR, setContent, updateProgress, getGeneratedImg, API_URL } = MNAIStylist;
+const { state, AESTHETICS, OCCASIONS, MOCK_WARDROBE, AFFILIATE_RECS, $, $$, INR, setContent, updateProgress, getGeneratedImg, API_URL, FASHION_CONSULTANT_URL } = MNAIStylist;
+
+function mnNormalizeProductLink(rawUrl) {
+  if (!rawUrl || typeof rawUrl !== 'string') return '';
+  if (rawUrl.startsWith('/')) return rawUrl;
+  let parsed;
+  try { parsed = new URL(rawUrl); } catch (e) { return ''; }
+  const host = parsed.hostname.toLowerCase();
+  const path = (parsed.pathname || '/').toLowerCase();
+  const isHome = path === '/' || path === '';
+  if (isHome) return '';
+
+  if (host.includes('amazon.')) return (path.includes('/dp/') || path.includes('/gp/product/')) ? parsed.toString() : '';
+  if (host.includes('myntra.')) return (path.includes('/buy') || path.includes('/p/')) ? parsed.toString() : '';
+  if (host.includes('flipkart.')) return (path.includes('/p/') || parsed.searchParams.has('pid')) ? parsed.toString() : '';
+  if (host.includes('ajio.')) return path.includes('/p/') ? parsed.toString() : '';
+  if (host.includes('meesho.')) return path.includes('/product/') ? parsed.toString() : '';
+  if (host.includes('nykaafashion.')) return path.includes('/p/') ? parsed.toString() : '';
+
+  // Generic marketplaces: require a deeper path (not section/home listing).
+  const depth = path.split('/').filter(Boolean).length;
+  return depth >= 2 ? parsed.toString() : '';
+}
+
+function mnPickProductUrl(record) {
+  if (!record) return '';
+  const candidates = [record.add_to_cart_url, record.exact_product_url, record.product_url, record.affiliate_url, record.url];
+  for (let i = 0; i < candidates.length; i += 1) {
+    const normalized = mnNormalizeProductLink(candidates[i]);
+    if (normalized) return normalized;
+  }
+  return '';
+}
+
+function mnNormalizePipelineResponse(data) {
+  const payload = data || {};
+  const rec = payload.recommendation || {};
+  let outfitPieces = payload.outfit_pieces || rec.outfit_pieces || [];
+  if (!Array.isArray(outfitPieces) || !outfitPieces.length) {
+    const mapped = [];
+    if (rec.top && rec.top.name) mapped.push({ slot: 'top', name: rec.top.name, type: 'top', color: rec.top.hex || '#39A596', owned: false, why: 'Core styling anchor', shop_links: [] });
+    if (rec.bottom && rec.bottom.name) mapped.push({ slot: 'bottom', name: rec.bottom.name, type: 'bottom', color: rec.bottom.hex || '#5f6368', owned: false, why: 'Balances the silhouette', shop_links: [] });
+    if (rec.footwear && rec.footwear.name) mapped.push({ slot: 'footwear', name: rec.footwear.name, type: 'footwear', color: rec.footwear.hex || '#ffffff', owned: false, why: 'Completes the look', shop_links: [] });
+    if (rec.accessory && rec.accessory.name) mapped.push({ slot: 'accessory', name: rec.accessory.name, type: 'accessory', color: rec.accessory.hex || '#c0c0c0', owned: false, why: 'Adds polish', shop_links: [] });
+    outfitPieces = mapped;
+  }
+
+  return {
+    direction: payload.direction || rec.direction || rec.outfit_description || 'Styled for you.',
+    outfit_pieces: outfitPieces,
+    suggestions: payload.suggestions || rec.suggestions || rec.styling_tips || [],
+    styling_tips: payload.styling_tips || rec.styling_tips || rec.suggestions || [],
+    color_science: payload.color_science || rec.color_science || rec.color_science_note || '',
+    archetype_note: payload.archetype_note || rec.archetype_note || '',
+  };
+}
+
+function buildGiftIdentityPayload() {
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem('mn_identity') || '{}') || {}; } catch (e) { saved = {}; }
+  return {
+    coreExpression: saved.coreExpression || state.selectedAesthetics.map(id => AESTHETICS.find(a => a.id === id)?.style || id).join(' / ') || 'Thoughtful',
+    presence: saved.presence || 'Adaptive',
+    signal: saved.signal || 'Care',
+    archetype: saved.archetype || { name: 'Gift Curator' },
+    height: saved.height || state.profileHeight || 'Not provided',
+    build: saved.build || (state.bodyShape || 'average').replace(/_/g, ' '),
+    gender: saved.gender || state.gender || 'unisex',
+    skinTone: saved.skinTone || state.skinTone || 'Not provided',
+    undertone: saved.undertone || 'Not provided',
+    region: saved.region || 'Not provided',
+    climate: saved.climate || 'Not provided',
+    budget: saved.budget || 'Not provided',
+    closet: Array.isArray(saved.closet) ? saved.closet : [],
+  };
+}
 
 // ── STEP 0: GENDER SELECTOR ──────────────────────────────────
 function renderStep0() {
@@ -191,7 +272,7 @@ function renderStep0() {
         <h2 class="mnw-hook-title" style="font-size:26px;margin-bottom:8px">
           Who are we <span class="mnw-gradient-text">styling today?</span>
         </h2>
-        <p class="mnw-hook-sub" style="margin-bottom:32px">Choose your style universe — we'll show the right looks.</p>
+        <p class="mnw-hook-sub" style="margin-bottom:32px">Pick who we’re styling.</p>
         <div class="mnw-gender-cards">
           <button class="mnw-gender-card" data-gender="men" id="mnw-gender-men">
             <span class="mnw-gender-emoji">👔</span>
@@ -249,7 +330,7 @@ function renderStep1() {
           Don't just get dressed.<br>
           <span class="mnw-gradient-text">Let's curate your story.</span>
         </h2>
-        <p class="mnw-hook-sub">Step into your main character energy today.</p>
+        <p class="mnw-hook-sub">Your look, your story.</p>
         <button class="mnw-cta" id="mnw-step1-cta">
           Curate My Look
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
@@ -272,8 +353,8 @@ function renderStep2() {
     <div class="mnw-step">
       <div class="mnw-step-hdr">
         <p class="mnw-step-num">02 / 06</p>
-        <h2 class="mnw-step-title">What kind of energy are we projecting?</h2>
-        <p class="mnw-step-sub">Choose your favorites — pick as many as feel right.</p>
+        <h2 class="mnw-step-title">Your vibe</h2>
+        <p class="mnw-step-sub">Tap one or more.</p>
       </div>
       <div class="mnw-aesthetic-grid" id="mnw-aesthetic-grid">
         ${(() => {
@@ -345,8 +426,8 @@ function renderStep3() {
     <div class="mnw-step">
       <div class="mnw-step-hdr">
         <p class="mnw-step-num">03 / 06</p>
-        <h2 class="mnw-step-title">Where are we taking this look?</h2>
-        <p class="mnw-step-sub">Select all that apply to your lifestyle.</p>
+        <h2 class="mnw-step-title">Where to?</h2>
+        <p class="mnw-step-sub">Pick what fits.</p>
       </div>
       <div class="mnw-occasion-chips">
         ${OCCASIONS.map(o => `
@@ -394,8 +475,8 @@ function renderStep35() {
     <div class="mnw-step">
       <div class="mnw-step-hdr">
         <p class="mnw-step-num">04 / 06</p>
-        <h2 class="mnw-step-title">Tell us a bit about yourself.</h2>
-        <p class="mnw-step-sub">This helps us match colors and fit to your unique features.</p>
+        <h2 class="mnw-step-title">Quick fit</h2>
+        <p class="mnw-step-sub">Better color &amp; fit picks.</p>
       </div>
 
       <div class="mnw-skin-tone-section" style="margin-bottom:28px">
@@ -476,8 +557,8 @@ function renderStep36() {
     <div class="mnw-step">
       <div class="mnw-step-hdr">
         <p class="mnw-step-num">04 / 06</p>
-        <h2 class="mnw-step-title">Where should we source your look?</h2>
-        <p class="mnw-step-sub">Choose your shopping path — exclusive drops or global brands.</p>
+        <h2 class="mnw-step-title">Shop from</h2>
+        <p class="mnw-step-sub">My Narrative or open market.</p>
       </div>
 
       <div class="mnw-source-grid" id="mnw-source-grid">
@@ -546,8 +627,8 @@ function renderStep4() {
     <div class="mnw-step">
       <div class="mnw-step-hdr">
         <p class="mnw-step-num">05 / 06</p>
-        <h2 class="mnw-step-title">Let's see the canvas.</h2>
-        <p class="mnw-step-sub">Upload a quick selfie to ensure the fit and colors perfectly match your unique skin tone and proportions.</p>
+        <h2 class="mnw-step-title">Your photo</h2>
+        <p class="mnw-step-sub">One clear selfie — we’ll match tone &amp; fit.</p>
       </div>
       <div class="mnw-upload-zone" id="mnw-canvas-zone">
         <div class="mnw-upload-cam">
@@ -601,11 +682,11 @@ function renderStep4() {
   zone.addEventListener('drop', (e) => { e.preventDefault(); zone.classList.remove('mnw-dragging'); if (e.dataTransfer.files[0]) loadSelfie(e.dataTransfer.files[0]); });
   inp.addEventListener('change', () => { if (inp.files[0]) loadSelfie(inp.files[0]); });
   $('#mnw-retake').addEventListener('click', () => { state.selfieBase64 = null; zone.style.display = 'flex'; prev.style.display = 'none'; if (next) next.disabled = true; });
-  $('#mnw-s4-back').addEventListener('click', renderStep3);
+  $('#mnw-s4-back').addEventListener('click', renderStep36);
   if (next) next.addEventListener('click', renderStep5A);
 }
 
-// ── STEP 5A: FLUX-GENERATED LOOK (simulated) ─────────────
+// ── STEP 5A: Generated look (pipeline) ─────────────
 function renderStep5A() {
   // Hide ALL back buttons when first design starts generating
   // (user cannot go back mid-generation — would lose context)
@@ -651,8 +732,8 @@ function renderStep5A() {
     <div class="mnw-step">
       <div class="mnw-step-hdr">
         <p class="mnw-step-num">06 / 06</p>
-        <h2 class="mnw-step-title">Generating your main character look</h2>
-        <p class="mnw-step-sub">AI is crafting a look for your skin tone, body type &amp; vibe.</p>
+        <h2 class="mnw-step-title">Curating your look</h2>
+        <p class="mnw-step-sub">Hang tight — this runs behind the scenes.</p>
       </div>
       <div class="mnw-result-wrap" id="mnw-result-wrap">
         <div id="mnw-loading-state" class="mnw-cinema-loader">
@@ -677,24 +758,24 @@ function renderStep5A() {
           <div class="mnw-cl-progress-wrap">
             <div class="mnw-cl-progress-bar" id="mnw-cl-progress"></div>
           </div>
-          <p class="mnw-cl-label" id="mnw-loading-text">Reading your style DNA...</p>
+          <p class="mnw-cl-label mnw-cl-label--silent" id="mnw-loading-text" aria-hidden="true">&nbsp;</p>
           <div class="mnw-cl-steps">
-            <span class="mnw-cl-step mnw-cl-step-active" id="mnw-cls-0">Analyse</span>
-            <span class="mnw-cl-sep">&#8212;</span>
-            <span class="mnw-cl-step" id="mnw-cls-1">Match</span>
-            <span class="mnw-cl-sep">&#8212;</span>
-            <span class="mnw-cl-step" id="mnw-cls-2">Generate</span>
-            <span class="mnw-cl-sep">&#8212;</span>
-            <span class="mnw-cl-step" id="mnw-cls-3">Finalise</span>
+            <span class="mnw-cl-step mnw-cl-step-active" id="mnw-cls-0">Scan</span>
+            <span class="mnw-cl-sep">·</span>
+            <span class="mnw-cl-step" id="mnw-cls-1">Align</span>
+            <span class="mnw-cl-sep">·</span>
+            <span class="mnw-cl-step" id="mnw-cls-2">Curate</span>
+            <span class="mnw-cl-sep">·</span>
+            <span class="mnw-cl-step" id="mnw-cls-3">Done</span>
           </div>
         </div>
         <img class="mnw-result-img" id="mnw-result-img" alt="AI Generated Look" style="display:none"/>
         <span class="mnw-result-badge" id="mnw-result-badge" style="display:none">AI Generated</span>
       </div>
       <div class="mnw-dopamine-box" id="mnw-result-info" style="display:none">
-        <p style="font-size:10px;font-weight:800;color:#39A596;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:6px">Based on: ${selectedLabels || 'Your Aesthetic'}</p>
-        <p class="mnw-dopamine-title" id="mnw-result-title">Your look is ready.</p>
-        <p class="mnw-dopamine-sub">Want to style this with clothes you already own?</p>
+        <p style="font-size:10px;font-weight:800;color:#39A596;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:6px">${selectedLabels || 'Your look'}</p>
+        <p class="mnw-dopamine-title" id="mnw-result-title">Ready when you are.</p>
+        <p class="mnw-dopamine-sub">Add a wardrobe snap to go further.</p>
       </div>
       <button class="mnw-upload-wardrobe-btn" id="mnw-upload-wardrobe" style="display:none">Upload Wardrobe Pic</button>
       <input type="file" id="mnw-wardrobe-input" accept="image/*" style="display:none"/>
@@ -707,34 +788,38 @@ function renderStep5A() {
     </div>
   `);
 
-  // Cinematic loader — rotating messages + progress bar + step indicators
-  const msgs = [
-    { text: 'Reading your style DNA...',         step: 0, pct: 10 },
-    { text: 'Analysing skin tone & body type...', step: 0, pct: 25 },
-    { text: 'Matching your aesthetic vibe...',    step: 1, pct: 45 },
-    { text: 'FLUX is painting your outfit...',    step: 2, pct: 68 },
-    { text: 'Composing your editorial look...',   step: 2, pct: 82 },
-    { text: 'Final touches...',                   step: 3, pct: 95 },
+  // Cinematic loader: progress + step dots only (no status copy — API runs in background)
+  const loaderTicks = [
+    { step: 0, pct: 18 },
+    { step: 0, pct: 32 },
+    { step: 1, pct: 48 },
+    { step: 1, pct: 58 },
+    { step: 2, pct: 72 },
+    { step: 2, pct: 84 },
+    { step: 3, pct: 94 },
   ];
-  let mi = 0;
-  var setLoaderState = function(idx) {
-    var m = msgs[idx];
-    var el = $('#mnw-loading-text'); if (el) el.textContent = m.text;
-    var pb = $('#mnw-cl-progress');  if (pb) pb.style.width = m.pct + '%';
-    [0,1,2,3].forEach(function(i) {
+  let li = 0;
+  var setLoaderProgress = function(idx) {
+    var m = loaderTicks[Math.min(idx, loaderTicks.length - 1)];
+    var pb = $('#mnw-cl-progress');
+    if (pb) pb.style.width = m.pct + '%';
+    [0, 1, 2, 3].forEach(function(i) {
       var s = document.getElementById('mnw-cls-' + i);
       if (!s) return;
       s.classList.remove('mnw-cl-step-done', 'mnw-cl-step-active');
-      if (i < m.step)  s.classList.add('mnw-cl-step-done');
+      if (i < m.step) s.classList.add('mnw-cl-step-done');
       if (i === m.step) s.classList.add('mnw-cl-step-active');
     });
   };
-  setLoaderState(0);
-  const msgInt = setInterval(function() { if (msgs[++mi]) setLoaderState(mi); else clearInterval(msgInt); }, 3500);
+  setLoaderProgress(0);
+  const loaderInt = setInterval(function() {
+    if (li < loaderTicks.length - 1) setLoaderProgress(++li);
+    else clearInterval(loaderInt);
+  }, 2200);
 
   const rawBase64 = state.selfieBase64 ? state.selfieBase64.replace(/^data:image\/\w+;base64,/, '') : null;
   if (!rawBase64) {
-    clearInterval(msgInt);
+    clearInterval(loaderInt);
     const e = $('#mnw-api-error'); if (e) { e.style.display='block'; e.textContent='No photo found. Please go back and upload your selfie.'; }
     const ls = $('#mnw-loading-state'); if (ls) ls.style.display='none';
     return;
@@ -744,41 +829,86 @@ function renderStep5A() {
 
   const abortCtrl = new AbortController();
   const timeoutId = setTimeout(() => abortCtrl.abort(), 90000);
-  console.log('[MN] Sending pipeline request:', { occasionId, vibeId, skinTone: state.skinTone, bodyShape: state.bodyShape, sourcePreference: state.sourcePreference, imageSize: rawBase64 ? rawBase64.length : 0 });
+  console.log('[MN] Sending stylist_pipeline request:', { occasionId, vibeId, skinTone: state.skinTone, bodyShape: state.bodyShape, sourcePreference: state.sourcePreference, imageSize: rawBase64 ? rawBase64.length : 0 });
+
   fetch(API_URL, {
     method: 'POST',
     signal: abortCtrl.signal,
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action:'full_pipeline', user_id:userId, occasion:occasionId, vibe_id:vibeId, user_image:rawBase64, skin_tone: state.skinTone, body_shape: state.bodyShape, sourcePreference: state.sourcePreference }),
+    body: JSON.stringify({
+      action: 'full_pipeline',
+      user_id: userId,
+      occasion: occasionId,
+      vibe_id: vibeId,
+      user_image: rawBase64 || '',
+      user_image_data_url: state.selfieBase64 || '',
+      skin_tone: state.skinTone,
+      body_shape: state.bodyShape,
+      gender: state.gender,
+      source_preference: state.sourcePreference || 'global_market',
+      sourcePreference: state.sourcePreference || 'global_market',
+      shot_preference: 'full_body',
+      framing: 'head_to_toe',
+    }),
   })
   .then(r => { clearTimeout(timeoutId); console.log('[MN] Response received:', r.status, r.ok); return r.ok ? r.json() : r.json().then(d => Promise.reject(d.error || ('Server error ' + r.status))); })
   .then(data => {
-    clearInterval(msgInt);
-    console.log('[MN] Pipeline data success:', data.success, 'image:', data.editorial?.final_image_url ? 'present' : 'MISSING');
-    if (!data.success) throw new Error(data.error || 'Pipeline failed');
-    state.pipelineResult = data;
-    state.affiliateRecs = data.affiliate_upsells || [];
+    clearInterval(loaderInt);
+    if (!data || data.success === false) throw new Error((data && data.error) || 'Pipeline failed');
+    const recommendations = mnNormalizePipelineResponse(data);
+    console.log('[MN] Pipeline data success:', recommendations.direction ? 'present' : 'MISSING');
+    state.pipelineResult = recommendations;
+    state.pipelineRaw = data;
 
-    const imgUrl = (data.editorial && data.editorial.final_image_url) ||
-                   (data.final_image_base64 ? 'data:image/jpeg;base64,' + data.final_image_base64 : null);
-    console.log('[MN] imgUrl:', imgUrl ? 'SET (' + imgUrl.slice(0, 60) + '...)' : 'NULL');
+    // Save to localStorage
+    try {
+      localStorage.setItem('mn_ai_context', JSON.stringify({
+        direction: recommendations.direction,
+        suggestions: recommendations.suggestions,
+        context: {
+          mode: 'self',
+          contexts: state.selectedOccasions.map(id => OCCASIONS.find(o => o.id === id)?.label || id),
+          loudness: 'Balanced',
+          sourcePreference: state.sourcePreference || 'global_market',
+        },
+        identity: {
+          coreExpression: state.selectedAesthetics.map(id => AESTHETICS.find(a => a.id === id)?.style || id).join(' / '),
+          build: (state.bodyShape || 'average').replace(/_/g, ' '),
+          skinTone: state.skinTone || 'Not provided',
+          gender: state.gender || 'men',
+        },
+        mode: 'self',
+        timestamp: Date.now()
+      }));
+    } catch(e) {}
 
-    const ls = $('#mnw-loading-state'), imgEl = $('#mnw-result-img'), badge = $('#mnw-result-badge');
-    const info = $('#mnw-result-info'), ub = $('#mnw-upload-wardrobe'), title = $('#mnw-result-title');
+    // Save to outfit history
+    try {
+      const history = JSON.parse(localStorage.getItem('mn_outfit_history') || '[]');
+      history.unshift({
+        id: Date.now().toString(36) + Math.random().toString(36).substr(2, 4),
+        direction: recommendations.direction,
+        outfit_pieces: recommendations.outfit_pieces || [],
+        suggestions: recommendations.suggestions || [],
+        context: (state.selectedOccasions || []).map(id => OCCASIONS.find(o => o.id === id)?.label || id).join(', '),
+        occasion: (state.selectedOccasions || []).map(id => OCCASIONS.find(o => o.id === id)?.label || id).join(', '),
+        loudness: 'Balanced',
+        mode: state.sourcePreference || 'self',
+        savedAt: new Date().toISOString()
+      });
+      localStorage.setItem('mn_outfit_history', JSON.stringify(history.slice(0, 30)));
+    } catch(e) {}
 
     // ── INTENT-BASED ROUTING HOOK ──────────────────────────
-    // If URL has ?intent=creator_ai or ?intent=creator_upload,
-    // fire window.mnOnDesignReady() instead of the retail UI.
     const _urlParams   = new URLSearchParams(window.location.search);
     const _intent      = _urlParams.get('intent') || '';
     const _isCreator   = _intent.indexOf('creator') !== -1;
-    const _designUuid  = data.unique_product_id || data.design_uuid || data.session_id || userId || '';
+    const _designUuid  = Date.now().toString(36) + Math.random().toString(36).substr(2, 4);
     const _designTitle = selectedLabels || 'My Narrative Design';
 
     if (_isCreator) {
-      // Mark first design complete for back-button state machine
       if (typeof window.mnMarkFirstDesignComplete === 'function') {
-        window.mnMarkFirstDesignComplete(_designUuid, imgUrl || getGeneratedImg(), _designTitle);
+        window.mnMarkFirstDesignComplete(_designUuid, getGeneratedImg(), _designTitle);
       }
       if (typeof window.mnShowSecondDesignPrompt === 'function') {
         window.mnShowSecondDesignPrompt();
@@ -787,45 +917,17 @@ function renderStep5A() {
       }
     }
 
-    // Non-creator flow: mark first design complete for back-button state
     if (typeof window.mnMarkFirstDesignComplete === 'function') {
-      window.mnMarkFirstDesignComplete(_designUuid, imgUrl || getGeneratedImg(), _designTitle);
+      window.mnMarkFirstDesignComplete(_designUuid, getGeneratedImg(), _designTitle);
     }
     // ── END INTENT HOOK ────────────────────────────────────
 
-    if (imgUrl && imgEl) {
-      imgEl.src = imgUrl;
-      imgEl.onerror = () => { console.log('[MN] img onerror'); imgEl.src = 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=480&h=640&fit=crop'; };
-      imgEl.onload = () => {
-        console.log('[MN] img onload fired');
-        if (ls) ls.style.display = 'none';
-        imgEl.style.display = 'block';
-        if (badge) badge.style.display = 'block';
-        if (info) info.style.display = 'block';
-        if (ub) ub.style.display = 'flex';
-        if (title && data.biometrics) {
-          const bt = data.biometrics.body_type || 'your build';
-          const vl = (data.editorial && data.editorial.vibe && data.editorial.vibe.label) || selectedLabels || 'your vibe';
-          title.textContent = 'This is your ' + bt + ' in ' + vl + ' energy.';
-        }
-        // ── GLOBAL MARKET PATH A: Render affiliate upsells ────────────────
-        if (state.sourcePreference === 'global_market') {
-          renderAffiliateResults(data);
-        }
-      };
-    } else {
-      if (ls) ls.style.display = 'none';
-      if (info) info.style.display = 'block';
-      if (ub) ub.style.display = 'flex';
-      // ── GLOBAL MARKET PATH A: Render affiliate upsells (no image) ──────
-      if (state.sourcePreference === 'global_market') {
-        renderAffiliateResults(data);
-      }
-    }
+    // Render results with source-aware payload (single API response).
+    renderAvatarStyleResults(recommendations, selectedLabels, occasionId, vibeId, data);
   })
   .catch(err => {
     clearTimeout(timeoutId);
-    clearInterval(msgInt);
+    clearInterval(loaderInt);
     const isTimeout = err && (err.name === 'AbortError' || String(err).includes('abort'));
     if (isTimeout) err = 'Request timed out. The AI is taking too long - please try again.';
     console.error('[MN] Pipeline error:', err);
@@ -833,6 +935,467 @@ function renderStep5A() {
     if (ls) ls.style.display = 'none';
     if (errEl) { errEl.style.display='block'; errEl.innerHTML='Something went wrong: ' + err + '. <button onclick="renderStep5A()" style="color:#39A596;background:none;border:none;cursor:pointer;font-weight:700">Retry</button>'; }
   });
+
+// ═══════════════════════════════════════════════════════════
+// AVATAR-STYLE RESULTS — Matches old working theme's renderAvatarResults
+// ═══════════════════════════════════════════════════════════
+function renderAvatarStyleResults(recommendations, selectedLabels, occasionId, vibeId, pipelineData) {
+  const shortText = (s, n) => {
+    const t = (s == null ? '' : String(s)).trim();
+    if (!t) return '';
+    return t.length <= n ? t : t.slice(0, Math.max(0, n - 1)).trim() + '\u2026';
+  };
+  const outfitItems = recommendations.outfit_pieces || [];
+  const profile = state;
+  const closetItems = profile.closetItems || [];
+
+  // Mark owned items
+  const categorized = outfitItems.map(item => ({
+    ...item,
+    owned: item.owned === true || (() => {
+      const richCloset = (() => { try { return JSON.parse(localStorage.getItem('mn_digital_closet') || '[]'); } catch(e) { return []; } })();
+      const itemName = (item.name || '').toLowerCase();
+      const itemType = (item.type || '').toLowerCase();
+      if (richCloset.some(c => {
+        const cName = (c.name || c.original_name || '').toLowerCase();
+        return cName && (itemName.includes(cName) || cName.includes(itemType));
+      })) return true;
+      return closetItems.some(owned => owned.toLowerCase().includes(itemType) || itemName.includes(owned.toLowerCase()));
+    })()
+  }));
+
+  const missingItems = categorized.filter(item => !item.owned);
+  const missingWithLinks = missingItems.map(item => ({
+    ...item,
+    exactLinks: (item.shop_links || []).map(link => ({
+      ...link,
+      exactUrl: mnPickProductUrl(link),
+    })).filter(link => link.exactUrl),
+  }));
+  const tipsPick = (recommendations.styling_tips || []).slice(0, 2).map(t => shortText(t, 72));
+
+  const html = `
+    <div class="mnw-step mn-fade-in" style="animation:fadeIn .4s ease">
+      <div class="mn-avatar-container" style="position:relative;margin-bottom:16px;border-radius:14px;overflow:hidden">
+        <div id="mn-flux-canvas" class="mn-preview-panel">
+          <div id="mn-flux-inner">
+            <div class="mn-preview-loading">
+              <div class="mnw-cl-orb mnw-cl-orb1" style="opacity:0.45"></div>
+              <div class="mnw-cl-orb mnw-cl-orb2" style="opacity:0.4"></div>
+              <div class="mnw-cl-frame" style="width:112px;height:112px;margin:0 auto">
+                <span class="mnw-cl-corner mnw-cl-tl"></span>
+                <span class="mnw-cl-corner mnw-cl-tr"></span>
+                <span class="mnw-cl-corner mnw-cl-bl"></span>
+                <span class="mnw-cl-corner mnw-cl-br"></span>
+                <div class="mnw-cl-rings">
+                  <div class="mnw-cl-ring mnw-cl-ring1"></div>
+                  <div class="mnw-cl-ring mnw-cl-ring2"></div>
+                  <div class="mnw-cl-ring mnw-cl-ring3"></div>
+                  <div class="mnw-cl-center">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#39A596" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                  </div>
+                </div>
+                <div class="mnw-cl-scanline"></div>
+              </div>
+              <div class="mnw-cl-progress-wrap"><div class="mnw-cl-progress-bar" id="mn-preview-pb" style="width:28%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mn-outfit-items" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
+        ${categorized.map(item => `
+          <div class="mn-outfit-item" style="background:rgba(255,255,255,0.04);border:1px solid ${item.owned ? 'rgba(57,165,150,0.3)' : 'rgba(255,255,255,0.08)'};border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:4px">
+            <div style="width:28px;height:28px;border-radius:6px;background:${item.color || '#333'};margin-bottom:4px"></div>
+            <div style="font-size:12px;font-weight:700;color:#fff">${shortText(item.name, 36)}</div>
+            <div style="font-size:10px;color:${item.owned ? '#39A596' : 'rgba(255,255,255,0.4)'}">${item.owned ? 'Yours' : 'Shop'}</div>
+            ${item.why ? `<div style="font-size:10px;opacity:0.55;color:rgba(255,255,255,0.65)">${shortText(item.why, 56)}</div>` : ''}
+          </div>
+        `).join('')}
+      </div>
+
+      ${recommendations.color_science ? `
+        <div style="background:rgba(57,165,150,0.06);border:1px solid rgba(57,165,150,0.18);border-radius:10px;padding:10px 12px;margin-bottom:12px;backdrop-filter:blur(8px)">
+          <p style="font-size:9px;font-weight:800;color:#39A596;text-transform:uppercase;letter-spacing:0.1em;margin:0 0 4px">Palette</p>
+          <p style="font-size:11px;color:rgba(255,255,255,0.72);margin:0;line-height:1.45">${shortText(recommendations.color_science, 140)}</p>
+        </div>
+      ` : ''}
+
+      ${tipsPick.length ? `
+        <div style="margin-bottom:14px">
+          <p style="font-size:9px;font-weight:800;color:#39A596;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px">Quick tips</p>
+          <ul style="list-style:none;padding:0;margin:0">
+            ${tipsPick.map(tip => `<li style="font-size:11px;color:rgba(255,255,255,0.58);padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05)">${tip}</li>`).join('')}
+          </ul>
+        </div>
+      ` : ''}
+
+      ${missingWithLinks.length > 0 ? `
+        <div style="margin-bottom:16px">
+          <p style="font-size:9px;font-weight:800;color:#39A596;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:2px">Fill the gap</p>
+          <p style="font-size:10px;color:rgba(255,255,255,0.38);margin-bottom:8px">One tap per piece</p>
+          ${missingWithLinks.map(item => `
+            <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px;margin-bottom:8px;backdrop-filter:blur(6px)">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap">
+                <div style="min-width:0;flex:1">
+                  <p style="font-size:12px;font-weight:700;color:#fff;margin:0">${shortText(item.name, 40)}</p>
+                  <p style="font-size:10px;color:rgba(255,255,255,0.38);margin:4px 0 0">${shortText(item.why || 'Finishes the outfit', 64)}</p>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:4px;align-items:stretch">
+                  ${item.exactLinks.slice(0, 1).map(link => `
+                    <a href="${link.exactUrl}" target="_blank" rel="noopener noreferrer" style="background:rgba(57,165,150,0.15);border:1px solid rgba(57,165,150,0.3);border-radius:8px;padding:8px 12px;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px">
+                      <span style="font-size:11px;font-weight:700;color:#fff">${link.platform || 'Shop'}</span>
+                      ${link.price ? `<span style="font-size:10px;color:#4fffd9;font-weight:600">${link.price}</span>` : ''}
+                    </a>
+                  `).join('')}
+                  ${!item.exactLinks.length ? `<span style="font-size:9px;color:rgba(255,255,255,0.35)">Exact product link unavailable</span>` : ''}
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      ` : `<div style="text-align:center;padding:10px;background:rgba(57,165,150,0.06);border:1px solid rgba(57,165,150,0.15);border-radius:10px;margin-bottom:14px"><p style="font-size:12px;color:#39A596;font-weight:700;margin:0">You’re set — closet covers this look.</p></div>`}
+
+      <div id="mn-affiliate-upsells" style="margin-bottom:16px"></div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+        <button id="btn-regenerate" type="button" class="mnw-cta" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);font-size:12px;padding:10px 16px;border-radius:10px;cursor:pointer">Regenerate look</button>
+        <button id="btn-save-look" type="button" class="mnw-cta" style="background:rgba(57,165,150,0.15);border:1px solid rgba(57,165,150,0.3);color:#39A596;font-size:12px;padding:10px 16px;border-radius:10px;cursor:pointer">Save</button>
+      </div>
+
+      <div class="mnw-step-dots">
+        <span class="mnw-dot mnw-dot-done"></span><span class="mnw-dot mnw-dot-done"></span>
+        <span class="mnw-dot mnw-dot-done"></span><span class="mnw-dot mnw-dot-done"></span>
+        <span class="mnw-dot mnw-dot-active"></span>
+      </div>
+    </div>
+  `;
+
+  setContent(html);
+
+  const renderAffiliateUpsells = function(affiliateRecs) {
+    const root = document.getElementById('mn-affiliate-upsells');
+    if (!root) return;
+    if (!affiliateRecs || !affiliateRecs.length) {
+      root.innerHTML = '';
+      return;
+    }
+    root.innerHTML = `
+      <div style="margin-bottom:8px">
+        <p style="font-size:9px;font-weight:800;color:#39A596;text-transform:uppercase;letter-spacing:0.1em;margin:0">Pairs well</p>
+      </div>
+      ${affiliateRecs.slice(0, 2).map(rec => `
+        ${(() => {
+          const exactUrl = mnPickProductUrl(rec);
+          return `
+        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px 12px;margin-bottom:8px;backdrop-filter:blur(6px)">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+            <div style="min-width:0;flex:1">
+              <p style="font-size:12px;font-weight:700;color:#fff;margin:0">${shortText(rec.product_name || rec.name || 'Pick', 42)}</p>
+              <p style="font-size:10px;color:rgba(255,255,255,0.4);margin:2px 0 0">${shortText(rec.brand || rec.platform || '', 28)}</p>
+            </div>
+            ${exactUrl ? `
+              <a href="${exactUrl}" target="_blank" rel="noopener noreferrer" style="background:rgba(57,165,150,0.15);border:1px solid rgba(57,165,150,0.3);border-radius:8px;padding:8px 12px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;flex-shrink:0">
+                <span style="font-size:11px;font-weight:700;color:#fff">${rec.platform || 'Shop'}</span>
+                ${rec.price ? `<span style="font-size:10px;color:#4fffd9;font-weight:700">₹${Number(rec.price).toLocaleString('en-IN')}</span>` : ''}
+              </a>
+            ` : `<span style="font-size:9px;color:rgba(255,255,255,0.35)">Exact product link unavailable</span>`}
+          </div>
+        </div>
+      `; })()}
+      `).join('')}
+    `;
+  };
+
+  const inner = document.getElementById('mn-flux-inner');
+  const imgUrl =
+    (pipelineData && pipelineData.editorial && (
+      pipelineData.editorial.vton_image_url ||
+      pipelineData.editorial.full_body_image_url ||
+      pipelineData.editorial.final_image_url ||
+      pipelineData.editorial.flux_image_url
+    )) || '';
+  if (inner) {
+    if (imgUrl) {
+      state.currentLookImage = imgUrl;
+      inner.innerHTML =
+        '<img src="' +
+        imgUrl +
+        '" alt="Your look" class="mn-preview-result-img" onerror="this.src=\'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=480&h=640&fit=crop\'" />';
+    } else {
+      inner.innerHTML =
+        '<div class="mn-preview-loading" style="min-height:180px"><p style="color:#f87171;font-size:12px;margin:0">Preview unavailable</p><p style="color:rgba(255,255,255,0.4);font-size:10px;margin:8px 0 0;max-width:240px;text-align:center">Image was not returned by pipeline.</p></div>';
+    }
+  }
+  renderAffiliateUpsells((pipelineData && pipelineData.affiliate_upsells) || []);
+
+  document.getElementById('btn-regenerate')?.addEventListener('click', renderStep5A);
+  document.getElementById('btn-save-look')?.addEventListener('click', () => {
+    try {
+      const nowIso = new Date().toISOString();
+      const imageSrc = state.currentLookImage || document.querySelector('#mn-flux-inner img')?.src || getGeneratedImg();
+      const entry = {
+        id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        direction: recommendations.direction || 'AI Generated Outfit',
+        outfit_pieces: categorized,
+        suggestions: recommendations.suggestions || [],
+        context: (state.selectedOccasions || []).map(id => OCCASIONS.find(o => o.id === id)?.label || id).join(', '),
+        occasion: (state.selectedOccasions || []).map(id => OCCASIONS.find(o => o.id === id)?.label || id).join(', '),
+        loudness: 'Balanced',
+        mode: 'self',
+        look_image_url: imageSrc,
+        savedAt: nowIso,
+        saved_manually: true,
+      };
+      const history = JSON.parse(localStorage.getItem('mn_outfit_history') || '[]');
+      history.unshift(entry);
+      localStorage.setItem('mn_outfit_history', JSON.stringify(history.slice(0, 50)));
+      localStorage.setItem('mn_saved_looks', JSON.stringify(history.slice(0, 50)));
+    } catch(e) {}
+    alert('✅ Saved to your profile looks.');
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+// TEXT-ONLY RESULTS — Fallback when no outfit_pieces returned
+// ═══════════════════════════════════════════════════════════
+function renderTextResults(recommendations, selectedLabels) {
+  const clip = (s, n) => {
+    const t = (s == null ? '' : String(s)).trim();
+    return !t ? '' : t.length <= n ? t : t.slice(0, n - 1).trim() + '\u2026';
+  };
+  const sug = (recommendations.suggestions || []).slice(0, 3).map(x => clip(x, 72));
+  const tips = (recommendations.styling_tips || []).slice(0, 2).map(x => clip(x, 72));
+  const html = `
+    <div class="mnw-step mn-fade-in" style="animation:fadeIn .4s ease">
+      <div class="mnw-step-hdr">
+        <p class="mnw-step-num" style="color:#39A596">Direction</p>
+        <h2 class="mnw-step-title" style="font-size:17px">"${clip(recommendations.direction || 'Curated for you.', 80)}"</h2>
+      </div>
+
+      ${sug.length ? `
+        <div style="margin-bottom:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:12px;backdrop-filter:blur(8px)">
+          <p style="font-size:9px;font-weight:800;color:#39A596;text-transform:uppercase;letter-spacing:0.1em;margin:0 0 6px">Ideas</p>
+          <ul style="list-style:none;padding:0;margin:0">
+            ${sug.map(s => `<li style="font-size:11px;color:rgba(255,255,255,0.65);padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05)">${s}</li>`).join('')}
+          </ul>
+        </div>
+      ` : ''}
+
+      ${tips.length ? `
+        <div style="margin-bottom:14px">
+          <p style="font-size:9px;font-weight:800;color:#39A596;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px">Tips</p>
+          <ul style="list-style:none;padding:0;margin:0">
+            ${tips.map(tip => `<li style="font-size:11px;color:rgba(255,255,255,0.55);padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05)">${tip}</li>`).join('')}
+          </ul>
+        </div>
+      ` : ''}
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+        <button type="button" id="btn-regenerate" class="mnw-cta" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);font-size:12px;padding:10px 16px;border-radius:10px;cursor:pointer">Start over</button>
+        <button type="button" id="btn-design" class="mnw-cta" style="background:rgba(57,165,150,0.15);border:1px solid rgba(57,165,150,0.3);color:#39A596;font-size:12px;padding:10px 16px;border-radius:10px;cursor:pointer">Design</button>
+      </div>
+
+      <div class="mnw-step-dots">
+        <span class="mnw-dot mnw-dot-done"></span><span class="mnw-dot mnw-dot-done"></span>
+        <span class="mnw-dot mnw-dot-done"></span><span class="mnw-dot mnw-dot-done"></span>
+        <span class="mnw-dot mnw-dot-active"></span>
+      </div>
+    </div>
+  `;
+
+  setContent(html);
+  document.getElementById('btn-regenerate')?.addEventListener('click', renderStep5A);
+  document.getElementById('btn-design')?.addEventListener('click', () => {
+    const studioUrl = window.MN_CONFIG?.studioUrl || '/pages/ai-studio';
+    window.location.href = studioUrl;
+  });
+}
+
+function renderGiftContext() {
+  state.giftMode = true;
+  state.currentContext = null;
+  state.selectedSlogan = null;
+  state.step = 3;
+  setContent(`
+    <div class="mn-context-flow mn-fade-in">
+      <div class="mnw-step-hdr" style="margin-bottom:8px">
+        <p class="mnw-step-num">Gift Mode</p>
+        <h2 class="mnw-step-title" style="font-size:18px">Who is this gift for?</h2>
+      </div>
+      <div class="mn-context-chips" id="mn-gift-recipient-chips">
+        ${GIFT_RECIPIENTS.map(rec => `<button type="button" class="mn-context-chip mn-recipient-chip" data-value="${rec}">${rec}</button>`).join('')}
+      </div>
+      <div class="mn-divider"></div>
+      <h3 class="mn-context-heading">What's the occasion?</h3>
+      <div class="mn-context-chips" id="mn-gift-occasion-chips">
+        ${GIFT_OCCASIONS.map(occ => `<button type="button" class="mn-context-chip mn-occasion-chip" data-value="${occ}">${occ}</button>`).join('')}
+      </div>
+      <div class="mn-divider"></div>
+      <h3 class="mn-context-heading">Unspoken Message (optional)</h3>
+      <input type="text" id="mn-gift-unspoken" class="mn-text-input" placeholder="What should this gift say?" />
+      <div class="mn-action-bar mn-action-bar-grid">
+        <button type="button" id="btn-gift-back" class="mn-btn-secondary">← Back</button>
+        <button type="button" id="btn-gift-generate" class="mn-btn-primary">✨ Get AI Recommendations</button>
+      </div>
+    </div>
+  `);
+
+  let selectedRecipient = '';
+  let selectedOccasion = '';
+  document.querySelectorAll('.mn-recipient-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.mn-recipient-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      selectedRecipient = chip.dataset.value || '';
+    });
+  });
+  document.querySelectorAll('.mn-occasion-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.mn-occasion-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      selectedOccasion = chip.dataset.value || '';
+    });
+  });
+
+  document.getElementById('btn-gift-back')?.addEventListener('click', () => {
+    state.giftMode = false;
+    const banner = document.getElementById('mnw-gift-banner');
+    if (banner) banner.style.display = 'none';
+    renderStep0();
+  });
+
+  document.getElementById('btn-gift-generate')?.addEventListener('click', () => {
+    if (!selectedRecipient || !selectedOccasion) {
+      alert('Please select both recipient and occasion.');
+      return;
+    }
+    state.currentContext = {
+      mode: 'gift',
+      recipient: selectedRecipient,
+      occasion: selectedOccasion,
+      unspoken: (document.getElementById('mn-gift-unspoken')?.value || '').trim(),
+      contexts: [selectedOccasion],
+      loudness: 'Balanced',
+    };
+    generateGiftRecommendations();
+  });
+}
+
+function renderGiftResults(recommendations) {
+  const slogans = (recommendations.suggestions || []).filter(Boolean);
+  state.selectedSlogan = slogans[0] || recommendations.direction || 'For you.';
+  const tipLine = Array.isArray(recommendations.styling_tips) && recommendations.styling_tips[0] ? recommendations.styling_tips[0] : '';
+  const subtitle = 'Pick one message. First is AI-recommended.';
+
+  setContent(`
+    <div class="mn-results mn-fade-in">
+      <div class="mn-results-header">
+        <div class="mn-results-icon">🎁</div>
+        <div>
+          <h3 class="mn-results-title">Choose Their Message</h3>
+          <p class="mn-results-subtitle" style="font-size:12px;color:var(--mn-text-muted)">${subtitle}</p>
+        </div>
+      </div>
+      <div class="mn-slogan-grid">
+        ${(slogans.length ? slogans : [state.selectedSlogan]).map((slogan, index) => `
+          <button type="button" class="mn-slogan-card ${index === 0 ? 'recommended active' : ''}" data-slogan="${String(slogan).replace(/"/g, '&quot;')}">
+            ${index === 0 ? '<div class="mn-badge-recommended">Recommended</div>' : ''}
+            <div class="mn-slogan-content"><span class="mn-slogan-text">"${slogan}"</span></div>
+            <div class="mn-checkbox"></div>
+          </button>
+        `).join('')}
+      </div>
+      ${tipLine ? `<p class="mn-tips-text" style="margin-top:12px">💡 <b>Stylist tip:</b> ${tipLine}</p>` : ''}
+      <div class="mn-action-bar mn-action-bar-grid">
+        <button type="button" id="btn-gift-start-over" class="mn-btn-secondary">🔄 Start Over</button>
+        <button type="button" id="btn-gift-design" class="mn-btn-primary">🎨 Design This Slogan</button>
+      </div>
+    </div>
+  `);
+
+  document.querySelectorAll('.mn-slogan-card').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.mn-slogan-card').forEach(card => card.classList.remove('active'));
+      btn.classList.add('active');
+      state.selectedSlogan = btn.dataset.slogan || state.selectedSlogan;
+    });
+  });
+  document.getElementById('btn-gift-start-over')?.addEventListener('click', renderGiftContext);
+  document.getElementById('btn-gift-design')?.addEventListener('click', () => {
+    if (state.selectedSlogan) {
+      localStorage.setItem('mn_pending_design', JSON.stringify({
+        slogan: state.selectedSlogan,
+        context: state.currentContext,
+        timestamp: Date.now(),
+      }));
+    }
+    window.location.href = window.MN_CONFIG?.studioUrl || '/pages/ai-studio';
+  });
+}
+
+function generateGiftRecommendations() {
+  setContent(`
+    <div class="mn-transition">
+      <div class="mn-spinner"></div>
+      <p class="mn-transition-text">Creating gift recommendations...</p>
+    </div>
+  `);
+
+  const identityPayload = buildGiftIdentityPayload();
+  const contextPayload = state.currentContext || { mode: 'gift', contexts: ['Gift'], loudness: 'Balanced' };
+
+  fetch(FASHION_CONSULTANT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ identity: identityPayload, currentContext: contextPayload }),
+  })
+    .then(r => (r.ok ? r.json() : r.json().then(d => Promise.reject(d.error || ('Server error ' + r.status)))))
+    .then(recommendations => {
+      try {
+        localStorage.setItem('mn_ai_context', JSON.stringify({
+          direction: recommendations.direction,
+          suggestions: recommendations.suggestions,
+          context: contextPayload,
+          identity: identityPayload,
+          mode: 'gift',
+          timestamp: Date.now(),
+        }));
+      } catch (e) {}
+
+      try {
+        const history = JSON.parse(localStorage.getItem('mn_outfit_history') || '[]');
+        history.unshift({
+          id: Date.now().toString(36) + Math.random().toString(36).substr(2, 4),
+          direction: recommendations.direction || (recommendations.suggestions || [])[0] || 'Gift style recommendation',
+          outfit_pieces: recommendations.outfit_pieces || [],
+          suggestions: recommendations.suggestions || [],
+          context: contextPayload?.occasion || contextPayload?.contexts?.[0] || 'Gift',
+          occasion: contextPayload?.occasion || contextPayload?.contexts?.[0] || 'Gift',
+          loudness: contextPayload?.loudness || 'Balanced',
+          mode: 'gift',
+          recipient: contextPayload?.recipient || '',
+          savedAt: new Date().toISOString(),
+        });
+        localStorage.setItem('mn_outfit_history', JSON.stringify(history.slice(0, 50)));
+      } catch (e) {}
+
+      renderGiftResults(recommendations);
+    })
+    .catch(err => {
+      console.error('[MN] Gift mode error:', err);
+      setContent(`
+        <div class="mn-transition">
+          <p class="mn-transition-text" style="color:#f87171">Could not fetch gift recommendations.</p>
+          <p style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:10px">${String(err)}</p>
+          <div class="mn-action-bar" style="margin-top:14px">
+            <button type="button" id="btn-gift-retry" class="mn-btn-primary">Retry</button>
+          </div>
+        </div>
+      `);
+      document.getElementById('btn-gift-retry')?.addEventListener('click', renderGiftContext);
+    });
+}
 
   setTimeout(() => {
     const wb = $('#mnw-upload-wardrobe'), wi = $('#mnw-wardrobe-input');
@@ -856,55 +1419,56 @@ function renderAffiliateResults(data) {
   const affiliateRecs = data.affiliate_upsells || [];
   if (!affiliateRecs.length) return;
 
-  // Color theory data from the pipeline response
+  const snip = (s, n) => {
+    const t = (s == null ? '' : String(s)).trim();
+    return !t ? '' : t.length <= n ? t : t.slice(0, n - 1).trim() + '\u2026';
+  };
   const colorTheory = data.color_theory || {};
   const mstLabel = colorTheory.mst_label || '';
-  const undertoneNote = colorTheory.undertone_note || '';
-  const bestColors = (colorTheory.best_colors || []).join(', ');
+  const bestColors = snip((colorTheory.best_colors || []).slice(0, 4).join(', '), 48);
 
-  // Occasion & vibe labels
   const occData = OCCASIONS.find(o => o.id === state.selectedOccasions[0]) || {};
-  const vibeLabel = state.selectedAesthetics.map(id => AESTHETICS.find(a => a.id === id)?.style || id).join(' / ');
+  const vibeLabel = snip(state.selectedAesthetics.map(id => AESTHETICS.find(a => a.id === id)?.style || id).join(' · '), 36);
 
   const html = `
-    <div class="mn-shopping-section mn-fade-in" style="margin-top:16px;">
+    <div class="mn-shopping-section mn-fade-in" style="margin-top:14px;">
       ${colorTheory.mst_value ? `
-      <div style="background:rgba(57,165,150,0.08);border:1px solid rgba(57,165,150,0.2);border-radius:10px;padding:12px 14px;margin-bottom:14px;">
-        <p style="font-size:10px;font-weight:800;color:#39A596;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px">Your Color Profile</p>
-        <p style="font-size:12px;color:rgba(255,255,255,0.75);margin-bottom:4px"><span style="color:#39A596;font-weight:700">${mstLabel}</span> skin tone · Best colors: <span style="color:#4fffd9">${bestColors}</span></p>
-        <p style="font-size:11px;color:rgba(255,255,255,0.5);font-style:italic">${undertoneNote}</p>
+      <div style="background:rgba(57,165,150,0.06);border:1px solid rgba(57,165,150,0.18);border-radius:10px;padding:10px 12px;margin-bottom:12px;backdrop-filter:blur(8px)">
+        <p style="font-size:9px;font-weight:800;color:#39A596;text-transform:uppercase;letter-spacing:0.1em;margin:0 0 4px">Colors</p>
+        <p style="font-size:11px;color:rgba(255,255,255,0.75);margin:0;line-height:1.4"><span style="color:#39A596;font-weight:700">${snip(mstLabel, 24)}</span>${bestColors ? ' · ' + bestColors : ''}</p>
       </div>
       ` : ''}
 
-      <h4 style="font-size:13px;font-weight:800;color:#fff;margin-bottom:4px">Shop the Look</h4>
-      <p class="mn-shopping-subtitle">Complete your ${vibeLabel} vibe for ${occData.label || 'any occasion'}</p>
+      <h4 style="font-size:12px;font-weight:800;color:#fff;margin:0 0 2px">Shop</h4>
+      <p class="mn-shopping-subtitle" style="margin-bottom:10px;font-size:10px">${snip(vibeLabel + ' · ' + (occData.label || 'anywhere'), 64)}</p>
 
-      ${affiliateRecs.slice(0, 4).map(rec => `
-        <div class="mn-shopping-card" style="margin-bottom:10px;">
-          <div style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0">
-            <span class="mn-shopping-item-name" style="font-size:12px;font-weight:700;color:#fff;white-space:normal;word-break:break-word">${rec.product_name || rec.name || 'Product'}</span>
-            <span style="font-size:10px;color:rgba(255,255,255,0.45)">${rec.brand || rec.platform || 'Style'}</span>
-            ${rec.why || rec.gap_reason || rec.style_context ? `<span class="mn-shopping-item-reason" style="-webkit-line-clamp:2">${rec.why || rec.gap_reason || rec.style_context}</span>` : ''}
-            ${rec.bank_offer ? `<span style="font-size:10px;color:#4fffd9;margin-top:2px">${rec.bank_offer}</span>` : ''}
+      ${affiliateRecs.slice(0, 3).map(rec => `
+        ${(() => {
+          const exactUrl = mnPickProductUrl(rec);
+          return `
+        <div class="mn-shopping-card" style="margin-bottom:8px;">
+          <div style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0">
+            <span class="mn-shopping-item-name" style="font-size:12px;font-weight:700;color:#fff;white-space:normal;word-break:break-word">${snip(rec.product_name || rec.name || 'Product', 44)}</span>
+            <span style="font-size:10px;color:rgba(255,255,255,0.4)">${snip(rec.brand || rec.platform || 'Style', 28)}</span>
+            ${rec.why || rec.gap_reason ? `<span class="mn-shopping-item-reason" style="-webkit-line-clamp:1;font-size:10px">${snip(rec.why || rec.gap_reason, 56)}</span>` : ''}
+            ${rec.bank_offer ? `<span style="font-size:9px;color:#4fffd9;margin-top:2px">${snip(rec.bank_offer, 40)}</span>` : ''}
           </div>
           <div class="mn-shopping-links" style="flex-direction:column;align-items:flex-end;gap:6px">
-            ${rec.affiliate_url ? `
-              <a href="${rec.affiliate_url}" target="_blank" class="mn-shop-link" style="background:rgba(57,165,150,0.15);border:1px solid rgba(57,165,150,0.3);border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:5px;text-decoration:none;min-width:90px;justify-content:center">
-                <span style="font-size:14px">🛒</span>
-                <span style="display:flex;flex-direction:column;align-items:flex-start">
-                  <span style="font-size:11px;font-weight:800;color:#fff">${rec.platform || 'Shop'}</span>
-                  ${rec.price ? `<span style="font-size:10px;color:#4fffd9;font-weight:600">₹${rec.price.toLocaleString('en-IN')}</span>` : ''}
-                </span>
+            ${exactUrl ? `
+              <a href="${exactUrl}" target="_blank" rel="noopener noreferrer" class="mn-shop-link" style="background:rgba(57,165,150,0.15);border:1px solid rgba(57,165,150,0.3);border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:5px;text-decoration:none;min-width:88px;justify-content:center">
+                <span style="font-size:11px;font-weight:800;color:#fff">${rec.platform || 'Shop'}</span>
+                ${rec.price ? `<span style="font-size:10px;color:#4fffd9;font-weight:600">₹${Number(rec.price).toLocaleString('en-IN')}</span>` : ''}
               </a>
-            ` : ''}
+            ` : `<span style="font-size:9px;color:rgba(255,255,255,0.35)">Exact product link unavailable</span>`}
             ${rec.original_price && rec.discount_pct ? `
-              <div style="display:flex;align-items:center;gap:5px;padding:4px 8px;background:rgba(239,68,68,0.12);border-radius:6px">
-                <span style="font-size:10px;color:rgba(255,255,255,0.4);text-decoration:line-through">₹${rec.original_price.toLocaleString('en-IN')}</span>
-                <span style="font-size:11px;color:#ef4444;font-weight:800">${rec.discount_pct}% OFF</span>
+              <div style="display:flex;align-items:center;gap:4px;padding:3px 6px;background:rgba(239,68,68,0.1);border-radius:6px">
+                <span style="font-size:9px;color:rgba(255,255,255,0.35);text-decoration:line-through">₹${Number(rec.original_price).toLocaleString('en-IN')}</span>
+                <span style="font-size:10px;color:#ef4444;font-weight:800">${rec.discount_pct}%</span>
               </div>
             ` : ''}
           </div>
         </div>
+      `; })()}
       `).join('')}
     </div>
   `;
@@ -1057,6 +1621,7 @@ function renderStep5D() {
 // ── AFFILIATE CARD ────────────────────────────────────────
 function renderAffiliateCard(bank) {
   const rec = AFFILIATE_RECS[bank] || AFFILIATE_RECS['default'];
+  const exactUrl = mnPickProductUrl(rec);
   const el  = $('#mnw-affiliate-result');
   if (!el) return;
   el.style.display = 'block';
@@ -1079,9 +1644,9 @@ function renderAffiliateCard(bank) {
           <span class="mnw-bank-pill">${rec.offer}</span>
         </div>
       </div>
-      <a href="${rec.url}" target="_blank" rel="noopener noreferrer" class="mnw-aff-cta">
+      ${exactUrl ? `<a href="${exactUrl}" target="_blank" rel="noopener noreferrer" class="mnw-aff-cta">
         Shop on ${rec.platform} ↗
-      </a>
+      </a>` : `<div class="mnw-aff-cta" style="opacity:0.75;cursor:default">Exact product link unavailable</div>`}
     </div>
     <div class="mnw-dopamine-box" style="margin-top:12px;text-align:center">
       <p style="font-size:24px;margin-bottom:6px">🎉</p>
@@ -1236,12 +1801,16 @@ function initPersistentNav() {
     state.giftMode = true;
     const banner = document.getElementById('mnw-gift-banner');
     if (banner) banner.style.display = 'flex';
+    renderGiftContext();
   });
   const exitGift = document.getElementById('mnw-exit-gift');
   if (exitGift) exitGift.addEventListener('click', () => {
     state.giftMode = false;
+    state.currentContext = null;
+    state.selectedSlogan = null;
     const banner = document.getElementById('mnw-gift-banner');
     if (banner) banner.style.display = 'none';
+    renderStep0();
   });
 }
 

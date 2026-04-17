@@ -186,53 +186,39 @@ Task 3 of My Narrative Design-to-Earn Pipeline
     <div class="modal-success-header">
       <div class="modal-success-icon">🎉</div>
       <h2 class="modal-title" id="sampleKitTitle">Your Design is Live!</h2>
-      <p class="modal-subtitle">Customers can now discover and buy your design.</p>
+      <p class="modal-subtitle">Customers can now discover and buy your t-shirt / hoodie on My Narrative.</p>
       <a class="modal-view-link" id="modalViewLink" href="#" target="_blank">View on store →</a>
     </div>
 
     <div class="modal-divider"></div>
 
     <div class="modal-upsell">
-      <div class="upsell-badge">💡 Creator Pro Tip</div>
-      <h3 class="upsell-title">Boost Your Sales 5x with a Physical Sample</h3>
+      <div class="upsell-badge">📈 Creator Pro Tip</div>
+      <h3 class="upsell-title">Market your own design — see up to 50% more sales.</h3>
       <p class="upsell-body">
-        Creators who wear and photograph their own designs sell
-        <strong>5× more units</strong> on average. Get your sample at wholesale cost
-        and unlock <strong style="color:#39A596">+10 Narrative Tokens</strong> — enough for 10 more AI designs.
+        Creators who <strong>wear and share</strong> their own t-shirt or hoodie convert fans into customers.
+        On average they see <strong style="color:#39A596;">50% more sales</strong> than creators who don't.
+        Buy yours at a creator-discounted rate below.
       </p>
 
       <div class="sample-kit-options">
-        <!-- T-Shirt Sample -->
-        <div class="sample-option" id="sampleTshirt">
+        <a id="buyOwnDesignLink" class="sample-option" href="#" style="text-decoration:none;color:inherit;">
           <div class="sample-option-info">
-            <div class="sample-option-name">👕 T-Shirt Sample Kit</div>
-            <div class="sample-option-price">₹500 <span class="sample-option-retail">(retail ₹799+)</span></div>
-            <div class="sample-option-tokens" style="color:#39A596">Unlocks +10 Narrative Tokens 🪙</div>
+            <div class="sample-option-name">🛒 Buy my own design</div>
+            <div class="sample-option-price" id="buyOwnPriceLabel">Creator-discounted rate</div>
+            <div class="sample-option-tokens" style="color:#39A596" id="buyOwnDiscountHint">Discount auto-applied at checkout</div>
           </div>
-          <button class="sample-add-btn" data-product="tshirt" data-price-paise="50000">
-            Add to Cart
-          </button>
-        </div>
-
-        <!-- Hoodie Sample -->
-        <div class="sample-option" id="sampleHoodie">
-          <div class="sample-option-info">
-            <div class="sample-option-name">🧥 Hoodie Sample Kit</div>
-            <div class="sample-option-price">₹900 <span class="sample-option-retail">(retail ₹1,499+)</span></div>
-            <div class="sample-option-tokens" style="color:#39A596">Unlocks +10 Narrative Tokens 🪙</div>
-          </div>
-          <button class="sample-add-btn" data-product="hoodie" data-price-paise="90000">
-            Add to Cart
-          </button>
-        </div>
+          <span class="sample-add-btn" style="background:linear-gradient(135deg,#39A596,#2dd4bf);color:#000;">
+            Buy Now →
+          </span>
+        </a>
       </div>
 
       <p class="sample-note">
-        Sample orders include your exact design printed on the selected color.
-        Tokens are credited automatically when your order ships.
+        Ships your exact design on the selected product. Wear it, film a reel, tag @mynarrative — watch sales climb.
       </p>
 
-      <button class="modal-skip-btn" id="modalSkipBtn">No thanks, maybe later</button>
+      <button class="modal-skip-btn" id="modalSkipBtn">Maybe later — back to dashboard</button>
     </div>
   </div>
 </div>
@@ -390,23 +376,35 @@ Task 3 of My Narrative Design-to-Earn Pipeline
 
   function showSampleKitModal(productUrl, publishResult) {
     if (!modal) return;
+    var pr = publishResult || {};
+    var pUrl = productUrl || pr.product_url || pr.shopify_product_url || '';
+    var code = pr.creator_discount_code || pr.discount_code || '';
 
-    // Set view link
+    // "View on store" link
     const viewLink = document.getElementById('modalViewLink');
-    if (viewLink && productUrl) viewLink.href = productUrl;
+    if (viewLink) {
+      viewLink.href = pUrl || '#';
+      if (!pUrl) viewLink.style.display = 'none';
+    }
 
-    // Pre-select the published product type for Sample Kit CTA
-    const publishedType = publishResult && publishResult.product_type;
-    const options = modal.querySelectorAll('.sample-option');
-    options.forEach(opt => {
-      const btn = opt.querySelector('.sample-add-btn');
-      if (btn && publishedType) {
-        const optType = btn.getAttribute('data-product');
-        if (optType === publishedType) {
-          opt.style.borderColor = '#39A596';
-        }
+    // "Buy my own design" CTA — product URL with creator discount code applied via Shopify URL.
+    const buyLink     = document.getElementById('buyOwnDesignLink');
+    const hintEl      = document.getElementById('buyOwnDiscountHint');
+    const priceLabel  = document.getElementById('buyOwnPriceLabel');
+    if (buyLink) {
+      var finalUrl = pUrl || '/pages/creator-dashboard';
+      if (pUrl && code) {
+        var sep = pUrl.indexOf('?') === -1 ? '?' : '&';
+        finalUrl = pUrl + sep + 'discount=' + encodeURIComponent(code);
       }
-    });
+      buyLink.href = finalUrl;
+    }
+    if (hintEl && code) {
+      hintEl.innerHTML = 'Discount code <strong>' + String(code).toUpperCase() + '</strong> applied at checkout';
+    }
+    if (priceLabel && pr.creator_discount_percent) {
+      priceLabel.textContent = 'Save ' + pr.creator_discount_percent + '% at checkout';
+    }
 
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
