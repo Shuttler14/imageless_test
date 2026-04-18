@@ -62,6 +62,57 @@
         "label": "X Profile Link"
       }
     ]
+  },
+  {
+    "name": "My Narrative — Creator Pipeline",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Print-on-Demand Products"
+      },
+      {
+        "type": "paragraph",
+        "content": "Find variant IDs in Shopify admin → Products → [product] → Variants. Right-click the variant → 'Copy link address' → the number at the end of the URL is the variant ID."
+      },
+      {
+        "type": "text",
+        "id": "default_tshirt_variant_id",
+        "label": "Default t-shirt / hoodie variant ID",
+        "info": "Used by the consumer Design flow when adding a custom design to cart. REQUIRED for /pages/ai-studio consumer path and /pages/placement-editor."
+      },
+      {
+        "type": "text",
+        "id": "creator_sample_kit_variant_id",
+        "label": "Creator Sample Kit variant ID",
+        "info": "Used by the 'Buy Discounted Creator Kit' button inside the Buy-to-Publish popup. Falls back to the default t-shirt variant above if blank."
+      },
+      {
+        "type": "header",
+        "content": "Supabase Backend"
+      },
+      {
+        "type": "url",
+        "id": "supabase_url",
+        "label": "Supabase Project URL",
+        "info": "Example: https://xxxxx.supabase.co"
+      },
+      {
+        "type": "text",
+        "id": "supabase_anon_key",
+        "label": "Supabase Anon (public) Key",
+        "info": "The anon/public key from Supabase project settings. NEVER paste the service-role key here."
+      },
+      {
+        "type": "header",
+        "content": "Creator Economy API"
+      },
+      {
+        "type": "url",
+        "id": "creator_api_base",
+        "label": "Vercel backend base URL",
+        "info": "Example: https://creator-economy-xxxxxxxxxx.vercel.app. Leave blank to use the default baked into the theme."
+      }
+    ]
   }
 ]
 

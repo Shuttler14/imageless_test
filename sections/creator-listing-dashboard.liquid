@@ -369,6 +369,24 @@ Task 3 of My Narrative Design-to-Earn Pipeline
 
   const PROD_API = 'https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app';
 
+  // ── Resolve design_id at runtime (URL > wrapper data-attr > section setting) ──
+  // The outer template (page.creator-dashboard.liquid) parses ?design_id=<uuid>
+  // and wraps this section in <div data-design-id="<uuid>">. We can't pass
+  // section settings dynamically per request, so we must read the ID at runtime.
+  // Fallback to the theme-editor setting (legacy path) preserves backwards compat.
+  const MN_DESIGN_ID = (function() {
+    try {
+      var urlId = new URLSearchParams(window.location.search).get('design_id');
+      if (urlId) return urlId;
+      var wrap = document.querySelector('[data-design-id]');
+      if (wrap) {
+        var attr = wrap.getAttribute('data-design-id') || '';
+        if (attr) return attr;
+      }
+    } catch (e) {}
+    return '{{ section.settings.design_id }}' || '';
+  })();
+
   // ── Sample Kit Modal ─────────────────────────────────────────
   const modal     = document.getElementById('sampleKitModal');
   const closeBtn  = document.getElementById('modalCloseBtn');
@@ -432,7 +450,7 @@ Task 3 of My Narrative Design-to-Earn Pipeline
       const productType = this.getAttribute('data-product');
       const pricePaise  = parseInt(this.getAttribute('data-price-paise'), 10);
       const creatorId   = '{{ customer.id }}';
-      const designId    = '{{ section.settings.design_id }}';
+      const designId    = MN_DESIGN_ID;
 
       this.disabled    = true;
       this.textContent = 'Adding...';
@@ -1234,7 +1252,7 @@ Task 3 of My Narrative Design-to-Earn Pipeline
 
     async fetchData() {
       try {
-        const designId = '{{ section.settings.design_id }}';
+        const designId = MN_DESIGN_ID;
         const customerId = '{{ customer.id }}';
 
         // Fetch design data
@@ -1408,8 +1426,16 @@ Task 3 of My Narrative Design-to-Earn Pipeline
       this.showStatus('loading', 'Publishing your design...');
 
       try {
-        const designId = '{{ section.settings.design_id }}';
+        const designId = MN_DESIGN_ID;
         const customerId = '{{ customer.id }}';
+
+        if (!designId) {
+          this.showStatus('error', 'Missing design reference. Please reload the page from your dashboard.');
+          this.state.isPublishing = false;
+          this.updatePublishButton();
+          return;
+        }
+
         const selectedColors = Array.from(this.state.selectedColors).map(c => c.replace(`${this.state.selectedProduct}_`, ''));
 
         const payload = {
@@ -1424,7 +1450,7 @@ Task 3 of My Narrative Design-to-Earn Pipeline
         };
 
         const response = await fetch(
-          'https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app/api/design/publish',
+          PROD_API + '/api/design/publish',
           {
             method:  'POST',
             headers: { 'Content-Type': 'application/json' },
