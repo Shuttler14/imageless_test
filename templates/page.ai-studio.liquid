@@ -733,39 +733,24 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
     sessionStorage.setItem('mn_creator_intent_ts', Date.now().toString());
   }
 
-  // Show a subtle banner indicating creator mode
+  // Show a subtle banner indicating creator mode.
+  //
+  // IMPORTANT: this script executes INLINE in <body>, which runs BEFORE
+  // the `<div class="mn-ai-studio-wrapper">` later in the template has
+  // been parsed. Previously we tried `document.querySelector('.mn-ai-studio-wrapper')`
+  // synchronously, it returned null, and we fell back to
+  // `document.body.prepend(banner)` with the original `position: fixed`
+  // still in effect. Result: the pill stuck to the viewport at top:72px
+  // and visually overlapped the theme header, the studio content AND
+  // the footer as the user scrolled — which looked like a mis-aligned
+  // header/footer in screenshots.
+  //
+  // Fix: defer the banner mount until DOMContentLoaded so the wrapper
+  // exists, and always mount it as `position: absolute` inside the
+  // wrapper. That way it appears once at the top of the studio content
+  // and scrolls away with the page, leaving the theme chrome clean.
   if (IS_CREATOR_INTENT) {
-    var banner = document.createElement('div');
-    banner.id = 'mnCreatorModeBanner';
-    // Elegant floating pill — not a full-width bar
-    banner.style.cssText = [
-      'position:fixed',
-      'top:72px',
-      'left:50%',
-      'transform:translateX(-50%)',
-      'z-index:9988',
-      'background:rgba(10,10,10,0.82)',
-      'border:1px solid rgba(57,165,150,0.5)',
-      'border-radius:2rem',
-      'padding:0.35rem 1rem 0.35rem 0.75rem',
-      'display:flex',
-      'align-items:center',
-      'gap:0.45rem',
-      'font-family:Montserrat,sans-serif',
-      'font-size:0.72rem',
-      'font-weight:700',
-      'color:#39A596',
-      'letter-spacing:0.04em',
-      'white-space:nowrap',
-      'backdrop-filter:blur(12px)',
-      '-webkit-backdrop-filter:blur(12px)',
-      'box-shadow:0 4px 20px rgba(0,0,0,0.4),0 0 0 1px rgba(57,165,150,0.15)',
-      'animation:mnBannerIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both',
-    ].join(';');
-    banner.innerHTML = '<span style="width:7px;height:7px;background:#39A596;border-radius:50%;display:inline-block;box-shadow:0 0 6px #39A596;animation:mnDotPulse 2s ease infinite;"></span>' +
-      '<span style="color:rgba(255,255,255,0.5);font-weight:600;">' + (intent === 'creator_upload' ? 'Creator Upload' : 'Creator Mode') + '</span>';
-
-    // Add keyframes once
+    // Add keyframes once, regardless of when the banner actually mounts.
     if (!document.getElementById('mnBannerStyles')) {
       var s = document.createElement('style');
       s.id = 'mnBannerStyles';
@@ -775,14 +760,54 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
       ].join('');
       document.head.appendChild(s);
     }
-    var wrapper = document.querySelector('.mn-ai-studio-wrapper');
-    if (wrapper) {
-      banner.style.position = 'absolute';
-      banner.style.left = '50%';
-      banner.style.transform = 'translateX(-50%)';
-      wrapper.prepend(banner);
+
+    var mountCreatorBanner = function() {
+      if (document.getElementById('mnCreatorModeBanner')) return;
+      var banner = document.createElement('div');
+      banner.id = 'mnCreatorModeBanner';
+      // Absolute-positioned pill that scrolls with the page so it can
+      // never overlap the theme footer.
+      banner.style.cssText = [
+        'position:absolute',
+        'top:16px',
+        'left:50%',
+        'transform:translateX(-50%)',
+        'z-index:40',
+        'background:rgba(10,10,10,0.82)',
+        'border:1px solid rgba(57,165,150,0.5)',
+        'border-radius:2rem',
+        'padding:0.35rem 1rem 0.35rem 0.75rem',
+        'display:flex',
+        'align-items:center',
+        'gap:0.45rem',
+        'font-family:Montserrat,sans-serif',
+        'font-size:0.72rem',
+        'font-weight:700',
+        'color:#39A596',
+        'letter-spacing:0.04em',
+        'white-space:nowrap',
+        'pointer-events:none',
+        'box-shadow:0 4px 20px rgba(0,0,0,0.4),0 0 0 1px rgba(57,165,150,0.15)',
+        'animation:mnBannerIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both',
+      ].join(';');
+      banner.innerHTML = '<span style="width:7px;height:7px;background:#39A596;border-radius:50%;display:inline-block;box-shadow:0 0 6px #39A596;animation:mnDotPulse 2s ease infinite;"></span>' +
+        '<span style="color:rgba(255,255,255,0.5);font-weight:600;">' + (intent === 'creator_upload' ? 'Creator Upload' : 'Creator Mode') + '</span>';
+
+      var wrapper = document.querySelector('.mn-ai-studio-wrapper');
+      if (wrapper) {
+        wrapper.prepend(banner);
+      } else {
+        // Last-resort: mount inline at the top of <main> so it still
+        // scrolls with content rather than floating over the footer.
+        var main = document.querySelector('main') || document.body;
+        main.insertBefore(banner, main.firstChild);
+      }
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', mountCreatorBanner);
     } else {
-      document.body.prepend(banner);
+      mountCreatorBanner();
     }
   }
 
@@ -1307,50 +1332,49 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
      forcing a nested scroll container (which itself breaks the flow).
      ================================================================= */
 
-  /* Un-do any full-viewport lock the injected content applies to <body>/<html>.
-     These rules win because they are defined AFTER any inline <style> in
-     page.content on this specific template. */
+  /* Un-do ONLY the full-viewport lock the injected studio content
+     applies to <html>/<body>. Everything else — the theme header,
+     header-group strips (badges, narrative stories), the footer — is
+     left completely untouched so they render on this page exactly the
+     way they do on every other page of the site.
+
+     The studio's page.content CSS does:
+       html, body { min-height: 100%; margin: 0; padding: 0;
+                    background: radial-gradient(...) !important;
+                    background-attachment: fixed !important;
+                    overflow-x: hidden; }
+     …which alone would be fine, but some earlier studio iterations
+     also tried `height: 100vh; overflow: hidden` which freezes page
+     scroll and clips the footer. The rules below are the minimum
+     needed to keep normal page scroll working; we deliberately do NOT
+     touch `background` on <html>/<body> — the theme's own
+     `<main class="bg-black text-white">` handles that. */
   html, body {
     height: auto !important;
     min-height: 100% !important;
-    overflow-x: hidden !important;
     overflow-y: auto !important;
     margin: 0 !important;
-    padding: 0 !important;
-    /* The studio's own CSS inside page.content does:
-         html, body { background: radial-gradient(...) !important;
-                       background-attachment: fixed !important; }
-       which leaks its teal→black gradient behind the theme header +
-       footer so they appear to float over a different background than
-       every other page on the site. Re-pin the theme's solid black so
-       the chrome matches the rest of the website. */
-    background: #000 !important;
-    background-attachment: scroll !important;
   }
 
   /* Flow-level wrapper for the studio content.
        - `isolation: isolate` sandboxes z-index so high values inside the
-         studio can't climb above the sticky theme header (z-10 in
-         sections/navbar.liquid).
+         studio can't climb above the sticky theme header.
        - NO fixed height / NO internal scroll — footer must flow naturally
          below.
        - NO `transform` in animations — transforms create a new containing
          block that would break `position: fixed` modals inside the
          studio (token gate, sample-kit popup, etc).
-       - `contain: paint` keeps the studio's internal gradient + fixed
-         canvases (dust, glass layers) clipped to the wrapper so they
-         don't bleed over the theme navbar/footer. */
+       - Internal teal→black atmospheric gradient is scoped to this
+         wrapper (instead of the original `html, body` rule inside
+         page.content), so it never leaks behind the theme header or
+         footer. */
   .mn-ai-studio-wrapper {
     position: relative;
     width: 100%;
     min-height: 60vh;
     overflow-x: hidden;
     isolation: isolate;
-    contain: paint;
     z-index: 0;
-    /* Re-apply the studio's intended teal→black gradient HERE only, so
-       the atmospheric background sits inside the wrapper instead of
-       overflowing onto the theme chrome. */
     background: radial-gradient(circle at top center, #1a2e2b 0%, #000000 70%);
     animation: mnStudioFadeIn 0.35s ease-out both;
   }
@@ -1363,51 +1387,6 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
   .mn-ai-studio-wrapper > * {
     max-width: 100%;
     box-sizing: border-box;
-  }
-
-  /* The studio's internal .custom-nav is `position: sticky; top: 0`
-     inside #mn-app-container. When the theme's sticky header is also at
-     top:0 they overlap. Push the studio's in-page nav BELOW the theme
-     header so both remain visible and aligned. The theme header is
-     60px on mobile / 75px on desktop (see sections/navbar.liquid
-     → `h-[60px] md:h-[75px]`). */
-  .mn-ai-studio-wrapper .custom-nav {
-    top: 60px !important;
-  }
-  @media (min-width: 768px) {
-    .mn-ai-studio-wrapper .custom-nav {
-      top: 75px !important;
-    }
-  }
-
-  /* The theme's navbar is rendered by `sections/navbar.liquid` with
-     tag: "header" and Tailwind "sticky top-0 z-10". When the studio
-     content has elements at z-index 1000+, they punch through the
-     sticky header. Lift the section wrapper above the studio's isolation
-     stacking context and make sure it renders at the same full-bleed
-     width it does on every other page. */
-  #shopify-section-navbar {
-    position: sticky !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    width: 100% !important;
-    margin: 0 !important;
-    z-index: 50 !important;
-    background: #000 !important;
-  }
-
-  /* Ensure the footer always renders at the end of normal flow — the
-     studio should never stretch past its own content area — and that
-     it spans the full page width exactly like on every other page. */
-  #shopify-section-footer {
-    position: relative !important;
-    z-index: 1 !important;
-    clear: both;
-    width: 100% !important;
-    max-width: 100% !important;
-    margin: 0 !important;
-    background: #000 !important;
   }
 </style>
 
