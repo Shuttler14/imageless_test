@@ -959,63 +959,63 @@ Two differences from the source:
     document.body.style.overflow = '';
   }
 
+  // ═══════════════════════════════════════════════════════════════════════
+  // mnOnConsumerDesignReady — strict Auth-First cart-add + checkout redirect.
+  // Callers MUST be logged in — the click interceptor gates unauth'd users
+  // into the register flow BEFORE invoking this helper.
+  // ═══════════════════════════════════════════════════════════════════════
   window.mnOnConsumerDesignReady = function(designUuid, imageUrl, title, variantId, extraProps) {
     var variant = variantId || DEFAULT_TSHIRT_VARIANT_ID;
+
+    // Strict variant validation — required by the Auth-First spec.
+    if (!variant || variant === 0 || variant === '0') {
+      alert('Configuration Error: Default T-Shirt Variant ID is missing in Theme Settings. Please add it via the Theme Editor.');
+      return;
+    }
+
     var properties = Object.assign({
       '_design_uuid':  designUuid || '',
       '_design_title': title      || 'My Design',
       'Custom Design': imageUrl   || ''
     }, extraProps || {});
 
-    function addToCartAndRedirect() {
-      if (!variant) {
-        console.warn('[MN] settings.default_tshirt_variant_id is not configured. Skipping cart/add.');
-        alert(
-          'This store isn\u2019t fully configured for custom designs yet. ' +
-          'Please contact support \u2014 your design has been saved but we can\u2019t add it to cart.'
-        );
-        return;
-      }
-      fetch('/cart/add.js', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify({ items: [{ id: variant, quantity: 1, properties: properties }] })
-      })
-      .then(function(r) {
-        if (r.ok) return r.json();
-        return r.text().then(function(txt) {
-          console.error('[MN] consumer cart/add failed:', r.status, txt);
-          throw new Error('cart_add_failed:' + r.status);
-        });
-      })
-      .then(function() { window.location.href = '/cart'; })
-      .catch(function(err) {
-        console.error('[MN] Consumer add-to-cart failed:', err);
-        alert(
-          'We couldn\u2019t add your design to the cart. ' +
-          'Please try again in a moment \u2014 your design is still saved.'
-        );
+    fetch('/cart/add.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ items: [{ id: variant, quantity: 1, properties: properties }] })
+    })
+    .then(function(r) {
+      if (r.ok) return r.json();
+      return r.text().then(function(txt) {
+        console.error('[MN] consumer cart/add failed:', r.status, txt);
+        throw new Error('cart_add_failed:' + r.status);
       });
-    }
-
-    if (IS_LOGGED_IN) {
-      return addToCartAndRedirect();
-    }
-    showConsumerAuthModal({
-      returnUrl: '/cart',
-      onGuest: function() {
-        hideConsumerAuthModal();
-        addToCartAndRedirect();
-      }
+    })
+    .then(function() {
+      // Straight to checkout, NOT /cart — maximises conversion.
+      window.location.href = '/checkout';
+    })
+    .catch(function(err) {
+      console.error('[MN] Consumer add-to-cart failed:', err);
+      alert(
+        'We couldn\u2019t add your design to the cart. ' +
+        'Please try again in a moment \u2014 your design is still saved.'
+      );
     });
   };
 
+  // CAUTION: `.action-btn` is intentionally NOT in this list — the studio
+  // HTML reuses it for every primary button (REVEAL MY SLOGANS, PROCEED,
+  // etc.). Matching it here would swallow those clicks. The Auth-First
+  // click interceptor catches the real cart buttons via `#cart-btn` and
+  // the `finalizeOrder`/`addToCart` onclick selectors below.
   var CART_SELECTOR = [
     '[data-action="add-to-cart"]', '.add-to-cart', '#addToCart',
     '[name="add"]', '.btn-cart', '.product-form__submit',
     '[data-role="add-to-cart"]', '[data-cart]',
     '.buy-now-btn', '.mn-buy-btn',
-    '#cart-btn', '.action-btn', '[onclick*="finalizeOrder"]', '[onclick*="addToCart"]'
+    // Studio-shipped cart / publish buttons:
+    '#cart-btn', '[onclick*="finalizeOrder"]', '[onclick*="addToCart"]'
   ].join(', ');
   var CART_TEXT_RE  = /\b(add to cart|buy now|purchase|get yours|checkout now|order now)\b/i;
 
@@ -1061,106 +1061,94 @@ Two differences from the source:
     return false;
   }
 
-  console.info('[MN placement-editor] consumer-flow interceptor armed. MN_CREATOR_INTENT=' + !!window.MN_CREATOR_INTENT);
+  console.info('[MN placement-editor] Auth-First interceptor armed. MN_CREATOR_INTENT=' + !!window.MN_CREATOR_INTENT);
 
+  // ═══════════════════════════════════════════════════════════════════════
+  // AUTH-FIRST CART CLICK INTERCEPTOR — see page.ai-studio.liquid for the
+  // full rationale. Short version: the studio's inline onclick="finalizeOrder()"
+  // fires a /cart/add.js with a broken payload. We take TOTAL ownership:
+  //   1. preventDefault() + stopPropagation() unconditionally.
+  //   2. Branch on creator intent × login state and route accordingly.
+  // ═══════════════════════════════════════════════════════════════════════
   document.addEventListener('click', function(e) {
     if (!isCartAction(e.target)) return;
 
-    var effIntent = getEffectiveCreatorIntent();
-    console.info('[MN placement-editor] cart-button click detected. effIntent=' + (effIntent || '(none — consumer)'));
+    // Kill the studio's native cart-add + redirect UNCONDITIONALLY.
+    e.preventDefault();
+    e.stopPropagation();
+    if (typeof e.stopImmediatePropagation === 'function') {
+      e.stopImmediatePropagation();
+    }
 
+    var effIntent = getEffectiveCreatorIntent();
+    console.info('[MN placement-editor] cart-button click intercepted. effIntent=' +
+      (effIntent || '(none — consumer)') + ' logged_in=' + IS_LOGGED_IN);
+
+    // ─── Creator flow ────────────────────────────────────────────────
     if (effIntent) {
-      e.preventDefault();
-      e.stopPropagation();
-      var pendingRaw = localStorage.getItem('mn_pending_design');
-      if (pendingRaw) {
-        var pendingParsed = null;
-        try { pendingParsed = JSON.parse(pendingRaw); } catch(err) {}
-        if (isPendingDesignExpired(pendingParsed)) {
-          localStorage.removeItem('mn_pending_design');
-          return;
-        }
-        window.location.href = '/pages/creator-onboarding?from=studio&intent=' + encodeURIComponent(effIntent);
+      var onboardingUrl = '/pages/creator-onboarding?from=studio&intent=' + encodeURIComponent(effIntent);
+      if (IS_LOGGED_IN) {
+        window.location.href = onboardingUrl;
       } else {
-        console.warn('[MN placement-editor] creator click but no mn_pending_design in localStorage — letting default handler run');
+        window.location.href = '/account/register?return_url=' + encodeURIComponent(onboardingUrl);
       }
       return;
     }
 
-    var raw = null;
-    try { raw = localStorage.getItem('mn_pending_design'); } catch(err) {}
-    var parsed = null;
-    if (raw) { try { parsed = JSON.parse(raw); } catch(err) {} }
+    // ─── Consumer flow ───────────────────────────────────────────────
+    if (IS_LOGGED_IN) {
+      var raw = null;
+      try { raw = localStorage.getItem('mn_pending_design'); } catch (err) {}
+      var parsed = null;
+      if (raw) { try { parsed = JSON.parse(raw); } catch (err) {} }
 
-    e.preventDefault();
-    e.stopPropagation();
-    window.mnOnConsumerDesignReady(
-      (parsed && (parsed.design_uuid || parsed.uuid)) || '',
-      (parsed && (parsed.image_url   || parsed.imageUrl)) || '',
-      (parsed && parsed.title) || 'My Design',
-      (parsed && parsed.variant_id) || 0,
-      (parsed && parsed.properties)  || {}
-    );
+      var uuid  = (parsed && (parsed.design_uuid || parsed.uuid))     || '';
+      var img   = (parsed && (parsed.image_url   || parsed.imageUrl)) || '';
+      var title = (parsed && parsed.title)                             || 'My Design';
+
+      window.mnOnConsumerDesignReady(uuid, img, title);
+      return;
+    }
+
+    // Logged-out consumer: set resume flag, send to register with a
+    // return URL back to this exact page. The auto-resume listener
+    // below will re-fire the cart-add once they come back authenticated.
+    try { sessionStorage.setItem('mn_resume_checkout', 'true'); } catch (err) {}
+    var here = window.location.pathname + window.location.search;
+    window.location.href = '/account/register?return_url=' + encodeURIComponent(here);
   }, true);
 
-  // ---------------------------------------------------------------------------
-  // BULLETPROOF HIJACK — see page.ai-studio.liquid for rationale.
-  // The studio HTML (injected via page.content) uses inline
-  // onclick="finalizeOrder()" which can't be cancelled via stopPropagation.
-  // We replace the function itself.
-  // ---------------------------------------------------------------------------
-  function mnHijackFinalizeOrder() {
-    var attempts = 0, maxAttempts = 80, tickMs = 100;
-    var poll = setInterval(function() {
-      attempts++;
-      var fnNames = ['finalizeOrder', 'addToCart', 'submitOrder', 'handleAddToCart'];
-      var hijacked = false;
-      fnNames.forEach(function(name) {
-        var original = window[name];
-        if (typeof original === 'function' && !original.__mnWrapped) {
-          var wrapper = function() {
-            console.info('[MN placement-editor] hijacked `' + name + '()` — routing through consumer/creator flow');
-            var effIntent = getEffectiveCreatorIntent();
-            var raw = null;
-            try { raw = localStorage.getItem('mn_pending_design'); } catch(err) {}
-            var parsed = null;
-            if (raw) { try { parsed = JSON.parse(raw); } catch(err) {} }
+  // ═══════════════════════════════════════════════════════════════════════
+  // AUTO-RESUME CHECKOUT — fires after the register/login round-trip.
+  // ═══════════════════════════════════════════════════════════════════════
+  function mnAutoResumeCheckout() {
+    if (!IS_LOGGED_IN) return;
+    var flag = null;
+    try { flag = sessionStorage.getItem('mn_resume_checkout'); } catch (err) {}
+    if (flag !== 'true') return;
+    try { sessionStorage.removeItem('mn_resume_checkout'); } catch (err) {}
 
-            if (effIntent) {
-              if (parsed && !isPendingDesignExpired(parsed)) {
-                window.location.href = '/pages/creator-onboarding?from=studio&intent=' + encodeURIComponent(effIntent);
-                return;
-              }
-              console.warn('[MN placement-editor] creator intent but no pending design — falling through to original');
-              return original.apply(this, arguments);
-            }
-            window.mnOnConsumerDesignReady(
-              (parsed && (parsed.design_uuid || parsed.uuid)) || '',
-              (parsed && (parsed.image_url   || parsed.imageUrl)) || '',
-              (parsed && parsed.title) || 'My Design',
-              (parsed && parsed.variant_id) || 0,
-              (parsed && parsed.properties)  || {}
-            );
-          };
-          wrapper.__mnWrapped = true;
-          wrapper.__mnOriginal = original;
-          window[name] = wrapper;
-          console.info('[MN placement-editor] ✅ patched window.' + name);
-          hijacked = true;
-        }
-      });
-      if (hijacked || attempts >= maxAttempts) {
-        if (!hijacked && attempts >= maxAttempts) {
-          console.warn('[MN placement-editor] finalizeOrder not found after ' + (maxAttempts * tickMs) + 'ms');
-        }
-        clearInterval(poll);
-      }
-    }, tickMs);
+    var raw = null;
+    try { raw = localStorage.getItem('mn_pending_design'); } catch (err) {}
+    if (!raw) {
+      console.warn('[MN placement-editor] auto-resume skipped: no mn_pending_design in localStorage');
+      return;
+    }
+    var parsed = null;
+    try { parsed = JSON.parse(raw); } catch (err) {}
+    if (!parsed) return;
+
+    console.info('[MN placement-editor] ✅ auto-resume firing mnOnConsumerDesignReady after auth round-trip');
+    window.mnOnConsumerDesignReady(
+      parsed.design_uuid || parsed.uuid     || '',
+      parsed.image_url   || parsed.imageUrl || '',
+      parsed.title                          || 'My Design'
+    );
   }
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', mnHijackFinalizeOrder);
+    document.addEventListener('DOMContentLoaded', mnAutoResumeCheckout);
   } else {
-    mnHijackFinalizeOrder();
+    mnAutoResumeCheckout();
   }
 
   window.mnDiagnose = function mnDiagnose() {
@@ -1171,6 +1159,7 @@ Two differences from the source:
       page_url:           window.location.href,
       url_intent:         new URLSearchParams(window.location.search).get('intent') || '(none)',
       session_intent:     sessionStorage.getItem('mn_creator_intent') || '(none)',
+      resume_checkout:    sessionStorage.getItem('mn_resume_checkout') || '(none)',
       MN_CREATOR_INTENT:  !!window.MN_CREATOR_INTENT,
       effective_intent:   (typeof getEffectiveCreatorIntent === 'function') ? getEffectiveCreatorIntent() : '(fn missing)',
       is_logged_in:       IS_LOGGED_IN,
@@ -1179,7 +1168,8 @@ Two differences from the source:
       consumer_helper:    typeof window.mnOnConsumerDesignReady,
       creator_helper:     typeof window.mnOnDesignReady,
       auth_modal_mount:   typeof ensureConsumerAuthModal,
-      finalizeOrder:      typeof window.finalizeOrder + (window.finalizeOrder && window.finalizeOrder.__mnWrapped ? ' (hijacked ✅)' : ''),
+      finalizeOrder:      typeof window.finalizeOrder + ' (studio-owned, intercepted by Auth-First click gate)',
+      interceptor_mode:   'auth-first (preventDefault + stopPropagation always)',
     };
     console.table(report);
     console.log('[MN diagnose] Full object:', report);
@@ -1190,46 +1180,30 @@ Two differences from the source:
 </script>
 
 <style>
-  /* Header/footer isolation — mirror of page.ai-studio.liquid.
-     See that file for full rationale. Key rules:
-       1. Unlock body/html from any overflow:hidden/height:100vh the
-          injected creator-upload-studio content might apply.
-       2. No nested scroll container on the wrapper — footer must flow.
-       3. No `transform` animation — it would break position:fixed modals.
-       4. Lift theme navbar stacking context above studio z-indices. */
-  html, body {
-    height: auto !important;
-    min-height: 100%;
-    overflow-x: hidden;
-    overflow-y: auto !important;
-    margin: 0;
-  }
+  /* =================================================================
+     PLACEMENT EDITOR — CSS QUARANTINE WRAPPER
+     =================================================================
+     Mirror of page.ai-studio.liquid — see that file for the full
+     rationale. In short: every studio CSS rule lives INSIDE
+     `.mn-ai-studio-wrapper` now, so this template must NOT mutate
+     <html>, <body>, the navbar section, or the footer section. We
+     only:
+       1. Sandbox the stacking context (`isolation: isolate`)
+       2. Clip any rogue overflow (`overflow: hidden`)
+       3. Stay in normal flow so the footer renders below (NOT
+          position: absolute / fixed, NO fixed height)
+     ================================================================= */
   .mn-ai-studio-wrapper {
     position: relative;
     width: 100%;
-    min-height: 60vh;
-    overflow-x: hidden;
     isolation: isolate;
+    overflow: hidden;
     z-index: 0;
     animation: mnStudioFadeIn 0.35s ease-out both;
   }
   @keyframes mnStudioFadeIn {
     from { opacity: 0; }
     to   { opacity: 1; }
-  }
-  .mn-ai-studio-wrapper > * {
-    max-width: 100%;
-    box-sizing: border-box;
-  }
-  #shopify-section-navbar {
-    position: sticky !important;
-    top: 0 !important;
-    z-index: 50 !important;
-  }
-  #shopify-section-footer {
-    position: relative !important;
-    z-index: 1 !important;
-    clear: both;
   }
 </style>
 

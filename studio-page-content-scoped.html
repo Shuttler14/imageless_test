@@ -1,0 +1,1009 @@
+
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+
+<style>
+  /* --- GLOBAL RESET & THEME --- */
+  .mn-ai-studio-wrapper * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  /* FORCE HIDE SHOPIFY TITLES */
+  .mn-ai-studio-wrapper .main-content h1, .mn-ai-studio-wrapper .section-header, .mn-ai-studio-wrapper .page-width h1, .mn-ai-studio-wrapper .title--primary { display: none !important; }
+
+  .mn-ai-studio-wrapper {
+    --brand-teal: #39A596;
+    --brand-teal-dim: #2a7a6f;
+    --brand-glow: #4fffd9;
+    --glass-panel: rgba(30, 30, 30, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.15);
+    --text-main: #ffffff;
+    --text-muted: #aaaaaa;
+    --font-main: 'Montserrat', sans-serif;
+  }
+
+  .mn-ai-studio-wrapper {
+    min-height: 100%;
+    margin: 0; padding: 0;
+    background: radial-gradient(circle at top center, #1a2e2b 0%, #000000 70%) !important;
+    background-attachment: fixed !important;
+    font-family: var(--font-main);
+    color: var(--text-main);
+    overflow-x: hidden;
+  }
+
+  .mn-ai-studio-wrapper #mn-app-container {
+    max-width: 600px;
+    margin: 0 auto;
+    min-height: 100vh;
+    padding: 10px 12px 80px; 
+    position: relative;
+    background: transparent !important;
+  }
+
+  /* --- NAVIGATION --- */
+  .mn-ai-studio-wrapper .custom-nav {
+    position: sticky; top: 0; z-index: 90; display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 0; pointer-events: none; 
+  }
+  .mn-ai-studio-wrapper .nav-pill {
+    pointer-events: auto; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px); border-radius: 30px; padding: 8px 18px; color: #fff;
+    font-size: 10px; font-weight: 700; text-transform: uppercase; cursor: pointer;
+    display: none; align-items: center; gap: 6px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  }
+  .mn-ai-studio-wrapper .price-pill {
+    pointer-events: auto; background: rgba(57, 165, 150, 0.2); border: 1px solid rgba(57, 165, 150, 0.4);
+    backdrop-filter: blur(10px); border-radius: 30px; padding: 8px 16px; color: #fff;
+    font-size: 11px; font-weight: 700; display: none;
+  }
+
+  /* --- STEP SECTIONS --- */
+  .mn-ai-studio-wrapper .step-section { display: none; animation: fadeInUp 0.5s ease; }
+  .mn-ai-studio-wrapper .step-section.active { display: block; }
+  .mn-ai-studio-wrapper .input-panel { padding: 20px 0; text-align: center; }
+
+  /* --- STEP 1 & 2 STYLES --- */
+  .mn-ai-studio-wrapper .mn-input {
+    width: 100%; padding: 16px; background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15); border-radius: 12px;
+    color: #fff; font-family: var(--font-main); margin-bottom: 10px;
+    font-size: 13px; outline: none; text-align: center;
+  }
+  .mn-ai-studio-wrapper .mn-input:focus { border-color: var(--brand-teal); }
+
+  .mn-ai-studio-wrapper .suggestion-container { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; align-items: center; margin: 15px 0 25px; }
+  .mn-ai-studio-wrapper .eg-label { font-size: 10px; color: #666; font-weight: 700; margin-right: 5px; }
+  .mn-ai-studio-wrapper .sugg-pill {
+    font-size: 10px; color: #aaa; background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.15); padding: 7px 14px; border-radius: 20px;
+    cursor: pointer; transition: 0.3s; font-weight: 600;
+  }
+  .mn-ai-studio-wrapper .sugg-pill:hover { border-color: var(--brand-teal); color: #fff; background: rgba(57,165,150,0.2); }
+
+  .mn-ai-studio-wrapper .tone-pill-container { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 30px; }
+  .mn-ai-studio-wrapper .tone-pill {
+    padding: 10px 20px; background: rgba(255,255,255,0.05);
+    border: 1px solid var(--glass-border); border-radius: 20px;
+    font-size: 11px; font-weight: 600; color: var(--text-muted);
+    cursor: pointer; transition: 0.2s; text-transform: uppercase;
+  }
+  .mn-ai-studio-wrapper .tone-pill.selected { background: var(--brand-teal); border-color: var(--brand-teal); color: #fff; }
+
+  /* --- STEP 3 DESIGN (CINEMATIC) --- */
+  .mn-ai-studio-wrapper .cinematic-header { text-align: center; margin-bottom: 40px; margin-top: 20px; }
+  .mn-ai-studio-wrapper .cinematic-title { font-family: var(--font-main); font-size: 28px; font-weight: 300; color: #e0e0e0; margin-bottom: 10px; letter-spacing: 2px; text-transform: uppercase; }
+  .mn-ai-studio-wrapper .cinematic-subtitle { font-family: var(--font-main); font-size: 11px; color: #888; font-weight: 400; letter-spacing: 1px; line-height: 1.6; }
+  
+  .mn-ai-studio-wrapper .cinematic-cards-container { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+  
+  .mn-ai-studio-wrapper .cine-card {
+    flex: 1; min-width: 280px; height: 220px;
+    border-radius: 16px; position: relative; overflow: hidden;
+    cursor: pointer; transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex; flex-direction: column; justify-content: center; padding: 30px;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .mn-ai-studio-wrapper .cine-card:hover { transform: translateY(-5px); }
+
+  /* AI Card Animation */
+  .mn-ai-studio-wrapper .card-ai {
+    background: linear-gradient(135deg, rgba(0,30,25,0.9), rgba(0,0,0,0.95));
+    border: 1px solid var(--brand-teal);
+    box-shadow: 0 0 20px rgba(57, 165, 150, 0.15);
+  }
+  .mn-ai-studio-wrapper .card-ai::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--brand-glow), transparent);
+    opacity: 0.8;
+  }
+  .mn-ai-studio-wrapper .nebula-bg {
+    position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+    background: radial-gradient(circle, rgba(57,165,150,0.15) 0%, transparent 60%);
+    animation: pulseNebula 6s infinite alternate; pointer-events: none;
+  }
+
+  .mn-ai-studio-wrapper .card-manual { background: #0a0a0a; border: 1px solid rgba(255,255,255,0.15); }
+  .mn-ai-studio-wrapper .grid-bg {
+    position: absolute; top:0; left:0; width:100%; height:100%;
+    background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 30px 30px; pointer-events: none;
+  }
+
+  .mn-ai-studio-wrapper .cc-title { font-family: var(--font-main); font-size: 18px; font-weight: 600; color: #fff; margin-bottom: 10px; position: relative; z-index: 2; letter-spacing: 0.5px; }
+  .mn-ai-studio-wrapper .cc-desc { font-family: var(--font-main); font-size: 12px; color: #aaa; margin-bottom: 25px; font-weight: 300; position: relative; z-index: 2; line-height: 1.4; }
+
+  .mn-ai-studio-wrapper .cc-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 20px; border-radius: 30px; font-size: 11px; font-weight: 700; text-transform: uppercase;
+    width: fit-content; transition: 0.3s; position: relative; z-index: 2;
+  }
+  .mn-ai-studio-wrapper .btn-ai { background: rgba(57, 165, 150, 0.15); border: 1px solid var(--brand-teal); color: var(--brand-glow); }
+  .mn-ai-studio-wrapper .btn-manual { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #ddd; }
+  
+  .mn-ai-studio-wrapper .cine-card:hover .btn-ai { background: var(--brand-teal); color: #000; box-shadow: 0 0 15px var(--brand-teal); }
+  .mn-ai-studio-wrapper .cine-card:hover .btn-manual { background: rgba(255,255,255,0.15); border-color: #fff; color: #fff; }
+
+  .mn-ai-studio-wrapper .change-mind-text { text-align: center; color: #666; font-size: 10px; margin-top: 30px; letter-spacing: 0.5px; font-weight: 500; }
+
+  /* --- DRAWER & UTILS --- */
+  .mn-ai-studio-wrapper .preferences-drawer { max-height: 0; overflow: hidden; transition: max-height 0.6s ease; }
+  .mn-ai-studio-wrapper .preferences-drawer.expanded { max-height: 2000px; }
+  .mn-ai-studio-wrapper .drawer-content { padding: 20px 0; opacity: 0; transform: translateY(-20px); transition: all 0.5s ease 0.2s; }
+  .mn-ai-studio-wrapper .preferences-drawer.expanded .drawer-content { opacity: 1; transform: translateY(0); }
+  
+  .mn-ai-studio-wrapper .style-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 30px; }
+  .mn-ai-studio-wrapper .style-card { background: #111; border-radius: 12px; overflow: hidden; height: 140px; border: 2px solid transparent; cursor: pointer; position: relative; }
+  .mn-ai-studio-wrapper .style-card img { width: 100%; height: 100%; object-fit: cover; opacity: 0.6; transition: 0.3s; }
+  .mn-ai-studio-wrapper .style-card.selected { border-color: var(--brand-teal); box-shadow: 0 0 15px var(--brand-green-glow); }
+  .mn-ai-studio-wrapper .style-card.selected img { opacity: 1; }
+  .mn-ai-studio-wrapper .style-card span { position: absolute; bottom: 0; left: 0; right: 0; padding: 10px; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); font-size: 11px; font-weight: 700; text-transform: uppercase; text-align: center; z-index: 2; color: #fff; }
+
+  /* --- STEP 4 CANVAS --- */
+  .mn-ai-studio-wrapper #step-4 { margin-top: 0px; }
+  .mn-ai-studio-wrapper #preview-area { width: 100%; height: auto; max-height: 65vh; aspect-ratio: 4/5; display: flex; justify-content: center; align-items: center; overflow: hidden; margin: 0 auto 10px auto; background: transparent; }
+  .mn-ai-studio-wrapper .canvas-container { max-width: 100%; max-height: 100%; background: transparent !important; }
+
+  .mn-ai-studio-wrapper .control-panel {
+    background: var(--glass-panel); border: 1px solid var(--glass-border); border-radius: 25px;
+    margin: 0px 10px 20px; 
+    padding: 20px; backdrop-filter: blur(15px); position: relative; z-index: 10;
+  }
+
+  .mn-ai-studio-wrapper .action-btn, .mn-ai-studio-wrapper .continue-btn, .mn-ai-studio-wrapper .ai-generate-btn {
+    width: 100%; padding: 18px; background: linear-gradient(135deg, var(--brand-teal) 0%, var(--brand-teal-dim) 100%);
+    border: none; border-radius: 30px; color: white; font-weight: 800; font-size: 14px;
+    text-transform: uppercase; letter-spacing: 1px; cursor: pointer;
+    box-shadow: 0 5px 20px rgba(57, 165, 150, 0.3); margin-top: 20px; transition: 0.3s;
+  }
+  .mn-ai-studio-wrapper .action-btn:hover, .mn-ai-studio-wrapper .continue-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(57, 165, 150, 0.4); }
+  .mn-ai-studio-wrapper .secondary-btn { background: transparent; border: 1px solid #fff; color: #fff; width: 100%; padding: 14px; border-radius: 30px; margin-top: 15px; font-size: 11px; font-weight: 700; text-transform: uppercase; cursor: pointer; transition: 0.3s; }
+  .mn-ai-studio-wrapper .secondary-btn:hover { background: rgba(255,255,255,0.1); }
+
+  /* --- OVERLAYS --- */
+  .mn-ai-studio-wrapper .loading-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.95); z-index: 9999; backdrop-filter: blur(10px); display: none; justify-content: center; align-items: center; flex-direction: column; }
+  .mn-ai-studio-wrapper .loading-overlay.active { display: flex; }
+  .mn-ai-studio-wrapper .spinner { border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid var(--brand-teal); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 20px; }
+  .mn-ai-studio-wrapper .loading-text { font-size: 12px; letter-spacing: 2px; font-weight: 700; color: #fff; margin-bottom: 20px; }
+  .mn-ai-studio-wrapper .progress-container { width: 250px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; }
+  .mn-ai-studio-wrapper .progress-fill { height: 100%; width: 0%; background: var(--brand-teal); transition: width 0.3s ease; }
+  .mn-ai-studio-wrapper .progress-percent { font-size: 14px; font-weight: 700; color: var(--brand-teal); margin-top: 12px; }
+
+  .mn-ai-studio-wrapper .ai-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(12px); z-index: 2000; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.4s ease; }
+  .mn-ai-studio-wrapper .ai-overlay.active { display: flex; opacity: 1; }
+  .mn-ai-studio-wrapper .ai-panel { background: linear-gradient(145deg, rgba(20,20,20,0.95), rgba(0,0,0,0.95)); border: 1px solid var(--glass-border); border-radius: 32px; padding: 25px 20px; width: 90%; max-width: 450px; max-height: 90vh; overflow-y: auto; position: relative; transform: scale(0.9); transition: transform 0.3s ease; }
+  .mn-ai-studio-wrapper .ai-overlay.active .ai-panel { transform: scale(1); }
+  .mn-ai-studio-wrapper .ai-close { position: absolute; top: 20px; right: 20px; background: transparent; border: 1px solid var(--glass-border); color: var(--text-muted); width: 30px; height: 30px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .mn-ai-studio-wrapper .ai-question { margin-bottom: 30px; }
+  .mn-ai-studio-wrapper .ai-question-title { font-size: 16px; font-weight: 600; margin-bottom: 15px; color: #fff; }
+  .mn-ai-studio-wrapper .ai-color-grid { display: flex; justify-content: center; gap: 15px; margin-bottom: 10px; }
+  .mn-ai-studio-wrapper .ai-options { display: flex; flex-wrap: wrap; gap: 10px; }
+  .mn-ai-studio-wrapper .ai-option { background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 12px; padding: 16px 18px; font-size: 13px; font-weight: 600; color: var(--text-muted); cursor: pointer; text-align: center; transition: 0.2s; width: 100%; margin-bottom: 8px; }
+  .mn-ai-studio-wrapper .ai-option:hover, .mn-ai-studio-wrapper .ai-option.selected { border-color: var(--brand-teal); background: rgba(57,165,150,0.1); color: #fff; }
+  .mn-ai-studio-wrapper .ai-generate-btn { opacity: 0.5; pointer-events: none; }
+  .mn-ai-studio-wrapper .ai-generate-btn.ready { opacity: 1; pointer-events: all; }
+
+  .mn-ai-studio-wrapper .upsell-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 8000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+  .mn-ai-studio-wrapper .upsell-overlay.active { display: flex; }
+  .mn-ai-studio-wrapper .upsell-card { background: #111; border: 1px solid var(--brand-teal); border-radius: 20px; padding: 30px; text-align: center; width: 90%; max-width: 350px; }
+  
+  .mn-ai-studio-wrapper .quote-card { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 16px 20px; border-radius: 30px; margin-bottom: 12px; cursor: pointer; transition: all 0.25s ease; }
+  .mn-ai-studio-wrapper .quote-card.active { border-color: var(--brand-teal); background: rgba(57,165,150,0.15); box-shadow: 0 0 15px rgba(57,165,150,0.15); }
+  .mn-ai-studio-wrapper .quote-text { font-size: 13px; color: #ddd; font-weight: 500; flex: 1; padding-right: 15px; text-align: left; }
+  .mn-ai-studio-wrapper .edit-btn { background: transparent; border: 1px solid var(--brand-teal); color: var(--brand-teal); font-size: 10px; padding: 6px 16px; border-radius: 20px; font-weight: 700; cursor: pointer; }
+
+  .mn-ai-studio-wrapper .product-toggle, .mn-ai-studio-wrapper .placement-grid .toggle-wrapper { display: flex; background: rgba(0,0,0,0.4); border-radius: 15px; padding: 4px; margin-bottom: 20px; }
+  .mn-ai-studio-wrapper .prod-btn, .mn-ai-studio-wrapper .toggle-btn { flex: 1; border: none; background: transparent; color: #888; padding: 10px; font-size: 11px; font-weight: 700; cursor: pointer; border-radius: 12px; }
+  .mn-ai-studio-wrapper .prod-btn.active, .mn-ai-studio-wrapper .toggle-btn.active { background: #fff; color: #000; }
+  .mn-ai-studio-wrapper .color-scroll { display: flex; justify-content: center; gap: 15px; margin: 20px 0 5px 0; }
+  .mn-ai-studio-wrapper .color-dot { width: 34px; height: 34px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
+  .mn-ai-studio-wrapper .color-dot.active { transform: scale(1.2); border-color: #fff; box-shadow: 0 0 10px rgba(255,255,255,0.5); }
+  .mn-ai-studio-wrapper .color-name-display { text-align: center; font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; font-weight: 700; }
+
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  @keyframes pulseNebula { 0% { opacity: 0.3; transform: scale(1); } 100% { opacity: 0.6; transform: scale(1.1); } }
+</style>
+
+<div id="mn-app-container">
+
+    <div class="custom-nav">
+      <button id="nav-back" class="nav-pill"><span>←</span> BACK</button>
+      <div id="price-display" class="price-pill">INR 1199</div>
+    </div>
+
+    <div id="step-1" class="step-section active">
+      <div style="height: 0px;"></div>
+      <div class="input-panel">
+        <h2 style="font-size: 16px; margin-bottom: 20px; color:#fff; line-height: 1.5;">DEFINE YOUR NARRATIVE</h2>
+        <p style="color:#888; font-size: 14px; margin-bottom: 30px;">Describe the personality, passion, or vibe you want this design to reflect.</p>
+        
+        <input type="text" id="user-topic" class="mn-input" style="margin-bottom:0;" placeholder="Type your passion, favourites, mood etc...">
+        
+        <div class="suggestion-container">
+          <span class="eg-label">Eg.</span>
+          <div class="sugg-pill" onclick="fillTopic('Gym &amp; Discipline')">Gym &amp; Discipline</div>
+          <div class="sugg-pill" onclick="fillTopic('Entrepreneurship')">Entrepreneurship</div>
+          <div class="sugg-pill" onclick="fillTopic('Midnight Long Drives')">Midnight Long Drives</div>
+          <div class="sugg-pill" onclick="fillTopic('Coffee Lover')">Coffee Lover</div>
+          <div class="sugg-pill" onclick="fillTopic('Rock-climber')">Rock-Climber</div>
+          <div class="sugg-pill" onclick="fillTopic('Healed from Breakup')">Learning To Let Go</div>
+        </div>
+        
+        <p style="font-size:13px; color:#fff; text-transform:uppercase; margin-bottom:15px; letter-spacing:1px; margin-top:25px; text-align: center;">Choose the vibe of your design</p>
+        
+        <div class="tone-pill-container">
+          <div class="tone-pill selected" onclick="selectTone('hustle', this)">Hustle</div>
+          <div class="tone-pill" onclick="selectTone('darkhumour', this)">Dark Humor</div>
+          <div class="tone-pill" onclick="selectTone('internet', this)">Internet Culture</div>
+          <div class="tone-pill" onclick="selectTone('stoic', this)">Stoic</div>
+          <div class="tone-pill" onclick="selectTone('sarcastic', this)">Sarcastic</div>
+          <div class="tone-pill" onclick="selectTone('unapologetic', this)">Unapologetic</div>
+          <div class="tone-pill" onclick="selectTone('luxury', this)">Luxury</div>
+          <div class="tone-pill" onclick="selectTone('mainchar', this)">Main Character</div>
+          <div class="tone-pill" onclick="selectTone('retro', this)">Low-Key Flex</div>
+          <div class="tone-pill" onclick="selectTone('emotionally real', this)">Emotionally Real</div>
+          <div class="tone-pill" onclick="selectTone('healing', this)">Healing</div>
+        </div>
+
+        <button onclick="generateQuotes()" class="action-btn" id="btn-quotes">
+          <span id="btn-text">REVEAL MY SLOGANS</span>
+        </button>
+      </div>
+    </div>
+
+    <div id="step-2" class="step-section">
+      <div class="input-panel">
+        <h2 style="font-size: 16px; margin-bottom: 10px; color:#fff;">CHOOSE YOUR SLOGAN</h2>
+        <p style="color:#888; font-size: 12px; margin-bottom: 20px;">Pick your favorite or edit one.</p>
+        <div id="quote-list-container" class="quote-list"></div>
+        <button onclick="regenerateSlogans()" class="secondary-btn" id="regenerate-btn">Regenerate Slogans</button>
+        <button onclick="goToStep(3)" id="btn-continue-s2" class="continue-btn">Continue</button>
+      </div>
+    </div>
+
+    <div id="step-3" class="step-section">
+      
+      <div class="cinematic-header">
+        <h1 class="cinematic-title">Create Your Narrative</h1>
+        <p class="cinematic-subtitle">Your story. Designed by you — or designed for you.</p>
+      </div>
+      
+      <div class="cinematic-cards-container">
+        
+        <div class="cine-card card-ai" id="ai-choice">
+          <div class="nebula-bg"></div>
+          <h2 class="cc-title">Let AI Decide for Me</h2>
+          <p class="cc-desc">I want the system to choose what suits me best.</p>
+          <div class="cc-btn btn-ai">Start with AI →</div>
+        </div>
+
+        <div class="cine-card card-manual" id="manual-choice">
+          <div class="grid-bg"></div>
+          <h2 class="cc-title">I Have My Own Preferences</h2>
+          <p class="cc-desc">I want to select styles myself.</p>
+          <div class="cc-btn btn-manual">Choose Manually →</div>
+        </div>
+        
+      </div>
+
+      <p class="change-mind-text">You can always change your mind later.</p>
+
+      <div class="preferences-drawer" id="preferences-drawer">
+        <div class="drawer-content">
+          <h3 class="cinematic-subtitle" style="margin-bottom:20px; margin-top:30px;">SELECT YOUR STYLE</h3>
+          
+          <div class="style-grid">
+             <div class="style-card" id="style-card-Cyberpunk" onclick="selectManualStyle('Cyberpunk Neon', this)">
+               <img src="https://cdn.shopify.com/s/files/1/0000/0000/files/demo-cyberpunk.jpg"><span>CYBERPUNK</span>
+             </div>
+             <div class="style-card" id="style-card-Vintage" onclick="selectManualStyle('Vintage 90s', this)">
+               <img src="https://cdn.shopify.com/s/files/1/0000/0000/files/demo-vintage.jpg"><span>VINTAGE 90s</span>
+             </div>
+             <div class="style-card" id="style-card-Minimal" onclick="selectManualStyle('Minimalist Type', this)">
+               <img src="https://cdn.shopify.com/s/files/1/0000/0000/files/demo-minimal.jpg"><span>MINIMALIST</span>
+             </div>
+             <div class="style-card" id="style-card-Y2K" onclick="selectManualStyle('Y2K Chrome', this)">
+               <img src="https://cdn.shopify.com/s/files/1/0000/0000/files/demo-y2k.jpg"><span>Y2K CHROME</span>
+             </div>
+          </div>
+
+          <div class="pref-color-container" style="margin-top:30px; border-top:1px solid var(--glass-border); padding-top:20px; text-align:center;">
+            <p style="font-size:11px; color:#888; text-transform:uppercase; margin-bottom: 10px;">Select Fabric Color</p>
+            <div class="color-scroll">
+              <div class="color-dot active" style="background: #ffffff;" onclick="setPrefColor('white', this)"></div>
+              <div class="color-dot" style="background: #111111; border:1px solid #333;" onclick="setPrefColor('black', this)"></div>
+              <div class="color-dot" style="background: #f0e68c;" onclick="setPrefColor('beige', this)"></div>
+              <div class="color-dot" style="background: #E6E6FA;" onclick="setPrefColor('lavender', this)"></div>
+              <div class="color-dot" style="background: #3b271d; border:1px solid #555;" onclick="setPrefColor('brown', this)"></div>
+            </div>
+            <p id="manual-color-name" class="color-name-display">Classic White</p>
+          </div>
+
+          <button class="continue-btn" id="manual-continue">Generate Design</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="step-4" class="step-section">
+      <div id="preview-area"><canvas id="mn-canvas" width="400" height="500"></canvas></div>
+      
+      <div class="control-panel">
+        <div class="product-toggle">
+          <button class="prod-btn active" onclick="setProduct('hoodie', this)">Hoodie (₹1199)</button>
+          <button class="prod-btn" onclick="setProduct('tshirt', this)">T-Shirt (₹649)</button>
+        </div>
+
+        <div class="color-scroll">
+          <div class="color-dot active" style="background: #ffffff;" id="dot-white" onclick="setColor('white', this)"></div>
+          <div class="color-dot" style="background: #111111; border:1px solid #333;" id="dot-black" onclick="setColor('black', this)"></div>
+          <div class="color-dot" style="background: #f0e68c;" id="dot-beige" onclick="setColor('beige', this)"></div>
+          <div class="color-dot" style="background: #E6E6FA;" id="dot-lavender" onclick="setColor('lavender', this)"></div>
+          <div class="color-dot" style="background: #3b271d; border:1px solid #555;" id="dot-brown" onclick="setColor('brown', this)"></div>
+        </div>
+        <p id="studio-color-name" class="color-name-display">Classic White</p>
+
+        <div class="placement-grid" id="placement-controls">
+          <div class="placement-group" style="text-align:center;">
+             <h4 style="font-size:10px; color:#888; margin-bottom:8px;">FRONT</h4>
+             <div class="toggle-wrapper">
+               <button class="toggle-btn" onclick="setPlacement('chest', this)">Chest</button>
+               <button class="toggle-btn" onclick="setPlacement('pocket', this)">Pocket</button>
+             </div>
+          </div>
+          <div class="placement-group" style="text-align:center;">
+             <h4 style="font-size:10px; color:#888; margin-bottom:8px;">BACK</h4>
+             <div class="toggle-wrapper">
+               <button class="toggle-btn active" onclick="setPlacement('back-full', this)">Full</button>
+               <button class="toggle-btn" onclick="setPlacement('back-upper', this)">Upper</button>
+             </div>
+          </div>
+        </div>
+        <button onclick="checkDoubleSide()" class="action-btn">PROCEED</button>
+      </div>
+    </div>
+    
+    <div id="step-final" class="step-section">
+      <div id="final-preview-area" style="position:relative;">
+         <div id="final-canvas-wrapper" style="width:100%; display:flex; justify-content:center;"></div>
+         <button onclick="toggleSideView()" style="position:absolute; bottom:20px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.8); border:1px solid var(--brand-teal); color:#fff; padding:10px 20px; border-radius:20px; font-size:10px; z-index:50;">SWITCH VIEW ⟳</button>
+      </div>
+
+      <div class="control-panel">
+         <h3 style="text-align:center; font-size:14px; margin-bottom:20px;">READY FOR PRODUCTION</h3>
+         <div style="font-size:12px; color:#888; text-align:center; margin-bottom:20px;">
+           Side 1: <span id="summ-s1">Created</span><br>
+           Side 2: <span id="summ-s2">Not Selected</span>
+         </div>
+         <button onclick="finalizeOrder()" class="action-btn" id="cart-btn">ADD TO CART</button>
+      </div>
+    </div>
+
+</div> 
+
+<div class="ai-overlay" id="ai-overlay">
+  <div class="ai-panel">
+    <button class="ai-close" id="ai-close">×</button>
+    <div class="ai-question">
+      <h3 class="ai-question-title">Pick your fabric base:</h3>
+      <div class="ai-color-grid">
+        <div class="color-dot" style="background: #ffffff;" data-value="white" onclick="selectAIColor(this)"></div>
+        <div class="color-dot" style="background: #111111; border:1px solid #333;" data-value="black" onclick="selectAIColor(this)"></div>
+        <div class="color-dot" style="background: #f0e68c;" data-value="beige" onclick="selectAIColor(this)"></div>
+        <div class="color-dot" style="background: #E6E6FA;" data-value="lavender" onclick="selectAIColor(this)"></div>
+        <div class="color-dot" style="background: #3b271d; border:1px solid #555;" data-value="brown" onclick="selectAIColor(this)"></div>
+      </div>
+      <p id="ai-color-label" class="color-name-display">Select a color</p>
+    </div>
+    <div class="ai-question">
+      <h3 class="ai-question-title">Where would you like to place your design?</h3>
+      <div class="ai-options">
+        <button class="ai-option" data-question="placement" data-value="front">FRONT</button>
+        <button class="ai-option" data-question="placement" data-value="back">BACK</button>
+      </div>
+    </div>
+    <div class="ai-question">
+      <h3 class="ai-question-title">Which of these feels most like you?</h3>
+      <div class="ai-options">
+        <button class="ai-option" data-question="vibe" data-value="calm">Calm &amp; thoughtful</button>
+        <button class="ai-option" data-question="vibe" data-value="bold">Bold &amp; expressive</button>
+        <button class="ai-option" data-question="vibe" data-value="disciplined">Disciplined &amp; driven</button>
+        <button class="ai-option" data-question="vibe" data-value="free">Free &amp; adventurous</button>
+        <button class="ai-option" data-question="vibe" data-value="dark">Dark &amp; mysterious</button>
+        <button class="ai-option" data-question="vibe" data-value="light">Light &amp; happy</button>
+      </div>
+    </div>
+    <button class="ai-generate-btn" id="ai-generate-btn">Generate My Design</button>
+  </div>
+</div>
+
+<div class="loading-overlay" id="loading-overlay">
+  <div class="spinner"></div>
+  <span class="loading-text" id="loading-text">GENERATING...</span>
+  <div class="progress-container"><div class="progress-fill" id="progress-fill"></div></div>
+  <span class="progress-percent" id="progress-percent">0%</span>
+</div>
+
+<div id="upsell-modal" class="upsell-overlay">
+  <div class="upsell-card">
+    <h2 style="font-size:16px; color:var(--brand-teal); margin-bottom:15px;">COMPLETE THE LOOK?</h2>
+    <p style="font-size:12px; color:#ccc; margin-bottom:25px;">
+      You designed the <span id="current-side-name" style="font-weight:bold; color:#fff;">BACK</span>.<br>
+      Do you want to design the <span id="other-side-name" style="font-weight:bold; color:#fff;">FRONT</span>?
+    </p>
+    <div id="upsell-options">
+        <button onclick="showSecondSideOptions()" class="action-btn" style="margin-top:0;">YES, GENERATE IT (+ ₹100)</button>
+        <button onclick="skipSecondSide()" class="secondary-btn">NO, PROCEED WITH THIS</button>
+    </div>
+    <div id="upsell-placements" style="display:none; margin-top:20px;">
+        <p id="placement-select-msg" style="font-size:10px; color:#888; margin-bottom:15px;">SELECT PLACEMENT:</p>
+        <div id="dynamic-placement-btns" style="display:flex; gap:10px; justify-content:center;"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* --- 1. CORE STATE & CONFIG --- */
+  const state = { 
+    currentStep: 1, 
+    topic: "", 
+    toneKey: "hustle", 
+    selectedQuote: "", 
+    selectedStyle: "", 
+    product: 'hoodie', 
+    color: 'white', 
+    side1: { placement: 'back-full', url: '', tempUrl: '' }, 
+    side2: { active: false, placement: '', url: '', tempUrl: '' }, 
+    currentView: 'side1', 
+    canvas: null,
+    aiPlacement: null,
+    aiVibe: null,
+    aiColor: null,
+    // ✨ NEW GIFT PROPERTIES
+    isGiftMode: false,
+    giftContext: null
+  };
+
+  /* --- GIFT MODE RECEIVER --- */
+  document.addEventListener('DOMContentLoaded', () => {
+    const pendingDesign = localStorage.getItem('mn_pending_design');
+    if (pendingDesign) {
+      try {
+        const data = JSON.parse(pendingDesign);
+        const isRecent = (Date.now() - data.timestamp) < 3600000; // 1 hour expiry
+
+        if (data.slogan && isRecent) {
+          console.log("🎁 Gift Mode Detected");
+          
+          // 1. Load Data
+          state.isGiftMode = true;
+          state.giftContext = data.context;
+          state.selectedQuote = data.slogan;
+          state.topic = `Gift for ${data.context.recipient}`;
+
+          // 2. PSYCHOLOGICAL UI TRANSFORM
+          const titleEl = document.querySelector('#step-3 .cinematic-title');
+          const subEl = document.querySelector('#step-3 .cinematic-subtitle');
+          if (titleEl) titleEl.innerText = "HOW SHOULD THE DESIGN LOOK?";
+          if (subEl) subEl.innerHTML = `We have the message for <b>${data.context.recipient}</b>.<br>Now let's give it a visual soul.`;
+
+          // 3. Skip Slogan Generation (Jump to Step 3)
+          setTimeout(() => { goToStep(3); }, 100);
+        }
+        localStorage.removeItem('mn_pending_design');
+      } catch (e) { console.error("Gift Data Error:", e); }
+    }
+  });
+
+  const PRICES = {
+    hoodie: 1199,
+    tshirt: 649,
+    extra: 100
+  };
+
+  const COLOR_NAMES = {
+    'white': 'Classic White',
+    'black': 'Midnight Black',
+    'beige': 'Sand Beige',
+    'lavender': 'Soft Lavender',
+    'brown': 'Dark Brown'
+  };
+
+  const TONE_PROMPTS = {
+  'hustle': `Hustle energy — but the REAL kind. Not "rise and grind" cringe. Write like someone who's tired but won't quit. Simple words, heavy weight.`,
+  'darkhumour': `Dark humor — the kind where you laugh because it's painfully true. Not trying to be edgy. Just honest.`,
+  'internet': `Internet culture. Chronically online but self-aware about it. Write like a viral tweet — not a meme caption.`,
+  'stoic': `Stoic energy — calm, unbothered, quiet power. Write like someone who's already been through the worst and came out still.`,
+  'sarcastic': `Sarcastic — but warm underneath. The humor of someone who cares too much so they pretend they don't care at all.`,
+  'unapologetic': `Unapologetic energy. Not angry — just done performing for others. The freedom of someone who finally stopped caring.`,
+  'healing': `Healing energy — real, messy, beautiful healing. Not toxic positivity. Write like a gentle reminder from your future self.`,
+  'luxury': `Quiet luxury. Old money energy — not flashy, just effortless. Write like someone who never needs to prove anything.`,
+  'mainchar': `Main character energy — cinematic, dramatic, unapologetically self-focused. Write like the voiceover in someone's personal movie montage.`,
+  'retro': `Low-key flex. The art of saying nothing but implying everything. Write like someone who doesn't brag because they don't need to.`,
+  'emotionally real': `Emotionally raw and honest. No filter, no performance. Write like a late-night notes app entry that accidentally became poetry.`
+};
+
+  const mockups = {
+    hoodie: {
+        white: { front: 'https://cdn.shopify.com/s/files/1/0680/5762/8864/files/ChatGPT_Image_Jan_15_2026_06_24_23_PM.png?v=1768772058', back: 'https://cdn.shopify.com/s/files/1/0000/0000/files/hoodie-white-back.jpg' },
+        black: { front: 'https://cdn.shopify.com/s/files/1/0000/0000/files/hoodie-black-front.jpg', back: 'https://cdn.shopify.com/s/files/1/0000/0000/files/hoodie-black-back.jpg' },
+        beige: { front: 'https://cdn.shopify.com/s/files/1/0000/0000/files/hoodie-beige-front.jpg', back: 'https://cdn.shopify.com/s/files/1/0000/0000/files/hoodie-beige-back.jpg' },
+        lavender: { front: 'https://cdn.shopify.com/s/files/1/0000/0000/files/hoodie-white-front.jpg', back: 'https://cdn.shopify.com/s/files/1/0000/0000/files/hoodie-white-back.jpg' }, 
+        brown: { front: 'https://cdn.shopify.com/s/files/1/0000/0000/files/hoodie-black-front.jpg', back: 'https://cdn.shopify.com/s/files/1/0000/0000/files/hoodie-black-back.jpg' } 
+    },
+    tshirt: {
+        white: { front: 'https://cdn.shopify.com/s/files/1/0000/0000/files/tee-white-front.jpg', back: 'https://cdn.shopify.com/s/files/1/0000/0000/files/tee-white-back.jpg' },
+        black: { front: 'https://cdn.shopify.com/s/files/1/0000/0000/files/tee-black-front.jpg', back: 'https://cdn.shopify.com/s/files/1/0000/0000/files/tee-black-back.jpg' },
+        beige: { front: 'https://cdn.shopify.com/s/files/1/0000/0000/files/tee-beige-front.jpg', back: 'https://cdn.shopify.com/s/files/1/0000/0000/files/tee-beige-back.jpg' },
+        lavender: { front: 'https://cdn.shopify.com/s/files/1/0000/0000/files/tee-white-front.jpg', back: 'https://cdn.shopify.com/s/files/1/0000/0000/files/tee-white-back.jpg' }, 
+        brown: { front: 'https://cdn.shopify.com/s/files/1/0000/0000/files/tee-black-front.jpg', back: 'https://cdn.shopify.com/s/files/1/0000/0000/files/tee-black-back.jpg' } 
+    }
+  };
+
+  const VARIANTS = { 
+    hoodie_1sided: 44268394873120, hoodie_2sided: 44268394873121, 
+    tshirt_1sided: 44268394873122, tshirt_2sided: 44268394873123  
+  };
+  
+  const coords = {
+    'chest': { x: 200, y: 235, scale: 0.18, view: 'front', label: 'Center Chest' },
+    'pocket': { x: 250, y: 230, scale: 0.11, view: 'front', label: 'Pocket Badge' },
+    'back-full': { x: 200, y: 240, scale: 0.45, view: 'back', label: 'Full Back' },
+    'back-upper': { x: 200, y: 150, scale: 0.22, view: 'back', label: 'Upper Back' }
+  };
+
+  /* --- 2. STEP 3 LOGIC (DESIGN STUDIO) --- */
+  
+  const aiChoice = document.getElementById('ai-choice');
+  const manualChoice = document.getElementById('manual-choice');
+  const preferencesDrawer = document.getElementById('preferences-drawer');
+  const aiOverlay = document.getElementById('ai-overlay');
+  const aiClose = document.getElementById('ai-close');
+  const aiOptions = document.querySelectorAll('.ai-option');
+  const aiGenerateBtn = document.getElementById('ai-generate-btn');
+  const manualContinue = document.getElementById('manual-continue');
+  const styleCards = document.querySelectorAll('.style-card');
+
+  // AI Overlay Logic
+  aiChoice.addEventListener('click', () => { 
+    aiOverlay.classList.add('active'); 
+    preferencesDrawer.classList.remove('expanded'); 
+    // ✨ SMART HIDING: Hide the "Vibe" question if in Gift Mode
+    const questions = document.querySelectorAll('.ai-question');
+    // Assuming the Vibe question is the 3rd one (index 2)
+    if (questions[2]) {
+        questions[2].style.display = state.isGiftMode ? 'none' : 'block';
+    }
+  });
+
+  aiClose.addEventListener('click', () => { aiOverlay.classList.remove('active'); });
+  
+  // AI Color Logic
+  function selectAIColor(btn) {
+      document.querySelectorAll('.ai-color-grid .color-dot').forEach(el => el.classList.remove('active'));
+      btn.classList.add('active');
+      state.aiColor = btn.dataset.value;
+      document.getElementById('ai-color-label').innerText = COLOR_NAMES[state.aiColor];
+      checkAIReady();
+  }
+
+  // AI Option Logic (Placement/Vibe)
+  aiOptions.forEach(option => {
+    option.addEventListener('click', () => {
+      const q = option.dataset.question;
+      option.parentElement.querySelectorAll('.ai-option').forEach(o => o.classList.remove('selected'));
+      option.classList.add('selected');
+      if(q === 'placement') state.aiPlacement = option.dataset.value;
+      if(q === 'vibe') state.aiVibe = option.dataset.value;
+      checkAIReady();
+    });
+  });
+
+  function checkAIReady() {
+      // If Gift Mode, we ignore 'aiVibe'
+      if (state.isGiftMode) {
+          if (state.aiColor && state.aiPlacement) aiGenerateBtn.classList.add('ready');
+          else aiGenerateBtn.classList.remove('ready');
+      } else {
+          // Standard Mode requires all 3
+          if (state.aiColor && state.aiPlacement && state.aiVibe) aiGenerateBtn.classList.add('ready');
+          else aiGenerateBtn.classList.remove('ready');
+      }
+  }
+
+  // AI GENERATE CLICK
+  aiGenerateBtn.addEventListener('click', () => {
+    if(!aiGenerateBtn.classList.contains('ready')) return;
+    aiOverlay.classList.remove('active');
+    
+    state.color = state.aiColor;
+    if(state.aiPlacement === 'front') { state.side1.placement = 'chest'; } 
+    else { state.side1.placement = 'back-full'; }
+
+    // 🧠 CONTEXT AWARE PROMPT CONSTRUCTION
+    if (state.isGiftMode && state.giftContext) {
+        const ctx = state.giftContext;
+        // Construct a rich prompt for the backend
+        state.selectedStyle = `Gift Aesthetic for ${ctx.recipient} on ${ctx.occasion}. Unspoken Message: "${ctx.unspoken || 'None'}". Visual Style: Premium, meaningful.`;
+        state.toneKey = "emotionally real"; 
+    } else {
+        // 👤 Standard User Logic
+        switch(state.aiVibe) {
+            case 'calm': state.selectedStyle = "Minimalist Type"; state.toneKey = "stoic"; break;
+            case 'bold': state.selectedStyle = "Cyberpunk Neon"; state.toneKey = "unapologetic"; break;
+            case 'disciplined': state.selectedStyle = "Minimalist Type"; state.toneKey = "hustle"; break;
+            case 'free': state.selectedStyle = "Vintage 90s"; state.toneKey = "retro"; break;
+            case 'dark': state.selectedStyle = "Cyberpunk Neon"; state.toneKey = "darkhumour"; break;
+            case 'light': state.selectedStyle = "Y2K Chrome"; state.toneKey = "healing"; break;
+            default: state.selectedStyle = "Minimalist Type"; state.toneKey = "stoic";
+        }
+    }
+    
+    autoGenerate(); 
+  });
+
+  // MANUAL DRAWER Logic
+  manualChoice.addEventListener('click', () => { preferencesDrawer.classList.toggle('expanded'); aiOverlay.classList.remove('active'); });
+
+  function selectManualStyle(styleName, card) {
+    styleCards.forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    state.selectedStyle = styleName;
+  }
+
+  // MANUAL GENERATE CLICK
+  manualContinue.addEventListener('click', () => {
+    if(!state.selectedStyle) return alert('Please select a style first');
+    autoGenerate();
+  });
+
+
+  /* --- 3. GENERAL FUNCTIONS --- */
+
+  function fillTopic(text) {
+    const input = document.getElementById('user-topic');
+    if(input) { input.value = text; input.style.borderColor = '#39A596'; }
+  }
+
+  function selectTone(key, btn) {
+    state.toneKey = key;
+    document.querySelectorAll('.tone-pill').forEach(el => el.classList.remove('selected'));
+    btn.classList.add('selected');
+  }
+
+  function showLoading(text, duration) {
+    const overlay = document.getElementById('loading-overlay');
+    document.getElementById('loading-text').innerText = text;
+    overlay.classList.add('active');
+    startProgress(duration);
+  }
+  function hideLoading() {
+    stopProgress();
+    document.getElementById('loading-overlay').classList.remove('active');
+  }
+
+  let progressInterval;
+  function startProgress(duration) {
+    const fill = document.getElementById('progress-fill');
+    const text = document.getElementById('progress-percent');
+    let width = 0; fill.style.width = '0%'; text.innerText = '0%'; clearInterval(progressInterval);
+    const stepIncrement = 95 / (duration / 100);
+    progressInterval = setInterval(() => {
+        width += stepIncrement; if(width >= 95) width = 95; 
+        fill.style.width = width + '%'; text.innerText = Math.round(width) + '%';
+    }, 100);
+  }
+  function stopProgress() { 
+      clearInterval(progressInterval); 
+      const fill = document.getElementById('progress-fill');
+      const text = document.getElementById('progress-percent');
+      fill.style.width = '100%'; text.innerText = '100%'; 
+  }
+
+  /* --- API CALLS --- */
+  async function generateQuotes() {
+    const topic = document.getElementById('user-topic').value;
+    if(!topic) return alert("Please enter a topic.");
+    showLoading("GENERATING SLOGANS...", 4000);
+    try {
+      const complexTone = TONE_PROMPTS[state.toneKey] || "Motivational";
+      const res = await fetch('https://mynarrative-ai.vercel.app/api/generate_slogans', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ topic, tone: complexTone })
+      });
+      const data = await res.json();
+      hideLoading();
+      if(data.success) { 
+        state.topic = topic; 
+        renderQuotes(data.quotes); 
+        goToStep(2);
+      } else { alert("AI Error: " + data.error); }
+    } catch(e) { hideLoading(); alert("Connection Failed."); }
+  }
+
+  async function regenerateSlogans() {
+    showLoading("REGENERATING SLOGANS...", 4000);
+    try {
+      const complexTone = TONE_PROMPTS[state.toneKey] || "Motivational";
+      const res = await fetch('https://mynarrative-ai.vercel.app/api/generate_slogans', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ topic: state.topic, tone: complexTone })
+      });
+      const data = await res.json();
+      hideLoading();
+      if(data.success) renderQuotes(data.quotes);
+    } catch(e) { hideLoading(); alert("Connection Failed."); }
+  }
+
+  function renderQuotes(quotes) {
+    const container = document.getElementById('quote-list-container');
+    container.innerHTML = "";
+    quotes.forEach((q, index) => {
+      const card = document.createElement('div');
+      card.className = 'quote-card';
+      card.id = 'quote-card-' + index;
+      card.innerHTML = `<span class="quote-text" id="q-text-${index}">${q}</span><button class="edit-btn" onclick="editQuote(${index}, event)">Edit</button>`;
+      card.onclick = () => selectQuote(index, q);
+      container.appendChild(card);
+    });
+  }
+
+  function selectQuote(index, text) {
+    state.selectedQuote = document.getElementById(`q-text-${index}`).innerText;
+    document.querySelectorAll('.quote-card').forEach(el => el.classList.remove('active'));
+    document.getElementById('quote-card-' + index).classList.add('active');
+  }
+
+  function editQuote(index, event) {
+    event.stopPropagation();
+    const textSpan = document.getElementById(`q-text-${index}`);
+    const newText = prompt("Edit your slogan:", textSpan.innerText);
+    if (newText && newText.trim() !== "") {
+       textSpan.innerText = newText;
+       const card = document.getElementById('quote-card-' + index);
+       if (card && card.classList.contains('active')) state.selectedQuote = newText;
+    }
+  }
+
+  function goToStep(num) {
+    if(num === 'final') state.currentStep = 'final';
+    else state.currentStep = parseInt(num);
+
+    const navBack = document.getElementById('nav-back');
+    if(navBack) navBack.style.display = (state.currentStep !== 1) ? 'flex' : 'none';
+
+    const priceDisplay = document.getElementById('price-display');
+    if(priceDisplay) priceDisplay.style.display = (state.currentStep === 4 || state.currentStep === 'final') ? 'block' : 'none';
+    if(priceDisplay && priceDisplay.style.display === 'block') updatePriceDisplay();
+
+    document.querySelectorAll('.step-section').forEach(el => el.classList.remove('active'));
+    const targetStep = document.getElementById(num === 'final' ? 'step-final' : 'step-'+num);
+    if(targetStep) { targetStep.classList.add('active'); window.scrollTo(0,0); }
+  }
+
+  const navBackBtn = document.getElementById('nav-back');
+  if(navBackBtn) navBackBtn.onclick = () => { if(state.currentStep > 1) goToStep(state.currentStep === 'final' ? 4 : state.currentStep - 1); };
+
+  function setPrefColor(color, btn) {
+    state.color = color;
+    document.querySelectorAll('.pref-color-container .color-dot').forEach(el => el.classList.remove('active'));
+    btn.classList.add('active');
+    const label = document.getElementById('manual-color-name');
+    if(label) label.innerText = COLOR_NAMES[color];
+  }
+
+  async function autoGenerate() {
+    if(!state.selectedStyle) return alert("Please select a style.");
+    showLoading("BAKING DESIGN...", 8000);
+    try {
+      const enhancedStyle = `${state.selectedStyle} ${state.toneKey} optimized for ${state.color} background`;
+      
+      // 🎁 BUILD REQUEST BODY WITH GIFT CONTEXT
+      const requestBody = {
+        quote: state.selectedQuote,
+        style: enhancedStyle
+      };
+      
+      // If gift mode is active, include the full gift context
+      if (state.isGiftMode && state.giftContext) {
+        requestBody.giftContext = state.giftContext;
+        console.log('🎁 Sending gift context to AI:', state.giftContext);
+      }
+      
+      const res = await fetch('https://mynarrative-ai.vercel.app/api/generate_design', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(requestBody)
+      });
+      const data = await res.json();
+      hideLoading();
+      if(data.success) {
+        state.side1.url = data.image_preview; state.side1.tempUrl = data.temp_url;
+        initStudio();
+      } else { alert(data.error); }
+    } catch(e) { 
+        hideLoading(); 
+        console.error(e);
+        alert("Error: " + e.message); 
+    }
+  }
+
+  function initStudio() {
+    goToStep(4);
+    state.canvas = new fabric.Canvas('mn-canvas', { selection: false, backgroundColor: '#111' });
+    if(document.getElementById('dot-'+state.color)) {
+          setColor(state.color, document.getElementById('dot-'+state.color));
+    } else {
+          renderCanvas(state.side1);
+    }
+  }
+
+  function setProduct(prod, btn) {
+    state.product = prod;
+    document.querySelectorAll('.prod-btn').forEach(el => el.classList.remove('active'));
+    btn.classList.add('active');
+    updatePriceDisplay();
+    renderCanvas(state.currentView === 'side2' ? state.side2 : state.side1);
+  }
+
+  function setColor(color, btn) {
+    state.color = color;
+    document.querySelectorAll('.color-scroll .color-dot').forEach(el => el.classList.remove('active'));
+    btn.classList.add('active');
+    const label = document.getElementById('studio-color-name');
+    if(label) label.innerText = COLOR_NAMES[color];
+    renderCanvas(state.currentView === 'side2' ? state.side2 : state.side1);
+  }
+
+  function setPlacement(key, btn) {
+    state.side1.placement = key;
+    document.querySelectorAll('.toggle-btn').forEach(el => el.classList.remove('active'));
+    btn.classList.add('active');
+    renderCanvas(state.side1);
+  }
+
+  function renderCanvas(sideData) {
+    const c = state.canvas;
+    const p = coords[sideData.placement];
+    let bgUrl = "";
+    try { bgUrl = mockups[state.product][state.color][p.view]; } catch(e) {}
+    c.backgroundColor = 'transparent';
+
+    if(bgUrl) fabric.Image.fromURL(bgUrl, (img) => { img.scaleToWidth(400); c.setBackgroundImage(img, c.renderAll.bind(c)); });
+    c.getObjects().forEach(o => c.remove(o));
+    if(sideData.url) fabric.Image.fromURL(sideData.url, (img) => {
+        img.set({ left: p.x, top: p.y, originX: 'center', originY: 'center', scaleX: p.scale, scaleY: p.scale, selectable: false, evented: false });
+        c.add(img); c.renderAll();
+    }, { crossOrigin: 'anonymous' });
+  }
+
+  function updatePriceDisplay() {
+      let price = PRICES[state.product];
+      if (state.side2.active) price += PRICES.extra;
+      const priceEl = document.getElementById('price-display');
+      if(priceEl) priceEl.innerText = `INR ${price}`;
+      const cartBtn = document.getElementById('cart-btn');
+      if (cartBtn) cartBtn.innerText = `ADD TO CART • INR ${price}`;
+  }
+
+  function checkDoubleSide() {
+    const currentP = coords[state.side1.placement];
+    const isBack = currentP.view === 'back';
+    document.getElementById('current-side-name').innerText = isBack ? "BACK" : "FRONT";
+    document.getElementById('other-side-name').innerText = isBack ? "FRONT" : "BACK";
+    document.getElementById('upsell-modal').classList.add('active');
+    document.getElementById('upsell-options').style.display = 'block';
+    document.getElementById('upsell-placements').style.display = 'none';
+  }
+
+  function showSecondSideOptions() {
+    document.getElementById('upsell-options').style.display = 'none';
+    document.getElementById('upsell-placements').style.display = 'block';
+    const isBack = coords[state.side1.placement].view === 'back';
+    const btnContainer = document.getElementById('dynamic-placement-btns');
+    btnContainer.innerHTML = isBack ? 
+        `<button onclick="generateSecondSide('chest')" class="action-btn" style="font-size:10px; padding:10px;">CHEST</button><button onclick="generateSecondSide('pocket')" class="action-btn" style="font-size:10px; padding:10px;">BADGE</button>` : 
+        `<button onclick="generateSecondSide('back-full')" class="action-btn" style="font-size:10px; padding:10px;">FULL BACK</button><button onclick="generateSecondSide('back-upper')" class="action-btn" style="font-size:10px; padding:10px;">UPPER BACK</button>`;
+  }
+
+  async function generateSecondSide(placement) {
+    state.side2.active = true; state.side2.placement = placement;
+    document.getElementById('upsell-modal').classList.remove('active');
+    showLoading("BAKING SECOND DESIGN...", 8000);
+    try {
+      const context = placement === 'pocket' ? "Small Badge Logo Style" : "Center Chest Art";
+      const enhancedStyle = `${state.selectedStyle} ${state.toneKey} ${context} optimized for ${state.color} background`;
+      
+      // 🎁 BUILD REQUEST BODY WITH GIFT CONTEXT
+      const requestBody = {
+        quote: state.selectedQuote,
+        style: enhancedStyle
+      };
+      
+      // If gift mode is active, include the full gift context
+      if (state.isGiftMode && state.giftContext) {
+        requestBody.giftContext = state.giftContext;
+        console.log('🎁 Sending gift context to AI (Side 2):', state.giftContext);
+      }
+      
+      const res = await fetch('https://mynarrative-ai.vercel.app/api/generate_design', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(requestBody)
+      });
+      const data = await res.json();
+      hideLoading();
+      if(data.success) {
+        state.side2.url = data.image_preview; state.side2.tempUrl = data.temp_url;
+        showFinalReview();
+      } else { alert(data.error); }
+    } catch(e) { hideLoading(); alert("Error generating second side."); }
+  }
+
+  function skipSecondSide() {
+    state.side2.active = false;
+    document.getElementById('upsell-modal').classList.remove('active');
+    showFinalReview();
+  }
+
+  function showFinalReview() {
+    goToStep('final');
+    document.getElementById('final-canvas-wrapper').appendChild(document.getElementById('mn-canvas').parentNode);
+    document.getElementById('summ-s1').innerText = `${coords[state.side1.placement].label} (Ready)`;
+    if(state.side2.active) {
+        document.getElementById('summ-s2').innerText = `${coords[state.side2.placement].label} (Ready)`;
+        state.currentView = 'side2'; 
+    } else { document.getElementById('summ-s2').innerText = "Not Selected"; }
+    updatePriceDisplay();
+    renderCanvas(state.side2.active ? state.side2 : state.side1);
+  }
+
+  function toggleSideView() {
+    if(!state.side2.active) return;
+    state.currentView = (state.currentView === 'side1') ? 'side2' : 'side1';
+    renderCanvas(state.currentView === 'side1' ? state.side1 : state.side2);
+  }
+
+  async function finalizeOrder() {
+    const btn = document.getElementById('cart-btn'); btn.innerText = "ADDING..."; btn.disabled = true;
+    try {
+      const isDual = state.side2.active;
+      let variantKey = state.product + (isDual ? '_2sided' : '_1sided');
+      let variantId = VARIANTS[variantKey];
+      const customName = `AI Custom: ${state.selectedQuote} (${isDual ? '2-Sided' : '1-Sided'})`;
+      const properties = {
+            'Edition': customName, 'Color': state.color.toUpperCase(), 'Product': state.product.toUpperCase(),
+            'Side 1 Placement': coords[state.side1.placement].label, '_Side1Image': state.side1.tempUrl,
+            ...(isDual && { 'Side 2 Placement': coords[state.side2.placement].label, '_Side2Image': state.side2.tempUrl }),
+            '_TempImage': state.side1.tempUrl, '_CartImage': state.currentView === 'side1' ? state.side1.tempUrl : (state.side2.tempUrl || state.side1.tempUrl)
+      };
+      const res = await fetch(window.Shopify.routes.root + 'cart/add.js', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ 'items': [{ 'id': variantId, 'quantity': 1, 'properties': properties }] })
+      });
+      if (res.ok) window.location.href = '/cart';
+      else { alert("Cart Error."); btn.disabled = false; btn.innerText = "ADD TO CART"; }
+    } catch (e) { alert(e.message); btn.disabled = false; btn.innerText = "ADD TO CART"; }
+  }
+</script>

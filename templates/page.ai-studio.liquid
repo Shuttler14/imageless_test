@@ -964,92 +964,83 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
     document.body.style.overflow = '';
   }
 
+  // ═══════════════════════════════════════════════════════════════════════
+  // mnOnConsumerDesignReady — strict Auth-First cart-add + checkout redirect
+  //
+  // Callers of this function MUST already be in a logged-in state. The
+  // new click interceptor below gates unauth'd users into the register
+  // flow BEFORE ever invoking this helper, so there's no modal/login
+  // logic in here any more. The job here is narrowly:
+  //   1. Validate that DEFAULT_TSHIRT_VARIANT_ID is configured (hard-fail
+  //      with an alert if not — this surfaces the bug instead of silently
+  //      bricking the button with "Cart Error.").
+  //   2. POST the design to /cart/add.js.
+  //   3. Send the customer straight to /checkout to maximise conversion.
+  // ═══════════════════════════════════════════════════════════════════════
   window.mnOnConsumerDesignReady = function(designUuid, imageUrl, title, variantId, extraProps) {
     var variant = variantId || DEFAULT_TSHIRT_VARIANT_ID;
+
+    // Strict variant validation — required by the Auth-First spec.
+    if (!variant || variant === 0 || variant === '0') {
+      alert('Configuration Error: Default T-Shirt Variant ID is missing in Theme Settings. Please add it via the Theme Editor.');
+      return;
+    }
+
     var properties = Object.assign({
       '_design_uuid':  designUuid || '',
       '_design_title': title      || 'My Design',
       'Custom Design': imageUrl   || ''
     }, extraProps || {});
 
-    function addToCartAndRedirect() {
-      if (!variant) {
-        // No variant configured → the store owner hasn't set up the POD parent
-        // product yet. Send them to /cart (which will be empty but at least
-        // non-broken) and surface the issue to the console.
-        console.warn('[MN] settings.default_tshirt_variant_id is not configured. Skipping cart/add.');
-        alert(
-          'This store isn\u2019t fully configured for custom designs yet. ' +
-          'Please contact support \u2014 your design has been saved but we can\u2019t add it to cart.'
-        );
-        return;
-      }
-      fetch('/cart/add.js', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify({ items: [{ id: variant, quantity: 1, properties: properties }] })
-      })
-      .then(function(r) {
-        if (r.ok) return r.json();
-        return r.text().then(function(txt) {
-          console.error('[MN] consumer cart/add failed:', r.status, txt);
-          throw new Error('cart_add_failed:' + r.status);
-        });
-      })
-      .then(function() { window.location.href = '/cart'; })
-      .catch(function(err) {
-        console.error('[MN] Consumer add-to-cart failed:', err);
-        alert(
-          'We couldn\u2019t add your design to the cart. ' +
-          'Please try again in a moment \u2014 your design is still saved.'
-        );
+    fetch('/cart/add.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ items: [{ id: variant, quantity: 1, properties: properties }] })
+    })
+    .then(function(r) {
+      if (r.ok) return r.json();
+      return r.text().then(function(txt) {
+        console.error('[MN] consumer cart/add failed:', r.status, txt);
+        throw new Error('cart_add_failed:' + r.status);
       });
-    }
-
-    // ✱ Login gate ✱
-    // If the shopper is logged in we just add + redirect. If not, we show the
-    // auth modal so they can pick login / register / continue-as-guest.
-    if (IS_LOGGED_IN) {
-      return addToCartAndRedirect();
-    }
-    showConsumerAuthModal({
-      returnUrl: '/cart',
-      onGuest: function() {
-        hideConsumerAuthModal();
-        addToCartAndRedirect();
-      }
+    })
+    .then(function() {
+      // Straight to checkout, NOT /cart — maximises conversion.
+      window.location.href = '/checkout';
+    })
+    .catch(function(err) {
+      console.error('[MN] Consumer add-to-cart failed:', err);
+      alert(
+        'We couldn\u2019t add your design to the cart. ' +
+        'Please try again in a moment \u2014 your design is still saved.'
+      );
     });
   };
 
-  // Intercept any "Add to Cart" / "Buy" clicks from the studio.
-  //   - Creator intent  → hijack to creator-onboarding (dashboard/publish path)
-  //   - Consumer intent → run mnOnConsumerDesignReady (shows login modal + cart)
+  // Intercept any "Add to Cart" / "Buy" / "Publish" clicks from the studio.
+  // The Auth-First click handler below takes TOTAL ownership of the event:
+  // it calls preventDefault() + stopPropagation() so the studio's inline
+  // onclick="finalizeOrder()" never runs, and then routes the user through
+  // a strict state machine (creator/consumer × logged-in/logged-out).
   //
-  // We use BOTH selector-matching AND button-text matching because the studio
-  // HTML stored in `page.content` may use custom class names that don't match
-  // typical Shopify cart selectors (`.add-to-cart`, `#addToCart`, etc).
-  // IMPORTANT: do NOT put `.action-btn` here. The studio HTML (inside
-  // page.content) reuses `.action-btn` for *all* primary buttons —
-  // REVEAL MY SLOGANS (#btn-quotes), PROCEED (checkDoubleSide), YES
-  // GENERATE IT (showSecondSideOptions), CHEST/BADGE/FULL BACK
-  // (generateSecondSide), etc. Matching `.action-btn` here caused the
-  // capture-phase preventDefault()+stopPropagation() to swallow those
-  // clicks and the studio appeared frozen ("not clickable").
+  // That means we must now match the studio's own cart button
+  // (`#cart-btn` with onclick="finalizeOrder()") AND any other buttons
+  // wired to finalizeOrder()/addToCart() so they can never bypass the
+  // auth gate with a buggy fetch request.
   //
-  // We ALSO no longer match the studio's own cart button (`#cart-btn`
-  // with onclick="finalizeOrder()") here. The studio's `finalizeOrder`
-  // already does the correct cart-add (right variant for 1-sided vs
-  // 2-sided hoodie/tee, right properties, right canvas image). Instead
-  // of hijacking the click — which used a default t-shirt variant and
-  // failed silently — we now wrap `window.fetch` further below and
-  // intercept the `/cart/add.js` POST AFTER the studio has performed
-  // it, so the design is safely in Shopify's cart cookie before we
-  // redirect to login / onboarding. See `mnWrapCartAddFetch()`.
+  // CAUTION: `.action-btn` is intentionally NOT in this list. The studio
+  // HTML (inside page.content) reuses `.action-btn` for all primary
+  // buttons — REVEAL MY SLOGANS (#btn-quotes), PROCEED (checkDoubleSide),
+  // YES GENERATE IT (showSecondSideOptions), CHEST/BADGE/FULL BACK
+  // (generateSecondSide), etc. Matching `.action-btn` here would swallow
+  // every one of those clicks and freeze the studio.
   var CART_SELECTOR = [
     '[data-action="add-to-cart"]', '.add-to-cart', '#addToCart',
     '[name="add"]', '.btn-cart', '.product-form__submit',
     '[data-role="add-to-cart"]', '[data-cart]',
-    '.buy-now-btn', '.mn-buy-btn'
+    '.buy-now-btn', '.mn-buy-btn',
+    // Studio-shipped cart / publish buttons:
+    '#cart-btn', '[onclick*="finalizeOrder"]', '[onclick*="addToCart"]'
   ].join(', ');
   var CART_TEXT_RE  = /\b(add to cart|buy now|purchase|get yours|checkout now|order now)\b/i;
 
@@ -1095,20 +1086,13 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
 
   function isCartAction(target) {
     if (!target || target.nodeType !== 1) return false;
-    // Architect studio buttons must never be hijacked as cart buttons.
+    // Architect studio buttons (REVEAL MY SLOGANS, PROCEED, etc.) must
+    // never be hijacked as cart buttons. The allow-list in
+    // isArchitectAction() explicitly covers them.
     if (isArchitectAction(target)) return false;
     // Walk up the DOM a few levels so clicks on inner <span>/<i> icons still count.
     var node = target, hops = 0;
     while (node && hops < 4) {
-      // The studio's own ADD TO CART button is handled by the /cart/add.js
-      // fetch wrapper further below, NOT by this click interceptor. Its
-      // text reads "ADD TO CART • INR 649" which would otherwise match the
-      // CART_TEXT_RE regex and cause the click to be hijacked with the
-      // wrong (default) variant. Skip it explicitly.
-      if (node.id === 'cart-btn') return false;
-      var onAttr = (typeof node.getAttribute === 'function') ? (node.getAttribute('onclick') || '') : '';
-      if (onAttr && /\b(finalizeOrder|addToCart)\s*\(/.test(onAttr)) return false;
-
       if (typeof node.matches === 'function') {
         try { if (node.matches(CART_SELECTOR)) return true; } catch (e) {}
       }
@@ -1122,170 +1106,114 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
     return false;
   }
 
-  console.info('[MN studio] consumer-flow interceptor armed. MN_CREATOR_INTENT=' + !!window.MN_CREATOR_INTENT);
+  console.info('[MN studio] Auth-First interceptor armed. MN_CREATOR_INTENT=' + !!window.MN_CREATOR_INTENT);
 
+  // ═══════════════════════════════════════════════════════════════════════
+  // AUTH-FIRST CART CLICK INTERCEPTOR
+  //
+  // The studio's inline onclick="finalizeOrder()" fires a /cart/add.js POST
+  // using a variant/property payload built from state variables that are
+  // (a) scoped locally to the studio's IIFE and (b) often missing or wrong
+  // → Shopify returns "Cart Error." and no auth gate ever triggers.
+  //
+  // This handler takes TOTAL ownership of the click:
+  //   1. preventDefault() + stopPropagation() — unconditional. The native
+  //      studio fetch is killed before it can fire.
+  //   2. Branch on creator intent × login state and route accordingly.
+  // ═══════════════════════════════════════════════════════════════════════
   document.addEventListener('click', function(e) {
     if (!isCartAction(e.target)) return;
 
-    var effIntent = getEffectiveCreatorIntent();
-    console.info('[MN studio] cart-button click detected. effIntent=' + (effIntent || '(none — consumer)'));
+    // Kill the studio's native cart-add + redirect UNCONDITIONALLY.
+    e.preventDefault();
+    e.stopPropagation();
+    if (typeof e.stopImmediatePropagation === 'function') {
+      e.stopImmediatePropagation();
+    }
 
+    var effIntent = getEffectiveCreatorIntent();
+    console.info('[MN studio] cart-button click intercepted. effIntent=' +
+      (effIntent || '(none — consumer)') + ' logged_in=' + IS_LOGGED_IN);
+
+    // ─── Creator flow ────────────────────────────────────────────────
     if (effIntent) {
-      e.preventDefault();
-      e.stopPropagation();
-      var pendingRaw = localStorage.getItem('mn_pending_design');
-      if (pendingRaw) {
-        var pendingParsed = null;
-        try { pendingParsed = JSON.parse(pendingRaw); } catch(err) {}
-        if (isPendingDesignExpired(pendingParsed)) {
-          localStorage.removeItem('mn_pending_design');
-          return;
-        }
-        window.location.href = '/pages/creator-onboarding?from=studio&intent=' + encodeURIComponent(effIntent);
+      var onboardingUrl = '/pages/creator-onboarding?from=studio&intent=' + encodeURIComponent(effIntent);
+      if (IS_LOGGED_IN) {
+        window.location.href = onboardingUrl;
       } else {
-        console.warn('[MN studio] creator click but no mn_pending_design in localStorage — letting default handler run');
+        window.location.href = '/account/register?return_url=' + encodeURIComponent(onboardingUrl);
       }
       return;
     }
 
-    // Consumer path.
-    var raw = null;
-    try { raw = localStorage.getItem('mn_pending_design'); } catch(err) {}
-    var parsed = null;
-    if (raw) { try { parsed = JSON.parse(raw); } catch(err) {} }
+    // ─── Consumer flow ───────────────────────────────────────────────
+    if (IS_LOGGED_IN) {
+      // Read the pending design from localStorage and ship it straight
+      // to cart + checkout.
+      var raw = null;
+      try { raw = localStorage.getItem('mn_pending_design'); } catch (err) {}
+      var parsed = null;
+      if (raw) { try { parsed = JSON.parse(raw); } catch (err) {} }
 
-    // Even if we don't have a saved design, still show the auth modal for
-    // logged-out users so they get the popup the UX promises. If they have a
-    // saved design we pass its data through, otherwise the modal opens with
-    // empty properties and the cart add will still succeed for the default
-    // variant.
-    e.preventDefault();
-    e.stopPropagation();
-    window.mnOnConsumerDesignReady(
-      (parsed && (parsed.design_uuid || parsed.uuid)) || '',
-      (parsed && (parsed.image_url   || parsed.imageUrl)) || '',
-      (parsed && parsed.title) || 'My Design',
-      (parsed && parsed.variant_id) || 0,
-      (parsed && parsed.properties)  || {}
-    );
+      var uuid  = (parsed && (parsed.design_uuid || parsed.uuid))        || '';
+      var img   = (parsed && (parsed.image_url   || parsed.imageUrl))    || '';
+      var title = (parsed && parsed.title)                                || 'My Design';
+
+      window.mnOnConsumerDesignReady(uuid, img, title);
+      return;
+    }
+
+    // Logged-out consumer: set the resume flag, send them to register
+    // with a return URL back to this exact page. When they come back,
+    // the auto-resume listener below will fire mnOnConsumerDesignReady
+    // automatically.
+    try { sessionStorage.setItem('mn_resume_checkout', 'true'); } catch (err) {}
+    var here = window.location.pathname + window.location.search;
+    window.location.href = '/account/register?return_url=' + encodeURIComponent(here);
   }, true);
 
-  // ---------------------------------------------------------------------------
-  // Public diagnostic helper — paste `mnDiagnose()` in the browser console to
-  // print the current state of the pipeline. This is what we use to debug
-  // "why isn't the login popup appearing?" issues.
-  // ---------------------------------------------------------------------------
-  // ---------------------------------------------------------------------------
-  // CART-ADD FETCH WRAPPER
+  // ═══════════════════════════════════════════════════════════════════════
+  // AUTO-RESUME CHECKOUT
   //
-  // The studio's page.content defines its own `finalizeOrder()` that:
-  //   1. picks the correct variant (hoodie vs tee × 1-sided vs 2-sided)
-  //   2. POSTs to /cart/add.js with the right custom properties
-  //   3. on success, does `window.location.href = '/cart'`
-  //
-  // Previously we monkey-patched `window.finalizeOrder` with our own version
-  // that called `mnOnConsumerDesignReady(... DEFAULT_TSHIRT_VARIANT_ID ...)`.
-  // That was wrong because:
-  //   - `DEFAULT_TSHIRT_VARIANT_ID` is a *single* theme setting (often unset),
-  //     so the cart-add failed with "store not configured" and the button
-  //     appeared broken.
-  //   - it used the wrong variant regardless (didn't know 1-sided vs 2-sided,
-  //     hoodie vs tee).
-  //
-  // The studio already knows the right variant. We just need to change WHERE
-  // the user lands AFTER the cart-add succeeds:
-  //   - Creator with pending design  → /pages/creator-onboarding (publish)
-  //   - Logged-out consumer          → /account/login?return_url=/cart
-  //     (Shopify's cart cookie carries the item through login → /cart)
-  //   - Logged-in consumer           → /cart (studio's default)
-  //
-  // To do that without touching the studio code we wrap `window.fetch` once:
-  // when a /cart/add.js POST lands, we decide the destination and call
-  // `window.location.replace(...)` ourselves, then return a never-resolving
-  // promise so the studio's own `window.location.href = '/cart'` never fires.
-  //
-  // The sample-kit "Own & Drop" modal flow is recognised via the
-  // `_is_sample_kit` property and passes through unchanged.
-  // ---------------------------------------------------------------------------
-  function mnWrapCartAddFetch() {
-    if (typeof window.fetch !== 'function' || window.fetch.__mnCartWrapped) return;
-    var origFetch = window.fetch.bind(window);
+  // After a logged-out consumer registers/logs in, Shopify bounces them
+  // back to the studio page via the `return_url` we set above. If the
+  // `mn_resume_checkout` flag is present in sessionStorage and the user
+  // is now authenticated, we immediately re-trigger the cart-add so the
+  // user ends up on /checkout without having to click again.
+  // ═══════════════════════════════════════════════════════════════════════
+  function mnAutoResumeCheckout() {
+    if (!IS_LOGGED_IN) return;
+    var flag = null;
+    try { flag = sessionStorage.getItem('mn_resume_checkout'); } catch (err) {}
+    if (flag !== 'true') return;
+    try { sessionStorage.removeItem('mn_resume_checkout'); } catch (err) {}
 
-    function parseRequestBody(url, options) {
-      try {
-        var body = options && options.body;
-        if (!body) return null;
-        if (typeof body === 'string') return JSON.parse(body);
-      } catch (e) {}
-      return null;
+    var raw = null;
+    try { raw = localStorage.getItem('mn_pending_design'); } catch (err) {}
+    if (!raw) {
+      console.warn('[MN studio] auto-resume skipped: no mn_pending_design in localStorage');
+      return;
     }
+    var parsed = null;
+    try { parsed = JSON.parse(raw); } catch (err) {}
+    if (!parsed) return;
 
-    function isSampleKit(body) {
-      if (!body || !Array.isArray(body.items)) return false;
-      return body.items.some(function(it) {
-        var p = it && it.properties;
-        if (!p) return false;
-        return p._is_sample_kit === 'true' || p._is_sample_kit === true;
-      });
-    }
-
-    var wrapped = function(url, options) {
-      var urlStr = (typeof url === 'string') ? url : (url && url.url) || '';
-      var method = ((options && options.method) || 'GET').toUpperCase();
-      var isCartAdd = method === 'POST' && /\/cart\/add(\.js)?$/.test(urlStr.split('?')[0]);
-
-      if (!isCartAdd) return origFetch(url, options);
-
-      var body = parseRequestBody(url, options);
-      if (isSampleKit(body)) return origFetch(url, options);
-
-      var effIntent = getEffectiveCreatorIntent();
-      var pendingRaw = null;
-      try { pendingRaw = localStorage.getItem('mn_pending_design'); } catch (e) {}
-      var pendingParsed = null;
-      if (pendingRaw) { try { pendingParsed = JSON.parse(pendingRaw); } catch (e) {} }
-      var hasValidPending = pendingParsed && !isPendingDesignExpired(pendingParsed);
-
-      // Creator flow: do NOT add the consumer cart item. Divert straight to
-      // onboarding where they can publish / buy a sample kit. Only do this
-      // when we actually have a pending design context; otherwise fall
-      // through so the button doesn't silently disappear.
-      if (effIntent && hasValidPending) {
-        console.info('[MN studio] /cart/add intercepted for creator → onboarding');
-        window.location.replace('/pages/creator-onboarding?from=studio&intent=' + encodeURIComponent(effIntent));
-        return new Promise(function() {}); // hang so studio never sees a response
-      }
-
-      // Consumer, logged out: perform the real add (the Shopify cart cookie
-      // is attached to the session and will survive the auth round-trip),
-      // then divert to login with return_url=/cart so the user lands on
-      // the cart page with their design already in it.
-      if (!IS_LOGGED_IN) {
-        console.info('[MN studio] /cart/add intercepted for guest → login gate');
-        return origFetch(url, options).then(function(res) {
-          if (res && res.ok) {
-            var clone;
-            try { clone = res.clone(); } catch (e) {}
-            // Preserve the return URL so the customer always comes back to /cart.
-            var loginUrl = '/account/login?return_url=' + encodeURIComponent('/cart');
-            window.location.replace(loginUrl);
-            return new Promise(function() {}); // hang so studio doesn't run its own redirect
-          }
-          return res;
-        });
-      }
-
-      // Logged-in consumer: studio's default behaviour (add + /cart) is
-      // exactly what we want.
-      return origFetch(url, options);
-    };
-
-    wrapped.__mnCartWrapped = true;
-    window.fetch = wrapped;
-    console.info('[MN studio] ✅ /cart/add.js fetch wrapper installed');
+    console.info('[MN studio] ✅ auto-resume firing mnOnConsumerDesignReady after auth round-trip');
+    window.mnOnConsumerDesignReady(
+      parsed.design_uuid || parsed.uuid     || '',
+      parsed.image_url   || parsed.imageUrl || '',
+      parsed.title                          || 'My Design'
+    );
   }
-  mnWrapCartAddFetch();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', mnAutoResumeCheckout);
+  } else {
+    mnAutoResumeCheckout();
+  }
 
+  // ---------------------------------------------------------------------------
+  // Public diagnostic helper — paste `mnDiagnose()` in the browser console.
+  // ---------------------------------------------------------------------------
   window.mnDiagnose = function mnDiagnose() {
     var raw = localStorage.getItem('mn_pending_design');
     var parsed = null;
@@ -1294,6 +1222,7 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
       page_url:           window.location.href,
       url_intent:         new URLSearchParams(window.location.search).get('intent') || '(none)',
       session_intent:     sessionStorage.getItem('mn_creator_intent') || '(none)',
+      resume_checkout:    sessionStorage.getItem('mn_resume_checkout') || '(none)',
       MN_CREATOR_INTENT:  !!window.MN_CREATOR_INTENT,
       effective_intent:   (typeof getEffectiveCreatorIntent === 'function') ? getEffectiveCreatorIntent() : '(fn missing)',
       is_logged_in:       IS_LOGGED_IN,
@@ -1302,8 +1231,8 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
       consumer_helper:    typeof window.mnOnConsumerDesignReady,
       creator_helper:     typeof window.mnOnDesignReady,
       auth_modal_mount:   typeof ensureConsumerAuthModal,
-      finalizeOrder:      typeof window.finalizeOrder + ' (studio-owned)',
-      cart_fetch_wrapper: !!(window.fetch && window.fetch.__mnCartWrapped) ? 'installed ✅' : 'missing ❌',
+      finalizeOrder:      typeof window.finalizeOrder + ' (studio-owned, intercepted by Auth-First click gate)',
+      interceptor_mode:   'auth-first (preventDefault + stopPropagation always)',
     };
     console.table(report);
     console.log('[MN diagnose] Full object:', report);
@@ -1315,78 +1244,42 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
 
 <style>
   /* =================================================================
-     AI STUDIO — HEADER/FOOTER ISOLATION
+     AI STUDIO — CSS QUARANTINE WRAPPER
      =================================================================
-     The studio HTML (stored in page.content) originates from a
-     standalone full-page app (narrative-architect-complete.html) so it
-     expects to own the viewport. That causes theme header/footer to
-     render distorted because the injected content:
-       - sets `overflow: hidden` / `height: 100vh` on <body> or <html>
-       - uses `position: fixed` children that collide with the sticky
-         theme header
-       - introduces margins/paddings that push footer off-screen
-       - paints a radial-gradient background with !important on
-         <html>/<body>, which bled outside the wrapper and made the
-         theme header/footer look shifted vs. every other page
-     This block walls the studio off from the theme chrome without
-     forcing a nested scroll container (which itself breaks the flow).
+     The studio HTML stored in `page.content` is the ONLY thing allowed
+     to paint inside `.mn-ai-studio-wrapper`. All studio CSS has been
+     prefixed with `.mn-ai-studio-wrapper` so it cannot leak into the
+     Shopify theme chrome (header / footer / other pages).
+
+     What this block does — and, more importantly, does NOT do:
+
+       ✓  Sandboxes the studio's stacking context via `isolation: isolate`
+          so high z-index values inside the studio can't climb over the
+          sticky theme navbar.
+       ✓  Clips any studio content that tries to escape the wrapper
+          horizontally or vertically via `overflow: hidden`.
+       ✓  Keeps the wrapper in normal document flow (`position: relative`,
+          NO absolute positioning, NO fixed height) so the theme footer
+          lands naturally beneath it on every page.
+
+       ✗  Does NOT touch <html> or <body>. We deliberately do not mutate
+          the global document so the header/footer on these pages render
+          exactly the same as every other page on the site.
+       ✗  Does NOT override `#shopify-section-navbar` / `#shopify-section-footer`.
+       ✗  Does NOT paint a background — the wrapper is transparent and the
+          studio's own gradient (now scoped inside page.content) handles it.
      ================================================================= */
-
-  /* Un-do ONLY the full-viewport lock the injected studio content
-     applies to <html>/<body>. Everything else — the theme header,
-     header-group strips (badges, narrative stories), the footer — is
-     left completely untouched so they render on this page exactly the
-     way they do on every other page of the site.
-
-     The studio's page.content CSS does:
-       html, body { min-height: 100%; margin: 0; padding: 0;
-                    background: radial-gradient(...) !important;
-                    background-attachment: fixed !important;
-                    overflow-x: hidden; }
-     …which alone would be fine, but some earlier studio iterations
-     also tried `height: 100vh; overflow: hidden` which freezes page
-     scroll and clips the footer. The rules below are the minimum
-     needed to keep normal page scroll working; we deliberately do NOT
-     touch `background` on <html>/<body> — the theme's own
-     `<main class="bg-black text-white">` handles that. */
-  html, body {
-    height: auto !important;
-    min-height: 100% !important;
-    overflow-y: auto !important;
-    margin: 0 !important;
-  }
-
-  /* Flow-level wrapper for the studio content.
-       - `isolation: isolate` sandboxes z-index so high values inside the
-         studio can't climb above the sticky theme header.
-       - NO fixed height / NO internal scroll — footer must flow naturally
-         below.
-       - NO `transform` in animations — transforms create a new containing
-         block that would break `position: fixed` modals inside the
-         studio (token gate, sample-kit popup, etc).
-       - Internal teal→black atmospheric gradient is scoped to this
-         wrapper (instead of the original `html, body` rule inside
-         page.content), so it never leaks behind the theme header or
-         footer. */
   .mn-ai-studio-wrapper {
     position: relative;
     width: 100%;
-    min-height: 60vh;
-    overflow-x: hidden;
     isolation: isolate;
+    overflow: hidden;
     z-index: 0;
-    background: radial-gradient(circle at top center, #1a2e2b 0%, #000000 70%);
     animation: mnStudioFadeIn 0.35s ease-out both;
   }
   @keyframes mnStudioFadeIn {
     from { opacity: 0; }
     to   { opacity: 1; }
-  }
-
-  /* Prevent injected content from spilling out of the wrapper horizontally. */
-  .mn-ai-studio-wrapper > * {
-    max-width: 100%;
-    box-sizing: border-box;
   }
 </style>
 
