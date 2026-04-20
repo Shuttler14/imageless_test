@@ -34,9 +34,54 @@
       >
         Create
       </button>
+      {% comment %}
+        ─── Smart Auth Switch (in-card) ────────────────────────────────
+        Lives INSIDE the white card so it stacks below the submit button
+        on mobile instead of floating as a flex sibling next to the card
+        (the parent section is `flex justify-center`, so a sibling block
+        would get crushed into the narrow leftover column on phones).
+        The <script> further down reads ?return_url=... on DOMContentLoaded
+        and staples it to both this link AND a hidden `return_to` input on
+        the Shopify create_customer form.
+      {% endcomment %}
+      <p class="text-center text-sm normal-font" style="color:#4b5563; margin-top:4px;">
+        Already have an account?
+        <a
+          href="{{ routes.account_login_url }}"
+          id="mn-switch-to-login"
+          style="color:#39A596; font-weight:700; text-decoration:none; border-bottom:1px solid #39A596; padding-bottom:2px; margin-left:4px;"
+        >Log in here</a>
+      </p>
     </div>
   {% endform %}
 </div>
+
+<script>
+  // Smart Auth Switch — preserve ?return_url= across Register ↔ Login
+  // so the Auth-First flow from /pages/ai-studio never loses the
+  // eventual /checkout destination. Also stamps a hidden `return_to`
+  // input onto the Shopify create_customer form so the server-side
+  // post-auth redirect goes back to the studio / checkout.
+  document.addEventListener('DOMContentLoaded', function() {
+    var urlParams = new URLSearchParams(window.location.search);
+    var returnUrl = urlParams.get('return_url');
+
+    if (returnUrl) {
+      var loginLink = document.getElementById('mn-switch-to-login');
+      if (loginLink) {
+        loginLink.href = '{{ routes.account_login_url }}?return_url=' + encodeURIComponent(returnUrl);
+      }
+      var form = document.querySelector('form[action$="/account"]');
+      if (form && !form.querySelector('input[name="return_to"]')) {
+        var input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'return_to';
+        input.value = returnUrl;
+        form.appendChild(input);
+      }
+    }
+  });
+</script>
 
 {% schema %}
 {

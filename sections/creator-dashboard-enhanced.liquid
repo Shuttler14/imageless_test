@@ -19,6 +19,7 @@ SECTION CONFIGURATION
 
 {% assign api_base_url = section.settings.api_base_url | default: 'https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app' %}
 {% assign creator_api_base_url = section.settings.creator_api_base_url | default: 'https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app' %}
+{% assign social_verifier_url = section.settings.social_verifier_url | default: 'https://social-verifier.vercel.app' %}
 {% assign enable_debug = section.settings.enable_debug | default: false %}
 
 {% assign creator_id = customer.id | default: '' %}
@@ -888,6 +889,28 @@ SECTION CONFIGURATION
         </div>
       </div>
 
+      {% comment %} ═══════════════ ELITE CREATOR VERIFICATION ════════════════ {% endcomment %}
+      <div class="mn-elite-banner" id="mnEliteBanner" role="region" aria-label="Unlock Elite Status">
+        <div class="mn-elite-banner-glow" aria-hidden="true"></div>
+        <div class="mn-elite-banner-inner">
+          <div class="mn-elite-banner-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2l2.39 4.84L20 7.7l-4 3.9.94 5.5L12 14.77 7.06 17.1 8 11.6 4 7.7l5.61-.86L12 2z"/>
+            </svg>
+          </div>
+          <div class="mn-elite-banner-copy">
+            <h3>Unlock Elite Creator Status</h3>
+            <p>Verify 10K+ followers on any supported platform and your commission jumps from <strong>5%</strong> to <strong>40%</strong> — for life.</p>
+          </div>
+          <button class="mn-elite-banner-cta" id="mnEliteOpenBtn" type="button">
+            Verify my reach
+            <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M5 10h10M11 6l4 4-4 4"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
       <!-- Stats Grid -->
       {%- comment -%}
         Stats are populated dynamically from /api/creator/earnings?creator_id={{ customer.id }}
@@ -1450,6 +1473,602 @@ SECTION CONFIGURATION
 })();
 </script>
 
+{% comment %} ═══════════════ ELITE VERIFICATION — MODAL + CSS + JS ══════════════════ {% endcomment %}
+<div class="mn-elite-modal" id="mn-elite-verification-modal" role="dialog" aria-modal="true" aria-labelledby="mnEliteModalTitle" aria-hidden="true">
+  <div class="mn-elite-backdrop" data-elite-close></div>
+  <div class="mn-elite-card" role="document">
+    <button class="mn-elite-close" type="button" aria-label="Close" data-elite-close>
+      <svg viewBox="0 0 14 14" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 2l10 10M12 2L2 12"/></svg>
+    </button>
+
+    {% comment %} default (platform chooser) view {% endcomment %}
+    <div class="mn-elite-stage" data-stage="choose">
+      <div class="mn-elite-eyebrow">Elite Creator Verification</div>
+      <h2 class="mn-elite-title" id="mnEliteModalTitle">Prove your reach. Earn 8× more.</h2>
+      <p class="mn-elite-sub">Connect any of the platforms below. We read your follower count directly from the official API — no manual screenshots.</p>
+
+      <div class="mn-elite-warning">
+        <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.5"/><path d="M8 5v3.5M8 11h.01"/></svg>
+        Note: Your account must be public for verification to succeed.
+      </div>
+
+      <div class="mn-elite-grid">
+        <button type="button" class="mn-elite-platform-btn" data-platform="instagram">
+          <span class="mn-elite-platform-icon" style="background:linear-gradient(135deg,#f09433,#dc2743,#bc1888);color:#fff">
+            <svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="14" height="14" rx="4"/><circle cx="10" cy="10" r="3.4"/><circle cx="14.4" cy="5.6" r=".9" fill="currentColor"/></svg>
+          </span>
+          <span class="mn-elite-platform-label">
+            <strong>Instagram</strong>
+            <em>Business / Creator account</em>
+          </span>
+          <svg class="mn-elite-platform-arrow" viewBox="0 0 14 14" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 7h8M8 4l3 3-3 3"/></svg>
+        </button>
+
+        <button type="button" class="mn-elite-platform-btn" data-platform="twitter">
+          <span class="mn-elite-platform-icon" style="background:#000;color:#fff">
+            <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor"><path d="M14.8 2h2.6L11.6 9l6.6 9H13l-4.2-5.5L4 18H1.4L7.7 10.6 1.5 2h5l3.7 5.2L14.8 2z"/></svg>
+          </span>
+          <span class="mn-elite-platform-label">
+            <strong>X / Twitter</strong>
+            <em>OAuth login · free tier</em>
+          </span>
+          <svg class="mn-elite-platform-arrow" viewBox="0 0 14 14" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 7h8M8 4l3 3-3 3"/></svg>
+        </button>
+
+        <button type="button" class="mn-elite-platform-btn" data-platform="linkedin">
+          <span class="mn-elite-platform-icon" style="background:#0a66c2;color:#fff">
+            <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor"><rect x="2" y="2" width="16" height="16" rx="3"/><path d="M6 9v6M6 6.5v.01M9 15v-4c0-1.2 1-2 2-2s2 .7 2 2v4" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="6" cy="6.5" r=".8" fill="#fff"/></svg>
+          </span>
+          <span class="mn-elite-platform-label">
+            <strong>LinkedIn</strong>
+            <em>OAuth login · OIDC</em>
+          </span>
+          <svg class="mn-elite-platform-arrow" viewBox="0 0 14 14" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 7h8M8 4l3 3-3 3"/></svg>
+        </button>
+
+        <button type="button" class="mn-elite-platform-btn" data-platform="youtube">
+          <span class="mn-elite-platform-icon" style="background:#e03131;color:#fff">
+            <svg viewBox="0 0 20 20" width="18" height="18" fill="currentColor"><path d="M17.5 6a2 2 0 0 0-1.4-1.4C14.6 4.2 10 4.2 10 4.2s-4.6 0-6.1.4A2 2 0 0 0 2.5 6C2.1 7.5 2.1 10 2.1 10s0 2.5.4 4a2 2 0 0 0 1.4 1.4c1.5.4 6.1.4 6.1.4s4.6 0 6.1-.4A2 2 0 0 0 17.5 14c.4-1.5.4-4 .4-4s0-2.5-.4-4zM8.3 12.4V7.6l4.2 2.4-4.2 2.4z"/></svg>
+          </span>
+          <span class="mn-elite-platform-label">
+            <strong>YouTube</strong>
+            <em>Public subscriber count</em>
+          </span>
+          <svg class="mn-elite-platform-arrow" viewBox="0 0 14 14" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 7h8M8 4l3 3-3 3"/></svg>
+        </button>
+      </div>
+
+      <p class="mn-elite-fineprint">Threshold: <strong>10,000 verified followers</strong> on any single platform. We never post anything on your behalf.</p>
+    </div>
+
+    {% comment %} YouTube handle entry {% endcomment %}
+    <div class="mn-elite-stage" data-stage="youtube" hidden>
+      <button class="mn-elite-back" type="button" data-elite-back>← Pick a different platform</button>
+      <h2 class="mn-elite-title">Enter your YouTube handle</h2>
+      <p class="mn-elite-sub">We fetch your subscriber count directly from the YouTube Data API. Make sure your subscriber count is <strong>public</strong> in YouTube Studio.</p>
+      <label class="mn-elite-input-label" for="mnEliteYtHandle">Channel handle</label>
+      <input type="text" id="mnEliteYtHandle" class="mn-elite-input" placeholder="@yourhandle" autocomplete="off" spellcheck="false" />
+      <div id="mnEliteYtError" class="mn-elite-inline-error" hidden></div>
+      <button type="button" id="mnEliteYtSubmit" class="mn-elite-primary-btn">Verify my channel</button>
+    </div>
+
+    {% comment %} loading state {% endcomment %}
+    <div class="mn-elite-stage" data-stage="loading" hidden>
+      <div class="mn-elite-spinner" aria-hidden="true"></div>
+      <h2 class="mn-elite-title">Verifying your influence…</h2>
+      <p class="mn-elite-sub">We're talking to the platform's official API. This usually takes a few seconds.</p>
+    </div>
+
+    {% comment %} upgraded (success) {% endcomment %}
+    <div class="mn-elite-stage" data-stage="upgraded" hidden>
+      <div class="mn-elite-success-burst" aria-hidden="true">★</div>
+      <h2 class="mn-elite-title">Welcome to the Elite Tier.</h2>
+      <p class="mn-elite-sub" id="mnEliteUpgradedSub">Your commission is now <strong>40%</strong> on every sale, retroactive from today.</p>
+      <div class="mn-elite-stats">
+        <div class="mn-elite-stat"><em>Verified followers</em><strong id="mnEliteUpgradedFollowers">—</strong></div>
+        <div class="mn-elite-stat"><em>Platform</em><strong id="mnEliteUpgradedPlatform">—</strong></div>
+        <div class="mn-elite-stat"><em>New commission</em><strong>40%</strong></div>
+      </div>
+      <button type="button" class="mn-elite-primary-btn" data-elite-close>Back to dashboard</button>
+    </div>
+
+    {% comment %} keep_growing {% endcomment %}
+    <div class="mn-elite-stage" data-stage="keep_growing" hidden>
+      <div class="mn-elite-progress-wrap">
+        <svg class="mn-elite-progress-ring" viewBox="0 0 120 120" width="120" height="120" aria-hidden="true">
+          <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="8"/>
+          <circle id="mnEliteProgressFg" cx="60" cy="60" r="52" fill="none" stroke="#39A596" stroke-width="8" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="326.7" transform="rotate(-90 60 60)"/>
+        </svg>
+        <div class="mn-elite-progress-num" id="mnEliteProgressPct">0%</div>
+      </div>
+      <h2 class="mn-elite-title">You're on the path.</h2>
+      <p class="mn-elite-sub" id="mnEliteKeepMessage">Keep creating — you're closer than you think.</p>
+      <div class="mn-elite-stats">
+        <div class="mn-elite-stat"><em>Current followers</em><strong id="mnEliteKeepFollowers">—</strong></div>
+        <div class="mn-elite-stat"><em>To reach Elite</em><strong id="mnEliteKeepRemaining">—</strong></div>
+      </div>
+      <div class="mn-elite-stage-actions">
+        <button type="button" class="mn-elite-secondary-btn" data-elite-back>Try another platform</button>
+        <button type="button" class="mn-elite-primary-btn" data-elite-close>Got it</button>
+      </div>
+    </div>
+
+    {% comment %} error {% endcomment %}
+    <div class="mn-elite-stage" data-stage="error" hidden>
+      <div class="mn-elite-error-icon" aria-hidden="true">!</div>
+      <h2 class="mn-elite-title">Verification didn't go through.</h2>
+      <p class="mn-elite-sub" id="mnEliteErrorMsg">Account is private or invalid.</p>
+      <div class="mn-elite-stage-actions">
+        <button type="button" class="mn-elite-secondary-btn" data-elite-back>Try again</button>
+        <button type="button" class="mn-elite-primary-btn" data-elite-close>Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* ─── Elite banner ──────────────────────────────────────────────────────── */
+.mn-elite-banner {
+  position: relative; margin: 18px 0 28px; border-radius: 18px;
+  background: linear-gradient(135deg, rgba(57,165,150,0.12), rgba(57,165,150,0.04));
+  border: 1px solid rgba(57,165,150,0.35); overflow: hidden;
+  box-shadow: 0 20px 50px -30px rgba(57,165,150,0.45);
+}
+.mn-elite-banner[hidden] { display: none !important; }
+.mn-elite-banner-glow {
+  position:absolute; inset:-1px;
+  background: radial-gradient(circle at 12% 50%, rgba(57,165,150,0.35), transparent 50%);
+  pointer-events:none;
+}
+.mn-elite-banner-inner {
+  position: relative; display: flex; align-items: center; gap: 18px;
+  padding: 20px 24px;
+}
+.mn-elite-banner-icon {
+  flex-shrink:0; width: 46px; height: 46px; border-radius: 12px;
+  display:flex; align-items:center; justify-content:center;
+  background: rgba(57,165,150,0.18); color: #39A596;
+  border: 1px solid rgba(57,165,150,0.4);
+}
+.mn-elite-banner-copy { flex: 1; min-width: 0; }
+.mn-elite-banner-copy h3 {
+  font-family: 'Montserrat', sans-serif; font-size: 16px; font-weight: 700;
+  color: #fff; margin: 0 0 4px; letter-spacing: -0.2px;
+}
+.mn-elite-banner-copy p {
+  font-size: 13px; color: rgba(255,255,255,0.7); margin: 0; line-height: 1.5;
+}
+.mn-elite-banner-copy strong { color: #39A596; font-weight: 700; }
+.mn-elite-banner-cta {
+  flex-shrink: 0; display: inline-flex; align-items: center; gap: 8px;
+  padding: 11px 20px; border-radius: 10px; border: none; cursor: pointer;
+  font-family: 'Montserrat', sans-serif; font-size: 13px; font-weight: 700;
+  background: #39A596; color: #fff;
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+  white-space: nowrap;
+}
+.mn-elite-banner-cta:hover { background: #2d8a7d; transform: translateY(-1px); box-shadow: 0 8px 20px -8px rgba(57,165,150,0.6); }
+@media (max-width: 680px) {
+  .mn-elite-banner-inner { flex-direction: column; align-items: flex-start; gap: 14px; padding: 18px; }
+  .mn-elite-banner-cta   { width: 100%; justify-content: center; }
+}
+
+/* ─── Modal ────────────────────────────────────────────────────────────── */
+.mn-elite-modal {
+  position: fixed; inset: 0; z-index: 1000; display: none;
+  align-items: center; justify-content: center; padding: 16px;
+  font-family: 'Montserrat', sans-serif;
+}
+.mn-elite-modal.is-open { display: flex; }
+.mn-elite-backdrop {
+  position: absolute; inset: 0; background: rgba(5,7,12,0.7);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  animation: mnEliteFadeIn .2s ease;
+}
+.mn-elite-card {
+  position: relative; width: 100%; max-width: 520px;
+  background: linear-gradient(180deg, #14161d 0%, #0b0c10 100%);
+  border: 1px solid rgba(255,255,255,0.08); border-radius: 20px;
+  padding: 36px 32px 28px; color: #fff;
+  box-shadow: 0 40px 80px -20px rgba(0,0,0,0.7), 0 0 0 1px rgba(57,165,150,0.08);
+  animation: mnEliteSlideIn .25s cubic-bezier(.2,.9,.3,1);
+  max-height: calc(100vh - 32px); overflow-y: auto;
+}
+@keyframes mnEliteFadeIn { from { opacity: 0 } to { opacity: 1 } }
+@keyframes mnEliteSlideIn {
+  from { opacity: 0; transform: translateY(12px) scale(.98); }
+  to   { opacity: 1; transform: translateY(0)   scale(1); }
+}
+.mn-elite-close {
+  position: absolute; top: 14px; right: 14px; width: 32px; height: 32px;
+  border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: transparent;
+  color: rgba(255,255,255,0.6); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s ease;
+}
+.mn-elite-close:hover { background: rgba(255,255,255,0.05); color: #fff; }
+.mn-elite-back {
+  background: transparent; border: none; color: rgba(255,255,255,0.5);
+  font-size: 12px; font-family: inherit; cursor: pointer; padding: 0; margin-bottom: 14px;
+  text-align: left;
+}
+.mn-elite-back:hover { color: #39A596; }
+.mn-elite-eyebrow {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase;
+  color: #39A596; margin-bottom: 10px;
+}
+.mn-elite-title {
+  font-size: 22px; font-weight: 700; line-height: 1.25; letter-spacing: -0.3px;
+  margin: 0 0 10px;
+}
+.mn-elite-sub {
+  font-size: 13.5px; color: rgba(255,255,255,0.65); line-height: 1.6; margin: 0 0 18px;
+}
+.mn-elite-warning {
+  display: flex; align-items: flex-start; gap: 8px;
+  padding: 10px 12px; border-radius: 10px; font-size: 12px; line-height: 1.5;
+  background: rgba(249,180,71,0.08); color: #f9b447;
+  border: 1px solid rgba(249,180,71,0.22); margin-bottom: 20px;
+}
+.mn-elite-grid { display: grid; gap: 10px; grid-template-columns: 1fr; }
+@media (min-width: 520px) { .mn-elite-grid { grid-template-columns: 1fr 1fr; } }
+.mn-elite-platform-btn {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 14px; border-radius: 14px;
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+  cursor: pointer; font-family: inherit; color: inherit; text-align: left;
+  transition: all .18s ease;
+}
+.mn-elite-platform-btn:hover {
+  background: rgba(57,165,150,0.08); border-color: rgba(57,165,150,0.45);
+  transform: translateY(-1px);
+}
+.mn-elite-platform-btn[disabled] { opacity: .45; cursor: not-allowed; transform: none; }
+.mn-elite-platform-icon {
+  flex-shrink: 0; width: 38px; height: 38px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+}
+.mn-elite-platform-label { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.mn-elite-platform-label strong { font-size: 13.5px; font-weight: 600; color: #fff; }
+.mn-elite-platform-label em {
+  font-size: 11px; font-style: normal; color: rgba(255,255,255,0.5);
+}
+.mn-elite-platform-arrow { color: rgba(255,255,255,0.35); flex-shrink: 0; }
+.mn-elite-platform-btn:hover .mn-elite-platform-arrow { color: #39A596; }
+.mn-elite-fineprint {
+  font-size: 11px; color: rgba(255,255,255,0.4); margin: 20px 0 0; line-height: 1.55;
+}
+.mn-elite-fineprint strong { color: rgba(255,255,255,0.65); font-weight: 600; }
+
+.mn-elite-input-label {
+  font-size: 12px; color: rgba(255,255,255,0.6); font-weight: 500;
+  margin-bottom: 6px; display: block;
+}
+.mn-elite-input {
+  width: 100%; padding: 12px 14px; border-radius: 10px;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+  color: #fff; font-size: 14px; font-family: inherit; outline: none;
+  transition: border .15s, background .15s;
+}
+.mn-elite-input:focus { border-color: #39A596; background: rgba(57,165,150,0.06); }
+.mn-elite-inline-error {
+  color: #ef4444; font-size: 12px; margin: 8px 0 0;
+}
+.mn-elite-primary-btn, .mn-elite-secondary-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 13px 22px; border-radius: 11px; border: none; cursor: pointer;
+  font-family: inherit; font-size: 14px; font-weight: 700;
+  transition: all .15s ease; width: 100%; margin-top: 16px;
+}
+.mn-elite-primary-btn { background: #39A596; color: #fff; }
+.mn-elite-primary-btn:hover { background: #2d8a7d; transform: translateY(-1px); box-shadow: 0 10px 24px -12px rgba(57,165,150,0.6); }
+.mn-elite-secondary-btn {
+  background: transparent; color: rgba(255,255,255,0.75);
+  border: 1px solid rgba(255,255,255,0.12);
+}
+.mn-elite-secondary-btn:hover { border-color: #39A596; color: #fff; }
+
+.mn-elite-stage-actions { display: flex; gap: 10px; margin-top: 8px; }
+.mn-elite-stage-actions > * { flex: 1; margin-top: 8px; }
+
+.mn-elite-spinner {
+  width: 56px; height: 56px; border-radius: 50%;
+  border: 3px solid rgba(57,165,150,0.15); border-top-color: #39A596;
+  animation: mnEliteSpin 0.8s linear infinite; margin: 12px auto 20px;
+}
+@keyframes mnEliteSpin { to { transform: rotate(360deg); } }
+
+.mn-elite-success-burst {
+  width: 72px; height: 72px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px; color: #39A596;
+  background: radial-gradient(circle, rgba(57,165,150,0.25), rgba(57,165,150,0.03) 70%);
+  border: 2px solid rgba(57,165,150,0.5);
+  margin: 0 auto 20px; animation: mnElitePop .5s cubic-bezier(.2,.9,.3,1.4);
+}
+@keyframes mnElitePop { 0% { transform: scale(.4); opacity: 0 } 100% { transform: scale(1); opacity: 1 } }
+
+.mn-elite-error-icon {
+  width: 56px; height: 56px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; font-weight: 700; color: #ef4444;
+  background: rgba(239,68,68,0.1); border: 2px solid rgba(239,68,68,0.4);
+  margin: 0 auto 20px;
+}
+
+.mn-elite-stats {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0 4px;
+}
+.mn-elite-stat {
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 10px; padding: 12px 10px; text-align: center;
+}
+.mn-elite-stat em {
+  display: block; font-style: normal; font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.08em; color: rgba(255,255,255,0.45); margin-bottom: 4px;
+}
+.mn-elite-stat strong { font-size: 15px; font-weight: 700; color: #fff; }
+
+.mn-elite-progress-wrap { position: relative; width: 120px; height: 120px; margin: 0 auto 18px; }
+.mn-elite-progress-num {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-size: 22px; font-weight: 700; color: #39A596;
+}
+
+/* Celebrate the elite badge when it upgrades on the dashboard */
+.cd-tier-badge.mn-elite-flash {
+  background: linear-gradient(135deg, #39A596, #4ECDC4);
+  color: #fff; border: none; animation: mnEliteFlash 2.4s ease-in-out 2;
+}
+@keyframes mnEliteFlash {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(57,165,150,0.45); }
+  50%      { transform: scale(1.04); box-shadow: 0 0 0 10px rgba(57,165,150,0); }
+}
+</style>
+
+<script>
+(function () {
+  if (window.mnEliteVerificationInit) return;
+  window.mnEliteVerificationInit = true;
+
+  var CREATOR_API = {{ creator_api_base_url | json }};
+  var VERIFIER    = {{ social_verifier_url   | json }};
+  var CREATOR_ID  = {{ creator_id | json }};
+  if (!CREATOR_ID) return; // only logged-in creators can verify
+
+  var modal    = document.getElementById('mn-elite-verification-modal');
+  var openBtn  = document.getElementById('mnEliteOpenBtn');
+  var banner   = document.getElementById('mnEliteBanner');
+  if (!modal || !openBtn) return;
+
+  var popup = null;
+  var currentPlatform = null;
+
+  // ─── helpers ──────────────────────────────────────────────────────────────
+  function setStage(name) {
+    modal.querySelectorAll('.mn-elite-stage').forEach(function (el) {
+      el.hidden = el.getAttribute('data-stage') !== name;
+    });
+  }
+  function openModal(initialStage) {
+    setStage(initialStage || 'choose');
+    modal.classList.add('is-open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal() {
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    if (popup && !popup.closed) { try { popup.close(); } catch (_) {} }
+    popup = null;
+  }
+  function fmtN(n) {
+    n = Number(n) || 0;
+    if (n >= 1e6) return (n / 1e6).toFixed(1).replace(/\.0$/,'') + 'M';
+    if (n >= 1e3) return (n / 1e3).toFixed(1).replace(/\.0$/,'') + 'K';
+    return n.toLocaleString('en-IN');
+  }
+  function openPopup(url) {
+    var w = 560, h = 680;
+    var top  = Math.max(0, (screen.height - h) / 2);
+    var left = Math.max(0, (screen.width  - w) / 2);
+    return window.open(
+      url, 'mnSocialVerifier',
+      'width=' + w + ',height=' + h + ',top=' + top + ',left=' + left + ',resizable=yes,scrollbars=yes,noopener=no'
+    );
+  }
+
+  // ─── open / close wiring ─────────────────────────────────────────────────
+  openBtn.addEventListener('click', function () { openModal('choose'); });
+
+  modal.addEventListener('click', function (e) {
+    if (e.target.matches('[data-elite-close]')) closeModal();
+    if (e.target.matches('[data-elite-back]'))  setStage('choose');
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
+  });
+
+  // ─── platform picker ─────────────────────────────────────────────────────
+  modal.querySelectorAll('.mn-elite-platform-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var platform = btn.getAttribute('data-platform');
+      currentPlatform = platform;
+      if (platform === 'youtube') {
+        setStage('youtube');
+        setTimeout(function () {
+          var inp = document.getElementById('mnEliteYtHandle');
+          if (inp) inp.focus();
+        }, 50);
+        return;
+      }
+      launchOAuth(platform);
+    });
+  });
+
+  // ─── YouTube handle submission ───────────────────────────────────────────
+  var ytBtn = document.getElementById('mnEliteYtSubmit');
+  if (ytBtn) {
+    ytBtn.addEventListener('click', submitYouTube);
+  }
+  var ytInput = document.getElementById('mnEliteYtHandle');
+  if (ytInput) {
+    ytInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') submitYouTube(); });
+  }
+
+  async function submitYouTube() {
+    var handle = (document.getElementById('mnEliteYtHandle').value || '').trim();
+    var errEl  = document.getElementById('mnEliteYtError');
+    errEl.hidden = true;
+    if (!handle) {
+      errEl.textContent = 'Please enter your YouTube handle.';
+      errEl.hidden = false;
+      return;
+    }
+    currentPlatform = 'youtube';
+    setStage('loading');
+    try {
+      var r = await fetch(VERIFIER.replace(/\/+$/,'') + '/api/youtube/elite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ handle: handle, creator_id: CREATOR_ID })
+      });
+      var d = await r.json();
+      if (!d.success) throw new Error(d.error || 'Could not verify channel.');
+      await submitVerificationToken(d.verification_token);
+    } catch (e) {
+      showError(e.message || 'We could not verify that channel.');
+    }
+  }
+
+  // ─── OAuth popup + postMessage handshake (twitter / instagram / linkedin) ─
+  function launchOAuth(platform) {
+    setStage('loading');
+    var qs = new URLSearchParams({
+      creator_id:    CREATOR_ID,
+      opener_origin: window.location.origin
+    });
+    var url = VERIFIER.replace(/\/+$/,'') + '/api/' + platform + '/auth?' + qs.toString();
+
+    fetch(url, { credentials: 'omit' })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (!d.success || !d.authUrl) throw new Error(d.error || 'OAuth is not configured.');
+        popup = openPopup(d.authUrl);
+        if (!popup) throw new Error('Please allow popups for this site and retry.');
+      })
+      .catch(function (e) { showError(e.message); });
+  }
+
+  // Accept postMessages only from the known verifier origin.
+  var verifierOrigin;
+  try { verifierOrigin = new URL(VERIFIER).origin; } catch (_) { verifierOrigin = ''; }
+
+  window.addEventListener('message', function (e) {
+    if (verifierOrigin && e.origin !== verifierOrigin) return;
+    var msg = e.data;
+    if (!msg || msg.source !== 'mn-social-verifier') return;
+    if (!msg.ok) {
+      return showError(msg.error || 'Verification cancelled.');
+    }
+    if (!msg.verification_token) {
+      return showError('Verification succeeded but no token was returned.');
+    }
+    submitVerificationToken(msg.verification_token);
+  });
+
+  // ─── Backend handoff → /api/verify_social ────────────────────────────────
+  async function submitVerificationToken(token) {
+    setStage('loading');
+    try {
+      var r = await fetch(CREATOR_API.replace(/\/+$/,'') + '/api/verify_social', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ creator_id: CREATOR_ID, verification_token: token })
+      });
+      var d = await r.json();
+      if (!d.success) return showError(d.error || 'Verification failed.');
+      if (d.status === 'upgraded' || d.status === 'already_elite') return renderUpgraded(d);
+      if (d.status === 'keep_growing') return renderKeepGrowing(d);
+      showError('Unexpected response from server.');
+    } catch (e) {
+      showError(e.message || 'Network error. Please retry.');
+    }
+  }
+
+  // ─── Result renderers ────────────────────────────────────────────────────
+  function renderUpgraded(d) {
+    document.getElementById('mnEliteUpgradedFollowers').textContent = fmtN(d.followers);
+    document.getElementById('mnEliteUpgradedPlatform').textContent  = (d.platform || '').replace(/^\w/, function(c){return c.toUpperCase();});
+    document.getElementById('mnEliteUpgradedSub').innerHTML =
+      d.status === 'already_elite'
+        ? 'You are already an Elite Creator — we refreshed your stats.'
+        : 'Your commission is now <strong>40%</strong> on every sale, retroactive from today.';
+    setStage('upgraded');
+    applyEliteStateToDashboard({ followers: d.followers, platform: d.platform });
+  }
+
+  function renderKeepGrowing(d) {
+    var followers = Number(d.followers || 0);
+    var threshold = Number(d.threshold || 10000);
+    var pct       = Math.min(100, Math.round((followers / threshold) * 100));
+    var fg        = document.getElementById('mnEliteProgressFg');
+    if (fg) fg.setAttribute('stroke-dashoffset', String(326.7 * (1 - pct / 100)));
+    document.getElementById('mnEliteProgressPct').textContent  = pct + '%';
+    document.getElementById('mnEliteKeepFollowers').textContent = fmtN(followers);
+    document.getElementById('mnEliteKeepRemaining').textContent = fmtN(d.remaining || (threshold - followers));
+    document.getElementById('mnEliteKeepMessage').textContent   = d.message
+      || ('You have ' + followers.toLocaleString() + ' followers on ' + d.platform + '. Reach 10k to unlock Elite status!');
+    setStage('keep_growing');
+  }
+
+  function showError(msg) {
+    document.getElementById('mnEliteErrorMsg').textContent = msg || 'Something went wrong.';
+    setStage('error');
+  }
+
+  // ─── Dashboard state sync (hide banner, flip badge, bump commission) ─────
+  function applyEliteStateToDashboard(info) {
+    if (banner) banner.hidden = true;
+
+    var badge = document.getElementById('cd-tier-badge');
+    var text  = document.getElementById('cd-tier-text');
+    if (badge) {
+      badge.className = 'cd-tier-badge diamond mn-elite-flash';
+      badge.innerHTML = '<span>★</span> <span id="cd-tier-text">Elite Creator</span>';
+    } else if (text) { text.textContent = 'Elite Creator'; }
+
+    // Any dashboard surface that renders commission percentage
+    document.querySelectorAll('[data-creator-commission-pct]').forEach(function (el) {
+      el.textContent = '40%';
+    });
+  }
+
+  // ─── On load, if the dashboard already knows the creator is elite, hide banner
+  document.addEventListener('DOMContentLoaded', function () {
+    // 1) SessionStorage hint (set by onboarding or previous sessions)
+    try {
+      var just = JSON.parse(sessionStorage.getItem('mn_elite_state') || 'null');
+      if (just && just.is_elite) applyEliteStateToDashboard(just);
+    } catch (_) {}
+
+    // 2) Live check via the creator earnings/profile API (non-blocking)
+    fetch(CREATOR_API.replace(/\/+$/,'') + '/api/creator/earnings?creator_id=' + encodeURIComponent(CREATOR_ID))
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (!j || !j.success) return;
+        var s = j.stats || j.data || {};
+        if (s.is_elite || s.commission_tier === 'elite') {
+          applyEliteStateToDashboard(s);
+          try { sessionStorage.setItem('mn_elite_state', JSON.stringify({ is_elite: true })); } catch (_) {}
+        }
+      })
+      .catch(function () {});
+  });
+})();
+</script>
+
 {% schema %}
 {
   "name": "Creator Dashboard",
@@ -1465,6 +2084,13 @@ SECTION CONFIGURATION
       "id": "creator_api_base_url",
       "label": "Creator Economy API Base URL",
       "default": "https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app"
+    },
+    {
+      "type": "text",
+      "id": "social_verifier_url",
+      "label": "Social Verifier Base URL",
+      "info": "Deployed Node social-verifier (handles OAuth popups for Elite verification).",
+      "default": "https://social-verifier.vercel.app"
     },
     {
       "type": "checkbox",

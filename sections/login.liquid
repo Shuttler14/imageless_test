@@ -34,7 +34,25 @@
       >
         Login
       </button>
-      <a href="{{ routes.account_register_url }}" class="text-center block">Create an account</a>
+      {% comment %}
+        ─── Smart Auth Switch (in-card) ────────────────────────────────
+        Preserves `return_url` when users flip between Login ↔ Register.
+        Lives INSIDE the white card so it stacks below the submit button
+        on mobile instead of floating as a flex sibling next to the card
+        (the parent section is `flex justify-center`, so a sibling block
+        would get crushed into the narrow leftover column on phones).
+        The <script> at the bottom of this file reads ?return_url=... on
+        DOMContentLoaded and staples it to both this link AND a hidden
+        `return_to` input on the Shopify login form.
+      {% endcomment %}
+      <p class="text-center text-sm normal-font" style="color:#4b5563; margin-top:4px;">
+        Don&rsquo;t have an account?
+        <a
+          href="{{ routes.account_register_url }}"
+          id="mn-switch-to-register"
+          style="color:#39A596; font-weight:700; text-decoration:none; border-bottom:1px solid #39A596; padding-bottom:2px; margin-left:4px;"
+        >Create one here</a>
+      </p>
     </div>
   {% endform %}
 </div>
@@ -65,6 +83,33 @@
     </div>
   {% endform %}
 </div>
+
+<script>
+  // Smart Auth Switch — preserve ?return_url= across Login ↔ Register
+  // so the Auth-First flow from /pages/ai-studio never loses the
+  // eventual /checkout destination. Also stamps a hidden `return_to`
+  // input onto the Shopify customer_login form so the server-side
+  // post-auth redirect goes back to the studio / checkout.
+  document.addEventListener('DOMContentLoaded', function() {
+    var urlParams = new URLSearchParams(window.location.search);
+    var returnUrl = urlParams.get('return_url');
+
+    if (returnUrl) {
+      var registerLink = document.getElementById('mn-switch-to-register');
+      if (registerLink) {
+        registerLink.href = '{{ routes.account_register_url }}?return_url=' + encodeURIComponent(returnUrl);
+      }
+      var form = document.querySelector('form[action$="/account/login"]');
+      if (form && !form.querySelector('input[name="return_to"]')) {
+        var input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'return_to';
+        input.value = returnUrl;
+        form.appendChild(input);
+      }
+    }
+  });
+</script>
 
 <script>
   const passwordToggle = document.getElementById('password-toggle');
