@@ -243,104 +243,6 @@ Converts signed-in users to creators with brand setup and social verification
     line-height: 1.55;
   }
 
-  /* Social Links */
-  .cof-social-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-  }
-
-  @media (max-width: 600px) {
-    .cof-social-grid { grid-template-columns: 1fr; }
-  }
-
-  .cof-social-card {
-    background: rgba(255, 255, 255, 0.025);
-    border: 1px solid var(--cof-border);
-    border-radius: 14px;
-    padding: 16px;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 14px;
-    cursor: pointer;
-    transition: border-color 0.25s ease, background 0.25s ease;
-  }
-
-  .cof-social-card:hover {
-    border-color: rgba(57, 165, 150, 0.28);
-    background: rgba(57, 165, 150, 0.025);
-  }
-
-  .cof-social-card.connected {
-    border-color: rgba(34, 197, 94, 0.35);
-    background: rgba(34, 197, 94, 0.035);
-  }
-
-  .cof-social-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    flex-shrink: 0;
-  }
-
-  .cof-social-icon.instagram { background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
-  .cof-social-icon.youtube { background: #FF0000; }
-  .cof-social-icon.twitter { background: #000; border: 1px solid #333; }
-  .cof-social-icon.linkedin { background: #0077B5; }
-
-  .cof-social-info { flex: 1; min-width: 0; }
-  .cof-social-name { font-weight: 600; font-size: 14px; margin-bottom: 2px; letter-spacing: 0.01em; }
-  .cof-social-handle { font-size: 12px; color: var(--cof-text-muted); }
-  .cof-social-status {
-    font-size: 11px;
-    color: #5BC47A;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
-
-  .cof-social-input-wrapper {
-    display: none;
-    flex-basis: 100%;
-    width: 100%;
-    margin-top: 4px;
-    gap: 8px;
-  }
-
-  .cof-social-card.connecting .cof-social-input-wrapper {
-    display: flex;
-  }
-
-  .cof-social-input-wrapper .cof-input {
-    flex: 1;
-    padding: 11px 14px;
-    font-size: 14px;
-  }
-
-  .cof-connect-btn {
-    background: var(--cof-primary);
-    color: #fff;
-    border: none;
-    padding: 11px 20px;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: background 0.25s ease, transform 0.15s ease;
-    font-family: 'Montserrat', sans-serif;
-    white-space: nowrap;
-  }
-
-  .cof-connect-btn:hover { background: var(--cof-primary-dark); }
-  .cof-connect-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
   /* Secondary / outline button used for photo actions */
   .cof-btn-outline {
     background: rgba(255,255,255,0.02);
@@ -805,15 +707,6 @@ Converts signed-in users to creators with brand setup and social verification
     border-color: rgba(239, 68, 68, 0.55);
     box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
   }
-  .cof-social-hint {
-    flex-basis: 100%;
-    width: 100%;
-    color: rgba(255,255,255,0.5);
-    font-size: 11px;
-    margin: 2px 0 0;
-    line-height: 1.35;
-    letter-spacing: 0.01em;
-  }
 </style>
 
 <div class="cof-page">
@@ -836,13 +729,8 @@ Converts signed-in users to creators with brand setup and social verification
           <span class="cof-progress-label">Brand</span>
         </div>
         <div class="cof-progress-line"></div>
-        <div class="cof-progress-step" data-step="2">
-          <div class="cof-progress-dot">2</div>
-          <span class="cof-progress-label">Connect</span>
-        </div>
-        <div class="cof-progress-line"></div>
         <div class="cof-progress-step" data-step="3">
-          <div class="cof-progress-dot">3</div>
+          <div class="cof-progress-dot">2</div>
           <span class="cof-progress-label">Create</span>
         </div>
       </div>
@@ -879,10 +767,6 @@ Converts signed-in users to creators with brand setup and social verification
         <div class="cof-input-group">
           <label>Profile Picture</label>
           <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <button type="button" class="cof-btn-outline" onclick="cofUseInstagramPhoto()" style="flex: 1; min-width: 180px;">
-              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
-              Use Instagram photo
-            </button>
             <button type="button" class="cof-btn-outline" onclick="document.getElementById('cofPhotoUpload').click()" style="flex: 1; min-width: 180px;">
               <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0l-4 4m4-4l4 4M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
               Upload photo
@@ -902,12 +786,19 @@ Converts signed-in users to creators with brand setup and social verification
           </div>
         </div>
 
-        <button class="cof-cta-btn" onclick="cofNextStep(2)">
-          Continue <span class="arrow">→</span>
+        <button class="cof-cta-btn" id="cofCompleteBtn" onclick="cofCompleteOnboarding()">
+          Complete Setup <span class="arrow">→</span>
         </button>
       </div>
 
-      <!-- Step 2: Social Links -->
+      <!-- Step 2 (social verification) removed — Elite upgrade now lives on the dashboard. -->
+      {%- comment -%}
+        Legacy Step 2 (social verification) removed — Elite upgrade is now a
+        progressive-disclosure unlock on the creator dashboard (see
+        creator-dashboard-enhanced.liquid → #mn-elite-verification-modal).
+        Keeping this comment block as a marker in case anyone greps for it.
+      {%- endcomment -%}
+      {% if false %}
       <div class="cof-card cof-hidden" id="cofStep2">
         <span class="cof-card-kicker">Step 02 — Presence</span>
         <h3 class="cof-card-title">Connect your socials</h3>
@@ -995,6 +886,7 @@ Converts signed-in users to creators with brand setup and social verification
           </button>
         </div>
       </div>
+      {% endif %}
 
       <!-- Step 3: Create First Design -->
       <div class="cof-hidden" id="cofStep3">
@@ -1117,29 +1009,14 @@ const COF_API = '{{ creator_api_base_url }}';
 const COF_USER_ID = '{{ user_id }}';
 
 let cofCurrentStep = 1;
+// Legacy state removed — social verification lives on the dashboard now.
 let cofConnectedSocials = {};
 
-// Detect elite mode from URL
-const cofUrlParams = new URLSearchParams(window.location.search);
-const cofIsElite = cofUrlParams.get('type') === 'elite';
+// Elite-on-onboarding flow retired: creators always start as Standard (5%).
+// Keeping the flag as `false` so any legacy references are harmless.
+const cofIsElite = false;
 
-// On load: show elite banner if elite mode
 document.addEventListener('DOMContentLoaded', function() {
-  if (cofIsElite) {
-    const banner = document.getElementById('cofEliteBanner');
-    if (banner) banner.classList.remove('cof-hidden');
-    const subtext = document.getElementById('cofSocialSubtext');
-    if (subtext) subtext.textContent = 'Connect your platforms to verify your elite follower count. Any ONE qualifying platform is enough — connect all for maximum reach!';
-    // Update page header if present
-    const header = document.querySelector('.cof-header h1');
-    if (header) header.textContent = 'Apply as Elite Creator';
-    const headerP = document.querySelector('.cof-header p');
-    if (headerP) headerP.textContent = 'Verify your social following and unlock 30–45% commissions';
-    // Update complete button text
-    const completeBtn = document.querySelector('#cofStep2 .cof-cta-btn:last-child');
-    if (completeBtn) completeBtn.innerHTML = 'Verify &amp; Apply as Elite <span class="arrow">→</span>';
-  }
-
   // Load pending design
   loadPendingDesign();
 
@@ -1168,89 +1045,26 @@ document.getElementById('cofBrandName')?.addEventListener('input', function(e) {
 });
 
 function cofNextStep(step) {
-  if (cofCurrentStep === 1 && step === 2) {
-    const brandName = document.getElementById('cofBrandName').value.trim();
-    if (!brandName) {
-      alert('Please enter your brand name to continue');
-      return;
-    }
-  }
-
-  // Update progress indicators
-  document.querySelectorAll('.cof-progress-step').forEach((el, i) => {
+  // Update progress indicators — only dots that still exist in the DOM.
+  document.querySelectorAll('.cof-progress-step').forEach(function (el) {
+    var target = parseInt(el.getAttribute('data-step') || '0', 10);
     el.classList.remove('active', 'completed');
-    if (i + 1 < step) el.classList.add('completed');
-    if (i + 1 === step) el.classList.add('active');
+    if (target < step) el.classList.add('completed');
+    if (target === step) el.classList.add('active');
   });
 
-  // Hide all steps
-  ['cofStep1','cofStep2','cofStep3'].forEach(id => {
-    const el = document.getElementById(id);
+  // Hide all known step containers
+  ['cofStep1','cofStep2','cofStep3'].forEach(function (id) {
+    var el = document.getElementById(id);
     if (el) el.classList.add('cof-hidden');
   });
 
   // Show target step
-  const target = document.getElementById('cofStep' + step);
-  if (target) target.classList.remove('cof-hidden');
+  var targetEl = document.getElementById('cofStep' + step);
+  if (targetEl) targetEl.classList.remove('cof-hidden');
 
   cofCurrentStep = step;
   window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function cofToggleSocial(platform) {
-  const key = platform.charAt(0).toUpperCase() + platform.slice(1);
-  const card = document.getElementById('cof' + key + 'Card');
-  if (!card || card.classList.contains('connected')) return;
-  card.classList.toggle('connecting');
-}
-
-async function cofConnectSocial(platform) {
-  const key = platform.charAt(0).toUpperCase() + platform.slice(1);
-  const input = document.getElementById('cof' + key + 'Input');
-  const handle = input ? input.value.trim() : '';
-
-  if (!handle) {
-    alert('Please enter your ' + platform + ' handle');
-    return;
-  }
-
-  const btn = input.nextElementSibling;
-  if (btn) { btn.disabled = true; btn.textContent = 'Verifying...'; }
-
-  try {
-    const resp = await fetch(COF_API + '/api/creator/verification/connect-social', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id: COF_USER_ID, platform, handle })
-    });
-    const json = await resp.json();
-
-    if (json.success) {
-      const data = json.data || {};
-      cofConnectedSocials[platform] = { handle, followers: data.followers, verified: data.is_verified, commission_rate: data.commission_rate };
-      cofMarkSocialConnected(platform, handle, data.followers);
-    } else {
-      alert('Could not connect: ' + (json.error || 'Please try again'));
-      if (btn) { btn.disabled = false; btn.textContent = 'Connect'; }
-    }
-  } catch (e) {
-    // Demo/offline mode — mark as connected optimistically
-    cofConnectedSocials[platform] = { handle, verified: true };
-    cofMarkSocialConnected(platform, handle, null);
-  }
-}
-
-function cofMarkSocialConnected(platform, handle, followers) {
-  const key = platform.charAt(0).toUpperCase() + platform.slice(1);
-  const card = document.getElementById('cof' + key + 'Card');
-  const handleEl = document.getElementById('cof' + key + 'Handle');
-  const statusEl = document.getElementById('cof' + key + 'Status');
-  const btn = document.querySelector('#cof' + key + 'Card .cof-connect-btn');
-
-  if (card) { card.classList.remove('connecting'); card.classList.add('connected'); }
-  if (handleEl) handleEl.textContent = '@' + handle + (followers ? ' • ' + formatFollowers(followers) : '');
-  if (statusEl) statusEl.classList.remove('cof-hidden');
-  if (btn) btn.textContent = 'Connected ✓';
 }
 
 // ───────────────────────────────────────────────────────────────
@@ -1297,17 +1111,24 @@ function cofShowUniquenessError(fields, message) {
 });
 
 async function cofCompleteOnboarding() {
-  const brandName      = document.getElementById('cofBrandName')?.value?.trim() || 'My Brand';
+  const brandName      = document.getElementById('cofBrandName')?.value?.trim() || '';
   const narrativeName  = document.getElementById('cofNarrativeName')?.value?.trim() || (brandName + "'s Designs");
   const usernameInput  = document.getElementById('cofUsername')?.value?.trim() || '';
   const description    = document.getElementById('cofDescription')?.value?.trim() || '';
   const profilePhotoUrl = (window.COF_PROFILE_PHOTO_URL || document.getElementById('cofPhotoImg')?.src || '').trim();
-  let tier = cofIsElite ? 'Elite Creator' : 'Creator';
-  let commissionRate = cofIsElite ? 35 : 15;
+  // Everyone starts Standard. Elite is unlocked later on the dashboard.
+  let tier = 'Creator';
+  let commissionRate = 5;
+
+  // Minimal validation — the rest of uniqueness / format is enforced server-side.
+  if (!brandName) {
+    alert('Please enter your brand name to continue');
+    return;
+  }
 
   // Clear any prior error state and engage the loading state
   cofClearUniquenessErrors();
-  const submitBtn = document.querySelector('#cofStep2 .cof-cta-btn:last-child');
+  const submitBtn = document.getElementById('cofCompleteBtn');
   const submitBtnOriginalHTML = submitBtn ? submitBtn.innerHTML : '';
   if (submitBtn) {
     submitBtn.disabled = true;
@@ -1339,9 +1160,8 @@ async function cofCompleteOnboarding() {
         bio: description,
         profile_photo_url: profilePhotoUrl,
         avatar_url: profilePhotoUrl,
-        type: cofIsElite ? 'elite' : 'standard',
-        social_links: cofConnectedSocials,
-        primary_platform: Object.keys(cofConnectedSocials)[0] || null
+        type: 'standard',
+        commission_tier: 'standard'
       })
     });
 
