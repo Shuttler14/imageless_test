@@ -17,8 +17,8 @@ USAGE:
 SECTION CONFIGURATION
 ==================================================== {% endcomment %}
 
-{% assign api_base_url = section.settings.api_base_url | default: 'https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app' %}
-{% assign creator_api_base_url = section.settings.creator_api_base_url | default: 'https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app' %}
+{% assign api_base_url = section.settings.api_base_url | default: settings.creator_api_base | default: 'https://mynarrative-ai.vercel.app' %}
+{% assign creator_api_base_url = section.settings.creator_api_base_url | default: settings.creator_api_base | default: 'https://mynarrative-ai.vercel.app' %}
 {% assign social_verifier_url = section.settings.social_verifier_url | default: 'https://social-verifier.vercel.app' %}
 {% assign enable_debug = section.settings.enable_debug | default: false %}
 
@@ -992,7 +992,7 @@ SECTION CONFIGURATION
       <script>
       (function() {
         'use strict';
-        var CREATOR_API = 'https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app';
+        var CREATOR_API = 'https://mynarrative-ai.vercel.app';
         var CREATOR_ID  = '{{ customer.id }}';
         var REFRESH_MS  = 60000;
 
@@ -2077,13 +2077,13 @@ SECTION CONFIGURATION
       "type": "text",
       "id": "api_base_url",
       "label": "Main API Base URL",
-      "default": "https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app"
+      "default": "https://mynarrative-ai.vercel.app"
     },
     {
       "type": "text",
       "id": "creator_api_base_url",
       "label": "Creator Economy API Base URL",
-      "default": "https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app"
+      "default": "https://mynarrative-ai.vercel.app"
     },
     {
       "type": "text",
