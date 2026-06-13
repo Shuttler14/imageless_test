@@ -150,7 +150,7 @@ Two differences from the source:
   var pageParams = new URLSearchParams(window.location.search);
   var pageIntent = pageParams.get('intent') || '';
   var BYPASS_TOKENS_FOR_UPLOAD = pageIntent === 'creator_upload';
-  var CREATOR_API = 'https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app';
+  var CREATOR_API = 'https://mynarrative-ai-peach.vercel.app';
   var CREATOR_ID  = '{{ creator_id }}';
   var overlay     = document.getElementById('mnTokenGateOverlay');
   var badge       = document.getElementById('mnTokenBadge');
@@ -867,7 +867,21 @@ Two differences from the source:
   // ═══════════════════════════════════════════════════════════════════════════
   var DEFAULT_TSHIRT_VARIANT_ID =
     parseInt('{{ settings.default_tshirt_variant_id | default: "" }}', 10) || 0;
+  var DEFAULT_HOODIE_VARIANT_ID =
+    parseInt('{{ settings.default_hoodie_variant_id | default: "" }}', 10) || 0;
   var IS_LOGGED_IN = '{{ customer.id | default: "" }}' !== '';
+
+  function mnNormalizeProductType(value) {
+    var raw = String(value || '').toLowerCase();
+    if (raw.indexOf('hood') !== -1) return 'hoodie';
+    return 'tee';
+  }
+
+  function mnDefaultVariantForProductType(productType) {
+    return mnNormalizeProductType(productType) === 'hoodie'
+      ? (DEFAULT_HOODIE_VARIANT_ID || DEFAULT_TSHIRT_VARIANT_ID)
+      : DEFAULT_TSHIRT_VARIANT_ID;
+  }
 
   // ---------------------------------------------------------------------------
   // Consumer auth modal — lazy-mounted so it doesn't bloat the DOM unless used.
@@ -965,19 +979,23 @@ Two differences from the source:
   // into the register flow BEFORE invoking this helper.
   // ═══════════════════════════════════════════════════════════════════════
   window.mnOnConsumerDesignReady = function(designUuid, imageUrl, title, variantId, extraProps) {
-    var variant = variantId || DEFAULT_TSHIRT_VARIANT_ID;
+    var productType = mnNormalizeProductType(extraProps && extraProps._product_type);
+    var variant = variantId || mnDefaultVariantForProductType(productType);
 
     // Strict variant validation — required by the Auth-First spec.
     if (!variant || variant === 0 || variant === '0') {
-      alert('Configuration Error: Default T-Shirt Variant ID is missing in Theme Settings. Please add it via the Theme Editor.');
+      alert('Configuration Error: Default print product Variant ID is missing in Theme Settings. Please add it via the Theme Editor.');
       return;
     }
 
-    var properties = Object.assign({
+    var properties = Object.assign({}, extraProps || {}, {
       '_design_uuid':  designUuid || '',
       '_design_title': title      || 'My Design',
+      '_product_type': productType,
+      '_design_file_url': imageUrl || '',
+      '_design_preview_url': imageUrl || '',
       'Custom Design': imageUrl   || ''
-    }, extraProps || {});
+    });
 
     fetch('/cart/add.js', {
       method: 'POST',
@@ -1106,7 +1124,9 @@ Two differences from the source:
       var img   = (parsed && (parsed.image_url   || parsed.imageUrl)) || '';
       var title = (parsed && parsed.title)                             || 'My Design';
 
-      window.mnOnConsumerDesignReady(uuid, img, title);
+      window.mnOnConsumerDesignReady(uuid, img, title, null, {
+        '_product_type': (parsed && parsed.product_type) || 'tee'
+      });
       return;
     }
 
@@ -1142,7 +1162,9 @@ Two differences from the source:
     window.mnOnConsumerDesignReady(
       parsed.design_uuid || parsed.uuid     || '',
       parsed.image_url   || parsed.imageUrl || '',
-      parsed.title                          || 'My Design'
+      parsed.title                          || 'My Design',
+      null,
+      { '_product_type': parsed.product_type || 'tee' }
     );
   }
   if (document.readyState === 'loading') {
@@ -1581,7 +1603,7 @@ is unreachable, so the studio never becomes a dead-end.
   if ((upParams.get('intent') || '') === 'creator_upload') return;
 
   var CREATOR_API = (window.MN_CREATOR_API
-    || 'https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app');
+    || 'https://mynarrative-ai-peach.vercel.app');
   var CUSTOMER_ID = '{{ customer.id | default: "" }}';
 
   // Style variants we ask gpt-image-1 to render for step 3.

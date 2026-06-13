@@ -154,6 +154,11 @@
       {% endfor %}
 
       {% form 'product', product %}
+        {% assign mn_dtf_product_type = 'tee' %}
+        {% assign mn_dtf_product_type_source = product.type | append: ' ' | append: product.title | downcase %}
+        {% if mn_dtf_product_type_source contains 'hood' %}
+          {% assign mn_dtf_product_type = 'hoodie' %}
+        {% endif %}
         <input
           data-for="current-variant"
           type="hidden"
@@ -161,6 +166,11 @@
           value="{{ product.selected_or_first_available_variant.id }}"
           class=""
         >
+        <input type="hidden" name="properties[_design_uuid]" value="" data-mn-dtf-prop="design_uuid" data-mn-default-product-type="{{ mn_dtf_product_type }}" disabled>
+        <input type="hidden" name="properties[_product_type]" value="{{ mn_dtf_product_type }}" data-mn-dtf-prop="product_type" disabled>
+        <input type="hidden" name="properties[_design_file_url]" value="" data-mn-dtf-prop="design_file_url" disabled>
+        <input type="hidden" name="properties[_design_preview_url]" value="" data-mn-dtf-prop="design_preview_url" disabled>
+        <input type="hidden" name="properties[_design_title]" value="" data-mn-dtf-prop="design_title" disabled>
         <div class="flex flex-col gap-3 md:gap-5" data-for="product-variants-container">
           {% for product_option in product.options_with_values %}
             <div class="flex flex-col gap-1 md:gap-2">
@@ -419,6 +429,9 @@
           if (newProductContainer) {
             oldProductContainer.replaceWith(newProductContainer);
             addProductEvents(); // Re-attach all events including Wishlist
+            if (typeof window.mnApplyDTFDesignProperties === 'function') {
+              window.mnApplyDTFDesignProperties(newProductContainer);
+            }
             initSlider(selectedImagePosition);
           }
         }

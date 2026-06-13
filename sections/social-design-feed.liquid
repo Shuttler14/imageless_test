@@ -1,7 +1,9 @@
 ﻿{% liquid
   assign heading = section.settings.heading
   assign designs_per_page = section.settings.designs_per_page
-  assign api_endpoint = 'https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app/api/design/feed'
+  assign api_endpoint = 'https://mynarrative-ai-peach.vercel.app/api/design/feed'
+  assign default_tshirt_variant_id = settings.default_tshirt_variant_id | default: ''
+  assign default_hoodie_variant_id = settings.default_hoodie_variant_id | default: ''
 %}
 
 <style>
@@ -519,6 +521,8 @@
 <script>
   const API_ENDPOINT = '{{ api_endpoint }}';
   const DESIGNS_PER_PAGE = {{ designs_per_page }};
+  const DEFAULT_TSHIRT_VARIANT_ID = parseInt('{{ default_tshirt_variant_id }}', 10) || 0;
+  const DEFAULT_HOODIE_VARIANT_ID = parseInt('{{ default_hoodie_variant_id }}', 10) || 0;
   let currentPage = 1;
   let currentSort = 'latest';
   let currentFilter = 'all';
@@ -736,35 +740,44 @@
   }
 
   function addToCart(designUuid, title, creatorId, productType, color) {
-    const item = {
-      id: 12345678901, // Fixed variant ID for the shared product
-      quantity: 1,
-      properties: {
-        '_design_uuid': designUuid,
-        '_design_title': title,
-        '_creator_id': creatorId,
-        '_product_type': productType,
-        '_color': color
-      }
+    var normalizedType = String(productType || '').toLowerCase().indexOf('hood') !== -1 ? 'hoodie' : 'tee';
+    var variantId = normalizedType === 'hoodie'
+      ? (DEFAULT_HOODIE_VARIANT_ID || DEFAULT_TSHIRT_VARIANT_ID)
+      : DEFAULT_TSHIRT_VARIANT_ID;
+
+    if (!variantId || variantId === 0) {
+      showCartNotification('Configuration error: missing variant ID', true);
+      return;
+    }
+
+    var imageUrl = 'https://mynarrative-ai-peach.vercel.app/api/design/image/' + designUuid;
+
+    var properties = {
+      '_design_uuid': designUuid,
+      '_design_title': title,
+      '_design_file_url': imageUrl,
+      '_design_preview_url': imageUrl,
+      '_product_type': normalizedType,
+      '_creator_id': creatorId,
+      '_color': color,
+      'Custom Design': imageUrl
     };
 
     fetch('/cart/add.js', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        items: [item]
+        items: [{ id: variantId, quantity: 1, properties: properties }]
       })
     })
-    .then(response => {
+    .then(function(response) {
       if (!response.ok) throw new Error('Cart add failed');
       return response.json();
     })
-    .then(data => {
+    .then(function(data) {
       showCartNotification('Added to cart!');
     })
-    .catch(error => {
+    .catch(function(error) {
       console.error('Cart error:', error);
       showCartNotification('Error adding to cart. Please try again.', true);
     });

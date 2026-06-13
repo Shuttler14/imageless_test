@@ -367,7 +367,7 @@ Task 3 of My Narrative Design-to-Earn Pipeline
 (function() {
   'use strict';
 
-  const PROD_API = 'https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app';
+  const PROD_API = 'https://mynarrative-ai-peach.vercel.app';
 
   // ── Resolve design_id at runtime (URL > wrapper data-attr > section setting) ──
   // The outer template (page.creator-dashboard.liquid) parses ?design_id=<uuid>
@@ -477,10 +477,13 @@ Task 3 of My Narrative Design-to-Earn Pipeline
           properties: {
             '_design_uuid':  publishResult.unique_product_id || '',
             '_design_title': publishResult.title             || '',
+            '_design_file_url': publishResult.image_url || publishResult.design_image_url || '',
+            '_design_preview_url': publishResult.image_url || publishResult.design_image_url || '',
             '_creator_id':   creatorId,
             '_product_type': productType,
             '_color':        defaultColor,
             '_is_sample_kit': 'true',   // webhook reads this → +10 tokens
+            'Custom Design': publishResult.image_url || publishResult.design_image_url || ''
           }
         }]
       };
@@ -1235,7 +1238,7 @@ Task 3 of My Narrative Design-to-Earn Pipeline
       }
       try {
         const resp = await fetch(
-          `https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app/api/creator/earnings/summary?creator_id=${customerId}`,
+          `https://mynarrative-ai-peach.vercel.app/api/creator/earnings/summary?creator_id=${customerId}`,
           { headers: { 'Accept': 'application/json' } }
         );
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
@@ -1258,7 +1261,7 @@ Task 3 of My Narrative Design-to-Earn Pipeline
         // Fetch design data
         if (designId) {
           const designRes = await fetch(
-            `https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app/api/design/process?design_id=${encodeURIComponent(designId)}`
+            `https://mynarrative-ai-peach.vercel.app/api/design/process?design_id=${encodeURIComponent(designId)}`
           );
           if (designRes.ok) {
             this.state.designData = await designRes.json();
@@ -1269,7 +1272,7 @@ Task 3 of My Narrative Design-to-Earn Pipeline
         // Fetch creator profile
         if (customerId) {
           const profileRes = await fetch(
-            `https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app/api/creator/profile?user_id=${encodeURIComponent(customerId)}`
+            `https://mynarrative-ai-peach.vercel.app/api/creator/profile?user_id=${encodeURIComponent(customerId)}`
           );
           if (profileRes.ok) {
             this.state.creatorProfile = await profileRes.json();
@@ -1515,6 +1518,7 @@ Task 3 of My Narrative Design-to-Earn Pipeline
       const productType     = publishResult.product_type;
       const title           = publishResult.title;
       const creatorId       = '{{ customer.id }}';
+      const designImageUrl  = publishResult.image_url || publishResult.design_image_url || '';
 
       // Build preview cards for each selected color
       const colorCards = Object.entries(variantMap).map(([color, data]) => {
@@ -1527,9 +1531,12 @@ Task 3 of My Narrative Design-to-Earn Pipeline
             properties: {
               '_design_uuid':  uniqueProductId,
               '_design_title': title,
+              '_design_file_url': designImageUrl,
+              '_design_preview_url': designImageUrl,
               '_creator_id':   creatorId,
               '_product_type': productType,
-              '_color':        color
+              '_color':        color,
+              'Custom Design': designImageUrl
             }
           }]
         };

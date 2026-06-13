@@ -1,3 +1,132 @@
+window.MN_DTF = window.MN_DTF || {};
+
+(function () {
+    const DESIGN_TTL_MS = 2 * 60 * 60 * 1000;
+
+    function readJsonStorage(key) {
+        try {
+            const raw = localStorage.getItem(key) || sessionStorage.getItem(key);
+            return raw ? JSON.parse(raw) : null;
+        } catch (error) {
+            return null;
+        }
+    }
+
+    function isFreshDesign(payload) {
+        if (!payload) return false;
+        const savedAt = Number(payload.saved_at || payload.created_at_ms || payload.ts || 0);
+        if (!savedAt) return true;
+        return Date.now() - savedAt < DESIGN_TTL_MS;
+    }
+
+    function normalizeProductType(value, fallback) {
+        const raw = `${value || ''} ${fallback || ''}`.toLowerCase();
+        if (raw.includes('hood')) return 'hoodie';
+        if (raw.includes('tee') || raw.includes('t-shirt') || raw.includes('tshirt') || raw.includes('shirt')) return 'tee';
+        return 'tee';
+    }
+
+    function getUrlParam(names) {
+        const params = new URLSearchParams(window.location.search);
+        for (const name of names) {
+            const value = params.get(name);
+            if (value) return value;
+        }
+        return '';
+    }
+
+    function getStoredDesign() {
+        const candidates = [
+            readJsonStorage('mn_pending_design'),
+            readJsonStorage('mn_first_design'),
+            readJsonStorage('mn_uploaded_design')
+        ];
+        return candidates.find(isFreshDesign) || null;
+    }
+
+    function getDesignContext(root) {
+        const stored = getStoredDesign() || {};
+        const defaultTypeEl = (root || document).querySelector('[data-mn-default-product-type]');
+        const defaultType = defaultTypeEl ? defaultTypeEl.getAttribute('data-mn-default-product-type') : '';
+        const designUuid = getUrlParam(['_design_uuid', 'design_uuid', 'design_id', 'uuid']) ||
+            stored.design_uuid || stored.uuid || stored.design_id || '';
+        const imageUrl = getUrlParam(['_design_file_url', 'design_file_url', 'image_url', 'preview_url']) ||
+            stored.design_file_url || stored.image_url || stored.imageUrl || stored.asset_url || '';
+        const title = getUrlParam(['_design_title', 'design_title', 'title']) ||
+            stored.design_title || stored.title || '';
+        const productType = normalizeProductType(
+            getUrlParam(['_product_type', 'product_type']) || stored.product_type,
+            defaultType
+        );
+
+        return {
+            designUuid,
+            imageUrl,
+            title,
+            productType
+        };
+    }
+
+    function setHiddenInput(input, value, shouldDisableWhenBlank) {
+        if (!input) return;
+        input.value = value || '';
+        if (shouldDisableWhenBlank) {
+            input.disabled = !value;
+        }
+    }
+
+    function applyDTFDesignProperties(root) {
+        const scope = root || document;
+        const ctx = getDesignContext(scope);
+        const hasDesign = Boolean(ctx.designUuid);
+
+        scope.querySelectorAll('[data-mn-dtf-prop="design_uuid"]').forEach(input => {
+            setHiddenInput(input, ctx.designUuid, true);
+        });
+        scope.querySelectorAll('[data-mn-dtf-prop="product_type"]').forEach(input => {
+            setHiddenInput(input, ctx.productType, false);
+            input.disabled = !hasDesign;
+        });
+        scope.querySelectorAll('[data-mn-dtf-prop="design_file_url"]').forEach(input => {
+            setHiddenInput(input, ctx.imageUrl, true);
+        });
+        scope.querySelectorAll('[data-mn-dtf-prop="design_preview_url"]').forEach(input => {
+            setHiddenInput(input, ctx.imageUrl, true);
+        });
+        scope.querySelectorAll('[data-mn-dtf-prop="design_title"]').forEach(input => {
+            setHiddenInput(input, ctx.title, true);
+        });
+    }
+
+    window.mnGetDTFLineItemProperties = function (root) {
+        const ctx = getDesignContext(root || document);
+        if (!ctx.designUuid) return {};
+        return {
+            '_design_uuid': ctx.designUuid,
+            '_product_type': ctx.productType,
+            '_design_file_url': ctx.imageUrl,
+            '_design_preview_url': ctx.imageUrl,
+            '_design_title': ctx.title || 'My Design'
+        };
+    };
+
+    window.mnApplyDTFDesignProperties = applyDTFDesignProperties;
+
+    document.addEventListener('DOMContentLoaded', function () {
+        applyDTFDesignProperties(document);
+        const observer = new MutationObserver(function (mutations) {
+            mutations.forEach(function (mutation) {
+                mutation.addedNodes.forEach(function (node) {
+                    if (node && node.nodeType === 1) {
+                        applyDTFDesignProperties(node);
+                    }
+                });
+            });
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+    });
+})();
+
 const runWishlist = () => {
     const productPageWishlistBtn = document.querySelector(`[data-for="product-wishlist"]`);
     const productCardWishlistBtns = document.querySelectorAll(`[data-for="product-card-wishlist"]`);
