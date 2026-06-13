@@ -174,7 +174,7 @@
   // SINGLETON PATTERN: Ensure MNTryOn is only defined once
   if (!window.MNTryOn) {
     window.MNTryOn = {
-      api: "https://mynarrative-ai.vercel.app/api/virtual_try_on",
+      api: "https://mynarrative-vton.vercel.app/api/virtual_try_on",
       savedTwinUrl: null, // Cache Digital Twin URL
 
       open: async (id) => {
@@ -184,7 +184,7 @@
         {% if customer %}
         if (!MNTryOn.savedTwinUrl) {
           try {
-            const res = await fetch('https://mynarrative-ai.vercel.app/api/profile_manager', {
+            const res = await fetch('https://mynarrative-ai-peach.vercel.app/api/profile_manager', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({

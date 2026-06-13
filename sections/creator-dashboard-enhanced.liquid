@@ -17,8 +17,8 @@ USAGE:
 SECTION CONFIGURATION
 ==================================================== {% endcomment %}
 
-{% assign api_base_url = section.settings.api_base_url | default: settings.creator_api_base | default: 'https://mynarrative-ai.vercel.app' %}
-{% assign creator_api_base_url = section.settings.creator_api_base_url | default: settings.creator_api_base | default: 'https://mynarrative-ai.vercel.app' %}
+{% assign api_base_url = section.settings.api_base_url | default: settings.creator_api_base | default: 'https://mynarrative-ai-peach.vercel.app' %}
+{% assign creator_api_base_url = section.settings.creator_api_base_url | default: settings.creator_api_base | default: 'https://mynarrative-ai-peach.vercel.app' %}
 {% assign social_verifier_url = section.settings.social_verifier_url | default: 'https://social-verifier.vercel.app' %}
 {% assign enable_debug = section.settings.enable_debug | default: false %}
 
@@ -45,14 +45,6 @@ SECTION CONFIGURATION
     --cd-dark: #0a0a0a;
     --cd-card-bg: rgba(255, 255, 255, 0.03);
     --cd-border: rgba(255, 255, 255, 0.08);
-    --cd-focus-ring: 0 0 0 2px var(--cd-dark), 0 0 0 4px rgba(57, 165, 150, 0.55);
-    --cd-nav-sticky-top: 12px;
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    html {
-      scroll-behavior: smooth;
-    }
   }
 
   .cd-page {
@@ -117,83 +109,12 @@ SECTION CONFIGURATION
   }
 
   /* Main Container */
-  /* Skip link — first focus stop for keyboard / screen reader users */
-  .cd-skip-link {
-    position: absolute;
-    left: 16px;
-    top: -100px;
-    z-index: 9999;
-    padding: 12px 20px;
-    border-radius: 10px;
-    background: var(--cd-primary);
-    color: #fff;
-    font-size: 13px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: top 0.2s ease;
-    box-shadow: var(--cd-focus-ring);
-  }
-  .cd-skip-link:focus {
-    top: 16px;
-    outline: none;
-  }
-
   .cd-container {
     max-width: 1400px;
     margin: 0 auto;
     padding: 40px 24px;
     position: relative;
     z-index: 1;
-  }
-
-  /* In-page navigation — progressive disclosure for a long dashboard */
-  .cd-dash-nav {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 8px;
-    margin: 0 0 28px;
-    padding: 10px 12px;
-    position: sticky;
-    top: var(--cd-nav-sticky-top);
-    z-index: 5;
-    border-radius: 14px;
-    background: rgba(10, 10, 10, 0.72);
-    border: 1px solid var(--cd-border);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-  }
-  .cd-dash-nav a {
-    display: inline-flex;
-    align-items: center;
-    padding: 8px 14px;
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.55);
-    text-decoration: none;
-    border: 1px solid transparent;
-    transition: color 0.18s ease, background 0.18s ease, border-color 0.18s ease;
-  }
-  .cd-dash-nav a:hover {
-    color: #fff;
-    background: rgba(57, 165, 150, 0.12);
-    border-color: rgba(57, 165, 150, 0.25);
-  }
-  .cd-dash-nav a:focus-visible {
-    outline: none;
-    box-shadow: var(--cd-focus-ring);
-    color: #fff;
-  }
-
-  .cd-anchor-target {
-    scroll-margin-top: 96px;
-  }
-
-  main.cd-main {
-    outline: none;
   }
 
   /* Welcome Header */
@@ -541,23 +462,6 @@ SECTION CONFIGURATION
     border-color: rgba(57, 165, 150, 0.3);
     transform: translateX(4px);
   }
-  .cd-action-btn:focus-visible {
-    outline: none;
-    box-shadow: var(--cd-focus-ring);
-    border-color: rgba(57, 165, 150, 0.45);
-  }
-  button.cd-action-btn {
-    width: 100%;
-    font: inherit;
-    text-align: left;
-  }
-  button.cd-action-btn:disabled,
-  .cd-action-btn[aria-disabled="true"] {
-    opacity: 0.45;
-    cursor: not-allowed;
-    transform: none;
-    pointer-events: none;
-  }
 
   .cd-action-icon {
     width: 44px;
@@ -679,292 +583,206 @@ SECTION CONFIGURATION
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 16px;
-    flex-wrap: wrap;
-    margin-bottom: 22px;
-  }
-
-  .cd-products-header .cd-section-title {
-    margin-bottom: 0;
-    flex: 1 1 auto;
-    min-width: 0;
+    margin-bottom: 24px;
   }
 
   .cd-products-count {
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.55);
-    background: rgba(255, 255, 255, 0.06);
-    padding: 8px 16px;
-    border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    flex-shrink: 0;
-    white-space: nowrap;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.05);
+    padding: 6px 14px;
+    border-radius: 20px;
   }
 
-  /* Empty state — same language as stat / order cards (teal accent, no floating z-index border) */
+  /* Products Empty State - Beautiful Full-Width Card */
   .cd-products-empty {
     position: relative;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid var(--cd-border);
-    border-radius: 20px;
-    padding: 28px 24px 32px;
+    background: linear-gradient(135deg, rgba(20, 20, 30, 0.8), rgba(30, 20, 40, 0.8));
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    border-radius: 24px;
+    padding: 80px 60px;
+    text-align: center;
     overflow: hidden;
+    backdrop-filter: blur(10px);
   }
 
+  /* Gradient border effect */
   .cd-products-empty::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--cd-primary), var(--cd-purple));
-    opacity: 0.9;
-    border-radius: 20px 20px 0 0;
+    bottom: 0;
+    background: linear-gradient(135deg, var(--cd-primary), var(--cd-purple));
+    border-radius: 24px;
+    padding: 2px;
+    pointer-events: none;
+    z-index: -1;
   }
 
+  .cd-products-empty::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    right: 2px;
+    bottom: 2px;
+    background: linear-gradient(135deg, rgba(20, 20, 30, 0.9), rgba(30, 20, 40, 0.9));
+    border-radius: 22px;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  /* Animated glow effect */
   .cd-products-cta-glow {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: min(420px, 100%);
-    height: 280px;
-    background: radial-gradient(ellipse at center, rgba(57, 165, 150, 0.14) 0%, rgba(168, 85, 247, 0.06) 45%, transparent 70%);
-    pointer-events: none;
-    z-index: 0;
-    animation: cdEmptyGlow 4s ease-in-out infinite;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(57, 165, 150, 0.25) 0%, rgba(168, 85, 247, 0.15) 50%, transparent 100%);
+    animation: cdEmptyGlow 3s ease-in-out infinite;
+    filter: blur(60px);
   }
 
   @keyframes cdEmptyGlow {
-    0%, 100% { opacity: 0.55; transform: translate(-50%, -50%) scale(1); }
-    50% { opacity: 0.85; transform: translate(-50%, -50%) scale(1.03); }
+    0%, 100% { 
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 0.6;
+    }
+    50% { 
+      transform: translate(-50%, -50%) scale(1.15);
+      opacity: 0.9;
+    }
   }
 
   .cd-products-cta-content {
     position: relative;
     z-index: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    width: 100%;
-    max-width: 520px;
-    margin: 0 auto;
   }
 
   .cd-products-cta-icon {
-    width: 72px;
-    height: 72px;
-    margin: 0 auto 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 36px;
-    line-height: 1;
-    border-radius: 18px;
-    background: linear-gradient(135deg, rgba(57, 165, 150, 0.2), rgba(168, 85, 247, 0.12));
-    border: 1px solid rgba(57, 165, 150, 0.25);
+    font-size: 80px;
+    margin-bottom: 24px;
     animation: cdEmojiBounce 2.5s ease-in-out infinite;
+    display: inline-block;
   }
 
   @keyframes cdEmojiBounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-6px); }
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-15px) scale(1.1); }
   }
 
   .cd-products-empty h4 {
-    font-size: 22px;
-    font-weight: 700;
-    margin: 0 0 12px;
-    font-family: 'Montserrat', sans-serif;
-    letter-spacing: -0.02em;
-    line-height: 1.25;
-    color: #fff;
-    padding: 0 0 2px;
-    background: linear-gradient(135deg, #fff 0%, rgba(255, 255, 255, 0.88) 100%);
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, var(--cd-primary-light), var(--cd-gold));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    letter-spacing: -0.5px;
   }
 
   .cd-products-empty p {
-    font-size: 14px;
-    color: rgba(255, 255, 255, 0.62);
-    margin: 0 0 24px;
-    line-height: 1.65;
-    max-width: 420px;
-  }
-
-  .cd-products-empty-actions {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    width: 100%;
-    max-width: 360px;
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.75);
+    margin-bottom: 36px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.7;
+    letter-spacing: 0.3px;
   }
 
   .cd-products-cta-btn {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
     gap: 10px;
-    width: 100%;
-    max-width: 360px;
-    padding: 15px 28px;
-    background: linear-gradient(135deg, var(--cd-gold), #e8940c);
-    color: #0a0a0a;
-    font-size: 14px;
+    padding: 18px 44px;
+    background: linear-gradient(135deg, var(--cd-gold), #FFA500);
+    color: #000;
+    font-size: 17px;
     font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
     border: none;
-    border-radius: 12px;
+    border-radius: 50px;
     text-decoration: none;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    box-shadow: 0 8px 28px rgba(255, 215, 0, 0.22);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 8px 32px rgba(255, 215, 0, 0.35),
+                0 0 20px rgba(255, 215, 0, 0.2);
+    animation: cdPrimaryGlow 2s ease-in-out infinite;
     cursor: pointer;
   }
 
+  @keyframes cdPrimaryGlow {
+    0%, 100% { 
+      box-shadow: 0 8px 32px rgba(255, 215, 0, 0.35),
+                  0 0 20px rgba(255, 215, 0, 0.2);
+    }
+    50% { 
+      box-shadow: 0 12px 48px rgba(255, 215, 0, 0.5),
+                  0 0 30px rgba(255, 215, 0, 0.3);
+    }
+  }
+
   .cd-products-cta-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 36px rgba(255, 215, 0, 0.35);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 15px 60px rgba(255, 215, 0, 0.6),
+                0 0 40px rgba(255, 215, 0, 0.4);
   }
 
   .cd-products-cta-btn:active {
-    transform: translateY(0);
+    transform: translateY(-1px) scale(1.02);
   }
 
   .cd-products-cta-btn span {
-    font-size: 18px;
-    line-height: 1;
+    font-size: 22px;
   }
 
+  /* Secondary CTA Button */
   .cd-products-secondary-cta {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
     gap: 8px;
-    width: 100%;
-    max-width: 360px;
-    margin-top: 4px;
+    margin-top: 24px;
     color: var(--cd-primary-light);
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 600;
     text-decoration: none;
-    transition: background 0.2s ease, border-color 0.2s ease;
-    padding: 12px 20px;
-    border: 1px solid rgba(57, 165, 150, 0.35);
-    border-radius: 12px;
-    background: rgba(57, 165, 150, 0.06);
+    transition: all 0.3s ease;
+    padding: 12px 28px;
+    border: 1px solid rgba(57, 165, 150, 0.3);
+    border-radius: 50px;
+    background: rgba(57, 165, 150, 0.05);
   }
 
   .cd-products-secondary-cta:hover {
-    background: rgba(57, 165, 150, 0.12);
-    border-color: rgba(57, 165, 150, 0.55);
+    background: rgba(57, 165, 150, 0.15);
+    border-color: rgba(57, 165, 150, 0.6);
+    transform: translateX(4px);
   }
 
+  /* Helper text below button */
   .cd-products-helper-text {
-    margin: 0;
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.45);
-    letter-spacing: 0.04em;
-    line-height: 1.5;
-    text-align: center;
-    width: 100%;
+    margin-top: 20px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.5);
+    letter-spacing: 0.5px;
+    line-height: 1.6;
   }
 
   .cd-products-helper-text strong {
-    color: rgba(255, 255, 255, 0.65);
+    color: rgba(255, 255, 255, 0.7);
     font-weight: 600;
   }
 
   .cd-products-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 160px), 1fr));
-    gap: 16px;
-    align-items: stretch;
-  }
-
-  .cd-product-item {
-    display: flex;
-    flex-direction: column;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid var(--cd-border);
-    border-radius: 16px;
-    overflow: hidden;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  }
-  .cd-product-item:hover {
-    border-color: rgba(57, 165, 150, 0.28);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
-  }
-  .cd-product-item:focus-within {
-    border-color: rgba(57, 165, 150, 0.4);
-    box-shadow: var(--cd-focus-ring);
-  }
-  .cd-product-image {
-    flex-shrink: 0;
-    background: rgba(0, 0, 0, 0.25);
-  }
-  .cd-product-image img {
-    width: 100%;
-    aspect-ratio: 1;
-    object-fit: cover;
-    display: block;
-  }
-  .cd-product-info {
-    flex: 1;
-    padding: 14px 14px 16px;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    min-height: 0;
-  }
-  .cd-product-info h4 {
-    font-size: 14px;
-    font-weight: 600;
-    margin: 0 0 6px;
-    line-height: 1.35;
-    color: rgba(255, 255, 255, 0.95);
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-  .cd-product-info p {
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.5);
-    margin: 0;
-    margin-top: auto;
-  }
-
-  @media (max-width: 600px) {
-    .cd-products-card {
-      padding: 20px 16px;
-    }
-    .cd-products-header {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-    .cd-products-count {
-      align-self: flex-start;
-    }
-    .cd-products-empty {
-      padding: 24px 18px 28px;
-    }
-    .cd-products-empty h4 {
-      font-size: 19px;
-    }
-    .cd-products-cta-icon {
-      width: 64px;
-      height: 64px;
-      font-size: 32px;
-    }
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
   }
 
   .cd-hidden { display: none !important; }
@@ -1022,16 +840,6 @@ SECTION CONFIGURATION
     transform: translateY(-3px);
     box-shadow: 0 12px 40px rgba(57, 165, 150, 0.4);
   }
-  .cd-login-btn:focus-visible {
-    outline: none;
-    box-shadow: var(--cd-focus-ring);
-  }
-
-  .cd-products-cta-btn:focus-visible,
-  .cd-products-secondary-cta:focus-visible {
-    outline: none;
-    box-shadow: var(--cd-focus-ring);
-  }
 
   /* Animations */
   @keyframes fadeInUp {
@@ -1045,28 +853,12 @@ SECTION CONFIGURATION
     .cd-welcome { flex-direction: column; align-items: flex-start; }
     .cd-welcome-text h1 { font-size: 22px; }
     .cd-stat-value { font-size: 26px; }
-    .cd-dash-nav { gap: 6px; padding: 8px 10px; }
-    .cd-dash-nav a { padding: 7px 14px; font-size: 11px; }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .cd-shape { animation: none !important; }
-    .cd-products-cta-glow,
-    .cd-products-cta-icon {
-      animation: none !important;
-    }
-    .cd-stat-card:hover {
-      transform: none;
-    }
-    html {
-      scroll-behavior: auto;
-    }
   }
 </style>
 
 <div class="cd-page">
   <!-- Background Shapes -->
-  <div class="cd-bg-shapes" aria-hidden="true">
+  <div class="cd-bg-shapes">
     <div class="cd-shape cd-shape-1"></div>
     <div class="cd-shape cd-shape-2"></div>
     <div class="cd-shape cd-shape-3"></div>
@@ -1074,8 +866,6 @@ SECTION CONFIGURATION
 
   <div class="cd-container">
     {% if is_logged_in %}
-    <a href="#cd-main-content" class="cd-skip-link">Skip to dashboard content</a>
-    <main id="cd-main-content" class="cd-main" tabindex="-1">
       <!-- Welcome Header -->
       <div class="cd-welcome">
         <div class="cd-welcome-left">
@@ -1099,16 +889,8 @@ SECTION CONFIGURATION
         </div>
       </div>
 
-      <nav class="cd-dash-nav" aria-label="Dashboard sections">
-        <a href="#cd-dash-overview">Overview</a>
-        <a href="#cdProductsSection">Products</a>
-        <a href="#cd-activity">Orders &amp; shortcuts</a>
-        <a href="#creator-activity-payouts">Payouts</a>
-        <a href="#cd-progress-section">Goals</a>
-      </nav>
-
       {% comment %} ═══════════════ ELITE CREATOR VERIFICATION ════════════════ {% endcomment %}
-      <div class="mn-elite-banner cd-anchor-target" id="mnEliteBanner" role="region" aria-label="Unlock Elite Status">
+      <div class="mn-elite-banner" id="mnEliteBanner" role="region" aria-label="Unlock Elite Status">
         <div class="mn-elite-banner-glow" aria-hidden="true"></div>
         <div class="mn-elite-banner-inner">
           <div class="mn-elite-banner-icon" aria-hidden="true">
@@ -1134,7 +916,7 @@ SECTION CONFIGURATION
         Stats are populated dynamically from /api/creator/earnings?creator_id={{ customer.id }}
         Removing Shopify Metafield dependency — all data comes from Supabase via the API.
       {%- endcomment -%}
-      <div class="cd-stats-grid cd-anchor-target" id="cd-dash-overview" aria-label="Earnings and tier overview">
+      <div class="cd-stats-grid" id="cdStatsGrid">
         <!-- Card 1: Total Earnings / Available Balance -->
         <div class="cd-stat-card">
           <div class="cd-stat-icon">💰</div>
@@ -1210,7 +992,7 @@ SECTION CONFIGURATION
       <script>
       (function() {
         'use strict';
-        var CREATOR_API = {{ creator_api_base_url | json }};
+        var CREATOR_API = 'https://mynarrative-ai-peach.vercel.app';
         var CREATOR_ID  = '{{ customer.id }}';
         var REFRESH_MS  = 60000;
 
@@ -1273,31 +1055,13 @@ SECTION CONFIGURATION
                   ? tp.sales_to_next_tier + ' sales to ' + tp.next_tier
                   : '💎 Top tier!';
               }
-              var mpl = document.getElementById('cd-monthly-progress-label');
-              var mbar = document.getElementById('cdMonthlyProgressBar');
-              var mctr = document.getElementById('cdMonthlyProgressContainer');
-              if (mpl) {
-                mpl.textContent = tp.next_tier
-                  ? ('Next tier: ' + tp.next_tier + (tp.sales_to_next_tier != null ? ' · ' + tp.sales_to_next_tier + ' sales to go' : ''))
-                  : 'You are at the top tier — keep creating.';
-              }
-              var pct = 65;
-              if (tp.sales_to_next_tier != null && tp.sales_to_next_tier > 0 && tp.current_tier_sales != null) {
-                var total = tp.current_tier_sales + tp.sales_to_next_tier;
-                if (total > 0) pct = Math.min(100, Math.round((tp.current_tier_sales / total) * 100));
-              }
-              if (mbar) mbar.style.width = pct + '%';
-              if (mctr) mctr.setAttribute('aria-valuenow', String(pct));
             }
 
             // Update header tier badge if present
-            var badge = document.getElementById('cd-tier-badge');
-            var tierText = document.getElementById('cd-tier-text');
+            var badge = document.getElementById('cdHeaderTierBadge');
             if (badge) {
               badge.className = 'cd-tier-badge ' + tier.toLowerCase();
-              badge.innerHTML = tierCfg.icon + ' <span id="cd-tier-text">' + tier + ' Creator</span>';
-            } else if (tierText) {
-              tierText.textContent = tier + ' Creator';
+              badge.innerHTML = tierCfg.icon + ' ' + tier;
             }
 
             // Card 5: Narrative Tokens
@@ -1347,7 +1111,7 @@ SECTION CONFIGURATION
       </script>
 
       <!-- Products Section -->
-      <div class="cd-products-section cd-anchor-target" id="cdProductsSection">
+      <div class="cd-products-section" id="cdProductsSection">
         <div class="cd-products-card">
           <div class="cd-products-header">
             <h3 class="cd-section-title">🎨 Your Products</h3>
@@ -1358,20 +1122,18 @@ SECTION CONFIGURATION
           <div class="cd-products-empty" id="cdProductsEmpty">
             <div class="cd-products-cta-glow"></div>
             <div class="cd-products-cta-content">
-              <div class="cd-products-cta-icon" aria-hidden="true">🎨</div>
-              <h4>Your creative journey starts here</h4>
-              <p>You have not uploaded any designs yet. Every strong creator began with a first drop — make yours count.</p>
-              <div class="cd-products-empty-actions">
-                <a href="/pages/become-creator#bcIntentModal" class="cd-products-cta-btn">
-                  <span aria-hidden="true">✨</span> Upload my first design
-                </a>
-                <p class="cd-products-helper-text">
-                  <strong>Takes under 2 minutes</strong> · <strong>Free to upload</strong> · <strong>Start earning</strong>
-                </p>
-                <a href="/collections/all" class="cd-products-secondary-cta">
-                  Explore design inspiration →
-                </a>
+              <div class="cd-products-cta-icon">🎨</div>
+              <h4>Your Creative Journey Starts Here</h4>
+              <p>You haven't uploaded any designs yet. Every top creator started with their very first design — make yours count!</p>
+              <a href="/pages/become-creator#bcIntentModal" class="cd-products-cta-btn">
+                <span>✨</span> Upload My First Design
+              </a>
+              <div class="cd-products-helper-text">
+                <strong>Takes less than 2 minutes</strong> • <strong>Free to upload</strong> • <strong>Start earning immediately</strong>
               </div>
+              <a href="/collections/all" class="cd-products-secondary-cta">
+                Explore Design Inspiration →
+              </a>
             </div>
           </div>
 
@@ -1381,7 +1143,7 @@ SECTION CONFIGURATION
       </div>
 
       <!-- Main Content -->
-      <div class="cd-main-grid cd-anchor-target" id="cd-activity">
+      <div class="cd-main-grid">
         <!-- Recent Orders -->
         <div class="cd-orders-card">
           <h3 class="cd-section-title">Recent Orders</h3>
@@ -1420,43 +1182,43 @@ SECTION CONFIGURATION
               </div>
             </a>
 
-            <a href="/account" class="cd-action-btn">
+            <a href="#" class="cd-action-btn">
               <div class="cd-action-icon analytics">📊</div>
               <div class="cd-action-text">
-                <h4>Account &amp; orders</h4>
-                <p>Order history and store credit in one place</p>
+                <h4>View Analytics</h4>
+                <p>Track your performance</p>
               </div>
             </a>
 
-            <a href="/account" class="cd-action-btn">
+            <a href="#" class="cd-action-btn">
               <div class="cd-action-icon payout">💳</div>
               <div class="cd-action-text">
-                <h4>Wallet &amp; payouts</h4>
-                <p>Manage how you get paid</p>
+                <h4>Request Payout</h4>
+                <p>Withdraw your earnings</p>
               </div>
             </a>
 
-            <button type="button" class="cd-action-btn" id="mnQuickEliteFromActions">
-              <div class="cd-action-icon social">✦</div>
+            <a href="#" class="cd-action-btn">
+              <div class="cd-action-icon social">🔗</div>
               <div class="cd-action-text">
-                <h4>Verify for Elite</h4>
-                <p>Unlock up to 40% commission with a quick reach check</p>
+                <h4>Social Links</h4>
+                <p>Connect your profiles</p>
               </div>
-            </button>
+            </a>
           </div>
         </div>
       </div>
 
       <!-- Progress & Rewards -->
-      <div class="cd-progress-section cd-anchor-target" id="cd-progress-section">
+      <div class="cd-progress-section">
         <div class="cd-progress-card">
           <div class="cd-progress-header">
-            <h3 class="cd-section-title" id="cdProgressHeading" style="margin-bottom: 0;">Tier progress</h3>
-            <span id="cd-monthly-progress-label" style="color: rgba(255,255,255,0.6); font-size: 14px;">Advancing through creator tiers as you sell</span>
+            <h3 class="cd-section-title" style="margin-bottom: 0;">Monthly Progress</h3>
+            <span style="color: rgba(255,255,255,0.6); font-size: 14px;">65% to Gold Tier</span>
           </div>
 
-          <div class="cd-progress-bar-container" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="65" aria-labelledby="cdProgressHeading" id="cdMonthlyProgressContainer">
-            <div class="cd-progress-bar" id="cdMonthlyProgressBar" style="width: 65%;"></div>
+          <div class="cd-progress-bar-container">
+            <div class="cd-progress-bar" style="width: 65%;"></div>
           </div>
 
           <div class="cd-progress-rewards">
@@ -1476,7 +1238,6 @@ SECTION CONFIGURATION
         </div>
       </div>
 
-    </main>
     {% else %}
       <!-- Not Logged In State -->
       <div class="cd-not-logged">
@@ -1498,6 +1259,14 @@ SECTION CONFIGURATION
 
   if (!customerId) return;
 
+  // Format number with commas
+  function formatNumber(num) {
+    if (num >= 1000) {
+      return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+    }
+    return num.toString();
+  }
+
   // Format currency
   function formatCurrency(num) {
     return '₹' + num.toLocaleString('en-IN');
@@ -1517,6 +1286,50 @@ SECTION CONFIGURATION
     if (diffDays === 1) return 'Yesterday';
     if (diffDays < 7) return diffDays + ' days ago';
     return date.toLocaleDateString('en-IN');
+  }
+
+  // Load creator stats
+  async function loadCreatorStats() {
+    try {
+      const resp = await fetch(API_BASE + '/api/creator/stats?user_id=' + customerId);
+      const json = await resp.json();
+      if (json.success && json.data) {
+        const stats = json.data;
+
+        // Update earnings
+        document.getElementById('cd-earnings').textContent = formatCurrency(stats.total_earnings || 0);
+        const earningsChange = document.getElementById('cd-earnings-change');
+        if (stats.earnings_change > 0) {
+          earningsChange.innerHTML = '<span>↑</span> +' + stats.earnings_change + '% from last month';
+          earningsChange.className = 'cd-stat-change positive';
+        } else if (stats.earnings_change < 0) {
+          earningsChange.innerHTML = '<span>↓</span> ' + stats.earnings_change + '% from last month';
+          earningsChange.className = 'cd-stat-change negative';
+        }
+
+        // Update designs sold
+        document.getElementById('cd-designs-sold').textContent = stats.designs_sold || 0;
+        const salesChange = document.getElementById('cd-sales-change');
+        if (stats.sales_change > 0) {
+          salesChange.innerHTML = '<span>↑</span> +' + stats.sales_change + '% from last month';
+        }
+
+        // Update rating
+        document.getElementById('cd-rating').textContent = stats.rating || 0;
+
+        // Update followers
+        document.getElementById('cd-followers').textContent = formatNumber(stats.followers || 0);
+        const followersChange = document.getElementById('cd-followers-change');
+        if (stats.followers_change > 0) {
+          followersChange.innerHTML = '<span>↑</span> +' + stats.followers_change + ' new';
+        }
+
+        // Update tier badge
+        updateTierBadge(stats.tier);
+      }
+    } catch (e) {
+      console.log('Using demo stats data');
+    }
   }
 
   // Update tier badge
@@ -1587,24 +1400,15 @@ SECTION CONFIGURATION
     }).join('');
   }
 
-  // Initialize (/api/creator/earnings in the inline block above is the single source of truth for the stat cards)
+  // Initialize
   document.addEventListener('DOMContentLoaded', function() {
-    var skip = document.querySelector('.cd-skip-link');
-    if (skip) {
-      skip.addEventListener('click', function () {
-        requestAnimationFrame(function () {
-          var mainEl = document.getElementById('cd-main-content');
-          if (mainEl) mainEl.focus();
-        });
-      });
-    }
-
+    loadCreatorStats();
     loadRecentOrders();
     loadProducts();
 
     // Check if coming from onboarding
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('new') === 'true' || urlParams.get('first_time') === '1') {
+    if (urlParams.get('new') === 'true') {
       // Scroll to products section
       setTimeout(() => {
         const productsSection = document.getElementById('cdProductsSection');
@@ -1844,10 +1648,6 @@ SECTION CONFIGURATION
   white-space: nowrap;
 }
 .mn-elite-banner-cta:hover { background: #2d8a7d; transform: translateY(-1px); box-shadow: 0 8px 20px -8px rgba(57,165,150,0.6); }
-.mn-elite-banner-cta:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px #0a0a0a, 0 0 0 4px rgba(57,165,150,0.65);
-}
 @media (max-width: 680px) {
   .mn-elite-banner-inner { flex-direction: column; align-items: flex-start; gap: 14px; padding: 18px; }
   .mn-elite-banner-cta   { width: 100%; justify-content: center; }
@@ -1887,10 +1687,6 @@ SECTION CONFIGURATION
   transition: all .15s ease;
 }
 .mn-elite-close:hover { background: rgba(255,255,255,0.05); color: #fff; }
-.mn-elite-close:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px #14161d, 0 0 0 4px rgba(57,165,150,0.55);
-}
 .mn-elite-back {
   background: transparent; border: none; color: rgba(255,255,255,0.5);
   font-size: 12px; font-family: inherit; cursor: pointer; padding: 0; margin-bottom: 14px;
@@ -1939,10 +1735,6 @@ SECTION CONFIGURATION
 }
 .mn-elite-platform-arrow { color: rgba(255,255,255,0.35); flex-shrink: 0; }
 .mn-elite-platform-btn:hover .mn-elite-platform-arrow { color: #39A596; }
-.mn-elite-platform-btn:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px #0b0c10, 0 0 0 4px rgba(57,165,150,0.55);
-}
 .mn-elite-fineprint {
   font-size: 11px; color: rgba(255,255,255,0.4); margin: 20px 0 0; line-height: 1.55;
 }
@@ -1970,11 +1762,6 @@ SECTION CONFIGURATION
 }
 .mn-elite-primary-btn { background: #39A596; color: #fff; }
 .mn-elite-primary-btn:hover { background: #2d8a7d; transform: translateY(-1px); box-shadow: 0 10px 24px -12px rgba(57,165,150,0.6); }
-.mn-elite-primary-btn:focus-visible,
-.mn-elite-secondary-btn:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px #0b0c10, 0 0 0 4px rgba(57,165,150,0.55);
-}
 .mn-elite-secondary-btn {
   background: transparent; color: rgba(255,255,255,0.75);
   border: 1px solid rgba(255,255,255,0.12);
@@ -2037,12 +1824,6 @@ SECTION CONFIGURATION
   0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(57,165,150,0.45); }
   50%      { transform: scale(1.04); box-shadow: 0 0 0 10px rgba(57,165,150,0); }
 }
-@media (prefers-reduced-motion: reduce) {
-  .mn-elite-modal .mn-elite-card { animation: none; }
-  .mn-elite-backdrop { animation: none; }
-  .mn-elite-spinner { animation: none; border-top-color: #39A596; }
-  .mn-elite-success-burst { animation: none; }
-}
 </style>
 
 <script>
@@ -2062,7 +1843,6 @@ SECTION CONFIGURATION
 
   var popup = null;
   var currentPlatform = null;
-  var lastEliteOpenTrigger = null;
 
   // ─── helpers ──────────────────────────────────────────────────────────────
   function setStage(name) {
@@ -2075,10 +1855,6 @@ SECTION CONFIGURATION
     modal.classList.add('is-open');
     modal.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
-    setTimeout(function () {
-      var c = modal.querySelector('.mn-elite-close');
-      if (c) c.focus();
-    }, 80);
   }
   function closeModal() {
     modal.classList.remove('is-open');
@@ -2086,8 +1862,6 @@ SECTION CONFIGURATION
     document.body.style.overflow = '';
     if (popup && !popup.closed) { try { popup.close(); } catch (_) {} }
     popup = null;
-    var refocus = lastEliteOpenTrigger || openBtn;
-    if (refocus) refocus.focus();
   }
   function fmtN(n) {
     n = Number(n) || 0;
@@ -2106,13 +1880,7 @@ SECTION CONFIGURATION
   }
 
   // ─── open / close wiring ─────────────────────────────────────────────────
-  openBtn.addEventListener('click', function () { lastEliteOpenTrigger = openBtn; openModal('choose'); });
-
-  var quickElite = document.getElementById('mnQuickEliteFromActions');
-  if (quickElite) {
-    quickElite.addEventListener('click', function () { lastEliteOpenTrigger = quickElite; openModal('choose'); });
-  }
-  window.mnOpenEliteVerification = function () { lastEliteOpenTrigger = null; openModal('choose'); };
+  openBtn.addEventListener('click', function () { openModal('choose'); });
 
   modal.addEventListener('click', function (e) {
     if (e.target.matches('[data-elite-close]')) closeModal();
@@ -2309,13 +2077,13 @@ SECTION CONFIGURATION
       "type": "text",
       "id": "api_base_url",
       "label": "Main API Base URL",
-      "default": "https://mynarrative-ai.vercel.app"
+      "default": "https://mynarrative-ai-peach.vercel.app"
     },
     {
       "type": "text",
       "id": "creator_api_base_url",
       "label": "Creator Economy API Base URL",
-      "default": "https://mynarrative-ai.vercel.app"
+      "default": "https://mynarrative-ai-peach.vercel.app"
     },
     {
       "type": "text",

@@ -10,16 +10,19 @@ Access: /pages/creator-dashboard
 <div class="creator-dashboard-page">
 
   {% comment %}
-  Primary experience: enhanced dashboard (welcome, Elite unlock, stat grid, products, orders).
-  Activity block below is transactions + payout only — no duplicate stat cards.
+  ═══════════════════════════════════════════════════════════════
+  CREATOR STATS DASHBOARD — Financial overview (always visible)
+  Shows: Total Earnings | Designs Sold | Tier Badge | Progress Bar
+  Auto-refreshes every 60s. Fetches from /api/creator/earnings.
+  ═══════════════════════════════════════════════════════════════
   {% endcomment %}
-  {% section 'creator-dashboard-enhanced' %}
-
   {%- if customer -%}
-  <div class="creator-stats-wrapper cd-anchor-target" id="creator-activity-payouts">
+  <div class="creator-stats-wrapper">
     {% section 'creator-stats-dashboard' %}
   </div>
   {%- endif -%}
+
+  {% section 'creator-dashboard-enhanced' %}
 </div>
 
 {% comment %}

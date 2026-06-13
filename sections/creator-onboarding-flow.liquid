@@ -6,8 +6,8 @@ Converts signed-in users to creators with brand setup and social verification
 =================================================================================
 {% endcomment %}
 
-{% assign api_base_url = section.settings.api_base_url | default: 'https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app' %}
-{% assign creator_api_base_url = section.settings.creator_api_base_url | default: 'https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app' %}
+{% assign api_base_url = section.settings.api_base_url | default: 'https://mynarrative-ai-peach.vercel.app' %}
+{% assign creator_api_base_url = section.settings.creator_api_base_url | default: 'https://mynarrative-ai-peach.vercel.app' %}
 {% assign is_logged_in = false %}
 {% if customer.id != blank %}
   {% assign is_logged_in = true %}
@@ -1387,7 +1387,7 @@ async function publishPendingDesign() {
   if (btn) { btn.disabled = true; btn.textContent = 'Publishing...'; }
 
   try {
-    var resp = await fetch('https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app/api/design/publish', {
+    var resp = await fetch('https://mynarrative-ai-peach.vercel.app/api/design/publish', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1549,13 +1549,13 @@ window.buyOwnDesign        = buyOwnDesign;
       "type": "text",
       "id": "api_base_url",
       "label": "Main API Base URL",
-      "default": "https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app"
+      "default": "https://mynarrative-ai-peach.vercel.app"
     },
     {
       "type": "text",
       "id": "creator_api_base_url",
       "label": "Creator Economy API Base URL",
-      "default": "https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app"
+      "default": "https://mynarrative-ai-peach.vercel.app"
     }
   ],
   "presets": [

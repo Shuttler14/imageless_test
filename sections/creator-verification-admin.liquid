@@ -6,8 +6,8 @@ Admin interface for reviewing creator applications with approve/reject actions
 =================================================================================
 {% endcomment %}
 
-{% assign api_base_url = section.settings.api_base_url | default: 'https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app' %}
-{% assign creator_api_base_url = section.settings.creator_api_base_url | default: 'https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app' %}
+{% assign api_base_url = section.settings.api_base_url | default: 'https://mynarrative-ai-peach.vercel.app' %}
+{% assign creator_api_base_url = section.settings.creator_api_base_url | default: 'https://mynarrative-ai-peach.vercel.app' %}
 {% assign is_logged_in = false %}
 {% assign is_admin = false %}
 {% if customer.id != blank %}
@@ -978,13 +978,13 @@ document.getElementById('cvRejectModal')?.addEventListener('click', function(e) 
       "type": "text",
       "id": "api_base_url",
       "label": "Main API Base URL",
-      "default": "https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app"
+      "default": "https://mynarrative-ai-peach.vercel.app"
     },
     {
       "type": "text",
       "id": "creator_api_base_url",
       "label": "Creator Economy API Base URL",
-      "default": "https://creator-economy-98sr4ud94-aryans-projects-af8c9a95.vercel.app"
+      "default": "https://mynarrative-ai-peach.vercel.app"
     }
   ],
   "presets": [
