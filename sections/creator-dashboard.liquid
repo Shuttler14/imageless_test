@@ -23,8 +23,8 @@ Customer must be logged in to view their dashboard.
 SECTION CONFIGURATION
 ===================================================== {% endcomment %}
 
-{% assign api_base_url = section.settings.api_base_url | default: 'https://mynarrative-ai-peach.vercel.app' %}
-{% assign creator_api_base_url = section.settings.creator_api_base_url | default: 'https://mynarrative-ai-peach.vercel.app' %}
+{% assign api_base_url = section.settings.api_base_url | default: 'https://drishti-api-blond.vercel.app' %}
+{% assign creator_api_base_url = section.settings.creator_api_base_url | default: 'https://drishti-api-blond.vercel.app' %}
 {% assign enable_debug = section.settings.enable_debug | default: false %}
 
 {% assign creator_id = customer.id | default: '' %}
@@ -1906,14 +1906,14 @@ SCHEMA SETTINGS
       "type": "text",
       "id": "api_base_url",
       "label": "Main API Base URL",
-      "default": "https://mynarrative-ai-peach.vercel.app",
+      "default": "https://drishti-api-blond.vercel.app",
       "info": "The base URL for main API (non-creator endpoints)"
     },
     {
       "type": "text",
       "id": "creator_api_base_url",
       "label": "Creator Economy API Base URL",
-      "default": "https://mynarrative-ai-peach.vercel.app",
+      "default": "https://drishti-api-blond.vercel.app",
       "info": "The base URL for creator economy API"
     },
     {

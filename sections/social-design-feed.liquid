@@ -1,7 +1,7 @@
 ﻿{% liquid
   assign heading = section.settings.heading
   assign designs_per_page = section.settings.designs_per_page
-  assign api_endpoint = 'https://mynarrative-ai-peach.vercel.app/api/design/feed'
+  assign api_endpoint = 'https://drishti-api-blond.vercel.app/api/design/feed'
   assign default_tshirt_variant_id = settings.default_tshirt_variant_id | default: ''
   assign default_hoodie_variant_id = settings.default_hoodie_variant_id | default: ''
 %}
@@ -750,7 +750,7 @@
       return;
     }
 
-    var imageUrl = 'https://mynarrative-ai-peach.vercel.app/api/design/image/' + designUuid;
+    var imageUrl = 'https://drishti-api-blond.vercel.app/api/design/image/' + designUuid;
 
     var properties = {
       '_design_uuid': designUuid,

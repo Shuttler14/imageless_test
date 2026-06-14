@@ -17,8 +17,8 @@ USAGE:
 SECTION CONFIGURATION
 ==================================================== {% endcomment %}
 
-{% assign api_base_url = section.settings.api_base_url | default: settings.creator_api_base | default: 'https://mynarrative-ai-peach.vercel.app' %}
-{% assign creator_api_base_url = section.settings.creator_api_base_url | default: settings.creator_api_base | default: 'https://mynarrative-ai-peach.vercel.app' %}
+{% assign api_base_url = section.settings.api_base_url | default: settings.creator_api_base | default: 'https://drishti-api-blond.vercel.app' %}
+{% assign creator_api_base_url = section.settings.creator_api_base_url | default: settings.creator_api_base | default: 'https://drishti-api-blond.vercel.app' %}
 {% assign social_verifier_url = section.settings.social_verifier_url | default: 'https://social-verifier.vercel.app' %}
 {% assign enable_debug = section.settings.enable_debug | default: false %}
 
@@ -992,7 +992,7 @@ SECTION CONFIGURATION
       <script>
       (function() {
         'use strict';
-        var CREATOR_API = 'https://mynarrative-ai-peach.vercel.app';
+        var CREATOR_API = 'https://drishti-api-blond.vercel.app';
         var CREATOR_ID  = '{{ customer.id }}';
         var REFRESH_MS  = 60000;
 
@@ -2077,13 +2077,13 @@ SECTION CONFIGURATION
       "type": "text",
       "id": "api_base_url",
       "label": "Main API Base URL",
-      "default": "https://mynarrative-ai-peach.vercel.app"
+      "default": "https://drishti-api-blond.vercel.app"
     },
     {
       "type": "text",
       "id": "creator_api_base_url",
       "label": "Creator Economy API Base URL",
-      "default": "https://mynarrative-ai-peach.vercel.app"
+      "default": "https://drishti-api-blond.vercel.app"
     },
     {
       "type": "text",

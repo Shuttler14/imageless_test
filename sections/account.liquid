@@ -1467,7 +1467,7 @@
   <script>
     // ─── MN_CONFIG fallback (widget section may not be loaded) ──
     window.MN_CONFIG = window.MN_CONFIG || {};
-    window.MN_CONFIG.physiqueApiUrl = window.MN_CONFIG.physiqueApiUrl || 'https://mynarrative-vton.vercel.app/api/physique_analyze';
+    window.MN_CONFIG.physiqueApiUrl = window.MN_CONFIG.physiqueApiUrl || 'https://drishti-api-blond.vercel.app/api/physique_analyze';
 
     // ─── Helpers ──────────────────────────────────────────────
     function getProfile()  { try { return JSON.parse(localStorage.getItem('mn_core_identity') || '{}'); } catch(e) { return {}; } }
@@ -2161,7 +2161,7 @@ function closeEditModal() { document.getElementById('mnEditModalOverlay').classL
         const emptyClosetActions = document.getElementById('mnEmptyClosetActions');
         try {
           const userId = (window.Shopify && window.Shopify.customer && window.Shopify.customer.id) || null;
-          const resp   = await fetch(`https://mynarrative-ai-peach.vercel.app/api/profile_manager?action=get_closet&user_id=${userId}`);
+          const resp   = await fetch(`https://drishti-api-blond.vercel.app/api/profile_manager?action=get_closet&user_id=${userId}`);
           const data   = await resp.json();
           const remoteItems = (data.success && Array.isArray(data.items)) ? data.items : [];
           const closetItems = remoteItems.length ? remoteItems : closet;
@@ -2336,7 +2336,7 @@ function closeEditModal() { document.getElementById('mnEditModalOverlay').classL
       const userId = '{{ customer.id }}' || 'guest';
       
       try {
-        const res = await fetch('https://mynarrative-ai-peach.vercel.app/api/user_profile/sync', {
+        const res = await fetch('https://drishti-api-blond.vercel.app/api/user_profile/sync', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -2367,7 +2367,7 @@ function closeEditModal() { document.getElementById('mnEditModalOverlay').classL
       if (loadingEl) loadingEl.classList.add('active');
       
       // Use configurable physique API URL or default to local dev
-      const PHYSIQUE_API_URL = (window.MN_CONFIG && window.MN_CONFIG.physiqueApiUrl) || 'https://mynarrative-vton.vercel.app/api/physique_analyze';
+      const PHYSIQUE_API_URL = (window.MN_CONFIG && window.MN_CONFIG.physiqueApiUrl) || 'https://drishti-api-blond.vercel.app/api/physique_analyze';
       const userId = '{{ customer.id }}' || 'guest';
       
       try {
@@ -4490,7 +4490,7 @@ async function uploadTwin(input) {
     const base64 = await toBase64(file);
     
     // Send to Vercel Backend
-    const res = await fetch('https://mynarrative-ai-peach.vercel.app/api/profile_manager', {
+    const res = await fetch('https://drishti-api-blond.vercel.app/api/profile_manager', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -4533,7 +4533,7 @@ function toBase64(file) {
 // Load existing Digital Twin on page load
 document.addEventListener('DOMContentLoaded', async () => {
   try {
-    const res = await fetch('https://mynarrative-ai-peach.vercel.app/api/profile_manager', {
+    const res = await fetch('https://drishti-api-blond.vercel.app/api/profile_manager', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

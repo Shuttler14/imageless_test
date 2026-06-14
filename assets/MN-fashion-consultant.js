@@ -28,9 +28,9 @@ const MNAIStylist = (() => {
 
   // NOTE: Stylist pipeline stays on mynarrative-ai.vercel.app (separate project, 10+ functions)
 // Creator economy endpoints use creator-economy-e5xehp13q-aryans-projects-af8c9a95.vercel.app
-const API_URL = window.MN_CONFIG?.apiUrl || 'https://mynarrative-vton.vercel.app/api/stylist_pipeline';
-const FASHION_CONSULTANT_URL = window.MN_CONFIG?.fashionConsultantUrl || 'https://mynarrative-ai-peach.vercel.app/api/fashion_consultant';
-const CREATOR_API_URL = window.MN_CONFIG?.creatorApiUrl || 'https://mynarrative-ai-peach.vercel.app';
+const API_URL = window.MN_CONFIG?.apiUrl || 'https://drishti-api-blond.vercel.app/api/stylist_pipeline';
+const FASHION_CONSULTANT_URL = window.MN_CONFIG?.fashionConsultantUrl || 'https://drishti-api-blond.vercel.app/api/fashion_consultant';
+const CREATOR_API_URL = window.MN_CONFIG?.creatorApiUrl || 'https://drishti-api-blond.vercel.app';
 
   // ── STATE ──────────────────────────────────────────────────────────────
   const state = {

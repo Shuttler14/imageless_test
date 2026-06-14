@@ -123,7 +123,7 @@ Checks creator's Narrative Tokens BEFORE allowing design generation.
   var pageParams = new URLSearchParams(window.location.search);
   var pageIntent = pageParams.get('intent') || '';
   var BYPASS_TOKENS_FOR_UPLOAD = pageIntent === 'creator_upload';
-  var CREATOR_API = 'https://mynarrative-ai-peach.vercel.app';
+  var CREATOR_API = 'https://drishti-api-blond.vercel.app';
   var CREATOR_ID  = '{{ creator_id }}';
   var overlay     = document.getElementById('mnTokenGateOverlay');
   var badge       = document.getElementById('mnTokenBadge');
@@ -1680,7 +1680,7 @@ is unreachable, so the studio never becomes a dead-end.
   if ((upParams.get('intent') || '') === 'creator_upload') return;
 
   var CREATOR_API = (window.MN_CREATOR_API
-    || 'https://mynarrative-ai-peach.vercel.app');
+    || 'https://drishti-api-blond.vercel.app');
   var CUSTOMER_ID = '{{ customer.id | default: "" }}';
 
   // Style variants we ask gpt-image-1 to render for step 3.

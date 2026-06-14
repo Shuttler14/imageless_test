@@ -367,7 +367,7 @@ Task 3 of My Narrative Design-to-Earn Pipeline
 (function() {
   'use strict';
 
-  const PROD_API = 'https://mynarrative-ai-peach.vercel.app';
+  const PROD_API = 'https://drishti-api-blond.vercel.app';
 
   // ── Resolve design_id at runtime (URL > wrapper data-attr > section setting) ──
   // The outer template (page.creator-dashboard.liquid) parses ?design_id=<uuid>
@@ -1238,7 +1238,7 @@ Task 3 of My Narrative Design-to-Earn Pipeline
       }
       try {
         const resp = await fetch(
-          `https://mynarrative-ai-peach.vercel.app/api/creator/earnings/summary?creator_id=${customerId}`,
+          `https://drishti-api-blond.vercel.app/api/creator/earnings/summary?creator_id=${customerId}`,
           { headers: { 'Accept': 'application/json' } }
         );
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
@@ -1261,7 +1261,7 @@ Task 3 of My Narrative Design-to-Earn Pipeline
         // Fetch design data
         if (designId) {
           const designRes = await fetch(
-            `https://mynarrative-ai-peach.vercel.app/api/design/process?design_id=${encodeURIComponent(designId)}`
+            `https://drishti-api-blond.vercel.app/api/design/process?design_id=${encodeURIComponent(designId)}`
           );
           if (designRes.ok) {
             this.state.designData = await designRes.json();
@@ -1272,7 +1272,7 @@ Task 3 of My Narrative Design-to-Earn Pipeline
         // Fetch creator profile
         if (customerId) {
           const profileRes = await fetch(
-            `https://mynarrative-ai-peach.vercel.app/api/creator/profile?user_id=${encodeURIComponent(customerId)}`
+            `https://drishti-api-blond.vercel.app/api/creator/profile?user_id=${encodeURIComponent(customerId)}`
           );
           if (profileRes.ok) {
             this.state.creatorProfile = await profileRes.json();

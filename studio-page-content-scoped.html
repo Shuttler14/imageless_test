@@ -730,7 +730,7 @@
     showLoading("GENERATING SLOGANS...", 4000);
     try {
       const complexTone = TONE_PROMPTS[state.toneKey] || "Motivational";
-      const res = await fetch('https://mynarrative-ai-peach.vercel.app/api/generate_slogans', {
+      const res = await fetch('https://drishti-api-blond.vercel.app/api/generate_slogans', {
         method: 'POST', headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ topic, tone: complexTone })
       });
@@ -748,7 +748,7 @@
     showLoading("REGENERATING SLOGANS...", 4000);
     try {
       const complexTone = TONE_PROMPTS[state.toneKey] || "Motivational";
-      const res = await fetch('https://mynarrative-ai-peach.vercel.app/api/generate_slogans', {
+      const res = await fetch('https://drishti-api-blond.vercel.app/api/generate_slogans', {
         method: 'POST', headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ topic: state.topic, tone: complexTone })
       });
@@ -833,7 +833,7 @@
         console.log('🎁 Sending gift context to AI:', state.giftContext);
       }
       
-      const res = await fetch('https://mynarrative-ai-peach.vercel.app/api/generate_design', {
+      const res = await fetch('https://drishti-api-blond.vercel.app/api/generate_design', {
         method: 'POST', headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(requestBody)
       });
@@ -948,7 +948,7 @@
         console.log('🎁 Sending gift context to AI (Side 2):', state.giftContext);
       }
       
-      const res = await fetch('https://mynarrative-ai-peach.vercel.app/api/generate_design', {
+      const res = await fetch('https://drishti-api-blond.vercel.app/api/generate_design', {
         method: 'POST', headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(requestBody)
       });
