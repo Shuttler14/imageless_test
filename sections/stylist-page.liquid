@@ -1,0 +1,30 @@
+{%- comment -%}
+  AI Stylist Page Section — renders the full-page wizard
+{%- endcomment -%}
+
+{{ 'MN-stylist-wizard-v4.css' | asset_url | stylesheet_tag }}
+{{ 'MN-price-comparison.css' | asset_url | stylesheet_tag }}
+
+<div class="mn4-fullpage" id="mn-stylist-page">
+  <div class="mn4-fullpage-header">
+    <a href="/" class="mn4-fullpage-logo">my<span>narrative</span></a>
+    <a href="/" class="mn4-fullpage-back">&larr; Back to Shop</a>
+  </div>
+  <div class="mn4-fullpage-body">
+    <div class="mn4-fullpage-card">
+      <div class="mn4-orb mn4-orb-1"></div>
+      <div class="mn4-orb mn4-orb-2"></div>
+      <div id="mn4-wizard"></div>
+    </div>
+  </div>
+</div>
+
+{{ 'MN-weather.js' | asset_url | script_tag }}
+{{ 'MN-stylist-wizard-v4.js' | asset_url | script_tag }}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    if (window.MN4) {
+      MN4.init(document.getElementById('mn4-wizard'));
+    }
+  });
+</script>

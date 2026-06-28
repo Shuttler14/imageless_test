@@ -1710,6 +1710,15 @@ function expandWidget() {
     minimized.style.display = 'none';
     minimized.classList.remove('mn-widget-attention');
   }
+  // v4.0: Route to new wizard if enabled
+  if (window.MN_CONFIG && window.MN_CONFIG.v4Enabled && window.MN4) {
+    var mn4Container = document.getElementById('mn-content-container');
+    if (mn4Container) {
+      mn4Container.innerHTML = '<div id="mn4-wizard"></div>';
+      MN4.init(document.getElementById('mn4-wizard'));
+      return;
+    }
+  }
   if (state.step <= 1 && !$('#mnw-step0-cta')) renderStep0();
 }
 

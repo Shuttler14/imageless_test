@@ -1,0 +1,10 @@
+{
+  "sections": {
+    "stylist": {
+      "type": "stylist-page"
+    }
+  },
+  "order": [
+    "stylist"
+  ]
+}

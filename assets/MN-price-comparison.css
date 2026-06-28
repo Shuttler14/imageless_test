@@ -1,0 +1,15 @@
+/* MN Price Comparison Component */
+.mn-price-compare{display:flex;flex-direction:column;gap:6px;padding:12px 0}
+.mn-price-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.03);transition:all .2s}
+.mn-price-row:hover{border-color:rgba(255,255,255,0.15);background:rgba(255,255,255,0.05)}
+.mn-price-row.best{border-color:rgba(57,165,150,0.3);background:rgba(57,165,150,0.05)}
+.mn-price-platform{width:80px;font-size:12px;font-weight:700;color:rgba(244,244,244,0.6);text-transform:capitalize}
+.mn-price-amount{flex:1;font-size:14px;font-weight:800;color:#fff}
+.mn-price-row.best .mn-price-amount{color:#39A596}
+.mn-price-tag{font-size:9px;font-weight:800;color:#000;background:#39A596;padding:2px 8px;border-radius:4px;letter-spacing:.05em}
+.mn-price-link{font-size:11px;font-weight:700;color:#39A596;text-decoration:none;border:1px solid rgba(57,165,150,0.3);padding:5px 12px;border-radius:6px;transition:all .2s;white-space:nowrap}
+.mn-price-link:hover{background:rgba(57,165,150,0.1)}
+.mn-price-offer{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;background:linear-gradient(135deg,rgba(168,85,247,0.08),rgba(236,72,153,0.08));border:1px solid rgba(168,85,247,0.15);margin-top:8px}
+.mn-price-offer-icon{font-size:16px}
+.mn-price-offer-text{font-size:11px;font-weight:600;color:#a855f7}
+.mn-price-offer-code{font-size:10px;font-weight:800;color:#ec4899;letter-spacing:.1em}

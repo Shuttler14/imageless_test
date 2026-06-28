@@ -1,0 +1,38 @@
+{%- comment -%}
+  MN Price Comparison Snippet
+  Usage: render 'mn-price-comparison', prices: prices_array, compact: false
+  prices: [{platform: 'myntra', amount: 2499, link: '#', best: true}, ...]
+{%- endcomment -%}
+{%- assign prices = prices | default: blank -%}
+{%- assign compact = compact | default: false -%}
+
+{%- if prices.size > 0 -%}
+<div class="mn-price-compare" data-mn-prices>
+  {%- for p in prices -%}
+    {%- if p.best -%}
+      {%- assign row_class = "mn-price-row best" -%}
+    {%- else -%}
+      {%- assign row_class = "mn-price-row" -%}
+    {%- endif -%}
+    <div class="{{ row_class }}">
+      <span class="mn-price-platform">{{ p.platform }}</span>
+      <span class="mn-price-amount">₹{{ p.amount }}</span>
+      {%- if p.best -%}
+        <span class="mn-price-tag">BEST</span>
+      {%- endif -%}
+      {%- if p.link != blank and p.link != '#' -%}
+        <a class="mn-price-link" href="{{ p.link }}" target="_blank" rel="noopener">Shop →</a>
+      {%- endif -%}
+    </div>
+  {%- endfor -%}
+
+  {%- if compact == false -%}
+    {%- comment -%} Bank offer banner {%- endcomment -%}
+    <div class="mn-price-offer">
+      <span class="mn-price-offer-icon">💳</span>
+      <span class="mn-price-offer-text">10% off with HDFC Credit Card</span>
+      <span class="mn-price-offer-code">Use: MNSTYLE10</span>
+    </div>
+  {%- endif -%}
+</div>
+{%- endif -%}

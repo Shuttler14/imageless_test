@@ -113,10 +113,17 @@
   </div>
 </div>
 
+<!-- v4.0 Assets -->
+<link rel="stylesheet" href="{{ 'MN-stylist-wizard-v4.css' | asset_url }}">
+<link rel="stylesheet" href="{{ 'MN-price-comparison.css' | asset_url }}">
+
 <script>
   window.MN_CONFIG = {
     apiUrl: "https://drishti-api-blond.vercel.app/api/stylist_pipeline",
-    studioUrl: "/pages/ai-studio"
+    studioUrl: "/pages/ai-studio",
+    stylistPageUrl: "/pages/stylist",
+    drishtiApi: "https://drishti-api.fly.dev",
+    v4Enabled: true
   };
   window.MN_STYLE_IMGS = {
     old_money_m:    '',
@@ -137,5 +144,7 @@
     power_suit_f:   ''
   };
 </script>
-<script src="{{ 'MN-fashion-consultant.js' | asset_url }}?v=3.0.1" defer></script>
-<link rel="stylesheet" href="{{ 'MN-fashion-consultant.css' | asset_url }}?v=3.0.1">
+<script src="{{ 'MN-weather.js' | asset_url }}" defer></script>
+<script src="{{ 'MN-stylist-wizard-v4.js' | asset_url }}" defer></script>
+<script src="{{ 'MN-fashion-consultant.js' | asset_url }}?v=4.0.0" defer></script>
+<link rel="stylesheet" href="{{ 'MN-fashion-consultant.css' | asset_url }}?v=4.0.0">

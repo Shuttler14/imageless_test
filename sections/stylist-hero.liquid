@@ -1,0 +1,118 @@
+{%- comment -%}
+  Stylist Hero Section — Featured on homepage
+  Shows CTA card to launch the AI Stylist
+{%- endcomment -%}
+
+<div class="mn-stylist-hero" id="mn-stylist-hero-{{ section.id }}">
+  <div class="mn4-orb mn4-orb-1"></div>
+  <div class="mn4-orb mn4-orb-2"></div>
+
+  <div class="mn-stylist-hero-content">
+    <div class="mn4-badge">AI Stylist</div>
+    <h2 class="mn-stylist-hero-title">
+      Your body. Your style. <span class="mn4-gradient-text">Your outfit — virtually tried on.</span>
+    </h2>
+    <p class="mn-stylist-hero-sub">
+      Upload your photo, pick an occasion, and see how outfits look on YOUR body before you buy.
+    </p>
+    <div class="mn-stylist-hero-stats">
+      <div class="mn-stylist-hero-stat">
+        <span class="mn-stylist-hero-stat-num">4</span>
+        <span class="mn-stylist-hero-stat-label">Clicks to try on</span>
+      </div>
+      <div class="mn-stylist-hero-stat">
+        <span class="mn-stylist-hero-stat-num">3</span>
+        <span class="mn-stylist-hero-stat-label">If you're back</span>
+      </div>
+      <div class="mn-stylist-hero-stat">
+        <span class="mn-stylist-hero-stat-num">∞</span>
+        <span class="mn-stylist-hero-stat-label">Outfits to explore</span>
+      </div>
+    </div>
+    <a href="/pages/stylist" class="mn4-cta mn-stylist-hero-cta">
+      Launch AI Stylist ✨
+    </a>
+  </div>
+</div>
+
+<style>
+  .mn-stylist-hero {
+    position: relative;
+    padding: 60px 24px;
+    text-align: center;
+    background: #0a0a0a;
+    border-radius: 24px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .mn-stylist-hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 560px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  .mn-stylist-hero-title {
+    font-size: 28px;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1.2;
+    letter-spacing: -0.03em;
+    margin: 0;
+  }
+  .mn-stylist-hero-sub {
+    font-size: 14px;
+    color: rgba(244,244,244,0.5);
+    line-height: 1.6;
+    margin: 0;
+  }
+  .mn-stylist-hero-stats {
+    display: flex;
+    gap: 32px;
+    margin-top: 8px;
+  }
+  .mn-stylist-hero-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .mn-stylist-hero-stat-num {
+    font-size: 28px;
+    font-weight: 900;
+    color: #39A596;
+    font-family: 'Space Mono', monospace;
+  }
+  .mn-stylist-hero-stat-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(244,244,244,0.35);
+  }
+  .mn-stylist-hero-cta {
+    margin-top: 8px;
+    font-size: 14px;
+    padding: 16px 32px;
+  }
+  @media (max-width: 480px) {
+    .mn-stylist-hero-title { font-size: 22px; }
+    .mn-stylist-hero-stats { gap: 20px; }
+    .mn-stylist-hero-stat-num { font-size: 22px; }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "AI Stylist Hero",
+  "tag": "section",
+  "class": "section-stylist-hero",
+  "settings": [],
+  "presets": [
+    { "name": "AI Stylist Hero" }
+  ]
+}
+{% endschema %}

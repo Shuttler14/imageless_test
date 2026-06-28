@@ -121,6 +121,21 @@
 <button type="button" class="mn-vton-trigger" onclick="MNTryOn.open('{{ unique_id }}')">
   <span style="font-size: 18px;">✨</span> TRY ON YOURSELF
 </button>
+{% if section.settings.enable_wizard_v4 %}
+<button type="button" class="mn-vton-trigger" onclick="MN4FromProduct('{{ product.id }}', '{{ product.featured_image | image_url: width: 1024 }}', '{{ product.title | escape }}')" style="background: linear-gradient(135deg, rgba(168,85,247,0.2), rgba(0,0,0,0.4)); border-color: #7c3aed; margin-top: 8px;">
+  <span style="font-size: 18px;">👗</span> FULL STYLED OUTFIT
+</button>
+<script>
+  function MN4FromProduct(productId, productImg, productTitle) {
+    if (window.MN4) {
+      MN4._preselectProduct = { id: productId, image: productImg, title: productTitle };
+      window.location.href = '/pages/stylist?product=' + productId;
+    } else {
+      window.location.href = '/pages/stylist?product=' + productId;
+    }
+  }
+</script>
+{% endif %}
 
 <div id="modal-{{ unique_id }}" class="mn-vton-modal">
   <div class="mn-vton-card">
@@ -174,7 +189,7 @@
   // SINGLETON PATTERN: Ensure MNTryOn is only defined once
   if (!window.MNTryOn) {
     window.MNTryOn = {
-      api: "https://vton.mynarrative.in/v1/try-on",
+      api: "https://drishti-api-blond.vercel.app/api/vton/widget/try-on",
       savedTwinUrl: null, // Cache Digital Twin URL
 
       open: async (id) => {

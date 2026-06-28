@@ -1,0 +1,903 @@
+/**
+ * ═══════════════════════════════════════════════════════════
+ * MY NARRATIVE — AI STYLIST WIZARD v4.0
+ * Black Glass + Teal Design System
+ * ═══════════════════════════════════════════════════════════
+ *
+ * Design Tokens:
+ * - Brand Teal: #39A596
+ * - Glass: rgba(255,255,255,0.03) / rgba(20,20,20,0.95)
+ * - Font: Montserrat (primary), Space Mono (mono)
+ * - Borders: rgba(255,255,255,0.1)
+ * - Text: #fff (primary), rgba(244,244,244,0.5) (secondary)
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+
+/* ═══════════════════════════════════════════════
+   WIZARD v4.0 — SHELL & LAYOUT
+   ═══════════════════════════════════════════════ */
+
+.mn4-wizard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ── PROGRESS BAR ────────────────────────────── */
+.mn4-progress {
+  height: 3px;
+  background: rgba(255,255,255,0.06);
+  flex-shrink: 0;
+  position: relative;
+}
+.mn4-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #39A596, #2d8a7d);
+  border-radius: 0 9999px 9999px 0;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 12px rgba(57, 165, 150, 0.5);
+}
+
+/* ── STEP CONTAINER ──────────────────────────── */
+.mn4-step-container {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 14px 14px 80px;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+.mn4-step-container::-webkit-scrollbar { width: 3px; }
+.mn4-step-container::-webkit-scrollbar-track { background: transparent; }
+.mn4-step-container::-webkit-scrollbar-thumb { background: rgba(57,165,150,0.3); border-radius: 9999px; }
+
+/* ── STEP ANIMATION ──────────────────────────── */
+.mn4-step {
+  animation: mn4-fade-in 0.35s ease forwards;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+@keyframes mn4-fade-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── STEP HEADER ─────────────────────────────── */
+.mn4-step-hdr { text-align: center; }
+.mn4-step-num {
+  font-size: 10px;
+  font-weight: 800;
+  color: #39A596;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin: 0 0 6px;
+}
+.mn4-step-title {
+  font-size: 20px;
+  font-weight: 900;
+  color: #fff;
+  margin: 0 0 4px;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+.mn4-step-sub {
+  font-size: 12px;
+  color: rgba(244,244,244,0.5);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── BADGE ───────────────────────────────────── */
+.mn4-badge {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  color: #39A596;
+  border: 1px solid rgba(57,165,150,0.3);
+  border-radius: 9999px;
+  padding: 5px 14px;
+  text-transform: uppercase;
+  display: inline-block;
+}
+
+/* ── GRADIENT TEXT ───────────────────────────── */
+.mn4-gradient-text {
+  background: linear-gradient(135deg, #39A596, #a855f7, #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ═══════════════════════════════════════════════
+   STEP 0: GENDER + UPLOAD (First-Time)
+   ═══════════════════════════════════════════════ */
+
+.mn4-gender-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.mn4-gender-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 24px 12px;
+  border-radius: 16px;
+  border: 2px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.03);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.25s;
+  text-align: center;
+  color: rgba(244,244,244,0.6);
+}
+.mn4-gender-card:hover {
+  border-color: rgba(255,255,255,0.2);
+  transform: translateY(-3px);
+  color: #fff;
+}
+.mn4-gender-card.mn4-selected {
+  border-color: #39A596;
+  background: rgba(57,165,150,0.1);
+  color: #39A596;
+  box-shadow: 0 0 20px rgba(57,165,150,0.2);
+}
+.mn4-gender-emoji { font-size: 36px; line-height: 1; }
+.mn4-gender-label { font-size: 16px; font-weight: 800; }
+.mn4-gender-tagline { font-size: 10px; font-weight: 500; opacity: 0.7; }
+
+/* ── UPLOAD ZONE ─────────────────────────────── */
+.mn4-upload-section { margin-top: 8px; }
+.mn4-upload-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.mn4-upload-zone {
+  position: relative;
+  border: 2px dashed rgba(57,165,150,0.4);
+  border-radius: 14px;
+  padding: 24px 12px;
+  text-align: center;
+  cursor: pointer;
+  background: rgba(57,165,150,0.03);
+  transition: all 0.3s;
+  overflow: hidden;
+}
+.mn4-upload-zone:hover {
+  border-color: #39A596;
+  background: rgba(57,165,150,0.08);
+}
+.mn4-upload-zone.mn4-has-image {
+  border-color: #39A596;
+  border-style: solid;
+  background: rgba(57,165,150,0.05);
+}
+.mn4-upload-icon { font-size: 28px; margin-bottom: 6px; }
+.mn4-upload-label { font-size: 12px; font-weight: 700; color: #fff; }
+.mn4-upload-hint { font-size: 10px; color: rgba(244,244,244,0.4); margin-top: 4px; }
+.mn4-upload-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  display: none;
+}
+.mn4-upload-zone.mn4-has-image .mn4-upload-preview { display: block; }
+.mn4-upload-zone.mn4-has-image .mn4-upload-icon,
+.mn4-upload-zone.mn4-has-image .mn4-upload-label,
+.mn4-upload-zone.mn4-has-image .mn4-upload-hint { display: none; }
+.mn4-upload-remove {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.7);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  font-size: 12px;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+.mn4-upload-zone.mn4-has-image .mn4-upload-remove { display: flex; }
+
+/* ═══════════════════════════════════════════════
+   STEP 1: OCCASION + STYLE + WEATHER
+   ═══════════════════════════════════════════════ */
+
+.mn4-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(244,244,244,0.4);
+  margin: 0 0 10px;
+}
+
+/* ── OCCASION CHIPS ──────────────────────────── */
+.mn4-occasion-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+.mn4-occ-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.03);
+  color: rgba(244,244,244,0.5);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+  text-align: left;
+}
+.mn4-occ-chip:hover {
+  border-color: rgba(255,255,255,0.2);
+  color: #fff;
+}
+.mn4-occ-chip.mn4-active {
+  border-color: #39A596;
+  background: rgba(57,165,150,0.1);
+  color: #39A596;
+}
+.mn4-occ-emoji { font-size: 18px; }
+
+/* ── STYLE CHIPS ─────────────────────────────── */
+.mn4-style-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+.mn4-style-chip {
+  padding: 8px 16px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.03);
+  color: rgba(244,244,244,0.5);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+.mn4-style-chip:hover {
+  border-color: rgba(255,255,255,0.2);
+  color: #fff;
+}
+.mn4-style-chip.mn4-active {
+  border-color: #39A596;
+  background: rgba(57,165,150,0.1);
+  color: #39A596;
+}
+.mn4-style-chip.mn4-ai-auto {
+  border-color: rgba(168,85,247,0.4);
+  background: rgba(168,85,247,0.1);
+  color: #a855f7;
+}
+
+/* ── WEATHER INPUT ───────────────────────────── */
+.mn4-weather-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.03);
+}
+.mn4-weather-icon { font-size: 28px; }
+.mn4-weather-info { flex: 1; }
+.mn4-weather-temp { font-size: 18px; font-weight: 800; color: #fff; }
+.mn4-weather-desc { font-size: 11px; color: rgba(244,244,244,0.5); }
+.mn4-weather-city-input {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.04);
+  color: #fff;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.mn4-weather-city-input:focus { border-color: #39A596; }
+.mn4-weather-city-input::placeholder { color: rgba(244,244,244,0.3); }
+
+/* ═══════════════════════════════════════════════
+   STEP 2: BODY DATA CONFIRMATION
+   ═══════════════════════════════════════════════ */
+
+.mn4-body-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.mn4-body-item {
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.03);
+}
+.mn4-body-label {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(244,244,244,0.4);
+  margin-bottom: 6px;
+}
+.mn4-body-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: #39A596;
+}
+.mn4-body-value.mn4-editable {
+  cursor: pointer;
+  border-bottom: 1px dashed rgba(57,165,150,0.3);
+}
+.mn4-body-edit-input {
+  width: 100%;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(57,165,150,0.4);
+  background: rgba(57,165,150,0.08);
+  color: #fff;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  margin-top: 6px;
+}
+
+/* ═══════════════════════════════════════════════
+   STEP 3: BRAND + PRICE PREFERENCES
+   ═══════════════════════════════════════════════ */
+
+.mn4-brand-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+.mn4-brand-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.03);
+  color: rgba(244,244,244,0.5);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+.mn4-brand-chip:hover {
+  border-color: rgba(255,255,255,0.2);
+  color: #fff;
+}
+.mn4-brand-chip.mn4-active {
+  border-color: #39A596;
+  background: rgba(57,165,150,0.1);
+  color: #39A596;
+}
+
+/* ── PRICE SEGMENT CARDS ─────────────────────── */
+.mn4-price-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+.mn4-price-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.03);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.25s;
+  text-align: center;
+  color: rgba(244,244,244,0.6);
+}
+.mn4-price-card:hover {
+  border-color: rgba(255,255,255,0.2);
+  transform: translateY(-2px);
+  color: #fff;
+}
+.mn4-price-card.mn4-selected {
+  border-color: #39A596;
+  background: rgba(57,165,150,0.1);
+  color: #39A596;
+  box-shadow: 0 0 15px rgba(57,165,150,0.2);
+}
+.mn4-price-icon { font-size: 22px; }
+.mn4-price-label { font-size: 12px; font-weight: 700; }
+.mn4-price-range { font-size: 10px; opacity: 0.7; }
+
+/* ═══════════════════════════════════════════════
+   STEP 4: VTON RESULTS + PRICE COMPARISON
+   ═══════════════════════════════════════════════ */
+
+.mn4-results-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+}
+.mn4-loading-spinner {
+  width: 48px;
+  height: 48px;
+  border: 3px solid rgba(57,165,150,0.15);
+  border-top-color: #39A596;
+  border-radius: 50%;
+  animation: mn4-spin 0.8s linear infinite;
+  margin-bottom: 16px;
+}
+@keyframes mn4-spin { to { transform: rotate(360deg); } }
+.mn4-loading-text {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.05em;
+}
+.mn4-loading-sub {
+  font-size: 11px;
+  color: rgba(244,244,244,0.4);
+  margin-top: 6px;
+}
+
+/* ── OUTFIT CARD ─────────────────────────────── */
+.mn4-outfit-card {
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(20,20,20,0.95);
+  overflow: hidden;
+  transition: all 0.3s;
+}
+.mn4-outfit-card:hover {
+  border-color: rgba(57,165,150,0.3);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+.mn4-outfit-header {
+  padding: 14px 16px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.mn4-outfit-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+}
+.mn4-outfit-score {
+  font-size: 11px;
+  font-weight: 700;
+  color: #39A596;
+  background: rgba(57,165,150,0.1);
+  padding: 3px 10px;
+  border-radius: 9999px;
+}
+
+/* ── VTON RESULT IMAGE ───────────────────────── */
+.mn4-vton-result {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3/4;
+  overflow: hidden;
+  background: #0a0a0a;
+}
+.mn4-vton-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.mn4-vton-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #000;
+  background: #39A596;
+  padding: 4px 10px;
+  border-radius: 9999px;
+}
+.mn4-vton-actions {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  display: flex;
+  gap: 8px;
+}
+.mn4-vton-action-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.mn4-vton-action-btn:hover {
+  background: rgba(57,165,150,0.3);
+  border-color: #39A596;
+}
+
+/* ── GARMENT PIECES ──────────────────────────── */
+.mn4-pieces-list {
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.mn4-piece-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.03);
+}
+.mn4-piece-color {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.mn4-piece-info { flex: 1; }
+.mn4-piece-name { font-size: 12px; font-weight: 600; color: #fff; }
+.mn4-piece-type { font-size: 10px; color: rgba(244,244,244,0.4); text-transform: capitalize; }
+
+/* ── PRICE COMPARISON (inline) ───────────────── */
+.mn4-price-section {
+  padding: 0 16px 14px;
+}
+.mn4-price-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.mn4-price-row:last-child { border-bottom: none; }
+.mn4-price-platform {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(244,244,244,0.6);
+  width: 70px;
+}
+.mn4-price-amount {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  flex: 1;
+}
+.mn4-price-best .mn4-price-amount { color: #39A596; }
+.mn4-price-best-tag {
+  font-size: 9px;
+  font-weight: 800;
+  color: #000;
+  background: #39A596;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.mn4-price-shop-btn {
+  font-size: 10px;
+  font-weight: 700;
+  color: #39A596;
+  text-decoration: none;
+  border: 1px solid rgba(57,165,150,0.3);
+  padding: 4px 10px;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+.mn4-price-shop-btn:hover {
+  background: rgba(57,165,150,0.1);
+}
+
+/* ── BANK OFFER BANNER ───────────────────────── */
+.mn4-bank-offer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(168,85,247,0.1), rgba(236,72,153,0.1));
+  border: 1px solid rgba(168,85,247,0.2);
+  margin: 0 16px 14px;
+}
+.mn4-bank-offer-text {
+  font-size: 11px;
+  font-weight: 600;
+  color: #a855f7;
+}
+
+/* ── OUTFIT ACTIONS ──────────────────────────── */
+.mn4-outfit-actions {
+  padding: 12px 16px;
+  display: flex;
+  gap: 8px;
+}
+.mn4-outfit-cta {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #39A596, #2d8a7d);
+  color: #000;
+  font-size: 12px;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+  box-shadow: 0 4px 16px rgba(57,165,150,0.3);
+}
+.mn4-outfit-cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(57,165,150,0.4);
+}
+.mn4-outfit-secondary {
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(244,244,244,0.6);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+.mn4-outfit-secondary:hover {
+  border-color: rgba(255,255,255,0.25);
+  color: #fff;
+}
+
+/* ═══════════════════════════════════════════════
+   CTA BUTTONS (shared)
+   ═══════════════════════════════════════════════ */
+
+.mn4-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 24px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #39A596, #2d8a7d);
+  color: #000;
+  font-size: 13px;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.25s;
+  box-shadow: 0 6px 24px rgba(57,165,150,0.3);
+}
+.mn4-cta:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 32px rgba(57,165,150,0.45);
+}
+.mn4-cta:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+.mn4-cta-sm { padding: 10px 18px; font-size: 12px; }
+
+.mn4-btn-ghost {
+  padding: 10px 16px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  color: rgba(244,244,244,0.45);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+.mn4-btn-ghost:hover {
+  border-color: rgba(255,255,255,0.25);
+  color: #fff;
+}
+
+/* ── STEP FOOTER ─────────────────────────────── */
+.mn4-step-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 8px;
+}
+.mn4-skip-btn {
+  font-size: 11px;
+  color: rgba(244,244,244,0.35);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.mn4-skip-btn:hover { color: rgba(244,244,244,0.6); }
+
+/* ── STEP DOTS ───────────────────────────────── */
+.mn4-step-dots {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  padding: 8px 0;
+}
+.mn4-dot {
+  width: 24px;
+  height: 4px;
+  border-radius: 9999px;
+  background: rgba(255,255,255,0.1);
+}
+.mn4-dot-active { background: #39A596; }
+.mn4-dot-done { background: rgba(57,165,150,0.35); }
+
+/* ═══════════════════════════════════════════════
+   WELCOME BACK (Returning User)
+   ═══════════════════════════════════════════════ */
+
+.mn4-welcome-back {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 40px 20px;
+  text-align: center;
+}
+.mn4-welcome-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #39A596;
+}
+.mn4-welcome-name {
+  font-size: 18px;
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+}
+.mn4-welcome-sub {
+  font-size: 12px;
+  color: rgba(244,244,244,0.5);
+  margin: 0;
+}
+
+/* ═══════════════════════════════════════════════
+   ORB ANIMATIONS (glass morphism BG)
+   ═══════════════════════════════════════════════ */
+
+.mn4-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.2;
+  pointer-events: none;
+  animation: mn4-drift 8s ease-in-out infinite;
+}
+.mn4-orb-1 {
+  width: 280px;
+  height: 280px;
+  background: #39A596;
+  top: -80px;
+  left: -80px;
+}
+.mn4-orb-2 {
+  width: 220px;
+  height: 220px;
+  background: #7c3aed;
+  bottom: -60px;
+  right: -60px;
+  animation-delay: -4s;
+  animation-direction: reverse;
+}
+@keyframes mn4-drift {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(20px, 15px); }
+}
+
+/* ═══════════════════════════════════════════════
+   FULL-PAGE STYLIST (page.stylist.liquid)
+   ═══════════════════════════════════════════════ */
+
+.mn4-fullpage {
+  min-height: 100vh;
+  background: #0a0a0a;
+  display: flex;
+  flex-direction: column;
+}
+.mn4-fullpage-header {
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.mn4-fullpage-logo {
+  font-size: 16px;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -0.02em;
+}
+.mn4-fullpage-logo span { color: #39A596; }
+.mn4-fullpage-back {
+  margin-left: auto;
+  font-size: 12px;
+  color: rgba(244,244,244,0.5);
+  text-decoration: none;
+  font-weight: 600;
+}
+.mn4-fullpage-back:hover { color: #39A596; }
+.mn4-fullpage-body {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 24px;
+}
+.mn4-fullpage-card {
+  width: 100%;
+  max-width: 480px;
+  background: rgba(20,20,20,0.95);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 24px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* ═══════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════ */
+
+@media (max-width: 380px) {
+  .mn4-occasion-grid { grid-template-columns: 1fr; }
+  .mn4-upload-grid { grid-template-columns: 1fr; }
+  .mn4-price-grid { grid-template-columns: 1fr; }
+  .mn4-body-grid { grid-template-columns: 1fr; }
+}
