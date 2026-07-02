@@ -297,12 +297,42 @@ function fetchRecs(payload){
     body:JSON.stringify(payload)
   }).then(function(r){return r.json();})
     .then(function(data){
-      S.outfits=data.outfits||data.recommendations||generateMockOutfits(payload);
+      var recs=data.recommendations||data.outfits||generateMockOutfits(payload);
+      // Normalize to outfit format with pieces
+      var outfits=recs.map(function(r){
+        return {
+          id:r.product_id||r.id,
+          title:r.title||'Recommended',
+          score:Math.round((r.score||0.85)*100),
+          pieces:[{name:r.title,type:'top',color:'#39A596',product_id:r.product_id,image_url:r.image_url}],
+          prices:[{platform:'Shopify',amount:r.price||0,best:true,link:r.url||'#'}],
+          _product_id:r.product_id
+        };
+      });
+      S.outfits=outfits;
+      // Fetch cross-platform prices for each product
+      fetchCrossPlatformPrices(outfits);
       S.loading=false;S.step++;render();
     }).catch(function(){
       S.outfits=generateMockOutfits(payload);
       S.loading=false;S.step++;render();
     });
+}
+
+function fetchCrossPlatformPrices(outfits){
+  outfits.forEach(function(o){
+    if(!o._product_id)return;
+    fetch(C.DRISHTI+'/api/pricing/compare/shopify/'+o._product_id+'?product_name='+encodeURIComponent(o.title))
+      .then(function(r){return r.json();})
+      .then(function(data){
+        if(data.results&&data.results.length){
+          o.prices=data.results.map(function(p){
+            return {platform:p.platform,amount:p.price,best:p.is_best||false,link:p.url||'#',original_price:p.original_price||null};
+          });
+          render();
+        }
+      }).catch(function(){});
+  });
 }
 
 function generateMockOutfits(p){
