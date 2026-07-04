@@ -46,7 +46,7 @@
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 14px 14px 80px;
+  padding: 14px 14px 120px;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
 }
