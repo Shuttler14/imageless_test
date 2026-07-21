@@ -1714,8 +1714,7 @@ function expandWidget() {
   if (window.MN_CONFIG && window.MN_CONFIG.v4Enabled && window.MN4) {
     var mn4Container = document.getElementById('mn-content-container');
     if (mn4Container) {
-      mn4Container.innerHTML = '<div id="mn4-wizard"></div>';
-      MN4.init(document.getElementById('mn4-wizard'));
+      MN4.init(mn4Container);
       return;
     }
   }

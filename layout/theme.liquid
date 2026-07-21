@@ -228,7 +228,7 @@
     }
   }
 </script>
-  {% section 'MN-fashion-consultant' %}
+  {% unless template == 'page.stylist' %}{% section 'MN-fashion-consultant' %}{% endunless %}
 
   <script>
     function mnOpenCloset(opts) {
