@@ -173,7 +173,7 @@ var blob=new Blob([arr],{type:mime}),fd=new FormData();
 fd.append('file',blob,'person.jpg');fd.append('session_id','mn4_'+Date.now());
 fetch(API+'/api/vton/upload-person',{method:'POST',body:fd})
 .then(function(r){return r.json();})
-.then(function(d){cb(d.person_image_url||null);})
+.then(function(d){cb(d.url||d.person_image_url||null);})
 .catch(function(){cb(null);});
 }
 
@@ -217,15 +217,13 @@ function generateVTON(outfits,personUrl){
 outfits.forEach(function(o){
 var garmentUrl=o.pieces&&o.pieces[0]&&o.pieces[0].image_url;
 if(!garmentUrl)return;
-var fd=new FormData();
-fd.append('person_image_url',personUrl);
-fd.append('garment_image_url',garmentUrl);
-fd.append('session_id','mn4_vton_'+Date.now());
-fetch(API+'/api/vton/try-on',{method:'POST',body:fd})
+fetch(API+'/api/vton/try-on',{method:'POST',headers:{'Content-Type':'application/json'},
+body:JSON.stringify({person_image_url:personUrl,garment_image_url:garmentUrl,extract_garment:true})})
 .then(function(r){return r.json();})
 .then(function(d){
-if(d.result_image_url||d.vton_image_url||d.image_url){
-st.vtonImages[o.id]=d.result_image_url||d.vton_image_url||d.image_url;
+var result=d.result_image||d.result_image_url||d.vton_image_url||d.image_url;
+if(result){
+st.vtonImages[o.id]=result;
 render();
 }}).catch(function(){});
 });
