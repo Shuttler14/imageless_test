@@ -187,8 +187,8 @@ st.outfits=recs.map(function(r){return{id:r.product_id||r.id,title:r.title||'Rec
 score:Math.round((r.score||0.85)*100),pieces:[{name:r.title,type:'top',color:'#39A596',product_id:r.product_id,image_url:r.image_url}],
 prices:[{platform:'Shopify',amount:r.price||0,best:true,link:r.url||'#'}],_product_id:r.product_id};});
 fetchPrices(st.outfits);
-if(st._personUrl)generateVTON(st.outfits,st._personUrl);
-st.loading=false;st.step++;render();})
+st.loading=false;st.step++;render();
+if(st._personUrl)generateVTON(st.outfits,st._personUrl);})
 .catch(function(){st.outfits=mockRecs(p);st.loading=false;st.step++;render();});
 }
 
@@ -199,8 +199,24 @@ fetch(API+'/api/pricing/compare/shopify/'+o._product_id+'?product_name='+encodeU
 .then(function(r){return r.json();})
 .then(function(d){if(d.results&&d.results.length){
 o.prices=d.results.map(function(p){return{platform:p.platform,amount:p.price,best:p.is_best||false,link:p.url||'#',original_price:p.original_price||null};});
-render();}}).catch(function(){});
+updatePriceSection(o);
+}}).catch(function(){});
 });
+}
+
+function updatePriceSection(o){
+var el=document.querySelector('[data-price-id="'+o.id+'"]');
+if(!el||!o.prices||!o.prices.length)return;
+var bp=o.prices.find(function(x){return x.best;});
+var best=bp||o.prices[0];
+var detailMode=el.parentElement&&el.parentElement.querySelector('.mn4-section-label');
+var h='';
+if(detailMode){
+o.prices.forEach(function(p){h+='<div class="mn4-price-row'+(p.best?' mn4-price-row--best':'')+'"><span class="mn4-price-platform">'+esc(p.platform)+'</span><span class="mn4-price-amount">\u20B9'+p.amount+'</span>'+(p.best?'<span class="mn4-price-best-tag">BEST</span>':'')+'<a class="mn4-price-link" href="'+esc(p.link||'#')+'" target="_blank">Shop \u2192</a></div>';});
+}else{
+h+='<div class="mn4-price-row'+(bp?' mn4-price-row--best':'')+'"><span class="mn4-price-platform">'+esc(o.prices[0].platform)+'</span><span class="mn4-price-amount">\u20B9'+best.amount+'</span>'+(bp?'<span class="mn4-price-best-tag">BEST</span>':'')+'<a class="mn4-price-link" href="'+esc(best.link||'#')+'" target="_blank" onclick="event.stopPropagation()">Shop</a></div>';
+}
+el.innerHTML=h;
 }
 
 function mockRecs(p){
@@ -217,6 +233,8 @@ function generateVTON(outfits,personUrl){
 outfits.forEach(function(o){
 var garmentUrl=o.pieces&&o.pieces[0]&&o.pieces[0].image_url;
 if(!garmentUrl)return;
+startVTONLoader(o.id);
+var startTime=Date.now();
 fetch(API+'/api/vton/try-on',{method:'POST',headers:{'Content-Type':'application/json'},
 body:JSON.stringify({person_image_url:personUrl,garment_image_url:garmentUrl,extract_garment:true})})
 .then(function(r){return r.json();})
@@ -224,9 +242,86 @@ body:JSON.stringify({person_image_url:personUrl,garment_image_url:garmentUrl,ext
 var result=d.result_image||d.result_image_url||d.vton_image_url||d.image_url;
 if(result){
 st.vtonImages[o.id]=result;
-render();
-}}).catch(function(){});
+revealVTONImage(o.id,result);
+}}).catch(function(){
+stopVTONLoader(o.id);
 });
+});
+}
+
+/* ── VTON Loader: AI Processing Theater ── */
+
+var _vtonLoaders={};
+var _VTON_STAGES=[
+{icon:'\u{1F3A8}',msg:'Analyzing your style...',sub:'Reading color palette & fit preferences',dur:3000},
+{icon:'\u{1F457}',msg:'Fitting the garment...',sub:'AI is draping the outfit on your body',dur:5000},
+{icon:'\u2728',msg:'Perfecting the look...',sub:'Adding finishing touches for realism',dur:7000}
+];
+
+function startVTONLoader(outfitId){
+var el=document.querySelector('[data-vton-id="'+outfitId+'"]');
+if(!el)return;
+var existing=el.querySelector('.mn4-vton-loader');
+if(existing)return;
+
+var stageIdx=0;
+var loaderHTML='<div class="mn4-vton-loader">'
++'<div class="mn4-vton-loader-ring">'
++'<div class="mn4-vton-loader-icon">'+_VTON_STAGES[0].icon+'</div>'
++'<div class="mn4-vton-scan-line"></div>'
++'</div>'
++'<div class="mn4-vton-loader-stage">'+_VTON_STAGES[0].msg+'</div>'
++'<div class="mn4-vton-loader-sub">'+_VTON_STAGES[0].sub+'</div>'
++'<div class="mn4-vton-loader-dots">'
++'<div class="mn4-vton-loader-dot mn4-vton-loader-dot--active"></div>'
++'<div class="mn4-vton-loader-dot"></div>'
++'<div class="mn4-vton-loader-dot"></div>'
++'</div></div>';
+
+var container=el.querySelector('.mn4-vton');
+if(container)container.insertAdjacentHTML('beforeend',loaderHTML);
+
+function advance(){
+if(_vtonLoaders[outfitId]==='stopped')return;
+stageIdx++;
+if(stageIdx>=_VTON_STAGES.length)return;
+var stage=_VTON_STAGES[stageIdx];
+var loader=document.querySelector('[data-vton-id="'+outfitId+'"] .mn4-vton-loader');
+if(!loader)return;
+var iconEl=loader.querySelector('.mn4-vton-loader-icon');
+var msgEl=loader.querySelector('.mn4-vton-loader-stage');
+var subEl=loader.querySelector('.mn4-vton-loader-sub');
+if(iconEl)iconEl.textContent=stage.icon;
+if(msgEl)msgEl.textContent=stage.msg;
+if(subEl)subEl.textContent=stage.sub;
+var dots=loader.querySelectorAll('.mn4-vton-loader-dot');
+dots.forEach(function(d,i){
+d.className='mn4-vton-loader-dot';
+if(i<stageIdx)d.className+=' mn4-vton-loader-dot--done';
+else if(i===stageIdx)d.className+=' mn4-vton-loader-dot--active';
+});
+setTimeout(advance,stage.dur);
+}
+setTimeout(advance,_VTON_STAGES[0].dur);
+_vtonLoaders[outfitId]='running';
+}
+
+function stopVTONLoader(outfitId){
+_vtonLoaders[outfitId]='stopped';
+var el=document.querySelector('[data-vton-id="'+outfitId+'"]');
+if(!el)return;
+var loader=el.querySelector('.mn4-vton-loader');
+if(loader)loader.remove();
+}
+
+function revealVTONImage(outfitId,imageUrl){
+stopVTONLoader(outfitId);
+var el=document.querySelector('[data-vton-id="'+outfitId+'"]');
+if(!el)return;
+var container=el.querySelector('.mn4-vton');
+if(!container)return;
+container.innerHTML='<img src="'+imageUrl+'" class="mn4-vton-reveal" style="width:100%;height:100%;object-fit:cover" alt="VTON Result">'
++'<span class="mn4-vton-badge mn4-vton-reveal-badge">AI VTON</span>';
 }
 
 function render(){
@@ -344,29 +439,45 @@ if(st.activeIdx!==null&&st.outfits[st.activeIdx])return rDetail(st.outfits[st.ac
 var h='<div class="mn4-step"><div class="mn4-hdr"><div class="mn4-hdr-label">Your Outfits</div><h2 class="mn4-hdr-title">We found your style \u2728</h2><p class="mn4-hdr-sub">Tap any outfit for full VTON view + prices</p></div>';
 st.outfits.forEach(function(o,i){
 var bp=o.prices&&o.prices.find(function(x){return x.best;});
+var hasVTON=!!st.vtonImages[o.id];
+var vtonContent=hasVTON
+?'<img src="'+st.vtonImages[o.id]+'" class="mn4-vton-reveal" style="width:100%;height:100%;object-fit:cover" alt="VTON">'
+:'<div class="mn4-vton-loader">'
++'<div class="mn4-vton-loader-ring"><div class="mn4-vton-loader-icon">\u{1F3A8}</div><div class="mn4-vton-scan-line"></div></div>'
++'<div class="mn4-vton-loader-stage">Analyzing your style...</div>'
++'<div class="mn4-vton-loader-sub">Reading color palette & fit preferences</div>'
++'<div class="mn4-vton-loader-dots"><div class="mn4-vton-loader-dot mn4-vton-loader-dot--active"></div><div class="mn4-vton-loader-dot"></div><div class="mn4-vton-loader-dot"></div></div></div>';
 h+='<div class="mn4-outfit" data-action="view-outfit" data-value="'+i+'">'
 +'<div class="mn4-outfit-head"><h3 class="mn4-outfit-title">'+esc(o.title)+'</h3><span class="mn4-outfit-score">'+o.score+'% match</span></div>'
-+'<div class="mn4-vton" style="background:linear-gradient(135deg,'+(o.pieces[0]?o.pieces[0].color:'#222')+'22,#0a0a0a)">'+(st.vtonImages[o.id]?'<img src="'+st.vtonImages[o.id]+'" style="width:100%;height:100%;object-fit:cover" alt="VTON">':'<div class="mn4-vton-placeholder">\u{1F457}</div>')+'<span class="mn4-vton-badge">AI VTON</span></div>'
++'<div class="mn4-vton" data-vton-id="'+o.id+'" style="background:linear-gradient(135deg,'+(o.pieces[0]?o.pieces[0].color:'#222')+'22,#0a0a0a)">'+vtonContent+'<span class="mn4-vton-badge">AI VTON</span></div>'
 +'<div class="mn4-pieces">';
 o.pieces.forEach(function(p){h+='<div class="mn4-piece"><div class="mn4-piece-dot" style="background:'+esc(p.color)+'"></div><div class="mn4-piece-info"><div class="mn4-piece-name">'+esc(p.name)+'</div><div class="mn4-piece-type">'+esc(p.type)+'</div></div></div>';});
 h+='</div>';
 if(o.prices&&o.prices.length){var best=bp||o.prices[0];
-h+='<div class="mn4-prices"><div class="mn4-price-row'+(bp?' mn4-price-row--best':'')+'"><span class="mn4-price-platform">'+esc(o.prices[0].platform)+'</span><span class="mn4-price-amount">\u20B9'+best.amount+'</span>'+(bp?'<span class="mn4-price-best-tag">BEST</span>':'')+'<a class="mn4-price-link" href="'+esc(best.link||'#')+'" target="_blank" onclick="event.stopPropagation()">Shop</a></div></div>';}
+h+='<div class="mn4-prices" data-price-id="'+o.id+'"><div class="mn4-price-row'+(bp?' mn4-price-row--best':'')+'"><span class="mn4-price-platform">'+esc(o.prices[0].platform)+'</span><span class="mn4-price-amount">\u20B9'+best.amount+'</span>'+(bp?'<span class="mn4-price-best-tag">BEST</span>':'')+'<a class="mn4-price-link" href="'+esc(best.link||'#')+'" target="_blank" onclick="event.stopPropagation()">Shop</a></div></div>';}
 h+='</div>';});
 h+='<div class="mn4-footer mn4-text-center" style="justify-content:center"><button class="mn4-btn mn4-btn--ghost" data-action="retake">\u2190 Start Over</button></div></div>';
 return h;
 }
 
 function rDetail(o){
+var hasVTON=!!st.vtonImages[o.id];
+var vtonContent=hasVTON
+?'<img src="'+st.vtonImages[o.id]+'" class="mn4-vton-reveal" style="width:100%;height:100%;object-fit:cover" alt="VTON Result">'
+:'<div class="mn4-vton-loader">'
++'<div class="mn4-vton-loader-ring"><div class="mn4-vton-loader-icon">\u{1F3A8}</div><div class="mn4-vton-scan-line"></div></div>'
++'<div class="mn4-vton-loader-stage">Analyzing your style...</div>'
++'<div class="mn4-vton-loader-sub">Reading color palette & fit preferences</div>'
++'<div class="mn4-vton-loader-dots"><div class="mn4-vton-loader-dot mn4-vton-loader-dot--active"></div><div class="mn4-vton-loader-dot"></div><div class="mn4-vton-loader-dot"></div></div></div>';
 var h='<div class="mn4-step"><div class="mn4-outfit-head" style="padding:0 0 12px"><button class="mn4-btn mn4-btn--ghost" data-action="back-to-list">\u2190 Back</button><span class="mn4-outfit-score">'+o.score+'% match</span></div>'
 +'<h2 class="mn4-hdr-title" style="text-align:left">'+esc(o.title)+'</h2>'
-+'<div class="mn4-vton" style="border-radius:16px;margin-top:8px;background:linear-gradient(135deg,'+(o.pieces[0]?o.pieces[0].color:'#222')+'22,#0a0a0a)">'+(st.vtonImages[o.id]?'<img src="'+st.vtonImages[o.id]+'" style="width:100%;height:100%;object-fit:cover" alt="VTON Result">':'<div class="mn4-vton-placeholder" style="font-size:80px">\u{1F457}</div>')+'<span class="mn4-vton-badge">AI VTON Result</span></div>'
++'<div class="mn4-vton" data-vton-id="'+o.id+'" style="border-radius:16px;margin-top:8px;background:linear-gradient(135deg,'+(o.pieces[0]?o.pieces[0].color:'#222')+'22,#0a0a0a)">'+vtonContent+'<span class="mn4-vton-badge">AI VTON Result</span></div>'
 +'<div class="mn4-pieces">';
 o.pieces.forEach(function(p){h+='<div class="mn4-piece"><div class="mn4-piece-dot" style="background:'+esc(p.color)+'"></div><div class="mn4-piece-info"><div class="mn4-piece-name">'+esc(p.name)+'</div><div class="mn4-piece-type">'+esc(p.type)+'</div></div></div>';});
 h+='</div>';
-if(o.prices&&o.prices.length){h+='<div class="mn4-mt-sm"><p class="mn4-section-label">Price Comparison</p>';
+if(o.prices&&o.prices.length){h+='<div class="mn4-mt-sm"><p class="mn4-section-label">Price Comparison</p><div data-price-id="'+o.id+'">';
 o.prices.forEach(function(p){h+='<div class="mn4-price-row'+(p.best?' mn4-price-row--best':'')+'"><span class="mn4-price-platform">'+esc(p.platform)+'</span><span class="mn4-price-amount">\u20B9'+p.amount+'</span>'+(p.best?'<span class="mn4-price-best-tag">BEST</span>':'')+'<a class="mn4-price-link" href="'+esc(p.link||'#')+'" target="_blank">Shop \u2192</a></div>';});
-h+='</div>';}
+h+='</div></div>';}
 h+='<div class="mn4-bank-offer"><span>\u{1F4B3}</span><span class="mn4-bank-offer-text">10% off with HDFC Credit Card \u2014 ends in 2h</span></div>';
 h+='<div class="mn4-outfit-actions"><button class="mn4-btn mn4-btn--primary" data-action="shop-now" data-value="'+esc(o.prices&&o.prices[0]?o.prices[0].link:'#')+'">Shop All Pieces</button><button class="mn4-btn mn4-btn--ghost" data-action="retake">New Outfit</button></div></div>';
 return h;

@@ -912,3 +912,149 @@ button.mn4-btn--sm,
 .mn4-text-center { text-align: center; }
 .mn4-mt-sm { margin-top: 8px; }
 .mn4-mt-md { margin-top: 12px; }
+
+/* ═══════════════════════════════════════════════════
+   VTON AI PROCESSING THEATER — Multi-stage loader
+   ═══════════════════════════════════════════════════ */
+
+.mn4-vton-loader {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: linear-gradient(145deg, rgba(10,10,10,0.97), rgba(15,15,15,0.99));
+  z-index: 2;
+  padding: 24px;
+}
+
+/* Pulse ring — outer glow */
+.mn4-vton-loader-ring {
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+.mn4-vton-loader-ring::before,
+.mn4-vton-loader-ring::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid transparent;
+}
+.mn4-vton-loader-ring::before {
+  border-top-color: var(--mn4-teal);
+  border-right-color: var(--mn4-teal);
+  animation: mn4-ring-spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+.mn4-vton-loader-ring::after {
+  border-bottom-color: rgba(57, 165, 150, 0.3);
+  border-left-color: rgba(57, 165, 150, 0.3);
+  animation: mn4-ring-spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  animation-direction: reverse;
+  inset: 6px;
+}
+@keyframes mn4-ring-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Center icon — morphs per stage */
+.mn4-vton-loader-icon {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  animation: mn4-loader-icon-pulse 2s ease-in-out infinite;
+}
+@keyframes mn4-loader-icon-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.08); opacity: 1; }
+}
+
+/* Scanning line */
+.mn4-vton-scan-line {
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--mn4-teal), transparent);
+  opacity: 0.6;
+  animation: mn4-scan 2s ease-in-out infinite;
+}
+@keyframes mn4-scan {
+  0% { top: 15%; opacity: 0; }
+  20% { opacity: 0.6; }
+  80% { opacity: 0.6; }
+  100% { top: 85%; opacity: 0; }
+}
+
+/* Stage text */
+.mn4-vton-loader-stage {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--mn4-text);
+  text-align: center;
+  letter-spacing: 0.02em;
+  min-height: 20px;
+  transition: opacity 0.3s ease;
+}
+.mn4-vton-loader-sub {
+  font-size: 10px;
+  color: var(--mn4-text-muted);
+  text-align: center;
+  min-height: 16px;
+}
+
+/* Progress dots */
+.mn4-vton-loader-dots {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.mn4-vton-loader-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  transition: all 0.4s ease;
+}
+.mn4-vton-loader-dot--active {
+  background: var(--mn4-teal);
+  box-shadow: 0 0 8px rgba(57, 165, 150, 0.5);
+  transform: scale(1.2);
+}
+.mn4-vton-loader-dot--done {
+  background: rgba(57, 165, 150, 0.4);
+}
+
+/* ═══ VTON REVEAL ANIMATION ═══ */
+
+.mn4-vton-reveal {
+  animation: mn4-vton-reveal-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes mn4-vton-reveal-in {
+  0% { opacity: 0; transform: scale(1.04); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.mn4-vton-reveal-badge {
+  animation: mn4-badge-slide 0.4s 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes mn4-badge-slide {
+  0% { opacity: 0; transform: translateX(-12px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+/* Loader fade-out */
+.mn4-vton-loader-exit {
+  animation: mn4-loader-fade 0.35s ease forwards;
+}
+@keyframes mn4-loader-fade {
+  0% { opacity: 1; }
+  100% { opacity: 0; pointer-events: none; }
+}
