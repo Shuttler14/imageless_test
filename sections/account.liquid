@@ -1884,8 +1884,9 @@
         document.getElementById('mnEditCustomInput').style.display = 'none';
         const pStr = (p['budget'] || '').replace(/[^0-9,]/g,'').split(',');
         let minV = parseInt(pStr[0]) || 1000, maxV = parseInt(pStr[1]) || 8000;
-        const toDisp = v => v >= 1000 ? '₹' + (v/1000).toFixed(v%1000===0?0:1) + 'K' : '₹' + v;
-        const presets = [{l:'Under ₹1K',mn:500,mx:1000},{l:'₹1K–3K',mn:1000,mx:3000},{l:'₹3K–7K',mn:3000,mx:7000},{l:'₹7K–15K',mn:7000,mx:15000},{l:'₹15K–30K',mn:15000,mx:30000},{l:'₹30K+',mn:30000,mx:50000}];
+        const _fmtCur = function(n){ var c=window.MN_currency; return c&&c.format?c.format(n):'₹'+Number(n).toLocaleString('en-IN'); };
+        const toDisp = v => v >= 1000 ? _fmtCur(v/1000).replace(/\.0$/,'') + 'K' : _fmtCur(v);
+        const presets = [{l:'Under '+_fmtCur(1000),mn:500,mx:1000},{l:_fmtCur(1000)+'–'+_fmtCur(3000),mn:1000,mx:3000},{l:_fmtCur(3000)+'–'+_fmtCur(7000),mn:3000,mx:7000},{l:_fmtCur(7000)+'–'+_fmtCur(15000),mn:7000,mx:15000},{l:_fmtCur(15000)+'–'+_fmtCur(30000),mn:15000,mx:30000},{l:_fmtCur(30000)+'+',mn:30000,mx:50000}];
         grid.innerHTML = '<div style="text-align:center;margin-bottom:16px">' +
           '<div style="font-size:24px;font-weight:900;color:#39A596" id="mnBudgetDisp">' + toDisp(minV) + ' – ' + toDisp(maxV) + '</div>' +
           '<div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px">per outfit</div></div>' +
@@ -1894,7 +1895,7 @@
           '<input type="range" id="mnBMin" min="500" max="50000" value="'+minV+'" step="500" style="position:absolute;width:100%;-webkit-appearance:none;background:transparent;height:6px;pointer-events:none;top:0;margin:0"/>' +
           '<input type="range" id="mnBMax" min="500" max="50000" value="'+maxV+'" step="500" style="position:absolute;width:100%;-webkit-appearance:none;background:transparent;height:6px;pointer-events:none;top:0;margin:0"/>' +
           '<style>#mnBMin::-webkit-slider-thumb,#mnBMax::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#39A596;cursor:pointer;pointer-events:all;box-shadow:0 0 10px rgba(57,165,150,0.5)}</style></div>' +
-          '<div style="display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,0.35);margin-bottom:20px"><span>₹500</span><span>₹50K+</span></div>' +
+          '<div style="display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,0.35);margin-bottom:20px"><span>'+_fmtCur(500)+'</span><span>'+_fmtCur(50000)+'</span></div>' +
           '<div style="display:flex;flex-wrap:wrap;gap:6px">' + presets.map(function(pr){ return '<button onclick="mnBPreset(' + pr.mn + ',' + pr.mx + ')" style="font-size:11px;font-weight:700;padding:6px 12px;border-radius:99px;border:1.5px solid rgba(255,255,255,0.1);background:transparent;color:rgba(255,255,255,0.5);cursor:pointer;font-family:Montserrat,sans-serif">' + pr.l + '</button>'; }).join('') + '</div>';
         
         window.mnBPreset = function(mn,mx) {
@@ -1911,7 +1912,7 @@
           const lp = ((mn-500)/total)*100, rp = ((mx-500)/total)*100;
           const fill = document.getElementById('mnBFill');
           if (fill) { fill.style.left=lp+'%'; fill.style.width=(rp-lp)+'%'; }
-          _selectedValues = ['₹'+mn.toLocaleString('en-IN')+'–₹'+mx.toLocaleString('en-IN')];
+          _selectedValues = [_fmtCur(mn)+'–'+_fmtCur(mx)];
         }
         grid.querySelector('#mnBMin').addEventListener('input', mnUpdateBudget);
         grid.querySelector('#mnBMax').addEventListener('input', mnUpdateBudget);

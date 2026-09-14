@@ -174,7 +174,7 @@ const MNOnboarding = (() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const formatINR = (n) => '₹' + n.toLocaleString('en-IN');
+  const formatINR = (n) => { var c=window.MN_currency; return c&&c.format?c.format(n):'₹'+n.toLocaleString('en-IN'); };
 
   return { state, AESTHETICS, OCCASIONS, MOCK_WARDROBE_ITEMS, AFFILIATE_RECS, $, $$, showStep, formatINR };
 

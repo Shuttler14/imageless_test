@@ -589,6 +589,22 @@ button.mn4-btn--sm,
   background: rgba(57, 165, 150, 0.1);
   color: var(--mn4-teal);
 }
+.mn4-brand-btn--active {
+  border-color: var(--mn4-teal);
+  background: rgba(57, 165, 150, 0.15);
+  color: var(--mn4-teal);
+  box-shadow: 0 0 12px rgba(57, 165, 150, 0.2);
+}
+.mn4-brand-global {
+  font-size: 8px;
+  padding: 1px 4px;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.4);
+  margin-left: 2px;
+  vertical-align: middle;
+}
+.mn4-text-muted { color: rgba(244,244,244,0.35); }
 
 .mn4-price-grid {
   display: grid;
@@ -659,6 +675,12 @@ button.mn4-btn--sm,
   font-size: 11px;
   color: var(--mn4-text-muted);
 }
+.mn4-progress-wrap{display:flex;align-items:center;gap:8px;margin-top:12px;width:100%;}
+.mn4-progress-bar{flex:1;height:6px;background:rgba(255,255,255,0.1);border-radius:3px;overflow:hidden;}
+.mn4-progress-fill{height:100%;background:linear-gradient(90deg,var(--mn4-accent),var(--mn4-accent2));border-radius:3px;transition:width 0.3s ease;}
+.mn4-progress-fill--animated{animation:mn4-progress-anim 3s ease-in-out infinite;}
+.mn4-progress-pct{font-size:11px;color:var(--mn4-text-muted);min-width:30px;text-align:right;}
+@keyframes mn4-progress-anim{0%{width:10%}50%{width:85%}100%{width:10%}}
 
 /* Outfit cards */
 .mn4-outfit {

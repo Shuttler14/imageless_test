@@ -250,7 +250,7 @@ Add to index.json or homepage template:
                 <span class="mn-creator-name">@${creator.username}</span>
               </div>
               <h3 class="mn-item-title">${creator.featured_design_title || 'Exclusive Design Collection'}</h3>
-              <p class="mn-item-price">From ₹${creator.featured_price || 899}</p>
+              <p class="mn-item-price">From ${window.MN_currency && window.MN_currency.format ? window.MN_currency.format(creator.featured_price || 899) : '₹'+(creator.featured_price || 899)}</p>
             </div>
           </a>
         `;

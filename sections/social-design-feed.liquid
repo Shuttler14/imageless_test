@@ -659,7 +659,7 @@
           ${creatorAvatar ? `<img src="${creatorAvatar}" alt="${creatorName}" class="creator-avatar">` : '<div class="creator-avatar"></div>'}
           <span class="creator-name">${escapeHtml(creatorName)}</span>
         </div>
-        <div class="design-price">₹${price.toLocaleString('en-IN')}</div>
+        <div class="design-price">${window.MN_currency && window.MN_currency.format ? window.MN_currency.format(price) : '₹'+price.toLocaleString('en-IN')}</div>
         ${colors.length > 1 ? `
           <div class="color-swatches">
             ${colors.map((variant, idx) => `

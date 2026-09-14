@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Stylist</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0b0b0f;
+      color: #e0e0e0;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ── Header ─────────────────────────────────────────────────────── */
+    .mn-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .mn-header-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .mn-header-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #39A596 0%, #2d8a7d 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .mn-header-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+    }
+    .mn-header-subtitle {
+      font-size: 11px;
+      color: #888;
+    }
+    .mn-header-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .mn-icon-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: none;
+      background: rgba(255,255,255,0.08);
+      color: #aaa;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .mn-icon-btn:hover { background: rgba(255,255,255,0.12); color: #fff; }
+
+    /* ── Chat Flow ──────────────────────────────────────────────────── */
+    .mn-chat {
+      height: calc(100vh - 65px);
+      overflow-y: auto;
+      padding: 16px;
+      scroll-behavior: smooth;
+    }
+    .mn-msg {
+      margin-bottom: 16px;
+      animation: mnFadeIn 0.3s ease;
+    }
+    @keyframes mnFadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .mn-msg-bot {
+      background: rgba(57, 165, 150, 0.12);
+      border: 1px solid rgba(57, 165, 150, 0.2);
+      border-radius: 12px 12px 12px 4px;
+      padding: 12px 16px;
+      font-size: 14px;
+      line-height: 1.5;
+      max-width: 90%;
+    }
+    .mn-msg-bot strong { color: #39A596; }
+
+    /* ── Buttons Grid ───────────────────────────────────────────────── */
+    .mn-btn-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .mn-btn-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .mn-option-btn {
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04);
+      color: #ddd;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .mn-option-btn:hover {
+      background: rgba(57, 165, 150, 0.15);
+      border-color: #39A596;
+      color: #fff;
+    }
+    .mn-option-btn.active {
+      background: rgba(57, 165, 150, 0.2);
+      border-color: #39A596;
+      color: #39A596;
+    }
+    .mn-option-btn .icon { font-size: 20px; display: block; margin-bottom: 4px; }
+
+    /* ── Closet Toggle ──────────────────────────────────────────────── */
+    .mn-closet-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 10px;
+      margin-top: 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .mn-closet-toggle-label { font-size: 13px; color: #aaa; }
+    .mn-toggle-switch {
+      width: 44px;
+      height: 24px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      position: relative;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .mn-toggle-switch.active { background: #39A596; }
+    .mn-toggle-switch::after {
+      content: '';
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-radius: 50%;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      transition: transform 0.2s;
+    }
+    .mn-toggle-switch.active::after { transform: translateX(20px); }
+
+    /* ── Loading ────────────────────────────────────────────────────── */
+    .mn-loading {
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .mn-loading-dots {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+    .mn-loading-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #39A596;
+      animation: mnPulse 1.4s infinite ease-in-out;
+    }
+    .mn-loading-dot:nth-child(2) { animation-delay: 0.2s; }
+    .mn-loading-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes mnPulse {
+      0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+    .mn-loading-text { font-size: 13px; color: #888; }
+
+    /* ── Outfit Card ────────────────────────────────────────────────── */
+    .mn-outfit-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .mn-outfit-card:hover { border-color: rgba(57,165,150,0.3); }
+    .mn-outfit-img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      background: rgba(255,255,255,0.05);
+    }
+    .mn-outfit-body { padding: 12px; }
+    .mn-outfit-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+    .mn-outfit-price {
+      font-size: 13px;
+      color: #39A596;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .mn-outfit-reason {
+      font-size: 12px;
+      color: #888;
+      line-height: 1.4;
+      margin-bottom: 8px;
+    }
+    .mn-outfit-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .mn-outfit-btn {
+      flex: 1;
+      padding: 8px;
+      border-radius: 8px;
+      border: none;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .mn-btn-vton {
+      background: #39A596;
+      color: white;
+    }
+    .mn-btn-vton:hover { background: #2d8a7d; }
+    .mn-btn-shop {
+      background: rgba(255,255,255,0.08);
+      color: #ddd;
+    }
+    .mn-btn-shop:hover { background: rgba(255,255,255,0.12); }
+
+    /* ── Outfit Detail View ──────────────────────────────────────────── */
+    .mn-detail-back {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 13px; color: #39A596; cursor: pointer;
+      margin-bottom: 12px; padding: 8px 0;
+      border: none; background: none; width: 100%; text-align: left;
+    }
+    .mn-detail-back:hover { color: #fff; }
+    .mn-detail-img {
+      width: 100%; height: 240px; object-fit: cover;
+      border-radius: 12px; margin-bottom: 12px;
+      background: rgba(255,255,255,0.05);
+    }
+    .mn-detail-title { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+    .mn-detail-total { font-size: 14px; color: #39A596; font-weight: 600; margin-bottom: 8px; }
+    .mn-detail-reason { font-size: 13px; color: #999; line-height: 1.5; margin-bottom: 16px; }
+    .mn-detail-section-title {
+      font-size: 12px; text-transform: uppercase; letter-spacing: 1px;
+      color: #666; margin-bottom: 8px;
+    }
+    .mn-item-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px; padding: 12px; margin-bottom: 8px;
+    }
+    .mn-item-header { display: flex; gap: 10px; margin-bottom: 8px; }
+    .mn-item-img {
+      width: 60px; height: 60px; border-radius: 8px;
+      object-fit: cover; background: rgba(255,255,255,0.05);
+    }
+    .mn-item-info { flex: 1; }
+    .mn-item-name { font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 2px; }
+    .mn-item-meta { font-size: 11px; color: #888; }
+    .mn-item-price { font-size: 14px; color: #39A596; font-weight: 600; }
+    .mn-price-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 10px; border-radius: 8px; margin-bottom: 4px;
+      background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04);
+      text-decoration: none; transition: all 0.2s; cursor: pointer;
+    }
+    .mn-price-row:hover { background: rgba(57,165,150,0.08); border-color: rgba(57,165,150,0.2); }
+    .mn-price-row.best {
+      background: rgba(57,165,150,0.1); border-color: rgba(57,165,150,0.3);
+    }
+    .mn-price-platform { font-size: 12px; color: #ccc; flex: 1; }
+    .mn-price-amount { font-size: 13px; font-weight: 600; color: #fff; margin-right: 8px; }
+    .mn-price-badge {
+      font-size: 10px; background: #39A596; color: white;
+      padding: 2px 6px; border-radius: 4px; font-weight: 600;
+    }
+    .mn-price-delivery { font-size: 10px; color: #888; margin-right: 8px; }
+    .mn-price-arrow { color: #666; font-size: 12px; }
+    .mn-detail-actions {
+      display: flex; gap: 8px; margin-top: 16px; padding-top: 12px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .mn-detail-btn {
+      flex: 1; padding: 12px; border-radius: 10px; border: none;
+      font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+    }
+    .mn-detail-btn-vton { background: #39A596; color: white; }
+    .mn-detail-btn-vton:hover { background: #2d8a7d; }
+    .mn-detail-btn-shop { background: rgba(255,255,255,0.08); color: #ddd; }
+    .mn-detail-btn-shop:hover { background: rgba(255,255,255,0.12); }
+
+    /* ── Closet Panel ───────────────────────────────────────────────── */
+    .mn-closet-panel {
+      display: none;
+      padding: 16px;
+    }
+    .mn-closet-panel.active { display: block; }
+    .mn-closet-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+    }
+    .mn-closet-item {
+      aspect-ratio: 1;
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+    }
+    .mn-closet-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .mn-closet-item-badge {
+      position: absolute;
+      bottom: 4px;
+      left: 4px;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    /* ── Upload Area ────────────────────────────────────────────────── */
+    .mn-upload-area {
+      border: 2px dashed rgba(255,255,255,0.15);
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      margin-top: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .mn-upload-area:hover {
+      border-color: #39A596;
+      background: rgba(57, 165, 150, 0.05);
+    }
+    .mn-upload-icon { font-size: 32px; margin-bottom: 8px; }
+    .mn-upload-text { font-size: 13px; color: #888; }
+
+    /* ── Scrollbar ──────────────────────────────────────────────────── */
+    .mn-chat::-webkit-scrollbar { width: 4px; }
+    .mn-chat::-webkit-scrollbar-track { background: transparent; }
+    .mn-chat::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+  </style>
+</head>
+<body>
+  <div class="mn-header">
+    <div class="mn-header-brand">
+      <div class="mn-header-logo">MN</div>
+      <div>
+        <div class="mn-header-title">AI Stylist</div>
+        <div class="mn-header-subtitle">Powered by MyNarrative</div>
+      </div>
+    </div>
+    <div class="mn-header-actions">
+      <button class="mn-icon-btn" id="mn-closet-btn" title="My Closet">👗</button>
+      <button class="mn-icon-btn" id="mn-close-btn" title="Close">✕</button>
+    </div>
+  </div>
+
+  <div class="mn-chat" id="mn-chat"></div>
+
+  <div class="mn-closet-panel" id="mn-closet-panel">
+    <div class="mn-upload-area" id="mn-upload-area">
+      <div class="mn-upload-icon">📸</div>
+      <div class="mn-upload-text">Drop a photo of your clothes or click to upload</div>
+      <input type="file" id="mn-upload-input" accept="image/*" multiple style="display:none">
+    </div>
+    <div class="mn-closet-grid" id="mn-closet-grid"></div>
+  </div>
+
+  <script>
+    // ── State ──────────────────────────────────────────────────────────
+    var config = {};
+    var userId = '';
+    var sessionId = '';
+    var apiBase = '';
+    var currencySymbol = '₹';
+    var currencyCode = 'INR';
+    var chatEl = document.getElementById('mn-chat');
+    var closetPanel = document.getElementById('mn-closet-panel');
+    var closetGrid = document.getElementById('mn-closet-grid');
+    var state = { step: 0, occasion: null, priceTier: null, includeCloset: false, activeOutfit: null, outfits: [], vtonImage: null };
+
+    // ── HTML sanitizer (prevents XSS from product data) ────────────────
+    function esc(str) {
+      if (!str) return '';
+      var d = document.createElement('div');
+      d.appendChild(document.createTextNode(str));
+      return d.innerHTML;
+    }
+
+    // ── Message helpers ────────────────────────────────────────────────
+    function addBotMsg(html) {
+      var div = document.createElement('div');
+      div.className = 'mn-msg mn-msg-bot';
+      div.innerHTML = html;
+      chatEl.appendChild(div);
+      chatEl.scrollTop = chatEl.scrollHeight;
+    }
+
+    function addUserMsg(text) {
+      var div = document.createElement('div');
+      div.className = 'mn-msg';
+      div.style.textAlign = 'right';
+      div.innerHTML = '<span style="background:rgba(57,165,150,0.2);padding:8px 12px;border-radius:10px;font-size:13px;display:inline-block;">' + text + '</span>';
+      chatEl.appendChild(div);
+      chatEl.scrollTop = chatEl.scrollHeight;
+    }
+
+    function addBtnGrid(options, callback, cols) {
+      var grid = document.createElement('div');
+      grid.className = 'mn-btn-grid' + (cols ? ' mn-btn-grid-' + cols : '');
+      options.forEach(function(opt) {
+        var btn = document.createElement('button');
+        btn.className = 'mn-option-btn';
+        btn.innerHTML = '<span class="icon">' + (opt.icon || '') + '</span>' + opt.label;
+        btn.onclick = function() {
+          grid.querySelectorAll('.mn-option-btn').forEach(function(b) { b.classList.remove('active'); });
+          btn.classList.add('active');
+          setTimeout(function() { callback(opt.value); }, 200);
+        };
+        grid.appendChild(btn);
+      });
+      chatEl.appendChild(grid);
+      chatEl.scrollTop = chatEl.scrollHeight;
+    }
+
+    function addLoading(msg) {
+      var div = document.createElement('div');
+      div.className = 'mn-loading';
+      div.id = 'mn-loading';
+      div.innerHTML = '<div class="mn-loading-dots"><div class="mn-loading-dot"></div><div class="mn-loading-dot"></div><div class="mn-loading-dot"></div></div>'
+        + '<div class="mn-loading-text">' + (msg || 'AI is styling your outfits...') + '</div>';
+      chatEl.appendChild(div);
+      chatEl.scrollTop = chatEl.scrollHeight;
+    }
+
+    function removeLoading() {
+      var el = document.getElementById('mn-loading');
+      if (el) el.remove();
+    }
+
+    // ── API call ───────────────────────────────────────────────────────
+    function apiCall(path, data, callback) {
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', apiBase + path, true);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+          try { callback(null, JSON.parse(xhr.responseText)); }
+          catch(e) { callback(e, null); }
+        }
+      };
+      xhr.send(JSON.stringify(data));
+    }
+
+    // ── Flow: Step 1 — Occasion ────────────────────────────────────────
+    function stepOccasion() {
+      addBotMsg('<strong>Hi! 👋</strong> I\'m your AI stylist. What\'s the occasion?');
+      addBtnGrid([
+        { icon: '☕', label: 'Casual', value: 'casual' },
+        { icon: '💼', label: 'Formal', value: 'formal' },
+        { icon: '🎉', label: 'Party', value: 'party' },
+        { icon: '📅', label: 'Work', value: 'work' },
+        { icon: '❤️', label: 'Date', value: 'date' },
+        { icon: '🏋️', label: 'Active', value: 'active' }
+      ], function(val) {
+        state.occasion = val;
+        addUserMsg(val.charAt(0).toUpperCase() + val.slice(1));
+        stepGender();
+      });
+    }
+
+    // ── Flow: Step 1b — Gender ────────────────────────────────────────
+    function stepGender() {
+      addBotMsg('What should I style for?');
+      addBtnGrid([
+        { icon: '👩', label: 'Women', value: 'women' },
+        { icon: '👨', label: 'Men', value: 'men' },
+        { icon: '⚧️', label: 'Unisex', value: 'unisex' }
+      ], function(val) {
+        state.gender = val;
+        addUserMsg(val.charAt(0).toUpperCase() + val.slice(1));
+        stepPrice();
+      }, 3);
+    }
+
+    // ── Flow: Step 2 — Price Tier ──────────────────────────────────────
+    function stepPrice() {
+      addBotMsg('What\'s your budget?');
+      // Dynamic currency labels
+      var curSym = currencySymbol || '₹';
+      var tiers = [
+        { icon: '💰', label: 'Under ' + curSym + '1,500', value: 'value' },
+        { icon: '✨', label: curSym + '1,500–3,500', value: 'premium' },
+        { icon: '👑', label: 'Above ' + curSym + '3,500', value: 'luxury' }
+      ];
+      // For USD/GBP/EUR, adjust thresholds
+      if (currencyCode === 'USD' || currencyCode === 'GBP' || currencyCode === 'EUR') {
+        tiers = [
+          { icon: '💰', label: 'Under ' + curSym + '25', value: 'value' },
+          { icon: '✨', label: curSym + '25–60', value: 'premium' },
+          { icon: '👑', label: 'Above ' + curSym + '60', value: 'luxury' }
+        ];
+      } else if (currencyCode === 'AED') {
+        tiers = [
+          { icon: '💰', label: 'Under ' + curSym + '100', value: 'value' },
+          { icon: '✨', label: curSym + '100–200', value: 'premium' },
+          { icon: '👑', label: 'Above ' + curSym + '200', value: 'luxury' }
+        ];
+      }
+      addBtnGrid(tiers, function(val) {
+        state.priceTier = val;
+        addUserMsg(val.charAt(0).toUpperCase() + val.slice(1));
+        stepClosetToggle();
+      }, 3);
+    }
+
+    // ── Flow: Step 3 — Closet Toggle ───────────────────────────────────
+    function stepClosetToggle() {
+      addBotMsg('Want to style with clothes you already own?');
+      var toggle = document.createElement('div');
+      toggle.className = 'mn-closet-toggle';
+      toggle.innerHTML = '<span class="mn-closet-toggle-label">Mix with my closet</span>'
+        + '<div class="mn-toggle-switch" id="mn-closet-switch"></div>';
+      chatEl.appendChild(toggle);
+
+      var switchEl = document.getElementById('mn-closet-switch');
+      switchEl.onclick = function() {
+        state.includeCloset = !state.includeCloset;
+        switchEl.classList.toggle('active', state.includeCloset);
+        if (state.includeCloset) {
+          addUserMsg('Yes, mix with my closet');
+        } else {
+          addUserMsg('Just brand recommendations');
+        }
+        setTimeout(function() { generateRecommendations(); }, 300);
+      };
+
+      // Add a "Skip" button instead of auto-skip
+      var skipBtn = document.createElement('button');
+      skipBtn.className = 'mn-option-btn';
+      skipBtn.style.marginTop = '8px';
+      skipBtn.style.width = '100%';
+      skipBtn.textContent = 'Skip — just recommend from brand';
+      skipBtn.onclick = function() {
+        state.includeCloset = false;
+        addUserMsg('Skip closet');
+        setTimeout(function() { generateRecommendations(); }, 200);
+      };
+      chatEl.appendChild(skipBtn);
+      chatEl.scrollTop = chatEl.scrollHeight;
+    }
+
+    // ── Flow: Step 4 — Generate Recommendations ────────────────────────
+    function generateRecommendations() {
+      if (state.step >= 4) return;
+      state.step = 4;
+
+      addLoading('AI is finding your perfect outfits...');
+
+      apiCall('/api/recommend', {
+        user_id: userId,
+        session_token: sessionId,
+        occasion: state.occasion,
+        price_tier: state.priceTier,
+        include_closet: state.includeCloset,
+        outfit_count: 3,
+        gender: state.gender || config.gender || '',
+        currency: currencyCode || 'INR'
+      }, function(err, response) {
+        removeLoading();
+        if (err || !response || response.error) {
+          if (response && response.error === 'subscription_expired') {
+            window.parent.postMessage({ type: 'SUBSCRIPTION_EXPIRED', payload: { redirect_url: response.redirect_url } }, '*');
+            return;
+          }
+          addBotMsg('Sorry, something went wrong. Please try again.');
+          return;
+        }
+        showRecommendations(response);
+      });
+    }
+
+    // ── Show Recommendations ───────────────────────────────────────────
+    function showRecommendations(response) {
+      var outfits = response.outfits || [];
+      if (!outfits.length) {
+        addBotMsg('No outfits found. Try a different occasion or budget.');
+        return;
+      }
+
+      state.outfits = outfits;
+      addBotMsg('<strong>Here are your outfits! ✨</strong> Tap an outfit to see details & shop.');
+
+      outfits.forEach(function(outfit, i) {
+        var items = outfit.items || [];
+        var card = document.createElement('div');
+        card.className = 'mn-outfit-card';
+        card.setAttribute('data-outfit-idx', i);
+
+        var mainItem = items[0] || {};
+        var price = outfit.total_price ? currencySymbol + outfit.total_price.toLocaleString() : '';
+
+        card.innerHTML = (mainItem.image_url ? '<img class="mn-outfit-img" src="' + esc(mainItem.image_url) + '" alt="">' : '<div class="mn-outfit-img" style="display:flex;align-items:center;justify-content:center;color:#555;font-size:40px;">👗</div>')
+          + '<div class="mn-outfit-body">'
+          + '<div class="mn-outfit-title">' + esc(outfit.title || 'Outfit ' + (i + 1)) + '</div>'
+          + (price ? '<div class="mn-outfit-price">' + esc(price) + '</div>' : '')
+          + '<div class="mn-outfit-reason">' + esc(outfit.reasoning || 'Perfect for ' + state.occasion) + '</div>'
+          + '<div class="mn-outfit-actions">'
+          + '<button class="mn-outfit-btn mn-btn-vton" data-outfit="' + i + '" onclick="event.stopPropagation();startVTON(' + i + ')">Try On</button>'
+          + '<button class="mn-outfit-btn mn-btn-shop" onclick="event.stopPropagation();showOutfitDetail(' + i + ')">View & Shop</button>'
+          + '</div>'
+          + '</div>';
+
+        card.onclick = function() { showOutfitDetail(i); };
+        chatEl.appendChild(card);
+      });
+
+      chatEl.scrollTop = chatEl.scrollHeight;
+      window.parent.postMessage({ type: 'WIDGET_EVENT', payload: { event: 'recommendations_viewed', data: { count: outfits.length } } }, '*');
+    }
+
+    // ── Outfit Detail View ─────────────────────────────────────────────
+    function showOutfitDetail(idx) {
+      var outfit = state.outfits[idx];
+      if (!outfit) return;
+      state.activeOutfit = idx;
+
+      var items = outfit.items || [];
+      var html = '';
+
+      // Back button
+      html += '<button class="mn-detail-back" onclick="showOutfitList()">← Back to outfits</button>';
+
+      // Main image
+      var mainItem = items[0] || {};
+      html += (mainItem.image_url
+        ? '<img class="mn-detail-img" src="' + esc(mainItem.image_url) + '" alt="">'
+        : '<div class="mn-detail-img" style="display:flex;align-items:center;justify-content:center;color:#555;font-size:40px;">👗</div>');
+
+      // Title + price + reasoning
+      html += '<div class="mn-detail-title">' + esc(outfit.title || 'Your Outfit') + '</div>';
+      if (outfit.total_price) {
+        html += '<div class="mn-detail-total">Total: ' + esc(currencySymbol + outfit.total_price.toLocaleString()) + '</div>';
+      }
+      html += '<div class="mn-detail-reason">' + esc(outfit.reasoning || '') + '</div>';
+
+      // Individual items with purchase links
+      html += '<div class="mn-detail-section-title">Outfit Pieces (' + items.length + ')</div>';
+
+      items.forEach(function(item, itemIdx) {
+        var purchaseLinks = item.purchase_links || [];
+        var bestPrice = item.best_price || item.price || 0;
+        var bestPlatform = item.best_platform || '';
+
+        html += '<div class="mn-item-card">';
+        html += '<div class="mn-item-header">';
+        if (item.image_url) {
+          html += '<img class="mn-item-img" src="' + esc(item.image_url) + '" alt="">';
+        }
+        html += '<div class="mn-item-info">';
+        html += '<div class="mn-item-name">' + esc(item.title || 'Item') + '</div>';
+        html += '<div class="mn-item-meta">' + esc(item.category || '') + (item.color ? ' · ' + esc(item.color) : '') + (item.brand ? ' · ' + esc(item.brand) : '') + '</div>';
+        html += '<div class="mn-item-price">' + esc(currencySymbol + (bestPrice || 0).toLocaleString()) + '</div>';
+        html += '</div>';
+        html += '</div>';
+
+        // Price comparison rows
+        if (purchaseLinks.length > 0) {
+          purchaseLinks.forEach(function(link) {
+            var isBest = link.is_best;
+            html += '<a class="mn-price-row' + (isBest ? ' best' : '') + '" href="' + esc(link.url || '#') + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">';
+            html += '<span class="mn-price-platform">' + esc(link.platform || 'Store') + '</span>';
+            html += '<span class="mn-price-delivery">' + esc(link.delivery || '') + '</span>';
+            html += '<span class="mn-price-amount">' + esc(currencySymbol + (link.price || 0).toLocaleString()) + '</span>';
+            if (isBest) html += '<span class="mn-price-badge">BEST</span>';
+            html += '<span class="mn-price-arrow">→</span>';
+            html += '</a>';
+          });
+        } else if (item.product_url) {
+          html += '<a class="mn-price-row best" href="' + esc(item.product_url) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">';
+          html += '<span class="mn-price-platform">' + esc(item.brand || 'Store') + '</span>';
+          html += '<span class="mn-price-amount">' + esc(currencySymbol + (item.price || 0).toLocaleString()) + '</span>';
+          html += '<span class="mn-price-badge">SHOP</span>';
+          html += '<span class="mn-price-arrow">→</span>';
+          html += '</a>';
+        }
+
+        html += '</div>';
+      });
+
+      // Action buttons
+      html += '<div class="mn-detail-actions">';
+      html += '<button class="mn-detail-btn mn-detail-btn-vton" onclick="startVTON(' + idx + ')">✨ Try On</button>';
+      html += '<button class="mn-detail-btn mn-detail-btn-shop" onclick="window.parent.postMessage({type:\'WIDGET_EVENT\',payload:{event:\'shop_outfit\',data:{outfit_idx:' + idx + '}}},\'*\')">🛒 Shop All</button>';
+      html += '</div>';
+
+      chatEl.innerHTML = '';
+      addBotMsg(html);
+    }
+
+    function showOutfitList() {
+      state.activeOutfit = null;
+      chatEl.innerHTML = '';
+      if (state.outfits.length) {
+        addBotMsg('<strong>Your outfits ✨</strong> Tap one to see details & shop.');
+        state.outfits.forEach(function(outfit, i) {
+          var items = outfit.items || [];
+          var card = document.createElement('div');
+          card.className = 'mn-outfit-card';
+          var mainItem = items[0] || {};
+          var price = outfit.total_price ? currencySymbol + outfit.total_price.toLocaleString() : '';
+          card.innerHTML = (mainItem.image_url ? '<img class="mn-outfit-img" src="' + esc(mainItem.image_url) + '" alt="">' : '<div class="mn-outfit-img" style="display:flex;align-items:center;justify-content:center;color:#555;font-size:40px;">👗</div>')
+            + '<div class="mn-outfit-body">'
+            + '<div class="mn-outfit-title">' + esc(outfit.title || 'Outfit ' + (i + 1)) + '</div>'
+            + (price ? '<div class="mn-outfit-price">' + esc(price) + '</div>' : '')
+            + '<div class="mn-outfit-reason">' + esc(outfit.reasoning || '') + '</div>'
+            + '<div class="mn-outfit-actions">'
+            + '<button class="mn-outfit-btn mn-btn-vton" onclick="event.stopPropagation();startVTON(' + i + ')">Try On</button>'
+            + '<button class="mn-outfit-btn mn-btn-shop" onclick="event.stopPropagation();showOutfitDetail(' + i + ')">View & Shop</button>'
+            + '</div></div>';
+          card.onclick = function() { showOutfitDetail(i); };
+          chatEl.appendChild(card);
+        });
+        chatEl.scrollTop = chatEl.scrollHeight;
+      }
+    }
+
+    // ── VTON Handler ───────────────────────────────────────────────────
+    function startVTON(outfitIdx) {
+      var outfit = state.outfits[outfitIdx];
+      if (!outfit) return;
+      var items = outfit.items || [];
+      var garmentItem = items[0] || {};
+      var garmentImage = garmentItem.flat_lay_url || garmentItem.image_url || '';
+      if (!garmentImage) {
+        addBotMsg('Sorry, no garment image available for try-on.');
+        return;
+      }
+
+      addLoading('Uploading your photo for virtual try-on...');
+
+      // Check if we have a user photo (from closet upload or session)
+      if (!state.userPhoto) {
+        removeLoading();
+        addBotMsg('<strong>Upload a photo</strong> to see how this outfit looks on you!');
+        var uploadArea2 = document.createElement('div');
+        uploadArea2.className = 'mn-upload-area';
+        uploadArea2.innerHTML = '<div class="mn-upload-icon">📸</div><div class="mn-upload-text">Tap to upload a full-body photo</div><input type="file" id="mn-vton-upload" accept="image/*" style="display:none">';
+        chatEl.appendChild(uploadArea2);
+        var vtonInput = document.getElementById('mn-vton-upload');
+        uploadArea2.onclick = function() { vtonInput.click(); };
+        vtonInput.onchange = function(e) {
+          if (e.target.files && e.target.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(ev) {
+              state.userPhoto = ev.target.result;
+              uploadArea2.remove();
+              doVTON(outfitIdx, garmentImage, garmentItem.title || 'outfit piece');
+            };
+            reader.readAsDataURL(e.target.files[0]);
+          }
+        };
+        return;
+      }
+
+      doVTON(outfitIdx, garmentImage, garmentItem.title || 'outfit piece');
+    }
+
+    function doVTON(outfitIdx, garmentImage, garmentDesc) {
+      addLoading('AI is trying on this outfit... This may take 30 seconds.');
+
+      apiCall('/api/fashion/try-on', {
+        mode: 'vton',
+        user_image: state.userPhoto,
+        garment_image: garmentImage,
+        description: garmentDesc,
+        category: 'upper_body'
+      }, function(err, response) {
+        removeLoading();
+        if (err || !response || response.error) {
+          addBotMsg('Virtual try-on is temporarily unavailable. ' + (response && response.error ? response.error : 'Please try again.'));
+          return;
+        }
+        if (response.image) {
+          state.vtonImage = response.image;
+          addBotMsg('<strong>Here\'s how it looks on you! ✨</strong>');
+          var vtonCard = document.createElement('div');
+          vtonCard.className = 'mn-outfit-card';
+          vtonCard.innerHTML = '<img class="mn-outfit-img" src="' + esc(response.image) + '" style="height:300px" alt="Virtual Try-On">'
+            + '<div class="mn-outfit-body"><div class="mn-outfit-title">Virtual Try-On Result</div>'
+            + '<div class="mn-outfit-reason">This is how the outfit piece would look on you.</div>'
+            + '<div class="mn-outfit-actions">'
+            + '<button class="mn-outfit-btn mn-btn-shop" onclick="showOutfitDetail(' + outfitIdx + ')">View & Shop</button>'
+            + '</div></div>';
+          chatEl.appendChild(vtonCard);
+          chatEl.scrollTop = chatEl.scrollHeight;
+        } else {
+          addBotMsg('Try-on completed but no image was returned. Please try again.');
+        }
+      });
+    }
+
+    // ── Closet Panel ───────────────────────────────────────────────────
+    document.getElementById('mn-closet-btn').onclick = function() {
+      closetPanel.classList.toggle('active');
+    };
+
+    // ── Upload Handler ─────────────────────────────────────────────────
+    var uploadArea = document.getElementById('mn-upload-area');
+    var uploadInput = document.getElementById('mn-upload-input');
+
+    uploadArea.onclick = function() { uploadInput.click(); };
+    uploadInput.onchange = function(e) {
+      Array.from(e.target.files).forEach(uploadClosetItem);
+    };
+
+    uploadArea.ondragover = function(e) { e.preventDefault(); uploadArea.style.borderColor = '#39A596'; };
+    uploadArea.ondragleave = function() { uploadArea.style.borderColor = ''; };
+    uploadArea.ondrop = function(e) {
+      e.preventDefault();
+      uploadArea.style.borderColor = '';
+      Array.from(e.dataTransfer.files).forEach(uploadClosetItem);
+    };
+
+    function uploadClosetItem(file) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var div = document.createElement('div');
+        div.className = 'mn-closet-item';
+        div.innerHTML = '<img src="' + e.target.result + '" alt="Closet item">';
+        closetGrid.appendChild(div);
+
+        // Upload to API
+        var formData = new FormData();
+        formData.append('image', file);
+        formData.append('user_id', userId);
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', apiBase + '/api/closet/upload', true);
+        xhr.onreadystatechange = function() {
+          if (xhr.readyState === 4) {
+            try {
+              var result = JSON.parse(xhr.responseText);
+              if (result.category) {
+                div.innerHTML += '<span class="mn-closet-item-badge">' + result.category + '</span>';
+              }
+              window.parent.postMessage({ type: 'CLOSET_UPLOAD', payload: result }, '*');
+            } catch(e) {}
+          }
+        };
+        xhr.send(formData);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // ── Close button ───────────────────────────────────────────────────
+    document.getElementById('mn-close-btn').onclick = function() {
+      window.parent.postMessage({ type: 'CLOSE_WIDGET' }, '*');
+    };
+
+    // ── Receive config from parent ─────────────────────────────────────
+    window.addEventListener('message', function(event) {
+      if (event.data && event.data.type === 'SET_CONFIG') {
+        var p = event.data.payload;
+        sessionId = p.session_token || '';
+        userId = p.user_id || '';
+        apiBase = p.api_base || '';
+        config = p.widget_config || {};
+        currencySymbol = p.currency_symbol || '₹';
+        currencyCode = p.currency_code || 'INR';
+
+        // Apply theme
+        if (config.primary_color) {
+          document.documentElement.style.setProperty('--mn-primary', config.primary_color);
+        }
+
+        // Start flow
+        stepOccasion();
+      }
+    });
+
+    // ── Request config from parent ─────────────────────────────────────
+    window.parent.postMessage({ type: 'IFRAME_READY' }, '*');
+  </script>
+</body>
+</html>

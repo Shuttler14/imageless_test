@@ -606,7 +606,7 @@ document.addEventListener('DOMContentLoaded', function(){
               let gridHtml = '<div class="search-results-grid">';
               products.forEach(p => {
                 const image = p.image ? `<img src="${p.image}" alt="${p.title}">` : '';
-                const price = p.price ? '₹' + Math.floor(p.price).toLocaleString() : '';
+                const price = p.price ? (window.MN_currency && window.MN_currency.format ? window.MN_currency.format(Math.floor(p.price)) : '₹' + Math.floor(p.price).toLocaleString()) : '';
                 
                 // Use Product Type for Green Subtitle
                 const subtitle = p.type || 'Unisex';

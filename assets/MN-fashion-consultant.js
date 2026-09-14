@@ -143,7 +143,7 @@ const CREATOR_API_URL = window.MN_CONFIG?.creatorApiUrl || 'https://drishti-api-
   // ── UTILITIES ──────────────────────────────────────────────────────────
   const $  = (sel) => document.querySelector(sel);
   const $$ = (sel) => document.querySelectorAll(sel);
-  const INR = (n)  => '₹' + n.toLocaleString('en-IN');
+  const INR = (n)  => { var c=window.MN_currency; return c&&c.format?c.format(n):'₹'+n.toLocaleString('en-IN'); };
 
   const setContent = (html) => {
     const c = $('#mn-content-container');
@@ -1097,7 +1097,7 @@ function renderAvatarStyleResults(recommendations, selectedLabels, occasionId, v
             ${exactUrl ? `
               <a href="${exactUrl}" target="_blank" rel="noopener noreferrer" style="background:rgba(57,165,150,0.15);border:1px solid rgba(57,165,150,0.3);border-radius:8px;padding:8px 12px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;flex-shrink:0">
                 <span style="font-size:11px;font-weight:700;color:#fff">${rec.platform || 'Shop'}</span>
-                ${rec.price ? `<span style="font-size:10px;color:#4fffd9;font-weight:700">₹${Number(rec.price).toLocaleString('en-IN')}</span>` : ''}
+                ${rec.price ? `<span style="font-size:10px;color:#4fffd9;font-weight:700">${INR(Number(rec.price))}</span>` : ''}
               </a>
             ` : `<span style="font-size:9px;color:rgba(255,255,255,0.35)">Exact product link unavailable</span>`}
           </div>
@@ -1457,12 +1457,12 @@ function renderAffiliateResults(data) {
             ${exactUrl ? `
               <a href="${exactUrl}" target="_blank" rel="noopener noreferrer" class="mn-shop-link" style="background:rgba(57,165,150,0.15);border:1px solid rgba(57,165,150,0.3);border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:5px;text-decoration:none;min-width:88px;justify-content:center">
                 <span style="font-size:11px;font-weight:800;color:#fff">${rec.platform || 'Shop'}</span>
-                ${rec.price ? `<span style="font-size:10px;color:#4fffd9;font-weight:600">₹${Number(rec.price).toLocaleString('en-IN')}</span>` : ''}
+                ${rec.price ? `<span style="font-size:10px;color:#4fffd9;font-weight:600">${INR(Number(rec.price))}</span>` : ''}
               </a>
             ` : `<span style="font-size:9px;color:rgba(255,255,255,0.35)">Exact product link unavailable</span>`}
             ${rec.original_price && rec.discount_pct ? `
               <div style="display:flex;align-items:center;gap:4px;padding:3px 6px;background:rgba(239,68,68,0.1);border-radius:6px">
-                <span style="font-size:9px;color:rgba(255,255,255,0.35);text-decoration:line-through">₹${Number(rec.original_price).toLocaleString('en-IN')}</span>
+                <span style="font-size:9px;color:rgba(255,255,255,0.35);text-decoration:line-through">${INR(Number(rec.original_price))}</span>
                 <span style="font-size:10px;color:#ef4444;font-weight:800">${rec.discount_pct}%</span>
               </div>
             ` : ''}

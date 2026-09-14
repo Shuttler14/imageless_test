@@ -1005,9 +1005,11 @@ SECTION CONFIGURATION
 
         function rupees(n) {
           n = parseFloat(n) || 0;
-          if (n >= 100000) return '₹' + (n/100000).toFixed(1) + 'L';
-          if (n >= 1000)   return '₹' + (n/1000).toFixed(1)   + 'K';
-          return '₹' + n.toFixed(0);
+          var c = window.MN_currency;
+          var fmt = c && c.format ? function(v){return c.format(v);} : function(v){return '₹'+Number(v).toLocaleString('en-IN');};
+          if (n >= 100000) return fmt(n/100000).replace(/\.0$/,'') + 'L';
+          if (n >= 1000)   return fmt(n/1000).replace(/\.0$/,'') + 'K';
+          return fmt(n);
         }
 
         function setText(id, val) {
@@ -1269,7 +1271,8 @@ SECTION CONFIGURATION
 
   // Format currency
   function formatCurrency(num) {
-    return '₹' + num.toLocaleString('en-IN');
+    var c = window.MN_currency;
+    return c && c.format ? c.format(num) : '₹' + num.toLocaleString('en-IN');
   }
 
   // Get relative time
@@ -1465,7 +1468,7 @@ SECTION CONFIGURATION
         </div>
         <div class="cd-product-info">
           <h4>${product.name}</h4>
-          <p>₹${product.price} • ${product.sales || 0} sales</p>
+          <p>${window.MN_currency && window.MN_currency.format ? window.MN_currency.format(product.price) : '₹'+product.price} • ${product.sales || 0} sales</p>
         </div>
       </div>
     `).join('');

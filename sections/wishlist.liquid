@@ -170,7 +170,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 function buildProductCard(product) {
   // --- Exact Logic from Search Bar ---
-  const price = '₹' + Math.floor(product.price / 100).toLocaleString('en-IN');
+  const price = (window.MN_currency && window.MN_currency.format ? window.MN_currency.format : function(n){return '₹'+Number(n).toLocaleString('en-IN');})(Math.floor(product.price / 100));
   const subtitle = product.type || 'Unisex'; // Using Type as the "Green Subtitle"
 
   return `
