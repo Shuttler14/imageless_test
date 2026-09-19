@@ -237,6 +237,7 @@ function mnNormalizePipelineResponse(data) {
     styling_tips: payload.styling_tips || rec.styling_tips || rec.suggestions || [],
     color_science: payload.color_science || rec.color_science || rec.color_science_note || '',
     archetype_note: payload.archetype_note || rec.archetype_note || '',
+    garment_candidates: payload.garment_candidates || [],
   };
 }
 
@@ -1003,15 +1004,40 @@ function renderAvatarStyleResults(recommendations, selectedLabels, occasionId, v
         </div>
       </div>
 
-      <div class="mn-outfit-items" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
-        ${categorized.map(item => `
-          <div class="mn-outfit-item" style="background:rgba(255,255,255,0.04);border:1px solid ${item.owned ? 'rgba(57,165,150,0.3)' : 'rgba(255,255,255,0.08)'};border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:4px">
-            <div style="width:28px;height:28px;border-radius:6px;background:${item.color || '#333'};margin-bottom:4px"></div>
-            <div style="font-size:12px;font-weight:700;color:#fff">${shortText(item.name, 36)}</div>
-            <div style="font-size:10px;color:${item.owned ? '#39A596' : 'rgba(255,255,255,0.4)'}">${item.owned ? 'Yours' : 'Shop'}</div>
-            ${item.why ? `<div style="font-size:10px;opacity:0.55;color:rgba(255,255,255,0.65)">${shortText(item.why, 56)}</div>` : ''}
-          </div>
-        `).join('')}
+      <div class="mn-outfit-items" style="margin-bottom:16px">
+        ${(() => {
+          const candidates = recommendations.garment_candidates || [];
+          if (candidates.length > 0) {
+            return `
+              <p style="font-size:9px;font-weight:800;color:#39A596;text-transform:uppercase;letter-spacing:0.1em;margin:0 0 8px">Try these garments</p>
+              <div style="display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding-bottom:4px" id="mn-flatlay-scroll">
+                ${candidates.map((c, i) => `
+                  <div class="mn-flatlay-card" data-idx="${i}" style="flex:0 0 110px;scroll-snap-align:start;background:rgba(255,255,255,0.04);border:1px solid ${i === 0 ? 'rgba(57,165,150,0.5)' : 'rgba(255,255,255,0.08)'};border-radius:10px;overflow:hidden;cursor:pointer;transition:border-color 0.2s">
+                    <div style="width:110px;height:110px;overflow:hidden;background:#111">
+                      <img src="${c.flat_lay_url || c.garment_url || ''}" alt="${shortText(c.title, 30)}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'" loading="lazy" />
+                    </div>
+                    <div style="padding:6px 8px">
+                      <div style="font-size:10px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${shortText(c.title, 28)}</div>
+                      <div style="font-size:9px;color:rgba(255,255,255,0.4);margin-top:2px">${c.platform || 'Global'}</div>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            `;
+          }
+          // Fallback: show outfit pieces as before
+          return `
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              ${categorized.map(item => `
+                <div class="mn-outfit-item" style="background:rgba(255,255,255,0.04);border:1px solid ${item.owned ? 'rgba(57,165,150,0.3)' : 'rgba(255,255,255,0.08)'};border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:4px">
+                  <div style="width:28px;height:28px;border-radius:6px;background:${item.color || '#333'};margin-bottom:4px"></div>
+                  <div style="font-size:12px;font-weight:700;color:#fff">${shortText(item.name, 36)}</div>
+                  <div style="font-size:10px;color:${item.owned ? '#39A596' : 'rgba(255,255,255,0.4)'}">${item.owned ? 'Yours' : 'Shop'}</div>
+                </div>
+              `).join('')}
+            </div>
+          `;
+        })()}
       </div>
 
       ${recommendations.color_science ? `
@@ -1020,6 +1046,27 @@ function renderAvatarStyleResults(recommendations, selectedLabels, occasionId, v
           <p style="font-size:11px;color:rgba(255,255,255,0.72);margin:0;line-height:1.45">${shortText(recommendations.color_science, 140)}</p>
         </div>
       ` : ''}
+
+      ${(() => {
+        const bio = (pipelineData && pipelineData.biometrics) || {};
+        if (!bio.physique_analyzed) return '';
+        const tags = [];
+        if (bio.undertone) tags.push('Undertone: ' + bio.undertone);
+        if (bio.fitness_level) tags.push('Build: ' + bio.fitness_level);
+        if (bio.face_shape) tags.push('Face: ' + bio.face_shape);
+        if (bio.hair_color) tags.push('Hair: ' + bio.hair_color);
+        if (bio.shoulder_width) tags.push('Shoulders: ' + bio.shoulder_width);
+        if (bio.height_estimate) tags.push('Height: ' + bio.height_estimate);
+        if (!tags.length) return '';
+        return `
+          <div style="background:rgba(168,85,247,0.06);border:1px solid rgba(168,85,247,0.18);border-radius:10px;padding:10px 12px;margin-bottom:12px;backdrop-filter:blur(8px)">
+            <p style="font-size:9px;font-weight:800;color:#A855F7;text-transform:uppercase;letter-spacing:0.1em;margin:0 0 6px">Body Analysis</p>
+            <div style="display:flex;flex-wrap:wrap;gap:4px">
+              ${tags.map(t => '<span style="font-size:9px;color:rgba(255,255,255,0.6);background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.2);border-radius:6px;padding:3px 7px">' + t + '</span>').join('')}
+            </div>
+          </div>
+        `;
+      })()}
 
       ${tipsPick.length ? `
         <div style="margin-bottom:14px">
@@ -1128,6 +1175,25 @@ function renderAvatarStyleResults(recommendations, selectedLabels, occasionId, v
     }
   }
   renderAffiliateUpsells((pipelineData && pipelineData.affiliate_upsells) || []);
+
+  // Flat-lay card click handlers — tap to view in hero panel
+  document.querySelectorAll('.mn-flatlay-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const idx = parseInt(card.dataset.idx, 10);
+      const candidates = (recommendations && recommendations.garment_candidates) || [];
+      const c = candidates[idx];
+      if (!c) return;
+      // Highlight selected card
+      document.querySelectorAll('.mn-flatlay-card').forEach(cc => cc.style.borderColor = 'rgba(255,255,255,0.08)');
+      card.style.borderColor = 'rgba(57,165,150,0.5)';
+      // Swap hero image to this garment's flat-lay
+      const heroInner = document.getElementById('mn-flux-inner');
+      if (heroInner && (c.flat_lay_url || c.garment_url)) {
+        heroInner.innerHTML = '<img src="' + (c.flat_lay_url || c.garment_url) + '" alt="' + shortText(c.title, 30) + '" style="width:100%;height:100%;object-fit:cover;border-radius:10px" onerror="this.style.display=\'none\'" />';
+        state.currentLookImage = c.flat_lay_url || c.garment_url;
+      }
+    });
+  });
 
   document.getElementById('btn-regenerate')?.addEventListener('click', renderStep5A);
   document.getElementById('btn-save-look')?.addEventListener('click', () => {
