@@ -35,6 +35,9 @@ var DNA_OCCASIONS=[
 
 var DNA_PLACES=['Myntra','AJIO','Amazon Fashion','Tata CLiQ','Nykaa Fashion','Flipkart','Meesho','Brand stores'];
 
+/* Marketplaces with standardized returns policy — vs brand-owned stores */
+var MN_MARKETPLACES=['amazon','flipkart','myntra','ajio','meesho','nykaa','nykaaman','nykaafashion','jiomart','tatacliq','snapdeal'];
+
 var CLOSET_CATS=['Top','Bottom','Shoes','Outerwear','Accessory'];
 
 /* ── Look narrative pools (algorithmic naming) ── */
@@ -432,6 +435,30 @@ var d=JSON.parse(raw);
 if(d&&d.w&&Date.now()-d.ts<3600000)st.weather=d.w;
 }catch(e){}
 }
+function lookGarmentUrls(look){
+/* Full-look try-on: hero + bottom + shoes (max 4 garments). Accessories
+   are excluded — the try-on model renders clothing/footwear only. */
+var VTON_SLOTS={full:1,top:1,bottom:1,shoes:1};
+var seen={},urls=[];
+look.items.forEach(function(it){
+if(!it.image_url||!VTON_SLOTS[it.slot])return;
+if(seen[it.image_url])return;
+seen[it.image_url]=1;
+urls.push(it.image_url);
+});
+if(!urls.length&&look.hero&&look.hero.image_url)urls.push(look.hero.image_url);
+return urls.slice(0,4);
+}
+function resolveGarmentUrls(urls,cb){
+/* Upload any data-URI garments, pass through http(s) ones. */
+var out=[],pending=urls.length;
+if(!pending){cb([]);return;}
+urls.forEach(function(u,i){
+if(u&&u.indexOf('data:')===0){
+uploadGarmentToGetUrl(u,function(uploaded){out[i]=uploaded||null;if(--pending===0)cb(out.filter(Boolean));});
+}else{out[i]=u;if(--pending===0)cb(out.filter(Boolean));}
+});
+}
 function startLooksVton(){
 if(!st.looks.length)return;
 var personUrl=st.photoUrl||st.photo;
@@ -442,21 +469,18 @@ if(!queue.length)return;
 var i=queue.shift();
 var look=st.looks[i];
 if(!look||!look.hero||!look.hero.image_url){next();return;}
-function doVton(finalGarment){
-if(!finalGarment){look.vtonFailed=true;render();next();return;}
+var garments=lookGarmentUrls(look);
+resolveGarmentUrls(garments,function(finalGarments){
+if(!finalGarments.length){look.vtonFailed=true;render();next();return;}
 fetch(API+'/api/vton/try-on',{method:'POST',headers:{'Content-Type':'application/json'},
-body:JSON.stringify({person_image_url:personUrl,garment_image_url:finalGarment,extract_garment:false,seed:randomSeed()})})
+body:JSON.stringify({person_image_url:personUrl,garment_image_url:finalGarments[0],garment_image_urls:finalGarments,extract_garment:false,seed:randomSeed()})})
 .then(function(r){return r.json();})
 .then(function(d){
 var url=d.result_image||d.result_image_url||d.vton_image_url||d.image_url||d.output_image||d.image||d.url;
 if(url)look.vton=url;else look.vtonFailed=true;
 render();next();
 }).catch(function(){look.vtonFailed=true;render();next();});
-}
-var gUrl=look.hero.image_url;
-if(gUrl&&gUrl.indexOf('data:')===0){
-uploadGarmentToGetUrl(gUrl,function(u){doVton(u||null);});
-}else{doVton(gUrl);}
+});
 }
 next();
 }
@@ -470,21 +494,18 @@ var personUrl=st.photoUrl||st.photo;
 if(!personUrl)return;
 look.vton=null;look.vtonFailed=false;look.regenerating=true;
 render();
-var gUrl=look.hero.image_url;
-function doVton(finalGarment){
-if(!finalGarment){look.vtonFailed=true;look.regenerating=false;render();return;}
+var garments=lookGarmentUrls(look);
+resolveGarmentUrls(garments,function(finalGarments){
+if(!finalGarments.length){look.vtonFailed=true;look.regenerating=false;render();return;}
 fetch(API+'/api/vton/try-on',{method:'POST',headers:{'Content-Type':'application/json'},
-body:JSON.stringify({person_image_url:personUrl,garment_image_url:finalGarment,extract_garment:false,seed:randomSeed()})})
+body:JSON.stringify({person_image_url:personUrl,garment_image_url:finalGarments[0],garment_image_urls:finalGarments,extract_garment:false,seed:randomSeed()})})
 .then(function(r){return r.json();})
 .then(function(d){
 var url=d.result_image||d.result_image_url||d.vton_image_url||d.image_url||d.output_image||d.image||d.url;
 if(url)look.vton=url;else look.vtonFailed=true;
 look.regenerating=false;render();
 }).catch(function(){look.vtonFailed=true;look.regenerating=false;render();});
-}
-if(gUrl&&gUrl.indexOf('data:')===0){
-uploadGarmentToGetUrl(gUrl,function(u){doVton(u||null);});
-}else{doVton(gUrl);}
+});
 }
 function uploadGarmentToGetUrl(dataUrl,cb){
 var pts=dataUrl.split(','),mime=(pts[0].match(/:(.*?);/)||[])[1]||'image/png';
@@ -931,8 +952,9 @@ if(!look)return'';
 var rows='';
 var retailers={};
 look.items.forEach(function(it){
-var key=(it.source||'retailer').toLowerCase();
-if(!retailers[key])retailers[key]={name:it.source||'Retailer',items:[],total:0,best:0};
+var key=(it.source||'').toLowerCase();
+if(!key||key==='unknown')key=('brand:'+(it.brand||'store')).toLowerCase();
+if(!retailers[key])retailers[key]={name:(it.source&&it.source!=='unknown')?it.source:(it.brand||'Store'),items:[],total:0,best:0};
 retailers[key].items.push(it);
 retailers[key].total+=it.price||0;
 if(it.discount_pct>retailers[key].best)retailers[key].best=it.discount_pct;
@@ -943,7 +965,13 @@ keys.forEach(function(k,idx){
 var r=retailers[k];
 var label=r.name.charAt(0).toUpperCase()+r.name.slice(1);
 var badge=idx===0?'<span class="mn4-best-tag">Best Price</span>':'';
-var disc=r.best>=5?'<span class="mn4-disc-note">'+r.best+'% off</span>':'<span class="mn4-disc-note">Easy returns</span>';
+/* "Easy returns" is marketplace-specific (Amazon/Flipkart/Myntra/Ajio...) —
+   brand stores get it only when the offer data confirms it. */
+var isMarketplace=MN_MARKETPLACES.indexOf(k)>=0;
+var disc;
+if(r.best>=5)disc='<span class="mn4-disc-note">'+r.best+'% off</span>';
+else if(isMarketplace)disc='<span class="mn4-disc-note">Easy returns</span>';
+else disc='<span class="mn4-disc-note">Official store</span>';
 var first=r.items[0];
 rows+='<div class="mn4-retailer-row">'
 +'<span class="mn4-retailer-logo">'+esc(label.charAt(0))+'</span>'
