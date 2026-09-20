@@ -6,6 +6,7 @@
 'use strict';
 
 var API='https://drishti-api.fly.dev';
+var VERCEL_API='https://drishti-api-blond.vercel.app';
 
 /* ── Occasions (6 hero cards + other) ── */
 var OCC=[
@@ -320,13 +321,66 @@ st.hero=st.outfits[0];
 buildLooks();
 st.loading=false;
 goStep('result');
-startLooksVton();
+/* Only run VTON if no pre-generated images */
+var hasVton=st.looks.some(function(l){return !!l.vton;});
+if(!hasVton)startLooksVton();
 }).catch(function(e){
 st.loading=false;st.error=e.message||'Could not create your look';render();
 });
 });
 }
 function fetchRecs(p){
+/* If user photo available, use Vercel backend which returns VTON images directly */
+if(st.photo||st.photoUrl){
+var personImage=st.photoUrl||st.photo;
+var vercelPayload=Object.assign({},p,{
+brand_id:p.brand_id||'',
+brand_name:p.brand_name||'',
+user_image:personImage,
+outfit_count:4,
+});
+return fetch(VERCEL_API+'/api/recommend',{
+method:'POST',
+headers:{'Content-Type':'application/json'},
+body:JSON.stringify(vercelPayload)
+})
+.then(function(r){return r.json();})
+.then(function(d){
+var recs=(d.outfits||[]).map(function(outfit,idx){
+var items=(outfit.items||[]).map(function(r){
+return{
+id:r.product_id||r.id,
+title:r.title||'Recommended',
+price:r.price||0,
+mrp:r.mrp||0,
+discount_pct:r.discount_pct||0,
+url:r.url||r.product_url||'',
+image_url:r.image_url||r.image||'',
+slot:r.slot||r.category||'top',
+vton_friendly:r.vton_friendly!==false,
+source:r.source||'',
+brand:r.brand||'',
+reason:r.reason||'',
+score:r.score||0,
+_is_partner:r._is_partner||false,
+};
+});
+return{
+id:outfit.id||('outfit_'+idx),
+title:outfit.title||'Look '+(idx+1),
+vton_image:outfit.vton_image||null,
+vton_hero:outfit.vton_hero||'',
+vton_quality:outfit.vton_quality||null,
+items:items,
+total:items.reduce(function(s,x){return s+(x.price||0);},0),
+};
+});
+st.dynamicBrands=d.brands||st.dynamicBrands;
+st.budgetIntel=d.budget_intelligence||null;
+return{recs:recs};
+});
+}
+/* Fallback: Fly.io direct (no VTON pre-generation) */
 var fetchMain=fetch(API+'/api/reco/outfits',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)})
 .then(function(r){return r.json();})
 .then(function(d){
@@ -385,7 +439,9 @@ name:meta.names[i%meta.names.length],
 desc:meta.descs[i%meta.descs.length],
 tags:meta.tags[i%meta.tags.length],
 hero:hero,items:lookItems,total:total,
-vton:null,vtonFailed:false
+vton:hero.vton_image||null,
+vtonHero:hero.vton_hero||'',
+vtonFailed:false,
 };
 });
 st.activeLook=0;
@@ -933,15 +989,16 @@ var look=st.looks[st.activeLook];
 if(!look)return'';
 var cards='';
 look.items.forEach(function(it){
+var partnerBadge=it._is_partner?'<span class="mn4-partner-badge">Partner</span>':'';
 cards+='<a class="mn4-item-card" '+(it.url?'href="'+esc(it.url)+'" target="_blank" rel="noopener"':'')+'>'
-+'<div class="mn4-item-thumb"><img src="'+esc(it.image_url)+'" alt="'+esc(it.title)+'" loading="lazy" onerror="this.style.display=\'none\'"></div>'
++'<div class="mn4-item-thumb"><img src="'+esc(it.image_url)+'" alt="'+esc(it.title)+'" loading="lazy" onerror="this.style.display=\'none\'">'+partnerBadge+'</div>'
 +'<div class="mn4-item-name">'+esc(it.brand||slotLabel(it.slot))+'</div>'
 +'<div class="mn4-item-title">'+esc(it.title.length>30?it.title.slice(0,30)+'\u2026':it.title)+'</div>'
 +'<div class="mn4-item-price">'+fmtPrice(it.price)+' <span class="mn4-item-chev">\u203A</span></div>'
 +'</a>';
 });
 return'<div class="mn4-items-block">'
-+'<div class="mn4-items-head"><span class="mn4-section-label" style="margin:0">Items in this look</span>'
++'<div class="mn4-items-head"><span class="mn4-section-label" style="margin:0">Shop the Look</span>'
 +'<span class="mn4-items-count">'+look.items.length+' item'+(look.items.length>1?'s':'')+'</span></div>'
 +'<div class="mn4-items-scroll">'+cards+'</div>'
 +'</div>';

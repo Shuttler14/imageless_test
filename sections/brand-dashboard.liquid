@@ -1,0 +1,127 @@
+{{ 'brand-dashboard.css' | asset_url | stylesheet_tag }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="{{ 'brand-dashboard.js' | asset_url }}" defer></script>
+
+<div id="db-app" class="db-app">
+  <!-- Sidebar -->
+  <aside class="db-sidebar" id="db-sidebar">
+    <div class="db-sidebar-logo">
+      <span class="db-logo-icon">◆</span>
+      <span class="db-logo-text">NARRATIVE</span>
+      <span class="db-logo-badge">ADS</span>
+    </div>
+    
+    <nav class="db-sidebar-nav">
+      <a class="db-nav-item active" data-view="overview">
+        <span class="db-nav-icon">◐</span>
+        <span class="db-nav-label">Overview</span>
+      </a>
+      <a class="db-nav-item" data-view="campaigns">
+        <span class="db-nav-icon">◈</span>
+        <span class="db-nav-label">Campaigns</span>
+      </a>
+      <a class="db-nav-item" data-view="products">
+        <span class="db-nav-icon">◉</span>
+        <span class="db-nav-label">Products</span>
+      </a>
+      <a class="db-nav-item" data-view="network">
+        <span class="db-nav-icon">◎</span>
+        <span class="db-nav-label">Network</span>
+      </a>
+      <a class="db-nav-item" data-view="analytics">
+        <span class="db-nav-icon">◑</span>
+        <span class="db-nav-label">Analytics</span>
+      </a>
+      <a class="db-nav-item" data-view="billing">
+        <span class="db-nav-icon">◒</span>
+        <span class="db-nav-label">Billing</span>
+      </a>
+    </nav>
+    
+    <div class="db-sidebar-brand">
+      <div class="db-brand-avatar" id="db-brand-avatar">Z</div>
+      <div class="db-brand-info">
+        <div class="db-brand-name" id="db-brand-name">Brand Name</div>
+        <div class="db-brand-plan">Growth Plan</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="db-main">
+    <!-- Top Header -->
+    <header class="db-header">
+      <button class="db-menu-toggle" id="db-menu-toggle">☰</button>
+      <h1 class="db-page-title" id="db-page-title">Overview</h1>
+      <div class="db-header-actions">
+        <div class="db-search-wrap">
+          <input type="text" class="db-search" placeholder="Search..." id="db-search">
+        </div>
+        <button class="db-notif-btn" id="db-notif-btn">
+          <span>🔔</span>
+          <span class="db-notif-dot"></span>
+        </button>
+        <div class="db-avatar" id="db-header-avatar">Z</div>
+      </div>
+    </header>
+
+    <!-- Content Area (JS populates this) -->
+    <div class="db-content" id="db-content">
+      <!-- Loading skeleton shown initially -->
+      <div class="db-loading-grid">
+        <div class="db-skeleton-card"></div>
+        <div class="db-skeleton-card"></div>
+        <div class="db-skeleton-card"></div>
+        <div class="db-skeleton-card"></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Toast Container -->
+<div class="db-toast-container" id="db-toast-container"></div>
+
+<!-- Modal Container -->
+<div class="db-modal-overlay" id="db-modal-overlay">
+  <div class="db-modal" id="db-modal">
+    <div class="db-modal-header">
+      <h2 class="db-modal-title" id="db-modal-title"></h2>
+      <button class="db-modal-close" id="db-modal-close">×</button>
+    </div>
+    <div class="db-modal-body" id="db-modal-body"></div>
+    <div class="db-modal-footer" id="db-modal-footer"></div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Brand Dashboard",
+  "tag": "section",
+  "class": "brand-dashboard-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "brand_id",
+      "label": "Brand ID",
+      "info": "The Supabase brand UUID"
+    },
+    {
+      "type": "text",
+      "id": "brand_name",
+      "label": "Brand Name",
+      "default": "My Brand"
+    },
+    {
+      "type": "color",
+      "id": "brand_color",
+      "label": "Brand Color",
+      "default": "#39A596"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Brand Dashboard"
+    }
+  ]
+}
+{% endschema %}
