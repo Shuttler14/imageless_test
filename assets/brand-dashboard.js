@@ -32,6 +32,17 @@
   };
 
   // ——— Fashion Taxonomy ———
+  var CATEGORY_IMAGES = {
+    'Tops': 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=120&h=80&fit=crop',
+    'Bottoms': 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=120&h=80&fit=crop',
+    'Outerwear': 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=120&h=80&fit=crop',
+    'Ethnic': 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=120&h=80&fit=crop',
+    'Footwear': 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=120&h=80&fit=crop',
+    'Accessories': 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=120&h=80&fit=crop',
+    'One-Piece': 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=120&h=80&fit=crop',
+    'Indian / Ethnic': 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=120&h=80&fit=crop'
+  };
+
   var TAXONOMY = {
     genders: ['Men', 'Women', 'Unisex'],
 
@@ -877,8 +888,10 @@
     Object.keys(taxSource).forEach(function (section) {
       var info = taxSource[section];
       var count = info.items.length;
+      var imgUrl = CATEGORY_IMAGES[section] || '';
       html += '<div class="category-section">';
       html += '<div class="category-section-header">' +
+        (imgUrl ? '<img class="category-thumb" src="' + imgUrl + '" alt="' + section + '" loading="lazy">' : '') +
         '<span class="category-section-name">' + section + '</span>' +
         '<span class="category-section-count">' + count + ' types</span>' +
         '<label class="toggle-switch" style="margin-left:auto"><input type="checkbox" class="cat-section-toggle" data-section="' + section + '"><span class="toggle-slider"></span></label>' +
@@ -1116,7 +1129,8 @@
         var html2 = '';
         Object.keys(taxSrc).forEach(function (section) {
           var info = taxSrc[section];
-          html2 += '<div class="category-section"><div class="category-section-header"><span class="category-section-name">' + section + '</span><span class="category-section-count">' + info.items.length + ' types</span><label class="toggle-switch" style="margin-left:auto"><input type="checkbox" class="cat-section-toggle" data-section="' + section + '"><span class="toggle-slider"></span></label></div>';
+          var imgUrl2 = CATEGORY_IMAGES[section] || '';
+          html2 += '<div class="category-section"><div class="category-section-header">' + (imgUrl2 ? '<img class="category-thumb" src="' + imgUrl2 + '" alt="' + section + '" loading="lazy">' : '') + '<span class="category-section-name">' + section + '</span><span class="category-section-count">' + info.items.length + ' types</span><label class="toggle-switch" style="margin-left:auto"><input type="checkbox" class="cat-section-toggle" data-section="' + section + '"><span class="toggle-slider"></span></label></div>';
           html2 += '<div class="category-items">';
           info.items.forEach(function (item) {
             html2 += '<label class="form-checkbox-group category-item"><input type="checkbox" class="form-checkbox cat-item" value="' + item + '" data-section="' + section + '"><span class="form-checkbox-label">' + item + '</span></label>';
@@ -1626,7 +1640,8 @@
     html += '<div id="ns-men-custom"' + ((s.men_accept_mode || 'all') === 'custom' ? '' : ' style="display:none"') + '>';
     Object.keys(TAXONOMY.men).forEach(function (section) {
       var info = TAXONOMY.men[section];
-      html += '<div class="category-section"><div class="category-section-header"><span class="category-section-name">' + section + '</span><span class="category-section-count">' + info.items.length + '</span><label class="toggle-switch" style="margin-left:auto"><input type="checkbox" class="cat-section-toggle" data-section="men-' + section + '"><span class="toggle-slider"></span></label></div>';
+      var imgUrl3 = CATEGORY_IMAGES[section] || '';
+      html += '<div class="category-section"><div class="category-section-header">' + (imgUrl3 ? '<img class="category-thumb" src="' + imgUrl3 + '" alt="' + section + '" loading="lazy">' : '') + '<span class="category-section-name">' + section + '</span><span class="category-section-count">' + info.items.length + '</span><label class="toggle-switch" style="margin-left:auto"><input type="checkbox" class="cat-section-toggle" data-section="men-' + section + '"><span class="toggle-slider"></span></label></div>';
       html += '<div class="category-items">';
       info.items.forEach(function (item) {
         var checked = (s.men_accept || []).indexOf(item) > -1 ? ' checked' : '';
@@ -1646,7 +1661,8 @@
     html += '<div id="ns-women-custom"' + ((s.women_accept_mode || 'all') === 'custom' ? '' : ' style="display:none"') + '>';
     Object.keys(TAXONOMY.women).forEach(function (section) {
       var info = TAXONOMY.women[section];
-      html += '<div class="category-section"><div class="category-section-header"><span class="category-section-name">' + section + '</span><span class="category-section-count">' + info.items.length + '</span><label class="toggle-switch" style="margin-left:auto"><input type="checkbox" class="cat-section-toggle" data-section="women-' + section + '"><span class="toggle-slider"></span></label></div>';
+      var imgUrl4 = CATEGORY_IMAGES[section] || '';
+      html += '<div class="category-section"><div class="category-section-header">' + (imgUrl4 ? '<img class="category-thumb" src="' + imgUrl4 + '" alt="' + section + '" loading="lazy">' : '') + '<span class="category-section-name">' + section + '</span><span class="category-section-count">' + info.items.length + '</span><label class="toggle-switch" style="margin-left:auto"><input type="checkbox" class="cat-section-toggle" data-section="women-' + section + '"><span class="toggle-slider"></span></label></div>';
       html += '<div class="category-items">';
       info.items.forEach(function (item) {
         var checked = (s.women_accept || []).indexOf(item) > -1 ? ' checked' : '';
