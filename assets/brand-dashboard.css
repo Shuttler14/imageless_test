@@ -2464,3 +2464,127 @@ input, select, textarea {
     break-inside: avoid;
   }
 }
+
+/* ============================================
+   Campaign Modal Tabs
+   ============================================ */
+.campaign-tabs {
+  display: flex;
+  gap: 0;
+  padding: 0 var(--space-lg);
+  border-bottom: 1px solid var(--border-subtle);
+  overflow-x: auto;
+  flex-shrink: 0;
+}
+
+.campaign-tab {
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+
+.campaign-tab:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+.campaign-tab.active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+.campaign-tab-num {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  line-height: 18px;
+  text-align: center;
+  border-radius: 50%;
+  background: var(--bg-secondary);
+  font-size: 10px;
+  margin-right: 4px;
+}
+
+.campaign-tab.active .campaign-tab-num {
+  background: var(--color-primary);
+  color: white;
+}
+
+.campaign-tab-content {
+  display: none;
+}
+
+.campaign-tab-content.active {
+  display: block;
+}
+
+/* ============================================
+   Category Tree
+   ============================================ */
+.category-tree {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.category-section {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.category-section-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg-secondary);
+  cursor: pointer;
+}
+
+.category-section-name {
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-sm);
+}
+
+.category-section-count {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+}
+
+.category-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+}
+
+.category-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px var(--space-xs);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  transition: background 0.15s;
+}
+
+.category-item:hover {
+  background: var(--bg-hover);
+}
+
+/* ============================================
+   Gender Toggle Buttons
+   ============================================ */
+.gender-toggle.active {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}

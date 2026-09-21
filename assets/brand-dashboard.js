@@ -31,6 +31,120 @@
     charts: {}
   };
 
+  // ——— Fashion Taxonomy ———
+  var TAXONOMY = {
+    genders: ['Men', 'Women', 'Unisex'],
+
+    productRoles: {
+      anchor: { label: 'Outfit Anchor', desc: 'Statement piece that defines the look' },
+      core: { label: 'Core Garment', desc: 'Essential everyday pieces' },
+      complement: { label: 'Complement', desc: 'Supporting accessories' },
+      footwear: { label: 'Footwear', desc: 'Shoes and sandals' },
+      accent: { label: 'Accent', desc: 'Finishing touches' }
+    },
+
+    men: {
+      'Tops': {
+        role: 'core', gender: 'Men',
+        items: ['T-Shirts', 'Shirts', 'Polos', 'Henleys', 'Tank Tops', 'Sweatshirts', 'Hoodies', 'Sweaters', 'Cardigans']
+      },
+      'Bottoms': {
+        role: 'core', gender: 'Men',
+        items: ['Jeans', 'Trousers', 'Chinos', 'Cargo Pants', 'Joggers', 'Shorts', 'Track Pants']
+      },
+      'Outerwear': {
+        role: 'anchor', gender: 'Men',
+        items: ['Jackets', 'Blazers', 'Coats', 'Overshirts', 'Shackets']
+      },
+      'Ethnic': {
+        role: 'anchor', gender: 'Men',
+        items: ['Kurtas', 'Kurta Sets', 'Nehru Jackets', 'Sherwanis', 'Bandhgalas', 'Dhoti', 'Ethnic Bottoms']
+      },
+      'Footwear': {
+        role: 'footwear', gender: 'Men',
+        items: ['Sneakers', 'Running Shoes', 'Loafers', 'Formal Shoes', 'Boots', 'Sandals', 'Slides', 'Ethnic Footwear']
+      },
+      'Accessories': {
+        role: 'complement', gender: 'Men',
+        items: ['Watches', 'Sunglasses', 'Belts', 'Wallets', 'Bags', 'Backpacks', 'Caps', 'Hats', 'Ties', 'Bow Ties', 'Bracelets', 'Chains', 'Rings', 'Cufflinks', 'Socks']
+      }
+    },
+
+    women: {
+      'Tops': {
+        role: 'core', gender: 'Women',
+        items: ['T-Shirts', 'Shirts', 'Blouses', 'Crop Tops', 'Tank Tops', 'Camisoles', 'Sweaters', 'Sweatshirts', 'Hoodies']
+      },
+      'Bottoms': {
+        role: 'core', gender: 'Women',
+        items: ['Jeans', 'Trousers', 'Wide-leg Pants', 'Cargo Pants', 'Joggers', 'Shorts', 'Skirts', 'Leggings']
+      },
+      'One-Piece': {
+        role: 'anchor', gender: 'Women',
+        items: ['Dresses', 'Jumpsuits', 'Rompers', 'Playsuits', 'Gowns', 'Sarees', 'Saree Gowns']
+      },
+      'Outerwear': {
+        role: 'anchor', gender: 'Women',
+        items: ['Jackets', 'Blazers', 'Coats', 'Shrugs', 'Cardigans', 'Overshirts']
+      },
+      'Indian / Ethnic': {
+        role: 'anchor', gender: 'Women',
+        items: ['Kurtis', 'Kurta Sets', 'Anarkali', 'Lehengas', 'Sarees', 'Salwar Suits', 'Dupattas']
+      },
+      'Footwear': {
+        role: 'footwear', gender: 'Women',
+        items: ['Sneakers', 'Heels', 'Flats', 'Sandals', 'Boots', 'Loafers', 'Mules', 'Wedges', 'Slides', 'Ethnic Footwear']
+      },
+      'Accessories': {
+        role: 'complement', gender: 'Women',
+        items: ['Handbags', 'Shoulder Bags', 'Sling Bags', 'Clutches', 'Backpacks', 'Watches', 'Sunglasses', 'Belts', 'Scarves', 'Jewellery', 'Earrings', 'Necklaces', 'Bracelets', 'Rings', 'Hair Accessories']
+      }
+    },
+
+    occasions: ['Casual', 'Formal', 'Party', 'Wedding', 'Festival', 'Work', 'Travel', 'Date Night', 'Brunch', 'Athleisure'],
+
+    styles: ['Bohemian', 'Minimalist', 'Classic', 'Streetwear', 'Elegant', 'Sporty', 'Grunge', 'Preppy', 'Chic', 'Ethnic Fusion'],
+
+    priceBands: [
+      { label: 'Budget', min: 0, max: 500 },
+      { label: 'Affordable', min: 500, max: 1500 },
+      { label: 'Contemporary', min: 1500, max: 4000 },
+      { label: 'Premium', min: 4000, max: 8000 },
+      { label: 'Luxury', min: 8000, max: 999999 }
+    ],
+
+    hostCategories: [
+      'Men\'s Fashion', 'Women\'s Fashion', 'Streetwear', 'Luxury', 'Premium',
+      'Contemporary', 'Ethnic', 'Activewear', 'Footwear', 'Accessories', 'Multi-brand Fashion'
+    ],
+
+    genderTargets: ['Men', 'Women', 'Unisex'],
+
+    // Pairing rules: what complements what
+    pairingRules: {
+      'Men': {
+        'Tops': ['Bottoms', 'Footwear', 'Accessories'],
+        'Bottoms': ['Tops', 'Footwear', 'Accessories'],
+        'Outerwear': ['Tops', 'Bottoms', 'Footwear', 'Accessories'],
+        'Ethnic': ['Ethnic', 'Footwear', 'Accessories'],
+        'Footwear': ['Tops', 'Bottoms', 'Outerwear', 'Accessories'],
+        'Accessories': ['Tops', 'Bottoms', 'Outerwear', 'Footwear']
+      },
+      'Women': {
+        'Tops': ['Bottoms', 'Footwear', 'Accessories'],
+        'Bottoms': ['Tops', 'Footwear', 'Accessories'],
+        'One-Piece': ['Footwear', 'Accessories', 'Outerwear'],
+        'Outerwear': ['One-Piece', 'Tops', 'Bottoms', 'Footwear', 'Accessories'],
+        'Indian / Ethnic': ['Footwear', 'Accessories'],
+        'Footwear': ['Tops', 'Bottoms', 'One-Piece', 'Outerwear', 'Accessories'],
+        'Accessories': ['Tops', 'Bottoms', 'One-Piece', 'Outerwear', 'Footwear']
+      }
+    },
+
+    // Women's one-piece pairing restrictions (hard rules)
+    onePieceExclusions: ['Tops', 'Bottoms', 'Skirts', 'Leggings', 'Shorts', 'Jeans', 'Trousers']
+  };
+
   // ——— DOM Refs ———
   var $content;
   var $viewTitle;
@@ -112,6 +226,7 @@
       overview: 'Overview',
       campaigns: 'Campaigns',
       products: 'Products',
+      partners: 'Partner Brands',
       settings: 'Network Settings',
       analytics: 'Analytics',
       wallet: 'Billing & Wallet'
@@ -131,6 +246,7 @@
       case 'overview': loadOverview(); break;
       case 'campaigns': loadCampaigns(); break;
       case 'products': loadProducts(); break;
+      case 'partners': loadPartnerBrands(); break;
       case 'settings': loadNetworkSettings(); break;
       case 'analytics': loadAnalytics(DB.dateRange); break;
       case 'wallet': loadWallet(); break;
@@ -642,17 +758,41 @@
   function openCampaignModal(existing) {
     var isEdit = !!existing;
     var title = isEdit ? 'Edit Campaign' : 'Create Campaign';
-    var obj = (existing && existing.objective) || 'product_views';
-    var name = (existing && (existing.name || existing.campaign_name)) || '';
-    var budget = (existing && existing.budget) || '';
-    var bidType = (existing && existing.bid_type) || 'CPC';
-    var bidAmt = (existing && existing.bid_amount) || '';
-    var startDate = toDateInputValue(existing && existing.start_date);
-    var endDate = toDateInputValue(existing && existing.end_date);
-    var cats = (existing && existing.target_categories) || [];
-    var occasions = (existing && existing.target_occasions) || [];
-    var styles = (existing && existing.target_styles) || [];
-    var products = (existing && existing.products) || [];
+    var d = existing || {};
+    var name = d.name || d.campaign_name || '';
+    var obj = d.objective || 'product_views';
+    var budget = d.budget || '';
+    var bidType = d.bid_type || 'CPC';
+    var bidAmt = d.bid_amount || '';
+    var startDate = toDateInputValue(d.start_date);
+    var endDate = toDateInputValue(d.end_date);
+    var selectedProducts = d.products || [];
+    var targetGender = (d.target_genders || ['Men', 'Women'])[0] || 'Unisex';
+    var targetCats = d.target_categories || [];
+    var targetOccasions = d.target_occasions || [];
+    var targetStyles = d.target_styles || [];
+    var pairCategories = d.pairing_categories || [];
+    var pairMode = d.pairing_mode || 'ai';
+    var distMode = d.distribution_mode || 'ai';
+    var distCategories = d.distribution_host_categories || [];
+    var distBrands = d.distribution_brands || [];
+    var priceBand = d.target_price_band || '';
+    var targetAge = d.target_age_groups || [];
+    var exBrands = d.exclude_brands || [];
+    var exCategories = d.exclude_categories || [];
+    var exPriceMin = d.exclude_price_min || '';
+    var exPriceMax = d.exclude_price_max || '';
+
+    var tabs = [
+      { id: 'campaign', num: '01', label: 'Campaign' },
+      { id: 'products', num: '02', label: 'Products' },
+      { id: 'categories', num: '03', label: 'Categories' },
+      { id: 'distribution', num: '04', label: 'Distribution' },
+      { id: 'pairing', num: '05', label: 'Pairing' },
+      { id: 'audience', num: '06', label: 'Audience' },
+      { id: 'budget', num: '07', label: 'Budget' },
+      { id: 'exclusions', num: '08', label: 'Exclusions' }
+    ];
 
     var objectives = [
       { value: 'product_views', label: 'Product Views' },
@@ -663,80 +803,254 @@
       { value: 'revenue', label: 'Revenue' }
     ];
 
-    var allCategories = ['Western Wear', 'Ethnic Wear', 'Activewear', 'Accessories', 'Footwear', 'Loungewear'];
-    var allOccasions = ['Casual', 'Formal', 'Party', 'Wedding', 'Festival', 'Work', 'Travel'];
-    var allStyles = ['Bohemian', 'Minimalist', 'Classic', 'Streetwear', 'Elegant', 'Sporty'];
+    var allOccasions = TAXONOMY.occasions;
+    var allStyles = TAXONOMY.styles;
+    var allGenders = TAXONOMY.genderTargets;
+    var allHostCats = TAXONOMY.hostCategories;
+    var allPriceBands = TAXONOMY.priceBands;
+
+    // Build men's + women's flat category list for pairing
+    var allTaxCats = [];
+    Object.keys(TAXONOMY.men).forEach(function (k) { allTaxCats.push({ cat: k, gender: 'Men' }); });
+    Object.keys(TAXONOMY.women).forEach(function (k) { allTaxCats.push({ cat: k, gender: 'Women' }); });
+    // Deduplicate by label
+    var catLabels = [];
+    var catSet = {};
+    allTaxCats.forEach(function (c) {
+      if (!catSet[c.cat]) { catSet[c.cat] = true; catLabels.push(c.cat); }
+    });
 
     var html = '<div class="modal-overlay open" id="campaign-modal">' +
-      '<div class="modal" style="max-width:620px">' +
-      '<div class="modal-header"><h3 class="modal-title">' + title + '</h3><button class="modal-close" id="modal-close-btn">&times;</button></div>' +
-      '<div class="modal-body">';
+      '<div class="modal" style="max-width:740px;max-height:90vh;display:flex;flex-direction:column">' +
+      '<div class="modal-header"><h3 class="modal-title">' + title + '</h3><button class="modal-close" id="modal-close-btn">&times;</button></div>';
 
-    // Campaign name
-    html += '<div class="form-group">' +
-      '<label class="form-label">Campaign Name <span class="required">*</span></label>' +
-      '<input class="form-input" id="c-name" type="text" placeholder="e.g. Summer Collection Push" value="' + escapeHtml(name) + '">' +
-      '</div>';
+    // Tab bar
+    html += '<div class="campaign-tabs">';
+    tabs.forEach(function (t, i) {
+      var cls = 'campaign-tab' + (i === 0 ? ' active' : '');
+      html += '<button class="' + cls + '" data-tab="' + t.id + '"><span class="campaign-tab-num">' + t.num + '</span> ' + t.label + '</button>';
+    });
+    html += '</div>';
 
-    // Objective
+    html += '<div class="modal-body" style="overflow-y:auto;flex:1">';
+
+    // ——— Tab 01: Campaign ———
+    html += '<div class="campaign-tab-content active" data-tab-content="campaign">';
+    html += '<div class="form-group"><label class="form-label">Campaign Name <span class="required">*</span></label>' +
+      '<input class="form-input" id="c-name" type="text" placeholder="e.g. Summer Collection Push" value="' + escapeHtml(name) + '"></div>';
     html += '<div class="form-group"><label class="form-label">Objective <span class="required">*</span></label>' +
       '<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-xs)">';
     objectives.forEach(function (o) {
       var checked = o.value === obj ? ' checked' : '';
-      html += '<div class="form-checkbox-group">' +
-        '<input type="radio" name="c-obj" class="form-checkbox" value="' + o.value + '"' + checked + ' id="obj-' + o.value + '">' +
-        '<label class="form-checkbox-label" for="obj-' + o.value + '">' + o.label + '</label>' +
-        '</div>';
+      html += '<div class="form-checkbox-group"><input type="radio" name="c-obj" class="form-checkbox" value="' + o.value + '"' + checked + ' id="obj-' + o.value + '">' +
+        '<label class="form-checkbox-label" for="obj-' + o.value + '">' + o.label + '</label></div>';
     });
     html += '</div></div>';
+    html += '</div>';
 
-    // Products multi-select
-    html += '<div class="form-group"><label class="form-label">Products</label>' +
-      '<select class="form-select" id="c-products" multiple style="height:100px">';
+    // ——— Tab 02: Products ———
+    html += '<div class="campaign-tab-content" data-tab-content="products">';
+    html += '<div class="form-group"><label class="form-label">Select Products</label>' +
+      '<select class="form-select" id="c-products" multiple style="height:120px">';
     DB.products.forEach(function (p) {
-      var selected = products.indexOf(p.id) > -1 || products.indexOf(String(p.id)) > -1 ? ' selected' : '';
-      html += '<option value="' + (p.id || p.product_id || '') + '"' + selected + '>' + escapeHtml(p.title || p.name || 'Product') + '</option>';
+      var sel = selectedProducts.indexOf(p.id) > -1 || selectedProducts.indexOf(String(p.id)) > -1 ? ' selected' : '';
+      html += '<option value="' + (p.id || p.product_id || '') + '"' + sel + '>' + escapeHtml(p.title || p.name || 'Product') + '</option>';
     });
     html += '</select><p class="form-hint">Hold Ctrl/Cmd to select multiple</p></div>';
+    html += '</div>';
 
-    // Target categories
-    html += '<div class="form-group"><label class="form-label">Target Categories</label><div style="display:flex;flex-wrap:wrap;gap:var(--space-xs)">';
-    allCategories.forEach(function (c) {
-      var checked = cats.indexOf(c) > -1 ? ' checked' : '';
-      html += '<div class="form-checkbox-group"><input type="checkbox" class="form-checkbox" value="' + c + '"' + checked + ' id="cat-' + c.replace(/\s/g, '-') + '"><label class="form-checkbox-label" for="cat-' + c.replace(/\s/g, '-') + '">' + c + '</label></div>';
+    // ——— Tab 03: Product Categories ———
+    html += '<div class="campaign-tab-content" data-tab-content="categories">';
+    html += '<p class="form-hint" style="margin-bottom:var(--space-md)">Select the product categories you are promoting</p>';
+
+    // Gender toggle
+    html += '<div class="form-group"><label class="form-label">Gender</label><div style="display:flex;gap:var(--space-sm)">';
+    allGenders.forEach(function (g) {
+      var sel = targetGender === g ? ' active' : '';
+      html += '<button class="btn btn-ghost btn-sm gender-toggle' + sel + '" data-gender="' + g + '">' + g + '</button>';
     });
     html += '</div></div>';
 
-    // Target occasions
-    html += '<div class="form-group"><label class="form-label">Target Occasions</label><div style="display:flex;flex-wrap:wrap;gap:var(--space-xs)">';
+    // Category tree
+    var taxSource = targetGender === 'Women' ? TAXONOMY.women : targetGender === 'Men' ? TAXONOMY.men : Object.assign({}, TAXONOMY.men, TAXONOMY.women);
+    html += '<div class="category-tree">';
+    Object.keys(taxSource).forEach(function (section) {
+      var info = taxSource[section];
+      var count = info.items.length;
+      html += '<div class="category-section">';
+      html += '<div class="category-section-header">' +
+        '<span class="category-section-name">' + section + '</span>' +
+        '<span class="category-section-count">' + count + ' types</span>' +
+        '<label class="toggle-switch" style="margin-left:auto"><input type="checkbox" class="cat-section-toggle" data-section="' + section + '"><span class="toggle-slider"></span></label>' +
+        '</div>';
+      html += '<div class="category-items">';
+      info.items.forEach(function (item) {
+        var checked = targetCats.indexOf(item) > -1 ? ' checked' : '';
+        html += '<label class="form-checkbox-group category-item"><input type="checkbox" class="form-checkbox cat-item" value="' + item + '"' + checked + ' data-section="' + section + '"><span class="form-checkbox-label">' + item + '</span></label>';
+      });
+      html += '</div></div>';
+    });
+    html += '</div></div>';
+
+    // ——— Tab 04: Distribution ———
+    html += '<div class="campaign-tab-content" data-tab-content="distribution">';
+    html += '<p class="form-hint" style="margin-bottom:var(--space-md)">Where should your products appear?</p>';
+
+    // Distribution mode
+    html += '<div class="form-group"><label class="form-label">Distribution Mode</label>' +
+      '<div style="display:flex;flex-direction:column;gap:var(--space-sm)">' +
+      '<label class="form-checkbox-group"><input type="radio" name="c-dist" class="form-checkbox" value="ai"' + (distMode === 'ai' ? ' checked' : '') + '><span class="form-checkbox-label">AI Recommended Partners (auto-match best hosts)</span></label>' +
+      '<label class="form-checkbox-group"><input type="radio" name="c-dist" class="form-checkbox" value="categories"' + (distMode === 'categories' ? ' checked' : '') + '><span class="form-checkbox-label">Select Partner Categories</span></label>' +
+      '<label class="form-checkbox-group"><input type="radio" name="c-dist" class="form-checkbox" value="brands"' + (distMode === 'brands' ? ' checked' : '') + '><span class="form-checkbox-label">Select Specific Brands</span></label>' +
+      '</div></div>';
+
+    // Host categories (shown when categories mode)
+    html += '<div class="form-group" id="dist-cats-group"' + (distMode === 'categories' ? '' : ' style="display:none"') + '><label class="form-label">Host Website Categories</label>' +
+      '<div style="display:flex;flex-wrap:wrap;gap:var(--space-xs)">';
+    allHostCats.forEach(function (c) {
+      var checked = distCategories.indexOf(c) > -1 ? ' checked' : '';
+      html += '<label class="form-checkbox-group"><input type="checkbox" class="form-checkbox" value="' + c + '"' + checked + ' id="dcat-' + c.replace(/[^a-zA-Z]/g, '') + '"><span class="form-checkbox-label">' + c + '</span></label>';
+    });
+    html += '</div></div>';
+
+    // Brand selection (shown when brands mode)
+    html += '<div class="form-group" id="dist-brands-group"' + (distMode === 'brands' ? '' : ' style="display:none"') + '><label class="form-label">Partner Brands</label>' +
+      '<select class="form-select" id="c-dist-brands" multiple style="height:100px">';
+    // Placeholder — real brands loaded dynamically; for now show categories as proxy
+    allHostCats.forEach(function (b) {
+      var checked = distBrands.indexOf(b) > -1 ? ' selected' : '';
+      html += '<option value="' + b + '"' + checked + '>' + b + '</option>';
+    });
+    html += '</select><p class="form-hint">Select brands to allow your products on</p></div>';
+
+    // Target gender
+    html += '<div class="form-group"><label class="form-label">Target Gender</label><div style="display:flex;gap:var(--space-sm)">';
+    allGenders.forEach(function (g) {
+      var checked = targetGender === g ? ' checked' : '';
+      html += '<label class="form-checkbox-group"><input type="radio" name="c-dist-gender" class="form-checkbox" value="' + g + '"' + checked + '><span class="form-checkbox-label">' + g + '</span></label>';
+    });
+    html += '</div></div>';
+
+    // Price band
+    html += '<div class="form-group"><label class="form-label">Price Compatibility</label><div style="display:flex;flex-wrap:wrap;gap:var(--space-xs)">';
+    allPriceBands.forEach(function (pb) {
+      var checked = priceBand === pb.label ? ' checked' : '';
+      html += '<label class="form-checkbox-group"><input type="radio" name="c-price-band" class="form-checkbox" value="' + pb.label + '"' + checked + '><span class="form-checkbox-label">' + pb.label + ' (\u20B9' + fmtPrice(pb.min) + '-' + fmtPrice(pb.max) + ')</span></label>';
+    });
+    html += '</div></div>';
+    html += '</div>';
+
+    // ——— Tab 05: Pairing ———
+    html += '<div class="campaign-tab-content" data-tab-content="pairing">';
+    html += '<p class="form-hint" style="margin-bottom:var(--space-md)">What should your products be paired with?</p>';
+
+    // Pairing mode
+    html += '<div class="form-group"><label class="form-label">Pairing Mode</label>' +
+      '<div style="display:flex;flex-direction:column;gap:var(--space-sm)">' +
+      '<label class="form-checkbox-group"><input type="radio" name="c-pair" class="form-checkbox" value="ai"' + (pairMode === 'ai' ? ' checked' : '') + '><span class="form-checkbox-label">AI Optimize — auto-select highest-converting complementary categories</span></label>' +
+      '<label class="form-checkbox-group"><input type="radio" name="c-pair" class="form-checkbox" value="custom"' + (pairMode === 'custom' ? ' checked' : '') + '><span class="form-checkbox-label">Customize — select specific categories</span></label>' +
+      '</div></div>';
+
+    html += '<div class="form-group" id="pair-cats-group"' + (pairMode === 'custom' ? '' : ' style="display:none"') + '><label class="form-label">Complementary Categories</label>';
+    html += '<div style="display:flex;flex-wrap:wrap;gap:var(--space-xs)">';
+    catLabels.forEach(function (c) {
+      var checked = pairCategories.indexOf(c) > -1 ? ' checked' : '';
+      html += '<label class="form-checkbox-group"><input type="checkbox" class="form-checkbox" value="' + c + '"' + checked + ' id="pair-' + c.replace(/\s/g, '-') + '"><span class="form-checkbox-label">' + c + '</span></label>';
+    });
+    html += '</div></div>';
+
+    // Occasion
+    html += '<div class="form-group"><label class="form-label">Occasion</label><div style="display:flex;flex-wrap:wrap;gap:var(--space-xs)">';
     allOccasions.forEach(function (o) {
-      var checked = occasions.indexOf(o) > -1 ? ' checked' : '';
-      html += '<div class="form-checkbox-group"><input type="checkbox" class="form-checkbox" value="' + o + '"' + checked + ' id="occ-' + o + '"><label class="form-checkbox-label" for="occ-' + o + '">' + o + '</label></div>';
+      var checked = targetOccasions.indexOf(o) > -1 ? ' checked' : '';
+      html += '<label class="form-checkbox-group"><input type="checkbox" class="form-checkbox" value="' + o + '"' + checked + ' id="occ-' + o + '"><span class="form-checkbox-label">' + o + '</span></label>';
     });
     html += '</div></div>';
 
-    // Target styles
-    html += '<div class="form-group"><label class="form-label">Target Styles</label><div style="display:flex;flex-wrap:wrap;gap:var(--space-xs)">';
+    // Style
+    html += '<div class="form-group"><label class="form-label">Style</label><div style="display:flex;flex-wrap:wrap;gap:var(--space-xs)">';
     allStyles.forEach(function (s) {
-      var checked = styles.indexOf(s) > -1 ? ' checked' : '';
-      html += '<div class="form-checkbox-group"><input type="checkbox" class="form-checkbox" value="' + s + '"' + checked + ' id="sty-' + s + '"><label class="form-checkbox-label" for="sty-' + s + '">' + s + '</label></div>';
+      var checked = targetStyles.indexOf(s) > -1 ? ' checked' : '';
+      html += '<label class="form-checkbox-group"><input type="checkbox" class="form-checkbox" value="' + s + '"' + checked + ' id="sty-' + s + '"><span class="form-checkbox-label">' + s + '</span></label>';
     });
     html += '</div></div>';
 
-    // Budget + Bid
+    // Pairing price
+    html += '<div class="form-group"><label class="form-label">Pairing Price Range</label><div style="display:flex;flex-wrap:wrap;gap:var(--space-xs)">';
+    allPriceBands.forEach(function (pb) {
+      html += '<label class="form-checkbox-group"><input type="radio" name="c-pair-price" class="form-checkbox" value="' + pb.label + '"><span class="form-checkbox-label">' + pb.label + '</span></label>';
+    });
+    html += '</div></div>';
+    html += '</div>';
+
+    // ——— Tab 06: Audience ———
+    html += '<div class="campaign-tab-content" data-tab-content="audience">';
+    html += '<p class="form-hint" style="margin-bottom:var(--space-md)">Define your target customer</p>';
+
+    // Age groups
+    html += '<div class="form-group"><label class="form-label">Age Group</label><div style="display:flex;flex-wrap:wrap;gap:var(--space-xs)">';
+    ['18-24', '25-34', '35-44', '45-54', '55+'].forEach(function (a) {
+      var checked = targetAge.indexOf(a) > -1 ? ' checked' : '';
+      html += '<label class="form-checkbox-group"><input type="checkbox" class="form-checkbox" value="' + a + '"' + checked + ' id="age-' + a + '"><span class="form-checkbox-label">' + a + '</span></label>';
+    });
+    html += '</div></div>';
+
+    // Style preferences
+    html += '<div class="form-group"><label class="form-label">Style Preference</label><div style="display:flex;flex-wrap:wrap;gap:var(--space-xs)">';
+    allStyles.forEach(function (s) {
+      html += '<label class="form-checkbox-group"><input type="checkbox" class="form-checkbox" value="' + s + '" id="aud-sty-' + s + '"><span class="form-checkbox-label">' + s + '</span></label>';
+    });
+    html += '</div></div>';
+
+    // Customer type
+    html += '<div class="form-group"><label class="form-label">Customer Type</label><div style="display:flex;flex-direction:column;gap:var(--space-sm)">';
+    ['New Customers', 'Returning Customers', 'All'].forEach(function (ct) {
+      html += '<label class="form-checkbox-group"><input type="radio" name="c-cust-type" class="form-checkbox" value="' + ct + '"' + (ct === 'All' ? ' checked' : '') + '><span class="form-checkbox-label">' + ct + '</span></label>';
+    });
+    html += '</div></div>';
+    html += '</div>';
+
+    // ——— Tab 07: Budget ———
+    html += '<div class="campaign-tab-content" data-tab-content="budget">';
     html += '<div class="form-row">' +
-      '<div class="form-group"><label class="form-label">Budget (\u20B9 INR) <span class="required">*</span></label><input class="form-input" id="c-budget" type="number" min="100" step="100" placeholder="5000" value="' + budget + '"></div>' +
-      '<div class="form-group"><label class="form-label">Bid Type</label>' +
-      '<select class="form-select" id="c-bid-type"><option value="CPC"' + (bidType === 'CPC' ? ' selected' : '') + '>CPC (Cost per Click)</option><option value="CPA"' + (bidType === 'CPA' ? ' selected' : '') + '>CPA (Cost per Action)</option></select></div>' +
+      '<div class="form-group"><label class="form-label">Daily Budget (\u20B9 INR)</label><input class="form-input" id="c-daily-budget" type="number" min="100" step="100" placeholder="500"></div>' +
+      '<div class="form-group"><label class="form-label">Campaign Budget (\u20B9 INR) <span class="required">*</span></label><input class="form-input" id="c-budget" type="number" min="100" step="100" placeholder="5000" value="' + budget + '"></div>' +
       '</div>';
-
-    html += '<div class="form-group"><label class="form-label">Bid Amount (\u20B9)</label><input class="form-input" id="c-bid" type="number" min="1" step="0.5" placeholder="10" value="' + bidAmt + '"></div>';
-
-    // Duration
+    html += '<div class="form-row">' +
+      '<div class="form-group"><label class="form-label">Bid Strategy</label>' +
+      '<select class="form-select" id="c-bid-type"><option value="CPC"' + (bidType === 'CPC' ? ' selected' : '') + '>CPC (Cost per Click)</option><option value="CPA"' + (bidType === 'CPA' ? ' selected' : '') + '>CPA (Cost per Action)</option><option value="CPM"' + (bidType === 'CPM' ? ' selected' : '') + '>CPM (Cost per Mille)</option></select></div>' +
+      '<div class="form-group"><label class="form-label">Max Bid (\u20B9)</label><input class="form-input" id="c-bid" type="number" min="1" step="0.5" placeholder="10" value="' + bidAmt + '"></div>' +
+      '</div>';
     html += '<div class="form-row">' +
       '<div class="form-group"><label class="form-label">Start Date</label><input class="form-input" id="c-start" type="date" value="' + startDate + '"></div>' +
       '<div class="form-group"><label class="form-label">End Date</label><input class="form-input" id="c-end" type="date" value="' + endDate + '"></div>' +
       '</div>';
+    html += '</div>';
+
+    // ——— Tab 08: Exclusions ———
+    html += '<div class="campaign-tab-content" data-tab-content="exclusions">';
+    html += '<p class="form-hint" style="margin-bottom:var(--space-md)">Control where your products will NOT appear</p>';
+
+    html += '<div class="form-group"><label class="form-label">Exclude Brands</label>' +
+      '<select class="form-select" id="c-ex-brands" multiple style="height:80px">';
+    ['Direct Competitors', 'Luxury Brands', 'Discount Brands'].forEach(function (b) {
+      var checked = exBrands.indexOf(b) > -1 ? ' selected' : '';
+      html += '<option value="' + b + '"' + checked + '>' + b + '</option>';
+    });
+    html += '</select><p class="form-hint">Hold Ctrl/Cmd for multiple</p></div>';
+
+    html += '<div class="form-group"><label class="form-label">Exclude Categories</label><div style="display:flex;flex-wrap:wrap;gap:var(--space-xs)">';
+    catLabels.forEach(function (c) {
+      var checked = exCategories.indexOf(c) > -1 ? ' checked' : '';
+      html += '<label class="form-checkbox-group"><input type="checkbox" class="form-checkbox" value="' + c + '"' + checked + ' id="excat-' + c.replace(/\s/g, '-') + '"><span class="form-checkbox-label">' + c + '</span></label>';
+    });
+    html += '</div></div>';
+
+    html += '<div class="form-group"><label class="form-label">Price Range Exclusions</label><div class="form-row">' +
+      '<div class="form-group"><input class="form-input" id="c-ex-min" type="number" min="0" step="100" placeholder="Min \u20B9 (e.g. 500)" value="' + exPriceMin + '"></div>' +
+      '<div class="form-group"><input class="form-input" id="c-ex-max" type="number" min="0" step="100" placeholder="Max \u20B9 (e.g. 5000)" value="' + exPriceMax + '"></div>' +
+      '</div><p class="form-hint">Don\'t show products in this price range</p></div>';
+    html += '</div>';
 
     html += '</div>'; // modal-body
 
@@ -750,6 +1064,74 @@
 
     var modal = document.getElementById('campaign-modal');
     var closeModal = function () { modal.remove(); };
+
+    // Tab switching
+    modal.querySelectorAll('.campaign-tab').forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        modal.querySelectorAll('.campaign-tab').forEach(function (t) { t.classList.remove('active'); });
+        modal.querySelectorAll('.campaign-tab-content').forEach(function (c) { c.classList.remove('active'); });
+        tab.classList.add('active');
+        modal.querySelector('[data-tab-content="' + tab.getAttribute('data-tab') + '"]').classList.add('active');
+      });
+    });
+
+    // Category section toggles
+    modal.querySelectorAll('.cat-section-toggle').forEach(function (toggle) {
+      toggle.addEventListener('change', function () {
+        var section = this.getAttribute('data-section');
+        modal.querySelectorAll('.cat-item[data-section="' + section + '"]').forEach(function (item) {
+          item.checked = toggle.checked;
+        });
+      });
+    });
+
+    // Distribution mode visibility
+    modal.querySelectorAll('[name="c-dist"]').forEach(function (radio) {
+      radio.addEventListener('change', function () {
+        var catsG = document.getElementById('dist-cats-group');
+        var brandsG = document.getElementById('dist-brands-group');
+        if (catsG) catsG.style.display = this.value === 'categories' ? '' : 'none';
+        if (brandsG) brandsG.style.display = this.value === 'brands' ? '' : 'none';
+      });
+    });
+
+    // Pairing mode visibility
+    modal.querySelectorAll('[name="c-pair"]').forEach(function (radio) {
+      radio.addEventListener('change', function () {
+        var pairG = document.getElementById('pair-cats-group');
+        if (pairG) pairG.style.display = this.value === 'custom' ? '' : 'none';
+      });
+    });
+
+    // Gender toggle for categories tab
+    modal.querySelectorAll('.gender-toggle').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        modal.querySelectorAll('.gender-toggle').forEach(function (b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        // Rebuild category tree
+        var g = btn.getAttribute('data-gender');
+        var taxSrc = g === 'Women' ? TAXONOMY.women : g === 'Men' ? TAXONOMY.men : Object.assign({}, TAXONOMY.men, TAXONOMY.women);
+        var tree = modal.querySelector('.category-tree');
+        if (!tree) return;
+        var html2 = '';
+        Object.keys(taxSrc).forEach(function (section) {
+          var info = taxSrc[section];
+          html2 += '<div class="category-section"><div class="category-section-header"><span class="category-section-name">' + section + '</span><span class="category-section-count">' + info.items.length + ' types</span><label class="toggle-switch" style="margin-left:auto"><input type="checkbox" class="cat-section-toggle" data-section="' + section + '"><span class="toggle-slider"></span></label></div>';
+          html2 += '<div class="category-items">';
+          info.items.forEach(function (item) {
+            html2 += '<label class="form-checkbox-group category-item"><input type="checkbox" class="form-checkbox cat-item" value="' + item + '" data-section="' + section + '"><span class="form-checkbox-label">' + item + '</span></label>';
+          });
+          html2 += '</div></div>';
+        });
+        tree.innerHTML = html2;
+        tree.querySelectorAll('.cat-section-toggle').forEach(function (toggle) {
+          toggle.addEventListener('change', function () {
+            var sec = this.getAttribute('data-section');
+            tree.querySelectorAll('.cat-item[data-section="' + sec + '"]').forEach(function (item) { item.checked = toggle.checked; });
+          });
+        });
+      });
+    });
 
     document.getElementById('modal-close-btn').addEventListener('click', closeModal);
     document.getElementById('modal-cancel-btn').addEventListener('click', closeModal);
@@ -770,6 +1152,7 @@
     var bidAmt = document.getElementById('c-bid').value;
     var startDate = document.getElementById('c-start').value;
     var endDate = document.getElementById('c-end').value;
+    var dailyBudget = document.getElementById('c-daily-budget') ? document.getElementById('c-daily-budget').value : '';
 
     if (!name) { showToast('Please enter a campaign name', 'error'); return null; }
     if (!obj) { showToast('Please select an objective', 'error'); return null; }
@@ -778,17 +1161,41 @@
     var productSelect = document.getElementById('c-products');
     var selectedProducts = [];
     if (productSelect) {
-      Array.from(productSelect.selectedOptions).forEach(function (opt) {
-        selectedProducts.push(opt.value);
-      });
+      Array.from(productSelect.selectedOptions).forEach(function (opt) { selectedProducts.push(opt.value); });
     }
 
     var categories = [];
-    document.querySelectorAll('#campaign-modal [id^="cat-"]:checked').forEach(function (el) { categories.push(el.value); });
+    document.querySelectorAll('#campaign-modal .cat-item:checked').forEach(function (el) { categories.push(el.value); });
     var occasions = [];
     document.querySelectorAll('#campaign-modal [id^="occ-"]:checked').forEach(function (el) { occasions.push(el.value); });
     var styles = [];
     document.querySelectorAll('#campaign-modal [id^="sty-"]:checked').forEach(function (el) { styles.push(el.value); });
+    var pairCategories = [];
+    document.querySelectorAll('#campaign-modal [id^="pair-"]:checked').forEach(function (el) { pairCategories.push(el.value); });
+
+    var distRadio = document.querySelector('[name="c-dist"]:checked');
+    var distMode = distRadio ? distRadio.value : 'ai';
+    var distCategories = [];
+    document.querySelectorAll('#campaign-modal [id^="dcat-"]:checked').forEach(function (el) { distCategories.push(el.value); });
+
+    var pairRadio = document.querySelector('[name="c-pair"]:checked');
+    var pairMode = pairRadio ? pairRadio.value : 'ai';
+
+    var priceRadio = document.querySelector('[name="c-price-band"]:checked');
+    var priceBand = priceRadio ? priceRadio.value : '';
+
+    var targetAge = [];
+    document.querySelectorAll('#campaign-modal [id^="age-"]:checked').forEach(function (el) { targetAge.push(el.value); });
+
+    var exBrands = [];
+    var exBrandsSelect = document.getElementById('c-ex-brands');
+    if (exBrandsSelect) {
+      Array.from(exBrandsSelect.selectedOptions).forEach(function (opt) { exBrands.push(opt.value); });
+    }
+    var exCategories = [];
+    document.querySelectorAll('#campaign-modal [id^="excat-"]:checked').forEach(function (el) { exCategories.push(el.value); });
+    var exPriceMin = document.getElementById('c-ex-min') ? document.getElementById('c-ex-min').value : '';
+    var exPriceMax = document.getElementById('c-ex-max') ? document.getElementById('c-ex-max').value : '';
 
     return {
       id: id || undefined,
@@ -799,6 +1206,19 @@
       target_categories: categories,
       target_occasions: occasions,
       target_styles: styles,
+      target_genders: [document.querySelector('[name="c-dist-gender"]:checked').value],
+      pairing_mode: pairMode,
+      pairing_categories: pairCategories,
+      distribution_mode: distMode,
+      distribution_host_categories: distCategories,
+      distribution_brands: [],
+      target_price_band: priceBand,
+      target_age_groups: targetAge,
+      exclude_brands: exBrands,
+      exclude_categories: exCategories,
+      exclude_price_min: exPriceMin ? Number(exPriceMin) : null,
+      exclude_price_max: exPriceMax ? Number(exPriceMax) : null,
+      daily_budget: dailyBudget ? Number(dailyBudget) : null,
       budget: Number(budget),
       bid_type: bidType,
       bid_amount: bidAmt ? Number(bidAmt) : null,
@@ -1038,6 +1458,104 @@
   }
 
   // ============================================
+  // PARTNER BRANDS
+  // ============================================
+  function loadPartnerBrands() {
+    $content.innerHTML = skeletonCardGrid(1) + skeletonCardGrid(1);
+
+    dbFetch('/api/network/partners?brand_id=' + encodeURIComponent(DB.brand_id))
+      .then(function (data) {
+        renderPartnerBrandsView(data);
+      })
+      .catch(function () {
+        renderPartnerBrandsView({ partners: [], stats: {} });
+      });
+  }
+
+  function renderPartnerBrandsView(data) {
+    var partners = data.partners || [];
+    var stats = data.stats || {};
+
+    var html = '<div class="section-header">' +
+      '<div><h2 class="section-title">Partner Network</h2><p class="section-subtitle">' + partners.length + ' compatible brands in the network</p></div>' +
+      '</div>';
+
+    // Stats
+    html += '<div class="stats-grid">';
+    html += renderStatCard('Partner Websites', partners.length || '0', '', '🌐');
+    html += renderStatCard('Product Pairings', stats.pairings || '0', '', '🔗');
+    html += renderStatCard('VTON Appearances', fmtNum(stats.vton_appearances || 0), '', '👗');
+    html += renderStatCard('Attributed GMV', fmtPrice(stats.attributed_gmv || 0), '', '💰');
+    html += '</div>';
+
+    // Filters
+    html += '<div class="panel"><div class="panel-header"><span class="panel-title">Compatible Partners</span>' +
+      '<div class="chart-filters">' +
+      '<button class="chart-filter-btn active" data-partner-filter="all">All</button>' +
+      '<button class="chart-filter-btn" data-partner-filter="strong">Strong</button>' +
+      '<button class="chart-filter-btn" data-partner-filter="compatible">Compatible</button>' +
+      '</div></div>';
+
+    if (partners.length === 0) {
+      html += emptyState('🌐', 'No Partners Yet', 'Enable cross-brand recommendations to see compatible partners');
+    } else {
+      html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:var(--space-md);padding:var(--space-md)">';
+      partners.forEach(function (p) {
+        var compat = p.compatibility || 'Compatible';
+        var badgeClass = compat === 'Strong' ? 'badge-active' : compat === 'Weak' ? 'badge-ended' : 'badge-paused';
+        html += '<div class="panel" style="margin:0">' +
+          '<div style="display:flex;align-items:center;gap:var(--space-md);margin-bottom:var(--space-md)">' +
+          '<div style="width:48px;height:48px;border-radius:var(--radius-md);background:var(--bg-secondary);display:flex;align-items:center;justify-content:center;font-size:20px">' + (p.logo || '🏪') + '</div>' +
+          '<div><div style="font-weight:var(--font-weight-medium)">' + escapeHtml(p.name) + '</div>' +
+          '<div class="text-sm text-secondary">' + (p.category || 'Fashion') + ' · ' + (p.price_range || '\u20B92,000\u2013\u20B96,000') + '</div></div>' +
+          '<span class="badge ' + badgeClass + '" style="margin-left:auto">' + compat + '</span>' +
+          '</div>' +
+          '<div style="display:flex;flex-wrap:wrap;gap:var(--space-xs);margin-bottom:var(--space-md)">' +
+          (p.accepts || []).slice(0, 5).forEach(function (cat) {
+            html += '<span class="badge badge-pill">' + cat + '</span>';
+          }) +
+          '</div>' +
+          '<div style="display:flex;gap:var(--space-sm)">' +
+          '<button class="btn btn-ghost btn-sm partner-view-btn" data-brand="' + escapeHtml(p.brand_id || '') + '">View Products</button>' +
+          '<button class="btn btn-ghost btn-sm partner-remove-btn" data-brand="' + escapeHtml(p.brand_id || '') + '">Remove</button>' +
+          '</div></div>';
+      });
+      html += '</div>';
+    }
+
+    html += '</div>';
+
+    // Where your products appear
+    html += '<div class="panel"><div class="panel-header"><span class="panel-title">Where Your Products Are Appearing</span></div>';
+    if (partners.length === 0) {
+      html += '<div style="padding:var(--space-lg);text-align:center" class="text-secondary">Enable product distribution to see where your products appear</div>';
+    } else {
+      html += '<div class="table-wrapper"><table class="data-table"><thead><tr>' +
+        '<th>Partner</th><th>Category</th><th>VTON Views</th><th>Clicks</th><th>Sales</th><th>GMV</th>' +
+        '</tr></thead><tbody>';
+      partners.forEach(function (p) {
+        html += '<tr><td>' + escapeHtml(p.name) + '</td><td>' + (p.category || '-') + '</td>' +
+          '<td class="table-cell-mono">' + fmtNum(p.vton_views || 0) + '</td>' +
+          '<td class="table-cell-mono">' + fmtNum(p.clicks || 0) + '</td>' +
+          '<td class="table-cell-mono">' + fmtNum(p.sales || 0) + '</td>' +
+          '<td class="table-cell-mono">' + fmtPrice(p.gmv || 0) + '</td></tr>';
+      });
+      html += '</tbody></table></div>';
+    }
+    html += '</div>';
+
+    $content.innerHTML = html;
+
+    // Filter buttons
+    document.querySelectorAll('[data-partner-filter]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('[data-partner-filter]').forEach(function (b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+      });
+    });
+  }
+
+  // ============================================
   // NETWORK SETTINGS
   // ============================================
   function loadNetworkSettings() {
@@ -1058,73 +1576,170 @@
 
   function renderNetworkSettingsView() {
     var s = DB.network_settings;
-
-    var toggles = [
-      {
-        key: 'vton_enabled',
-        label: 'VTON Enabled',
-        desc: 'Let customers try your products with AI virtual try-on',
-        default: false
-      },
-      {
-        key: 'receive_recommendations',
-        label: 'Receive Recommendations',
-        desc: 'Show compatible products from partner brands on your site',
-        default: false
-      },
-      {
-        key: 'distribute_products',
-        label: 'Distribute Products',
-        desc: 'Allow your products to appear on partner brand websites',
-        default: false
-      },
-      {
-        key: 'promote_products',
-        label: 'Promote Products',
-        desc: 'Pay to increase exposure across the network',
-        default: false
-      }
-    ];
+    var activeTab = 'website';
 
     var html = '<div class="section-header">' +
       '<div><h2 class="section-title">Network Settings</h2><p class="section-subtitle">Configure how your brand participates in the Narrative Ad Network</p></div>' +
       '</div>';
 
-    html += '<div class="panel"><div class="panel-header"><span class="panel-title">Participation Toggles</span></div>';
+    // Tabs
+    html += '<div class="campaign-tabs">';
+    html += '<button class="campaign-tab active" data-ns-tab="website"><span class="campaign-tab-num">A</span> My Website</button>';
+    html += '<button class="campaign-tab" data-ns-tab="distribution"><span class="campaign-tab-num">B</span> Product Distribution</button>';
+    html += '</div>';
+
+    // ——— Tab A: My Website (Host Controls) ———
+    html += '<div class="campaign-tab-content active" data-ns-tab-content="website">';
+
+    // VTON toggle
+    html += '<div class="panel"><div class="panel-header"><span class="panel-title">Experience Settings</span></div>';
     html += '<div class="network-toggles">';
-
-    toggles.forEach(function (t) {
-      var val = s[t.key] !== undefined ? s[t.key] : t.default;
-      html += '<div class="toggle-row' + (val ? ' active' : '') + '" id="toggle-row-' + t.key + '">' +
-        '<div class="toggle-info">' +
-        '<span class="toggle-label">' + t.label + '</span>' +
-        '<span class="toggle-description">' + t.desc + '</span>' +
-        '</div>' +
-        '<label class="toggle-switch">' +
-        '<input type="checkbox" data-setting="' + t.key + '"' + (val ? ' checked' : '') + '>' +
-        '<span class="toggle-slider"></span>' +
-        '</label>' +
-        '</div>';
-    });
-
+    html += buildToggle('vton_enabled', 'VTON Enabled', 'Let customers try your products with AI virtual try-on', s.vton_enabled);
+    html += buildToggle('receive_recommendations', 'Allow Cross-Brand Recommendations', 'Show compatible products from partner brands on your site', s.receive_recommendations);
     html += '</div></div>';
 
-    // Promotion settings (shown when promote is on)
+    // Brand Positioning
+    html += '<div class="panel"><div class="panel-header"><span class="panel-title">My Brand Positioning</span></div>';
+    html += '<div class="form-row">' +
+      '<div class="form-group"><label class="form-label">Price Range</label>' +
+      '<div class="form-row"><input class="form-input" id="ns-price-min" type="number" min="0" step="100" placeholder="Min \u20B9" value="' + (s.price_min || '') + '"><input class="form-input" id="ns-price-max" type="number" min="0" step="100" placeholder="Max \u20B9" value="' + (s.price_max || '') + '"></div></div>' +
+      '<div class="form-group"><label class="form-label">Positioning</label>' +
+      '<select class="form-select" id="ns-positioning">';
+    ['Value', 'Affordable', 'Contemporary', 'Premium', 'Luxury'].forEach(function (p) {
+      html += '<option value="' + p + '"' + (s.positioning === p ? ' selected' : '') + '>' + p + '</option>';
+    });
+    html += '</select></div></div>';
+    html += '<div class="form-group"><label class="form-label">Style</label><div style="display:flex;flex-wrap:wrap;gap:var(--space-xs)">';
+    TAXONOMY.styles.forEach(function (st) {
+      var checked = (s.styles || []).indexOf(st) > -1 ? ' checked' : '';
+      html += '<label class="form-checkbox-group"><input type="checkbox" class="form-checkbox ns-style" value="' + st + '"' + checked + '><span class="form-checkbox-label">' + st + '</span></label>';
+    });
+    html += '</div></div></div>';
+
+    // Accept External Products — Men
+    html += '<div class="panel"><div class="panel-header"><span class="panel-title">Accept External Products — Men</span></div>';
+    html += '<div class="form-group"><label class="form-label">Recommendation Access</label>' +
+      '<div style="display:flex;flex-direction:column;gap:var(--space-sm)">' +
+      '<label class="form-checkbox-group"><input type="radio" name="ns-men-mode" class="form-checkbox" value="all"' + ((s.men_accept_mode || 'all') === 'all' ? ' checked' : '') + '><span class="form-checkbox-label">All complementary categories</span></label>' +
+      '<label class="form-checkbox-group"><input type="radio" name="ns-men-mode" class="form-checkbox" value="custom"' + (s.men_accept_mode === 'custom' ? ' checked' : '') + '><span class="form-checkbox-label">Customize</span></label>' +
+      '</div></div>';
+    html += '<div id="ns-men-custom"' + ((s.men_accept_mode || 'all') === 'custom' ? '' : ' style="display:none"') + '>';
+    Object.keys(TAXONOMY.men).forEach(function (section) {
+      var info = TAXONOMY.men[section];
+      html += '<div class="category-section"><div class="category-section-header"><span class="category-section-name">' + section + '</span><span class="category-section-count">' + info.items.length + '</span><label class="toggle-switch" style="margin-left:auto"><input type="checkbox" class="cat-section-toggle" data-section="men-' + section + '"><span class="toggle-slider"></span></label></div>';
+      html += '<div class="category-items">';
+      info.items.forEach(function (item) {
+        var checked = (s.men_accept || []).indexOf(item) > -1 ? ' checked' : '';
+        html += '<label class="form-checkbox-group category-item"><input type="checkbox" class="form-checkbox ns-accept men-accept" value="' + item + '"' + checked + ' data-section="men-' + section + '"><span class="form-checkbox-label">' + item + '</span></label>';
+      });
+      html += '</div></div>';
+    });
+    html += '</div></div>';
+
+    // Accept External Products — Women
+    html += '<div class="panel"><div class="panel-header"><span class="panel-title">Accept External Products — Women</span></div>';
+    html += '<div class="form-group"><label class="form-label">Recommendation Access</label>' +
+      '<div style="display:flex;flex-direction:column;gap:var(--space-sm)">' +
+      '<label class="form-checkbox-group"><input type="radio" name="ns-women-mode" class="form-checkbox" value="all"' + ((s.women_accept_mode || 'all') === 'all' ? ' checked' : '') + '><span class="form-checkbox-label">All complementary categories</span></label>' +
+      '<label class="form-checkbox-group"><input type="radio" name="ns-women-mode" class="form-checkbox" value="custom"' + (s.women_accept_mode === 'custom' ? ' checked' : '') + '><span class="form-checkbox-label">Customize</span></label>' +
+      '</div></div>';
+    html += '<div id="ns-women-custom"' + ((s.women_accept_mode || 'all') === 'custom' ? '' : ' style="display:none"') + '>';
+    Object.keys(TAXONOMY.women).forEach(function (section) {
+      var info = TAXONOMY.women[section];
+      html += '<div class="category-section"><div class="category-section-header"><span class="category-section-name">' + section + '</span><span class="category-section-count">' + info.items.length + '</span><label class="toggle-switch" style="margin-left:auto"><input type="checkbox" class="cat-section-toggle" data-section="women-' + section + '"><span class="toggle-slider"></span></label></div>';
+      html += '<div class="category-items">';
+      info.items.forEach(function (item) {
+        var checked = (s.women_accept || []).indexOf(item) > -1 ? ' checked' : '';
+        html += '<label class="form-checkbox-group category-item"><input type="checkbox" class="form-checkbox ns-accept women-accept" value="' + item + '"' + checked + ' data-section="women-' + section + '"><span class="form-checkbox-label">' + item + '</span></label>';
+      });
+      html += '</div></div>';
+    });
+    html += '</div></div>';
+
+    // Exclusions
+    html += '<div class="panel"><div class="panel-header"><span class="panel-title">Exclusions</span></div>';
+    html += '<div class="form-group"><label class="form-label">External Price Range</label><div class="form-row">' +
+      '<input class="form-input" id="ns-ext-min" type="number" min="0" step="100" placeholder="Min \u20B9" value="' + (s.external_price_min || '') + '">' +
+      '<input class="form-input" id="ns-ext-max" type="number" min="0" step="100" placeholder="Max \u20B9" value="' + (s.external_price_max || '') + '">' +
+      '</div><p class="form-hint">Don\'t show external products outside this range</p></div>';
+    html += '<div class="form-group"><label class="form-label">Exclude Brands</label>' +
+      '<select class="form-select" id="ns-ex-brands" multiple style="height:80px">';
+    (s.exclude_brands || []).forEach(function (b) { html += '<option value="' + b + '" selected>' + b + '</option>'; });
+    html += '</select><p class="form-hint">Type to add brand names</p></div>';
+    html += '<div class="form-group"><label class="form-label">Don\'t Accept External Products</label><div style="display:flex;flex-wrap:wrap;gap:var(--space-xs)">';
+    ['Tops', 'Bottoms', 'Footwear', 'Accessories', 'Outerwear', 'Ethnic'].forEach(function (cat) {
+      var checked = (s.exclude_categories || []).indexOf(cat) > -1 ? ' checked' : '';
+      html += '<label class="form-checkbox-group"><input type="checkbox" class="form-checkbox" value="' + cat + '"' + checked + ' id="ns-excat-' + cat + '"><span class="form-checkbox-label">' + cat + '</span></label>';
+    });
+    html += '</div></div>';
+    html += '<div class="toggle-row"><div class="toggle-info"><span class="toggle-label">Block Direct Competitors</span><span class="toggle-description">Don\'t recommend products from direct competitors</span></div>' +
+      '<label class="toggle-switch"><input type="checkbox" data-setting="block_competitors"' + (s.block_competitors ? ' checked' : '') + '><span class="toggle-slider"></span></label></div>';
+    html += '</div>';
+
+    // Placement
+    html += '<div class="panel"><div class="panel-header"><span class="panel-title">External Product Placement</span></div>';
+    html += '<div class="network-toggles">';
+    ['vton', 'complete_the_look', 'product_page', 'cart'].forEach(function (loc) {
+      var labels = { vton: 'VTON Try-On', complete_the_look: 'Complete the Look', product_page: 'Product Page', cart: 'Cart' };
+      var descs = { vton: 'Show on virtual try-on results', complete_the_look: 'Show in outfit recommendations', product_page: 'Show on product detail pages', cart: 'Show in shopping cart' };
+      html += buildToggle('place_' + loc, labels[loc], descs[loc], s['place_' + loc]);
+    });
+    html += '</div></div>';
+
+    html += '</div>'; // website tab
+
+    // ——— Tab B: Product Distribution (Advertiser Controls) ———
+    html += '<div class="campaign-tab-content" data-ns-tab-content="distribution">';
+
+    html += '<div class="panel"><div class="panel-header"><span class="panel-title">Product Distribution</span></div>';
+    html += '<div class="network-toggles">';
+    html += buildToggle('distribute_products', 'Distribute Products', 'Allow your products to appear on partner brand websites', s.distribute_products);
+    html += buildToggle('promote_products', 'Promote Products', 'Pay to increase exposure across the network', s.promote_products);
+    html += '</div></div>';
+
+    // Distribution categories
+    var distOn = s.distribute_products || false;
+    html += '<div class="panel" id="dist-settings-panel"' + (distOn ? '' : ' style="display:none"') + '>';
+    html += '<div class="panel-header"><span class="panel-title">Where Should Your Products Appear?</span></div>';
+
+    html += '<div class="form-group"><label class="form-label">Target Gender</label><div style="display:flex;gap:var(--space-sm)">';
+    ['Men', 'Women', 'Unisex'].forEach(function (g) {
+      var checked = (s.dist_gender || 'All') === g ? ' checked' : '';
+      html += '<label class="form-checkbox-group"><input type="radio" name="ns-dist-gender" class="form-checkbox" value="' + g + '"' + checked + '><span class="form-checkbox-label">' + g + '</span></label>';
+    });
+    html += '</div></div>';
+
+    html += '<div class="form-group"><label class="form-label">Host Website Categories</label><div style="display:flex;flex-wrap:wrap;gap:var(--space-xs)">';
+    TAXONOMY.hostCategories.forEach(function (c) {
+      var checked = (s.dist_host_categories || []).indexOf(c) > -1 ? ' checked' : '';
+      html += '<label class="form-checkbox-group"><input type="checkbox" class="form-checkbox" value="' + c + '"' + checked + ' id="ns-dcat-' + c.replace(/[^a-zA-Z]/g, '') + '"><span class="form-checkbox-label">' + c + '</span></label>';
+    });
+    html += '</div></div>';
+
+    html += '<div class="form-group"><label class="form-label">Price Compatibility</label><div style="display:flex;flex-wrap:wrap;gap:var(--space-xs)">';
+    TAXONOMY.priceBands.forEach(function (pb) {
+      var checked = s.dist_price_band === pb.label ? ' checked' : '';
+      html += '<label class="form-checkbox-group"><input type="radio" name="ns-dist-price" class="form-checkbox" value="' + pb.label + '"' + checked + '><span class="form-checkbox-label">' + pb.label + '</span></label>';
+    });
+    html += '</div></div>';
+    html += '</div>';
+
+    // Promotion settings
     var promoteOn = s.promote_products || false;
-    html += '<div class="panel" id="promotion-settings" style="' + (promoteOn ? '' : 'display:none') + '">' +
-      '<div class="panel-header"><span class="panel-title">Promotion Settings</span></div>' +
-      '<div class="form-row">' +
+    html += '<div class="panel" id="promotion-settings"' + (promoteOn ? '' : ' style="display:none"') + '>';
+    html += '<div class="panel-header"><span class="panel-title">Promotion Settings</span></div>';
+    html += '<div class="form-row">' +
       '<div class="form-group"><label class="form-label">Monthly Promotion Budget (\u20B9 INR)</label><input class="form-input" id="promo-budget" type="number" min="500" step="500" placeholder="10000" value="' + (s.promo_budget || '') + '"></div>' +
       '<div class="form-group"><label class="form-label">Max CPC Bid (\u20B9)</label><input class="form-input" id="promo-cpc" type="number" min="1" step="0.5" placeholder="15" value="' + (s.max_cpc_bid || '') + '"></div>' +
-      '</div>' +
-      '<div class="form-group"><label class="form-label">Target Categories for Promotion</label>' +
-      '<div style="display:flex;flex-wrap:wrap;gap:var(--space-xs)">' +
-      ['Western Wear', 'Ethnic Wear', 'Activewear', 'Accessories', 'Footwear', 'Loungewear'].map(function (c) {
-        var checked = (s.promo_categories || []).indexOf(c) > -1 ? ' checked' : '';
-        return '<div class="form-checkbox-group"><input type="checkbox" class="form-checkbox" value="' + c + '"' + checked + ' id="promo-cat-' + c.replace(/\s/g, '-') + '"><label class="form-checkbox-label" for="promo-cat-' + c.replace(/\s/g, '-') + '">' + c + '</label></div>';
-      }).join('') +
-      '</div></div>' +
       '</div>';
+    html += '<div class="form-group"><label class="form-label">Target Categories for Promotion</label><div style="display:flex;flex-wrap:wrap;gap:var(--space-xs)">';
+    ['Western Wear', 'Ethnic Wear', 'Activewear', 'Accessories', 'Footwear', 'Loungewear'].forEach(function (c) {
+      var checked = (s.promo_categories || []).indexOf(c) > -1 ? ' checked' : '';
+      html += '<label class="form-checkbox-group"><input type="checkbox" class="form-checkbox" value="' + c + '"' + checked + ' id="promo-cat-' + c.replace(/\s/g, '-') + '"><span class="form-checkbox-label">' + c + '</span></label>';
+    });
+    html += '</div></div></div>';
+
+    html += '</div>'; // distribution tab
 
     // Save
     html += '<div style="display:flex;justify-content:flex-end;margin-top:var(--space-lg)">' +
@@ -1133,20 +1748,61 @@
 
     $content.innerHTML = html;
 
-    // Bind toggle behavior
+    // Tab switching
+    document.querySelectorAll('[data-ns-tab]').forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        document.querySelectorAll('[data-ns-tab]').forEach(function (t) { t.classList.remove('active'); });
+        document.querySelectorAll('[data-ns-tab-content]').forEach(function (c) { c.classList.remove('active'); });
+        tab.classList.add('active');
+        document.querySelector('[data-ns-tab-content="' + tab.getAttribute('data-ns-tab') + '"]').classList.add('active');
+      });
+    });
+
+    // Toggle row active states
     document.querySelectorAll('[data-setting]').forEach(function (input) {
       input.addEventListener('change', function () {
         var row = this.closest('.toggle-row');
         if (row) row.classList.toggle('active', this.checked);
-
-        if (this.getAttribute('data-setting') === 'promote_products') {
-          var promoPanel = document.getElementById('promotion-settings');
-          if (promoPanel) promoPanel.style.display = this.checked ? '' : 'none';
-        }
       });
     });
 
+    // Accept mode radio toggles
+    ['men', 'women'].forEach(function (g) {
+      document.querySelectorAll('[name="ns-' + g + '-mode"]').forEach(function (radio) {
+        radio.addEventListener('change', function () {
+          var customDiv = document.getElementById('ns-' + g + '-custom');
+          if (customDiv) customDiv.style.display = this.value === 'custom' ? '' : 'none';
+        });
+      });
+    });
+
+    // Section toggles for category trees
+    document.querySelectorAll('.cat-section-toggle').forEach(function (toggle) {
+      toggle.addEventListener('change', function () {
+        var section = this.getAttribute('data-section');
+        this.closest('.category-section').querySelectorAll('.cat-item, .category-item input').forEach(function (item) {
+          item.checked = toggle.checked;
+        });
+      });
+    });
+
+    // Distribution panel visibility
+    document.querySelector('[data-setting="distribute_products"]').addEventListener('change', function () {
+      var panel = document.getElementById('dist-settings-panel');
+      if (panel) panel.style.display = this.checked ? '' : 'none';
+    });
+    document.querySelector('[data-setting="promote_products"]').addEventListener('change', function () {
+      var panel = document.getElementById('promotion-settings');
+      if (panel) panel.style.display = this.checked ? '' : 'none';
+    });
+
     document.getElementById('btn-save-settings').addEventListener('click', saveNetworkSettings);
+  }
+
+  function buildToggle(key, label, desc, val) {
+    return '<div class="toggle-row' + (val ? ' active' : '') + '" id="toggle-row-' + key + '">' +
+      '<div class="toggle-info"><span class="toggle-label">' + label + '</span><span class="toggle-description">' + desc + '</span></div>' +
+      '<label class="toggle-switch"><input type="checkbox" data-setting="' + key + '"' + (val ? ' checked' : '') + '><span class="toggle-slider"></span></label></div>';
   }
 
   function saveNetworkSettings() {
@@ -1155,13 +1811,47 @@
       settings[input.getAttribute('data-setting')] = input.checked;
     });
 
+    // Brand positioning
+    settings.price_min = Number(document.getElementById('ns-price-min').value) || 0;
+    settings.price_max = Number(document.getElementById('ns-price-max').value) || 0;
+    settings.positioning = document.getElementById('ns-positioning').value;
+    settings.styles = [];
+    document.querySelectorAll('.ns-style:checked').forEach(function (el) { settings.styles.push(el.value); });
+
+    // Accept modes
+    var menMode = document.querySelector('[name="ns-men-mode"]:checked');
+    settings.men_accept_mode = menMode ? menMode.value : 'all';
+    settings.men_accept = [];
+    document.querySelectorAll('.men-accept:checked').forEach(function (el) { settings.men_accept.push(el.value); });
+    var womenMode = document.querySelector('[name="ns-women-mode"]:checked');
+    settings.women_accept_mode = womenMode ? womenMode.value : 'all';
+    settings.women_accept = [];
+    document.querySelectorAll('.women-accept:checked').forEach(function (el) { settings.women_accept.push(el.value); });
+
+    // Exclusions
+    settings.external_price_min = Number(document.getElementById('ns-ext-min').value) || 0;
+    settings.external_price_max = Number(document.getElementById('ns-ext-max').value) || 0;
+    settings.exclude_brands = [];
+    var exBrandsSelect = document.getElementById('ns-ex-brands');
+    if (exBrandsSelect) {
+      Array.from(exBrandsSelect.selectedOptions).forEach(function (opt) { settings.exclude_brands.push(opt.value); });
+    }
+    settings.exclude_categories = [];
+    document.querySelectorAll('[id^="ns-excat-"]:checked').forEach(function (el) { settings.exclude_categories.push(el.value); });
+
+    // Distribution
+    var distGender = document.querySelector('[name="ns-dist-gender"]:checked');
+    settings.dist_gender = distGender ? distGender.value : 'All';
+    settings.dist_host_categories = [];
+    document.querySelectorAll('[id^="ns-dcat-"]:checked').forEach(function (el) { settings.dist_host_categories.push(el.value); });
+    var distPrice = document.querySelector('[name="ns-dist-price"]:checked');
+    settings.dist_price_band = distPrice ? distPrice.value : '';
+
     if (settings.promote_products) {
       settings.promo_budget = Number(document.getElementById('promo-budget').value) || 0;
       settings.max_cpc_bid = Number(document.getElementById('promo-cpc').value) || 0;
       settings.promo_categories = [];
-      document.querySelectorAll('[id^="promo-cat-"]:checked').forEach(function (el) {
-        settings.promo_categories.push(el.value);
-      });
+      document.querySelectorAll('[id^="promo-cat-"]:checked').forEach(function (el) { settings.promo_categories.push(el.value); });
     }
 
     dbFetch('/api/b2b_gateway', {
