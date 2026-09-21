@@ -91,36 +91,3 @@
     <div class="db-modal-footer" id="db-modal-footer"></div>
   </div>
 </div>
-
-{% schema %}
-{
-  "name": "Brand Dashboard",
-  "tag": "section",
-  "class": "brand-dashboard-section",
-  "settings": [
-    {
-      "type": "text",
-      "id": "brand_id",
-      "label": "Brand ID",
-      "info": "The Supabase brand UUID"
-    },
-    {
-      "type": "text",
-      "id": "brand_name",
-      "label": "Brand Name",
-      "default": "My Brand"
-    },
-    {
-      "type": "color",
-      "id": "brand_color",
-      "label": "Brand Color",
-      "default": "#39A596"
-    }
-  ],
-  "presets": [
-    {
-      "name": "Brand Dashboard"
-    }
-  ]
-}
-{% endschema %}
