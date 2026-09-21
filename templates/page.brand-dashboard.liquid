@@ -1,93 +1,89 @@
 <link rel="stylesheet" href="https://mynarrative.store/cdn/shop/t/3/assets/brand-dashboard.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://mynarrative.store/cdn/shop/t/3/assets/brand-dashboard.js" defer></script>
+<meta name="brand-id" content="7fcf3029-86e6-43ab-a256-9518d32458f8">
+<meta name="brand-name" content="">
 
-<div id="db-app" class="db-app">
-  <!-- Sidebar -->
-  <aside class="db-sidebar" id="db-sidebar">
-    <div class="db-sidebar-logo">
-      <span class="db-logo-icon">&#9670;</span>
-      <span class="db-logo-text">NARRATIVE</span>
-      <span class="db-logo-badge">ADS</span>
+<div class="dashboard-layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">N</div>
+      <div class="sidebar-logo-text">NARRATIVE <span>ADS</span></div>
     </div>
-    
-    <nav class="db-sidebar-nav">
-      <a class="db-nav-item active" data-view="overview">
-        <span class="db-nav-icon">&#9680;</span>
-        <span class="db-nav-label">Overview</span>
+
+    <nav class="sidebar-nav">
+      <div class="sidebar-section-label">Main</div>
+      <a class="sidebar-nav-item active" data-nav="overview">
+        <span class="sidebar-nav-icon">&#9680;</span>
+        <span class="sidebar-nav-label">Overview</span>
       </a>
-      <a class="db-nav-item" data-view="campaigns">
-        <span class="db-nav-icon">&#9672;</span>
-        <span class="db-nav-label">Campaigns</span>
+      <a class="sidebar-nav-item" data-nav="campaigns">
+        <span class="sidebar-nav-icon">&#9672;</span>
+        <span class="sidebar-nav-label">Campaigns</span>
       </a>
-      <a class="db-nav-item" data-view="products">
-        <span class="db-nav-icon">&#9673;</span>
-        <span class="db-nav-label">Products</span>
+      <a class="sidebar-nav-item" data-nav="products">
+        <span class="sidebar-nav-icon">&#9673;</span>
+        <span class="sidebar-nav-label">Products</span>
       </a>
-      <a class="db-nav-item" data-view="network">
-        <span class="db-nav-icon">&#9678;</span>
-        <span class="db-nav-label">Network</span>
+      <div class="sidebar-section-label">Network</div>
+      <a class="sidebar-nav-item" data-nav="settings">
+        <span class="sidebar-nav-icon">&#9678;</span>
+        <span class="sidebar-nav-label">Network Settings</span>
       </a>
-      <a class="db-nav-item" data-view="analytics">
-        <span class="db-nav-icon">&#9681;</span>
-        <span class="db-nav-label">Analytics</span>
+      <a class="sidebar-nav-item" data-nav="analytics">
+        <span class="sidebar-nav-icon">&#9681;</span>
+        <span class="sidebar-nav-label">Analytics</span>
       </a>
-      <a class="db-nav-item" data-view="billing">
-        <span class="db-nav-icon">&#9682;</span>
-        <span class="db-nav-label">Billing</span>
+      <div class="sidebar-section-label">Account</div>
+      <a class="sidebar-nav-item" data-nav="wallet">
+        <span class="sidebar-nav-icon">&#9682;</span>
+        <span class="sidebar-nav-label">Billing & Wallet</span>
       </a>
     </nav>
-    
-    <div class="db-sidebar-brand">
-      <div class="db-brand-avatar" id="db-brand-avatar">Z</div>
-      <div class="db-brand-info">
-        <div class="db-brand-name" id="db-brand-name">Brand Name</div>
-        <div class="db-brand-plan">Growth Plan</div>
+
+    <div class="sidebar-bottom">
+      <div class="sidebar-brand-info">
+        <div class="sidebar-brand-avatar" id="header-avatar">B</div>
+        <div class="sidebar-brand-details">
+          <div class="sidebar-brand-name" id="brand-display-name">Brand</div>
+          <div class="sidebar-brand-plan">Growth Plan</div>
+        </div>
       </div>
     </div>
   </aside>
 
-  <!-- Main Content -->
-  <main class="db-main">
-    <!-- Top Header -->
-    <header class="db-header">
-      <button class="db-menu-toggle" id="db-menu-toggle">&#9776;</button>
-      <h1 class="db-page-title" id="db-page-title">Overview</h1>
-      <div class="db-header-actions">
-        <div class="db-search-wrap">
-          <input type="text" class="db-search" placeholder="Search..." id="db-search">
+  <main class="dashboard-main">
+    <header class="top-header">
+      <div class="header-left">
+        <button class="mobile-menu-btn" id="mobile-menu-btn">&#9776;</button>
+        <h1 class="header-title" id="header-title">Overview</h1>
+        <div class="header-breadcrumb">
+          <span>/</span>
+          <span id="breadcrumb-view">Overview</span>
         </div>
-        <button class="db-notif-btn" id="db-notif-btn">
-          <span>&#128276;</span>
-          <span class="db-notif-dot"></span>
+      </div>
+      <div class="header-right">
+        <div class="header-search">
+          <span class="header-search-icon">&#128269;</span>
+          <input type="text" placeholder="Search...">
+        </div>
+        <button class="header-action-btn" title="Notifications">
+          &#128276;
+          <span class="header-notification-dot"></span>
         </button>
-        <div class="db-avatar" id="db-header-avatar">Z</div>
+        <div class="header-avatar" id="header-avatar-circle">B</div>
       </div>
     </header>
 
-    <!-- Content Area (JS populates this) -->
-    <div class="db-content" id="db-content">
-      <div class="db-loading-grid">
-        <div class="db-skeleton-card"></div>
-        <div class="db-skeleton-card"></div>
-        <div class="db-skeleton-card"></div>
-        <div class="db-skeleton-card"></div>
+    <div class="dashboard-content" id="dashboard-content">
+      <div class="stats-grid">
+        <div class="stat-card skeleton skeleton-card"></div>
+        <div class="stat-card skeleton skeleton-card"></div>
+        <div class="stat-card skeleton skeleton-card"></div>
+        <div class="stat-card skeleton skeleton-card"></div>
       </div>
     </div>
   </main>
 </div>
 
-<!-- Toast Container -->
-<div class="db-toast-container" id="db-toast-container"></div>
-
-<!-- Modal Container -->
-<div class="db-modal-overlay" id="db-modal-overlay">
-  <div class="db-modal" id="db-modal">
-    <div class="db-modal-header">
-      <h2 class="db-modal-title" id="db-modal-title"></h2>
-      <button class="db-modal-close" id="db-modal-close">&times;</button>
-    </div>
-    <div class="db-modal-body" id="db-modal-body"></div>
-    <div class="db-modal-footer" id="db-modal-footer"></div>
-  </div>
-</div>
+<div class="mobile-overlay" id="mobile-overlay"></div>
