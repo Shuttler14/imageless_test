@@ -1,0 +1,282 @@
+{%- comment -%}
+  MY NARRATIVE — My Profile / Style Intelligence Profile
+  Shows user data, saved cards, person profiles, saved outfits
+  Change ID: ADD-USR-007-260922
+{%- endcomment -%}
+
+{{ 'MN-stylist-wizard-v4.css' | asset_url | stylesheet_tag }}
+
+<style>
+.mn-profile-shell{min-height:100vh;background:#080808;color:#fff;font-family:'DM Sans',sans-serif;padding:20px}
+.mn-profile-wrap{max-width:640px;margin:0 auto}
+.mn-profile-header{text-align:center;padding:40px 0 24px}
+.mn-profile-logo{font-size:20px;font-weight:800;letter-spacing:-0.02em;margin-bottom:16px}
+.mn-profile-logo a{color:#fff;text-decoration:none}.mn-profile-logo a b{color:#00bcbc}
+.mn-profile-avatar{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#00bcbc,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:#fff;margin:0 auto 12px;border:2px solid rgba(255,255,255,0.1)}
+.mn-profile-name{font-size:22px;font-weight:700}
+.mn-profile-email{font-size:13px;color:rgba(255,255,255,0.4);margin-top:4px}
+.mn-profile-section{margin-top:24px}
+.mn-profile-section-title{font-size:11px;font-weight:600;color:rgba(255,255,255,0.35);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:12px;padding-left:4px}
+.mn-profile-card{background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:16px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.mn-profile-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px}
+.mn-profile-stat{text-align:center;padding:12px 8px;border-radius:12px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04)}
+.mn-profile-stat-num{font-size:20px;font-weight:700;color:var(--mn4-teal,#00bcbc)}
+.mn-profile-stat-label{font-size:10px;color:rgba(255,255,255,0.35);margin-top:4px;text-transform:uppercase;letter-spacing:0.05em}
+.mn-profile-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
+.mn-profile-row:last-child{border-bottom:none}
+.mn-profile-row-icon{font-size:18px;width:28px;text-align:center;flex-shrink:0}
+.mn-profile-row-info{flex:1;min-width:0}
+.mn-profile-row-name{font-size:14px;font-weight:500;color:#fff}
+.mn-profile-row-meta{font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px}
+.mn-profile-row-badge{padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;background:rgba(0,188,188,0.1);color:#00bcbc}
+.mn-profile-row-action{background:none;border:none;color:rgba(255,255,255,0.25);cursor:pointer;font-size:13px;padding:6px 10px;border-radius:8px;transition:all 0.15s}
+.mn-profile-row-action:hover{color:#ef4444;background:rgba(239,68,68,0.1)}
+.mn-profile-empty{text-align:center;padding:24px;color:rgba(255,255,255,0.25);font-size:13px}
+.mn-profile-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.03);color:rgba(255,255,255,0.6);font-size:12px;cursor:pointer;transition:all 0.15s;font-family:'DM Sans',sans-serif}
+.mn-profile-btn:hover{border-color:rgba(0,188,188,0.3);color:#00bcbc}
+.mn-profile-btn--primary{background:linear-gradient(135deg,#00bcbc,#00a3a3);border:none;color:#fff}
+.mn-profile-btn--primary:hover{filter:brightness(1.1)}
+.mn-profile-footer{text-align:center;padding:32px 0;font-size:12px;color:rgba(255,255,255,0.2)}
+.mn-profile-footer a{color:rgba(0,188,188,0.6);text-decoration:none}
+.mn-profile-login-prompt{text-align:center;padding:60px 20px}
+.mn-profile-login-prompt h2{font-size:20px;font-weight:700;margin-bottom:8px}
+.mn-profile-login-prompt p{font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:20px}
+.mn-profile-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.mn-profile-chip{padding:5px 12px;border-radius:8px;font-size:11px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);color:rgba(255,255,255,0.6)}
+.mn-profile-chip--active{border-color:rgba(0,188,188,0.3);color:#00bcbc;background:rgba(0,188,188,0.06)}
+</style>
+
+<div class="mn-profile-shell">
+  <div class="mn-profile-wrap">
+    <!-- Loading state -->
+    <div id="mn-profile-loading" class="mn-profile-login-prompt">
+      <p style="color:rgba(255,255,255,0.3)">Loading your profile...</p>
+    </div>
+
+    <!-- Not logged in -->
+    <div id="mn-profile-login" class="mn-profile-login-prompt" style="display:none">
+      <div class="mn-profile-logo"><a href="/">my<b>narrative</b></a></div>
+      <h2>Your Style Profile</h2>
+      <p>Sign in to see your saved outfits, bank cards, and personalized recommendations.</p>
+      <a href="/pages/login?redirect=/pages/profile" class="mn-profile-btn mn-profile-btn--primary">Sign in →</a>
+    </div>
+
+    <!-- Profile content -->
+    <div id="mn-profile-content" style="display:none">
+      <div class="mn-profile-header">
+        <div class="mn-profile-logo"><a href="/">my<b>narrative</b></a></div>
+        <div class="mn-profile-avatar" id="mp-avatar">M</div>
+        <div class="mn-profile-name" id="mp-name">Loading...</div>
+        <div class="mn-profile-email" id="mp-email"></div>
+      </div>
+
+      <!-- Stats -->
+      <div class="mn-profile-stats" id="mp-stats"></div>
+
+      <!-- Style Profile -->
+      <div class="mn-profile-section" id="mp-style-section">
+        <div class="mn-profile-section-title">Style Intelligence</div>
+        <div class="mn-profile-card" id="mp-style-card"></div>
+      </div>
+
+      <!-- Saved Cards -->
+      <div class="mn-profile-section">
+        <div class="mn-profile-section-title">My Cards</div>
+        <div class="mn-profile-card" id="mp-cards-card"></div>
+      </div>
+
+      <!-- Person Profiles -->
+      <div class="mn-profile-section">
+        <div class="mn-profile-section-title">People</div>
+        <div class="mn-profile-card" id="mp-persons-card"></div>
+      </div>
+
+      <!-- Saved Outfits -->
+      <div class="mn-profile-section">
+        <div class="mn-profile-section-title">Saved Outfits</div>
+        <div class="mn-profile-card" id="mp-outfits-card"></div>
+      </div>
+
+      <!-- Footer -->
+      <div class="mn-profile-footer">
+        <a href="/" style="margin-right:16px">Back to shop</a>
+        <a href="#" onclick="mnProfileLogout();return false">Sign out</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var API='https://drishti-api.fly.dev';
+  var VERCEL='https://drishti-api-blond.vercel.app';
+  var user=null;
+
+  function getUser(){
+    try{return JSON.parse(localStorage.getItem('mn_user')||'null');}catch(e){return null;}
+  }
+
+  function authHeaders(){
+    var u=getUser();
+    if(!u||!u.token)return null;
+    return{'Content-Type':'application/json','Authorization':'Bearer '+u.token};
+  }
+
+  function init(){
+    user=getUser();
+    if(!user||!user.token){
+      document.getElementById('mn-profile-loading').style.display='none';
+      document.getElementById('mn-profile-login').style.display='block';
+      return;
+    }
+    loadProfile();
+    loadCards();
+    loadPersons();
+    loadOutfits();
+  }
+
+  function loadProfile(){
+    var h=authHeaders();if(!h)return;
+    fetch(VERCEL+'/api/user/profile',{headers:h})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      document.getElementById('mn-profile-loading').style.display='none';
+      document.getElementById('mn-profile-content').style.display='block';
+      var name=d.display_name||user.email.split('@')[0];
+      var initial=name.charAt(0).toUpperCase();
+      document.getElementById('mp-avatar').textContent=initial;
+      document.getElementById('mp-name').textContent=name;
+      document.getElementById('mp-email').textContent=d.email||user.email;
+      
+      // Stats
+      var statsHtml='';
+      var stats=[
+        {n:d.tryon_count||0,l:'Try-ons'},
+        {n:d.outfit_count||0,l:'Outfits'},
+        {n:d.card_count||0,l:'Cards'},
+        {n:d.person_count||0,l:'People'}
+      ];
+      stats.forEach(function(s){statsHtml+='<div class="mn-profile-stat"><div class="mn-profile-stat-num">'+s.n+'</div><div class="mn-profile-stat-label">'+s.l+'</div></div>';});
+      document.getElementById('mp-stats').innerHTML=statsHtml;
+
+      // Style info
+      var styleHtml='';
+      if(d.gender)styleHtml+=chip('Gender',d.gender);
+      if(d.age_range)styleHtml+=chip('Age',d.age_range);
+      if(d.preferred_styles&&d.preferred_styles.length){
+        styleHtml+='<p style="font-size:12px;color:rgba(255,255,255,0.4);margin:12px 0 6px">Styles</p><div class="mn-profile-chips">';
+        d.preferred_styles.forEach(function(s){styleHtml+='<span class="mn-profile-chip mn-profile-chip--active">'+esc(s)+'</span>';});
+        styleHtml+='</div>';
+      }
+      if(d.preferred_colors&&d.preferred_colors.length){
+        styleHtml+='<p style="font-size:12px;color:rgba(255,255,255,0.4);margin:12px 0 6px">Colors</p><div class="mn-profile-chips">';
+        d.preferred_colors.forEach(function(c){styleHtml+='<span class="mn-profile-chip mn-profile-chip--active">'+esc(c)+'</span>';});
+        styleHtml+='</div>';
+      }
+      if(!styleHtml)styleHtml='<p class="mn-profile-empty">Complete your style profile for better recommendations</p>';
+      document.getElementById('mp-style-card').innerHTML=styleHtml;
+    })
+    .catch(function(){
+      document.getElementById('mn-profile-loading').style.display='none';
+      document.getElementById('mn-profile-login').style.display='block';
+    });
+  }
+
+  function loadCards(){
+    var h=authHeaders();if(!h)return;
+    fetch(VERCEL+'/api/user/cards',{headers:h})
+    .then(function(r){return r.json();})
+    .then(function(cards){
+      var el=document.getElementById('mp-cards-card');
+      if(!cards.length){el.innerHTML='<p class="mn-profile-empty">No cards saved yet</p><a href="/pages/stylist" class="mn-profile-btn" style="margin-top:8px">Add card during checkout</a>';return;}
+      var html='';
+      cards.forEach(function(c){
+        html+='<div class="mn-profile-row">'
+          +'<span class="mn-profile-row-icon">💳</span>'
+          +'<div class="mn-profile-row-info">'
+          +'<div class="mn-profile-row-name">'+esc(c.bank_name)+' '+esc(c.card_variant)+'</div>'
+          +'<div class="mn-profile-row-meta">'+esc(c.card_network||'')+' · '+(c.card_type==='credit'?'Credit':'Debit')+'</div>'
+          +'</div>'
+          +(c.active_offers?'<span class="mn-profile-row-badge">'+c.active_offers+' offers</span>':'')
+          +'<button class="mn-profile-row-action" onclick="mnProfileRemoveCard(\''+c.card_id+'\')">✕</button>'
+          +'</div>';
+      });
+      el.innerHTML=html;
+    });
+  }
+
+  function loadPersons(){
+    var h=authHeaders();if(!h)return;
+    fetch(VERCEL+'/api/user/persons',{headers:h})
+    .then(function(r){return r.json();})
+    .then(function(persons){
+      var el=document.getElementById('mp-persons-card');
+      if(!persons.length){el.innerHTML='<p class="mn-profile-empty">No people added yet</p>';return;}
+      var html='';
+      var icons={self:'👤',partner:'💑',parent:'👨‍👩‍👧',sibling:'👫',friend:'🤝',colleague:'💼',other:'👤'};
+      persons.forEach(function(p){
+        html+='<div class="mn-profile-row">'
+          +'<span class="mn-profile-row-icon">'+(icons[p.relationship]||'👤')+'</span>'
+          +'<div class="mn-profile-row-info">'
+          +'<div class="mn-profile-row-name">'+esc(p.label||p.relationship)+'</div>'
+          +'<div class="mn-profile-row-meta">'+esc(p.relationship)+(p.tryon_count?' · '+p.tryon_count+' try-ons':'')+'</div>'
+          +'</div>'
+          +'<button class="mn-profile-row-action" onclick="mnProfileRemovePerson(\''+p.person_id+'\')">✕</button>'
+          +'</div>';
+      });
+      el.innerHTML=html;
+    });
+  }
+
+  function loadOutfits(){
+    var h=authHeaders();if(!h)return;
+    fetch(VERCEL+'/api/user/outfits',{headers:h})
+    .then(function(r){return r.json();})
+    .then(function(outfits){
+      var el=document.getElementById('mp-outfits-card');
+      if(!outfits.length){el.innerHTML='<p class="mn-profile-empty">No saved outfits yet</p><a href="/pages/stylist" class="mn-profile-btn" style="margin-top:8px">Try the AI Stylist</a>';return;}
+      var html='';
+      outfits.slice(0,10).forEach(function(o){
+        var price=o.best_price||o.total_price||0;
+        html+='<div class="mn-profile-row">'
+          +'<span class="mn-profile-row-icon">👗</span>'
+          +'<div class="mn-profile-row-info">'
+          +'<div class="mn-profile-row-name">'+esc(o.outfit_name||'Outfit')+'</div>'
+          +'<div class="mn-profile-row-meta">'+(o.occasion?esc(o.occasion)+' · ':'')+(price?'₹'+price.toLocaleString():'')+(o.best_offer?' · '+esc(o.best_offer):'')+'</div>'
+          +'</div>'
+          +'<button class="mn-profile-row-action" onclick="mnProfileRemoveOutfit(\''+o.outfit_id+'\')">✕</button>'
+          +'</div>';
+      });
+      el.innerHTML=html;
+    });
+  }
+
+  function chip(label,value){return'<div style="display:flex;gap:8px;align-items:center;margin-bottom:6px"><span style="font-size:11px;color:rgba(255,255,255,0.35);min-width:50px">'+label+'</span><span class="mn-profile-chip mn-profile-chip--active">'+esc(value)+'</span></div>';}
+  function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+  window.mnProfileRemoveCard=function(cardId){
+    if(!confirm('Remove this card?'))return;
+    var h=authHeaders();if(!h)return;
+    fetch(VERCEL+'/api/user/cards?card_id='+cardId,{method:'DELETE',headers:h})
+    .then(function(){loadCards();});
+  };
+  window.mnProfileRemovePerson=function(personId){
+    if(!confirm('Remove this person?'))return;
+    var h=authHeaders();if(!h)return;
+    fetch(VERCEL+'/api/user/persons?person_id='+personId,{method:'DELETE',headers:h})
+    .then(function(){loadPersons();});
+  };
+  window.mnProfileRemoveOutfit=function(outfitId){
+    if(!confirm('Remove this outfit?'))return;
+    var h=authHeaders();if(!h)return;
+    fetch(VERCEL+'/api/user/outfits?outfit_id='+outfitId,{method:'DELETE',headers:h})
+    .then(function(){loadOutfits();});
+  };
+  window.mnProfileLogout=function(){
+    localStorage.removeItem('mn_user');
+    window.location.href='/pages/login';
+  };
+
+  init();
+})();
+</script>
