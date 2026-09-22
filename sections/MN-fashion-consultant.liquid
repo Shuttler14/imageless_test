@@ -143,8 +143,20 @@
     boho_f:         '',
     power_suit_f:   ''
   };
+  // Expose Shopify customer data to wizard
+  window.MN_SHOPIFY_CUSTOMER = {
+    {% if customer %}
+      id: {{ customer.id }},
+      email: {{ customer.email | json }},
+      firstName: {{ customer.first_name | json }},
+      lastName: {{ customer.last_name | json }},
+      logged_in: true
+    {% else %}
+      logged_in: false
+    {% endif %}
+  };
 </script>
 <script src="{{ 'MN-weather.js' | asset_url }}" defer></script>
-<script src="{{ 'MN-stylist-wizard-v4.js' | asset_url }}?v=5.1.0" defer></script>
+<script src="{{ 'MN-stylist-wizard-v4.js' | asset_url }}?v=5.2.0" defer></script>
 <script src="{{ 'MN-fashion-consultant.js' | asset_url }}?v=4.0.0" defer></script>
 <link rel="stylesheet" href="{{ 'MN-fashion-consultant.css' | asset_url }}?v=4.0.0">

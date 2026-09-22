@@ -1,8 +1,6 @@
-/* MN4 AI Stylist Wizard v5.0 — Magic-first flow
-   New visitor: Try → Photo → Occasion → First Look → Personalize (optional)
-   Returning:   Occasion → Style mode → Budget → Brands → Create → Look
-   LOCKED: Recommendations always from Fly.io. Vercel /api/recommend is NOT used.
-   VTON runs separately via startLooksVton() after recs load. */
+/* MN4 AI Stylist Wizard v5.2 — Shopify Customer Accounts
+   Uses Shopify's native login. No custom OTP auth.
+   Gender prompt shown once for new users after Shopify login. */
 (function(){
 'use strict';
 
@@ -91,8 +89,7 @@ dnaStyles:[],dnaOccasions:[],dnaBrands:[],dnaPlaces:[],
 dnaBudget:4000,dnaBrandMode:'ai',dnaBrandQuery:'',
 rMode:null,rCategories:[],rBrandMode:'ai',rBrands:[],rBrandQuery:'',
 dynamicBrands:null,budgetIntel:null,quickPicks:null,
-authEmail:'',authOtp:'',authStage:'idle',authBusy:false,
-token:null,user:null,
+shopifyCustomer:null,genderPrompted:false,
 closet:[],closetBusy:false,
 whyList:[],
 sliderVal:4000,
@@ -106,9 +103,12 @@ var W=window.MN4=window.MN4||{};
 function esc(s){var d=document.createElement('div');d.textContent=s==null?'':String(s);return d.innerHTML;}
 function fmtPrice(n){var c=window.MN_currency;if(c&&c.format)return c.format(n);return'\u20B9'+Number(n||0).toLocaleString('en-IN');}
 function fmtShort(n){n=Number(n)||0;if(n>=100000)return'\u20B9'+(n/100000).toFixed(n%100000?1:0)+'L';if(n>=1000)return'\u20B9'+(n/1000).toFixed(n%1000?1:0)+'K';return'\u20B9'+Math.round(n);}
-function postJSON(path,body,token){
+function postJSON(path,body){
 var headers={'Content-Type':'application/json'};
-if(token)headers['Authorization']='Bearer '+token;
+/* Auto-attach Shopify customer ID for user endpoints */
+if(path.indexOf('/api/user/')===0&&st.shopifyCustomer&&st.shopifyCustomer.id){
+headers['X-Shopify-Customer-Id']=String(st.shopifyCustomer.id);
+}
 return fetch(API+path,{method:'POST',headers:headers,body:JSON.stringify(body)}).then(function(r){return r.json().then(function(d){if(!r.ok)throw new Error(d.detail||('HTTP '+r.status));return d;});});
 }
 function slotLabel(slot){
@@ -125,10 +125,22 @@ return JSON.parse(raw);
 }
 function saveLocal(){
 try{
-localStorage.setItem(LS_KEY,JSON.stringify({
+var data={
 styles:st.dnaStyles,occasions:st.dnaOccasions,brands:st.dnaBrands,
 places:st.dnaPlaces,budget:st.dnaBudget,closet:st.closet,gender:st.gender,ts:Date.now()
-}));
+};
+localStorage.setItem(LS_KEY,JSON.stringify(data));
+/* Also write to dashboard-compatible keys */
+try{
+var core=JSON.parse(localStorage.getItem('mn_core_identity')||'{}');
+if(st.gender)core.gender=st.gender;
+if(st.dnaStyles.length)core.coreExpression=st.dnaStyles.join(', ');
+if(st.dnaOccasions.length)core.occasion=st.dnaOccasions.join(', ');
+if(st.dnaBudget)core.budget='\u20B9'+(st.dnaBudget*0.8).toLocaleString('en-IN')+'\u2013\u20B9'+(st.dnaBudget*1.25).toLocaleString('en-IN');
+if(st.shopifyCustomer)core.name=st.shopifyCustomer.firstName;
+localStorage.setItem('mn_core_identity',JSON.stringify(core));
+if(st.closet.length)localStorage.setItem('mn_digital_closet',JSON.stringify(st.closet));
+}catch(e){}
 }catch(e){}
 }
 function hasProfile(){
@@ -142,20 +154,30 @@ st.dnaBrands=p.brands||[];st.dnaPlaces=p.places||[];
 st.dnaBudget=p.budget||4000;st.closet=p.closet||[];st.gender=p.gender||null;
 }
 function saveServerProfile(){
-if(!st.token)return Promise.resolve();
-return fetch(API+'/api/user/me',{method:'PATCH',
-headers:{'Content-Type':'application/json','Authorization':'Bearer '+st.token},
+var c=st.shopifyCustomer;
+if(!c||!c.id)return Promise.resolve();
+return fetch(API+'/api/user/sync',{
+method:'POST',
+headers:{'Content-Type':'application/json','X-Shopify-Customer-Id':String(c.id)},
 body:JSON.stringify({
+email:c.email,name:c.firstName+(c.lastName?' '+c.lastName:''),gender:st.gender||null,
 style_profile:{styles:st.dnaStyles,occasions:st.dnaOccasions,brands:st.dnaBrands,places:st.dnaPlaces,budget:st.dnaBudget},
 preferences:{closet_count:st.closet.length}
-})}).then(function(r){return r.json();}).catch(function(){});
+})}).then(function(){return r.json();}).catch(function(){});
 }
 
 /* ══════════ Steps ══════════ */
 function buildSteps(){
 if(st.flow==='new'){
+/* If logged in + gender set, skip signup step */
+var hasProfile=st.shopifyCustomer&&st.gender;
+if(hasProfile){
+st.steps=['landing','photo','occasion','creating','result',
+'dna_style','dna_occasion','dna_budget','dna_brands','dna_cards','dna_closet','done'];
+}else{
 st.steps=['landing','photo','occasion','creating','result','signup',
 'dna_style','dna_occasion','dna_budget','dna_brands','dna_cards','dna_closet','done'];
+}
 }else{
 st.steps=['r_occasion','r_mode'];
 if(st.rMode==='mixed')st.steps.push('r_category');
@@ -172,28 +194,31 @@ function prevStep(){if(st.step>0){st.step--;render();}}
 function startNewFlow(){st.flow='new';buildSteps();st.step=0;render();}
 function startReturnFlow(){st.flow='return';st.rMode=null;st.rCategories=[];buildSteps();st.step=0;render();}
 
-/* ══════════ Auth (email OTP) ══════════ */
-function sendOtp(){
-if(!st.authEmail||st.authEmail.indexOf('@')<0){st.error='Enter a valid email';render();return;}
-st.authBusy=true;st.error=null;render();
-postJSON('/api/user/send-otp',{email:st.authEmail})
-.then(function(){st.authStage='otp';st.authBusy=false;render();})
-.catch(function(e){st.authBusy=false;st.error=e.message||'Could not send code';render();});
-}
-function verifyOtp(){
-if(!st.authOtp){st.error='Enter the code';render();return;}
-st.authBusy=true;st.error=null;render();
-postJSON('/api/user/verify-otp',{contact:st.authEmail,otp:st.authOtp,purpose:'login'})
-.then(function(d){
-st.token=d.token;st.user=d.user;st.authBusy=false;
-try{localStorage.setItem('mn4_token',d.token);}catch(e){}
+/* ══════════ Shopify Customer Detection ══════════ */
+function initShopifyCustomer(){
+try{
+if(window.MN_SHOPIFY_CUSTOMER&&window.MN_SHOPIFY_CUSTOMER.logged_in){
+st.shopifyCustomer=window.MN_SHOPIFY_CUSTOMER;
+/* Load saved gender from localStorage */
+var profile=loadLocal();
+if(profile&&profile.gender)st.gender=profile.gender;
+/* Check if gender was already prompted */
+try{st.genderPrompted=localStorage.getItem('mn_gender_prompted')==='true';}catch(e){}
+/* Sync profile to Supabase in background */
 saveServerProfile();
-nextStep();
-})
-.catch(function(e){st.authBusy=false;st.error=e.message||'Invalid code';render();});
 }
-function loadToken(){
-try{var t=localStorage.getItem('mn4_token');if(t)st.token=t;}catch(e){}
+}catch(e){}
+}
+function isLoggedIn(){return !!(st.shopifyCustomer&&st.shopifyCustomer.id);}
+function promptLogin(){
+var returnTo=encodeURIComponent(window.location.pathname+window.location.search);
+window.location.href='/account/login?return_to='+returnTo;
+}
+function completeGenderPrompt(){
+st.genderPrompted=true;
+try{localStorage.setItem('mn_gender_prompted','true');}catch(e){}
+saveLocal();saveServerProfile();
+nextStep();
 }
 
 /* ══════════ Closet ══════════ */
@@ -616,11 +641,13 @@ case'occ-other-submit':{var el2=document.getElementById('mn4-other-input');
 if(el2&&el2.value.trim()){st.occasion=el2.value.trim().toLowerCase();st.otherOccasion='';render();}break;}
 case'create-look':{if(st.flow==='new'){goStep('creating');}else{goStep('r_creating');}break;}
 case'try-another':{st.vtonImage=null;goStep(st.flow==='new'?'creating':'r_creating');break;}
-case'personalize':goStep('signup');break;
+case'personalize':
+if(!isLoggedIn()){promptLogin();}else if(!st.gender){goStep('signup');}else{goStep('dna_style');}
+break;
 case'personalize-later':goStep('done');break;
-case'auth-send':sendOtp();break;
-case'auth-verify':verifyOtp();break;
-case'auth-skip':saveLocal();goStep('dna_style');break;
+case'gender-select':st.gender=v;render();break;
+case'gender-confirm':completeGenderPrompt();break;
+case'gender-skip':st.gender=null;completeGenderPrompt();break;
 case'dna-style-toggle':toggleIn(st.dnaStyles,v);render();break;
 case'dna-occ-toggle':toggleIn(st.dnaOccasions,v);render();break;
 case'dna-place-toggle':toggleIn(st.dnaPlaces,v);render();break;
@@ -697,7 +724,7 @@ st.photo=null;st.photoUrl=null;st.bodyData={};st.occasion=null;st.style=null;
 st.outfits=[];st.hero=null;st.vtonImage=null;st.error=null;
 st.looks=[];st.activeLook=0;st.locationEdit=false;
 st.vtonSubject=null;st.vtonRelationship=null;
-st.rMode=null;st.rCategories=[];st.rBrands=[];st.authStage='idle';st.authOtp='';
+st.rMode=null;st.rCategories=[];st.rBrands=[];
 if(hasProfile()){startReturnFlow();}else{startNewFlow();}
 }
 
@@ -1066,26 +1093,26 @@ return'<div class="mn4-step">'
 +'</div>';
 }
 
-/* ── Step: Signup ── */
+/* ── Step: Gender Prompt (one-time after Shopify login) ── */
 function rSignup(){
-var inner='';
-if(st.authStage==='idle'){
-inner='<input class="mn4-input" type="email" id="mn4-auth-email" placeholder="you@email.com" value="'+esc(st.authEmail)+'">'
-+'<button class="mn4-btn mn4-btn--primary" data-action="auth-send"'+(st.authBusy?' disabled':'')+'>'
-+(st.authBusy?'Sending\u2026':'Continue with email')+'</button>';
-}else{
-inner='<p class="mn4-hdr-sub" style="margin-bottom:10px">Code sent to <b>'+esc(st.authEmail)+'</b></p>'
-+'<input class="mn4-input" type="text" inputmode="numeric" id="mn4-auth-otp" placeholder="6-digit code" value="'+esc(st.authOtp)+'">'
-+'<button class="mn4-btn mn4-btn--primary" data-action="auth-verify"'+(st.authBusy?' disabled':'')+'>'
-+(st.authBusy?'Verifying\u2026':'Verify & continue')+'</button>';
-}
+var name=st.shopifyCustomer?(st.shopifyCustomer.firstName||''):'';
+var greeting=name?'Hi '+esc(name):'Welcome';
+var genders=[
+{id:'male',label:'Male',emoji:'\u{2642}\uFE0F'},
+{id:'female',label:'Female',emoji:'\u{2640}\uFE0F'},
+{id:'non-binary',label:'Non-binary',emoji:'\u{267E}\uFE0F'}
+];
+var btns='';
+genders.forEach(function(g){
+var sel=st.gender===g.id;
+btns+='<button class="mn4-style-btn'+(sel?' mn4-style-btn--on':'')+'" data-action="gender-select" data-value="'+g.id+'">'+g.emoji+' '+g.label+'</button>';
+});
 return'<div class="mn4-step">'
-+'<div class="mn4-hdr"><h2 class="mn4-hdr-title">Create your style profile</h2>'
-+'<p class="mn4-hdr-sub">So your looks get better every time</p></div>'
-+'<div class="mn4-auth-form">'+inner+'</div>'
-+(st.error?'<p class="mn4-error">'+esc(st.error)+'</p>':'')
-+'<button class="mn4-personalize-later" data-action="auth-skip">Skip \u2014 keep it on this device</button>'
-+'<div class="mn4-footer"><button class="mn4-btn mn4-btn--ghost" data-action="back">Back</button></div>'
++'<div class="mn4-hdr"><h2 class="mn4-hdr-title">'+greeting+'</h2>'
++'<p class="mn4-hdr-sub">One quick thing \u2014 what should we style for?</p></div>'
++'<div class="mn4-style-grid" style="justify-content:center">'+btns+'</div>'
++'<div class="mn4-footer"><button class="mn4-btn mn4-btn--ghost" data-action="gender-skip">Skip for now</button>'
++'<button class="mn4-btn mn4-btn--primary" data-action="gender-confirm"'+(!st.gender?' disabled':'')+'>Continue \u2192</button></div>'
 +'</div>';
 }
 
@@ -1400,17 +1427,12 @@ container.innerHTML='';container.appendChild(wrap);
 progressEl=pBar;scrollEl=sArea;dotsEl=dArea;
 }
 if(!scrollEl)return;
-loadToken();restoreLocal();loadSavedLooks();loadCachedWeather();
+initShopifyCustomer();restoreLocal();loadSavedLooks();loadCachedWeather();
 if(hasProfile()){startReturnFlow();}else{startNewFlow();}
 document.addEventListener('click',handleClick,true);
 document.addEventListener('change',function(e){
 if(e.target&&e.target.id==='mn4-photo-input')handlePhotoFile(e);
 if(e.target&&e.target.id==='mn4-closet-input')addClosetFiles(e.target.files);
-},true);
-document.addEventListener('input',function(e){
-if(!e.target)return;
-if(e.target.id==='mn4-auth-email')st.authEmail=e.target.value;
-if(e.target.id==='mn4-auth-otp')st.authOtp=e.target.value;
 },true);
 };
 

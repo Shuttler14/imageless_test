@@ -22,7 +22,21 @@
   </div>
 </div>
 
-<script src="{{ 'MN-stylist-wizard-v4.js' | asset_url }}?v=5.1.0"></script>
+<script>
+  // Expose Shopify customer data to wizard
+  window.MN_SHOPIFY_CUSTOMER = {
+    {% if customer %}
+      id: {{ customer.id }},
+      email: {{ customer.email | json }},
+      firstName: {{ customer.first_name | json }},
+      lastName: {{ customer.last_name | json }},
+      logged_in: true
+    {% else %}
+      logged_in: false
+    {% endif %}
+  };
+</script>
+<script src="{{ 'MN-stylist-wizard-v4.js' | asset_url }}?v=5.2.0"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     if (window.MN4 && typeof MN4.init === 'function') {
