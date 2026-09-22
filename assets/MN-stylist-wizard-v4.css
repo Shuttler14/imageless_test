@@ -1651,7 +1651,7 @@ button.mn4-btn--sm,
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(10,10,10,0.45) 0%, rgba(10,10,10,0) 32%, rgba(10,10,10,0.15) 55%, rgba(10,10,10,0.88) 100%);
+  background: linear-gradient(180deg, rgba(10,10,10,0.5) 0%, rgba(10,10,10,0) 28%, rgba(10,10,10,0) 45%, rgba(10,10,10,0.92) 75%, rgba(10,10,10,0.97) 100%);
   pointer-events: none;
 }
 .mn4-slide-count {
@@ -1691,10 +1691,12 @@ button.mn4-btn--sm,
 .mn4-save-heart { font-size: 13px; line-height: 1; }
 .mn4-slide-overlay {
   position: absolute;
-  left: 18px;
-  right: 18px;
-  bottom: 46px;
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 2;
+  padding: 40px 18px 22px;
+  background: linear-gradient(180deg, rgba(10,10,10,0) 0%, rgba(10,10,10,0.7) 40%, rgba(10,10,10,0.92) 100%);
 }
 .mn4-slide-title {
   font-size: 26px;
@@ -1968,3 +1970,43 @@ button.mn4-btn--sm,
   0%, 100% { opacity: 0.6; }
   50% { opacity: 1; }
 }
+
+/* ── Smart Card System ── */
+.mn-card-step{padding:16px 18px}
+.mn-card-search-wrap{margin-bottom:16px}
+.mn-card-search{width:100%}
+.mn-card-list{display:flex;flex-direction:column;gap:6px;max-height:380px;overflow-y:auto;padding-bottom:8px}
+.mn-card-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.02);cursor:pointer;transition:all 0.15s;font-family:var(--mn4-font);text-align:left;width:100%}
+.mn-card-item:hover{border-color:rgba(255,255,255,0.12);background:rgba(255,255,255,0.04)}
+.mn-card-flag{font-size:20px;width:28px;text-align:center;flex-shrink:0}
+.mn-card-name{flex:1;font-size:14px;font-weight:600;color:#fff}
+.mn-card-arrow{color:rgba(255,255,255,0.25);font-size:14px}
+.mn-card-empty{text-align:center;padding:30px;color:rgba(255,255,255,0.3);font-size:13px}
+.mn-card-types{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
+.mn-card-type-btn{display:flex;flex-direction:column;align-items:center;gap:8px;padding:24px 16px;border-radius:14px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.02);cursor:pointer;transition:all 0.15s;font-family:var(--mn4-font)}
+.mn-card-type-btn:hover{border-color:rgba(0,188,188,0.3);background:rgba(0,188,188,0.04)}
+.mn-card-type-icon{font-size:28px}
+.mn-card-type-label{font-size:13px;font-weight:600;color:#fff}
+.mn-card-item--variant{padding:14px 14px}
+.mn-card-variant-info{flex:1;min-width:0}
+.mn-card-variant-name{display:block;font-size:14px;font-weight:600;color:#fff}
+.mn-card-variant-meta{display:block;font-size:11px;color:rgba(255,255,255,0.4);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mn-card-popular{display:inline-block;padding:2px 7px;border-radius:6px;background:rgba(0,188,188,0.12);color:var(--mn4-teal);font-size:10px;font-weight:600;margin-left:6px}
+.mn-card-fee{color:rgba(255,255,255,0.5);margin-left:4px}
+.mn-card-reward{color:rgba(0,188,188,0.7);margin-left:4px;text-transform:capitalize}
+.mn-card-confirm{text-align:center;padding:20px 0}
+.mn-card-confirm-icon{font-size:40px;margin-bottom:10px}
+.mn-card-confirm-name{font-size:18px;font-weight:700;color:#fff}
+.mn-card-confirm-variant{font-size:14px;color:rgba(255,255,255,0.7);margin-top:4px}
+.mn-card-confirm-meta{font-size:12px;color:rgba(255,255,255,0.4);margin-top:6px}
+.mn-card-privacy{display:flex;gap:8px;align-items:flex-start;padding:12px 14px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);margin:16px 0;font-size:11px;color:rgba(255,255,255,0.4);line-height:1.5}
+.mn-card-privacy-icon{font-size:14px;flex-shrink:0;margin-top:1px}
+.mn-card-save-btn{width:100%;margin-top:8px}
+.mn-card-saved-section{margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.06)}
+.mn-card-saved-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.02);margin-bottom:6px}
+.mn-card-saved-icon{font-size:18px;flex-shrink:0}
+.mn-card-saved-info{flex:1;min-width:0}
+.mn-card-saved-name{display:block;font-size:13px;font-weight:600;color:#fff}
+.mn-card-saved-meta{display:block;font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px}
+.mn-card-saved-remove{background:none;border:none;color:rgba(255,255,255,0.25);cursor:pointer;font-size:14px;padding:4px 8px;border-radius:6px;transition:all 0.15s}
+.mn-card-saved-remove:hover{color:#ef4444;background:rgba(239,68,68,0.1)}

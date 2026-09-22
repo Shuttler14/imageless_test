@@ -1,12 +1,13 @@
 /* MN4 AI Stylist Wizard v5.0 — Magic-first flow
    New visitor: Try → Photo → Occasion → First Look → Personalize (optional)
    Returning:   Occasion → Style mode → Budget → Brands → Create → Look
-   Backend contract unchanged (drishti-api.fly.dev). */
+   LOCKED: Recommendations always from Fly.io. Vercel /api/recommend is NOT used.
+   VTON runs separately via startLooksVton() after recs load. */
 (function(){
 'use strict';
 
 var API='https://drishti-api.fly.dev';
-var VERCEL_API='https://drishti-api-blond.vercel.app';
+/* VERCEL_API removed — not used for recommendations. VTON handled separately. */
 
 /* ── Occasions (6 hero cards + other) ── */
 var OCC=[
@@ -94,7 +95,8 @@ authEmail:'',authOtp:'',authStage:'idle',authBusy:false,
 token:null,user:null,
 closet:[],closetBusy:false,
 whyList:[],
-sliderVal:4000
+sliderVal:4000,
+vtonSubject:null,vtonRelationship:null,personLabel:''
 };
 
 var progressEl,scrollEl,dotsEl,prevStep=-1;
@@ -153,7 +155,7 @@ preferences:{closet_count:st.closet.length}
 function buildSteps(){
 if(st.flow==='new'){
 st.steps=['landing','photo','occasion','creating','result','signup',
-'dna_style','dna_occasion','dna_budget','dna_brands','dna_closet','done'];
+'dna_style','dna_occasion','dna_budget','dna_brands','dna_cards','dna_closet','done'];
 }else{
 st.steps=['r_occasion','r_mode'];
 if(st.rMode==='mixed')st.steps.push('r_category');
@@ -330,57 +332,9 @@ st.loading=false;st.error=e.message||'Could not create your look';render();
 });
 }
 function fetchRecs(p){
-/* If user photo available, use Vercel backend which returns VTON images directly */
-if(st.photo||st.photoUrl){
-var personImage=st.photoUrl||st.photo;
-var vercelPayload=Object.assign({},p,{
-brand_id:p.brand_id||'',
-brand_name:p.brand_name||'',
-user_image:personImage,
-outfit_count:4,
-});
-return fetch(VERCEL_API+'/api/recommend',{
-method:'POST',
-headers:{'Content-Type':'application/json'},
-body:JSON.stringify(vercelPayload)
-})
-.then(function(r){return r.json();})
-.then(function(d){
-var recs=(d.outfits||[]).map(function(outfit,idx){
-var items=(outfit.items||[]).map(function(r){
-return{
-id:r.product_id||r.id,
-title:r.title||'Recommended',
-price:r.price||0,
-mrp:r.mrp||0,
-discount_pct:r.discount_pct||0,
-url:r.url||r.product_url||'',
-image_url:r.image_url||r.image||'',
-slot:r.slot||r.category||'top',
-vton_friendly:r.vton_friendly!==false,
-source:r.source||'',
-brand:r.brand||'',
-reason:r.reason||'',
-score:r.score||0,
-_is_partner:r._is_partner||false,
-};
-});
-return{
-id:outfit.id||('outfit_'+idx),
-title:outfit.title||'Look '+(idx+1),
-vton_image:outfit.vton_image||null,
-vton_hero:outfit.vton_hero||'',
-vton_quality:outfit.vton_quality||null,
-items:items,
-total:items.reduce(function(s,x){return s+(x.price||0);},0),
-};
-});
-st.dynamicBrands=d.brands||st.dynamicBrands;
-st.budgetIntel=d.budget_intelligence||null;
-return{recs:recs};
-});
-}
-/* Fallback: Fly.io direct (no VTON pre-generation) */
+/* LOCKED: Always use Fly.io for recommendations.
+   Vercel /api/recommend requires brand_id context and returns empty for wizard.
+   VTON is handled separately via startLooksVton() after recs load. */
 var fetchMain=fetch(API+'/api/reco/outfits',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)})
 .then(function(r){return r.json();})
 .then(function(d){
@@ -654,6 +608,7 @@ case'go':goStep(v);break;
 case'restart':resetAll();break;
 case'photo-trigger':{var inp=document.getElementById('mn4-photo-input');if(inp)inp.click();break;}
 case'photo-remove':st.photo=null;st.photoUrl=null;st.bodyData={};render();break;
+case'gender-select':st.gender=v;render();break;
 case'occ':st.occasion=v;st.otherOccasion='';st.style=null;render();fetchDynamicBrands();break;
 case'occ-other-toggle':st.otherOccasion=st.otherOccasion?'':' ';render();
 setTimeout(function(){var el=document.getElementById('mn4-other-input');if(el)el.focus();},50);break;
@@ -687,6 +642,10 @@ case'r-brand-toggle':toggleIn(st.rBrands,v);render();break;
 case'car-prev':carouselGo(-1);break;
 case'car-next':carouselGo(1);break;
 case'car-goto':carouselGoto(parseInt(v,10)||0);break;
+case'subject-self':st.vtonSubject='self';st.vtonRelationship=null;render();break;
+case'subject-other':st.vtonSubject='other';st.vtonRelationship=null;render();break;
+case'subject-rel':st.vtonRelationship=v;render();break;
+case'subject-reset':st.vtonSubject=null;st.vtonRelationship=null;render();break;
 case'save-look':saveLook(parseInt(v,10)||0);break;
 case'regen-look':regenLook(parseInt(v,10)||0);break;
 case'shop-now':if(v&&v!=='#')window.open(v,'_blank');break;
@@ -737,6 +696,7 @@ function resetAll(){
 st.photo=null;st.photoUrl=null;st.bodyData={};st.occasion=null;st.style=null;
 st.outfits=[];st.hero=null;st.vtonImage=null;st.error=null;
 st.looks=[];st.activeLook=0;st.locationEdit=false;
+st.vtonSubject=null;st.vtonRelationship=null;
 st.rMode=null;st.rCategories=[];st.rBrands=[];st.authStage='idle';st.authOtp='';
 if(hasProfile()){startReturnFlow();}else{startNewFlow();}
 }
@@ -811,6 +771,7 @@ case'dna_style':h=rDnaStyle();break;
 case'dna_occasion':h=rDnaOccasion();break;
 case'dna_budget':h=rDnaBudget();break;
 case'dna_brands':h=rDnaBrands();break;
+case'dna_cards':h=rDnaCards();break;
 case'dna_closet':h=rDnaCloset();break;
 case'done':h=rDone();break;
 case'r_occasion':h=rROccasion();break;
@@ -838,6 +799,9 @@ dotsEl.innerHTML=dh+'</div>';
 
 var loader=scrollEl.querySelector('.mn4-vton-loader');
 if(loader)startVtonLoaderAnim(loader);
+
+var cardEl=document.getElementById('mn-card-system');
+if(cardEl&&typeof MN4.initCardSystem==='function'){MN4.initCardSystem(cardEl);}
 
 var car=document.getElementById('mn4-carousel');
 if(car){
@@ -894,6 +858,13 @@ return'<div class="mn4-step">'
 +'<input type="file" id="mn4-photo-input" accept="image/jpeg,image/png,image/webp" hidden>'
 +zone+'</div>'
 +(st.error?'<p class="mn4-error">'+esc(st.error)+'</p>':'')
++'<div class="mn4-gender-select" style="margin-top:16px;text-align:center">'
++'<p class="mn4-section-label" style="font-size:11px;color:rgba(255,255,255,0.5);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px">I am</p>'
++'<div style="display:flex;gap:8px;justify-content:center">'
++'<button class="mn4-style-btn'+(st.gender==='male'?' mn4-style-btn--on':'')+'" data-action="gender-select" data-value="male">Male</button>'
++'<button class="mn4-style-btn'+(st.gender==='female'?' mn4-style-btn--on':'')+'" data-action="gender-select" data-value="female">Female</button>'
++'<button class="mn4-style-btn'+(st.gender==='non-binary'?' mn4-style-btn--on':'')+'" data-action="gender-select" data-value="non-binary">Non-binary</button>'
++'</div></div>'
 +'<div class="mn4-footer"><button class="mn4-btn mn4-btn--ghost" data-action="back">Back</button>'
 +'<button class="mn4-btn mn4-btn--primary" data-action="nxt"'+(p?'':' disabled')+'>Continue \u2192</button></div>'
 +'</div>';
@@ -1055,8 +1026,31 @@ return'<div class="mn4-cards-banner">'
 
 /* ── Step: Result (new user) ── */
 function rResult(){
+var subjectHTML='';
+if(!st.vtonSubject){
+subjectHTML='<div class="mn4-subject-prompt" style="margin:12px 0;padding:14px 16px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);text-align:center">'
++'<p style="font-size:13px;color:rgba(255,255,255,0.7);margin-bottom:10px">Who is this look for?</p>'
++'<div style="display:flex;gap:8px;justify-content:center">'
++'<button class="mn4-style-btn'+(st.vtonSubject==='self'?' mn4-style-btn--on':'')+'" data-action="subject-self" style="padding:8px 18px">For me</button>'
++'<button class="mn4-style-btn'+(st.vtonSubject==='other'?' mn4-style-btn--on':'')+'" data-action="subject-other" style="padding:8px 18px">Someone else</button>'
++'</div></div>';
+}else if(st.vtonSubject==='other'&&!st.vtonRelationship){
+var rels=[{id:'partner',label:'Partner'},{id:'parent',label:'Parent'},{id:'sibling',label:'Sibling'},{id:'friend',label:'Friend'},{id:'colleague',label:'Colleague'}];
+subjectHTML='<div class="mn4-subject-prompt" style="margin:12px 0;padding:14px 16px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);text-align:center">'
++'<p style="font-size:13px;color:rgba(255,255,255,0.7);margin-bottom:10px">Their relationship to you</p>'
++'<div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap">';
+rels.forEach(function(r){subjectHTML+='<button class="mn4-style-btn" data-action="subject-rel" data-value="'+r.id+'" style="padding:7px 14px;font-size:11px">'+r.label+'</button>';});
+subjectHTML+='</div></div>';
+}else if(st.vtonSubject==='other'&&st.vtonRelationship){
+subjectHTML='<div class="mn4-subject-prompt" style="margin:12px 0;padding:10px 16px;border-radius:12px;background:rgba(0,188,188,0.08);border:1px solid rgba(0,188,188,0.2);text-align:center;display:flex;align-items:center;justify-content:center;gap:8px">'
++'<span style="color:var(--mn4-teal);font-size:13px">\u2713</span>'
++'<span style="font-size:12px;color:rgba(255,255,255,0.7)">Saved for your '+st.vtonRelationship+'</span>'
++'<button style="background:none;border:none;color:rgba(255,255,255,0.4);cursor:pointer;font-size:11px;text-decoration:underline" data-action="subject-reset">Change</button>'
++'</div>';
+}
 return'<div class="mn4-step">'
 +carouselHTML()
++subjectHTML
 +'<div id="mn4-items-zone">'+itemsStripHTML()+'</div>'
 +'<div id="mn4-compare-zone">'+compareShopHTML()+'</div>'
 +cardsBannerHTML()
@@ -1176,6 +1170,17 @@ return'<div class="mn4-step">'
 +(st.dnaBrandMode==='manual'?'<div class="mn4-style-grid" style="margin-top:10px">'+brandChips+'</div>':'')
 +'<p class="mn4-section-label" style="margin-top:18px">Where do you like to shop?</p>'
 +'<div class="mn4-style-grid">'+places+'</div>'
++'<div class="mn4-footer"><button class="mn4-btn mn4-btn--ghost" data-action="back">Back</button>'
++'<button class="mn4-btn mn4-btn--primary" data-action="dna-next">Continue \u2192</button></div>'
++'</div>';
+}
+
+/* ── Step: Cards (Smart Card System) ── */
+function rDnaCards(){
+return'<div class="mn4-step">'
++'<div class="mn4-hdr"><h2 class="mn4-hdr-title">Add your bank cards</h2>'
++'<p class="mn4-hdr-sub">We\'ll match the best offers for your purchases</p></div>'
++'<div id="mn-card-system" style="min-height:200px"></div>'
 +'<div class="mn4-footer"><button class="mn4-btn mn4-btn--ghost" data-action="back">Back</button>'
 +'<button class="mn4-btn mn4-btn--primary" data-action="dna-next">Continue \u2192</button></div>'
 +'</div>';
@@ -1365,6 +1370,8 @@ complete+='<div class="mn4-complete-row"><span class="mn4-complete-dot mn4-compl
 
 return'<div class="mn4-step">'
 +carouselHTML()
++(function(){var sH='';
+if(!st.vtonSubject){sH='<div class="mn4-subject-prompt" style="margin:12px 0;padding:14px 16px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);text-align:center"><p style="font-size:13px;color:rgba(255,255,255,0.7);margin-bottom:10px">Who is this look for?</p><div style="display:flex;gap:8px;justify-content:center"><button class="mn4-style-btn" data-action="subject-self" style="padding:8px 18px">For me</button><button class="mn4-style-btn" data-action="subject-other" style="padding:8px 18px">Someone else</button></div></div>';}else if(st.vtonSubject==='other'&&!st.vtonRelationship){var rels2=[{id:'partner',label:'Partner'},{id:'parent',label:'Parent'},{id:'sibling',label:'Sibling'},{id:'friend',label:'Friend'},{id:'colleague',label:'Colleague'}];sH='<div class="mn4-subject-prompt" style="margin:12px 0;padding:14px 16px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);text-align:center"><p style="font-size:13px;color:rgba(255,255,255,0.7);margin-bottom:10px">Their relationship to you</p><div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap">';rels2.forEach(function(r){sH+='<button class="mn4-style-btn" data-action="subject-rel" data-value="'+r.id+'" style="padding:7px 14px;font-size:11px">'+r.label+'</button>';});sH+='</div></div>';}else if(st.vtonSubject==='other'&&st.vtonRelationship){sH='<div class="mn4-subject-prompt" style="margin:12px 0;padding:10px 16px;border-radius:12px;background:rgba(0,188,188,0.08);border:1px solid rgba(0,188,188,0.2);text-align:center;display:flex;align-items:center;justify-content:center;gap:8px"><span style="color:var(--mn4-teal);font-size:13px">\u2713</span><span style="font-size:12px;color:rgba(255,255,255,0.7)">Saved for your '+st.vtonRelationship+'</span><button style="background:none;border:none;color:rgba(255,255,255,0.4);cursor:pointer;font-size:11px;text-decoration:underline" data-action="subject-reset">Change</button></div>';}return sH;})()
 +'<div id="mn4-items-zone">'+itemsStripHTML()+'</div>'
 +'<p class="mn4-section-label" style="margin-top:16px">Why this works</p>'
 +'<ul class="mn4-why-list">'+why+'</ul>'

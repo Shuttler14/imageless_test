@@ -22,7 +22,7 @@
   </div>
 </div>
 
-{{ 'MN-stylist-wizard-v4.js' | asset_url | script_tag }}
+<script src="{{ 'MN-stylist-wizard-v4.js' | asset_url }}?v=5.1.0"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     if (window.MN4 && typeof MN4.init === 'function') {
