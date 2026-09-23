@@ -940,16 +940,13 @@ button.mn4-btn--sm,
    ═══════════════════════════════════════════════════ */
 
 .mn4-vton-loader {
-  position: absolute;
-  inset: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 16px;
   background: linear-gradient(145deg, rgba(10,10,10,0.97), rgba(15,15,15,0.99));
-  z-index: 2;
-  padding: 24px;
+  padding: 60px 24px;
 }
 
 /* Pulse ring — outer glow */
@@ -1642,20 +1639,21 @@ button.mn4-btn--sm,
   scroll-snap-align: start;
   background: linear-gradient(160deg, #141414 0%, #0a0a0a 100%);
   border: 1px solid var(--mn4-border);
-  display: flex;
-  flex-direction: column;
 }
 .mn4-slide-media {
   position: relative;
   width: 100%;
-  flex: 0 0 auto;
+  background: #0a0a0a;
 }
-.mn4-slide-img { width: 100%; height: auto; max-height: 520px; object-fit: contain; display: block; background: #0a0a0a; }
+.mn4-slide-img { width: 100%; display: block; }
 .mn4-slide::after {
   content: '';
   position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(10,10,10,0.4) 0%, rgba(10,10,10,0) 20%, rgba(10,10,10,0) 100%);
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: linear-gradient(180deg, rgba(10,10,10,0.4) 0%, rgba(10,10,10,0) 100%);
   pointer-events: none;
 }
 .mn4-slide-count {
@@ -1938,7 +1936,6 @@ button.mn4-btn--sm,
 /* ── Mobile tweaks ── */
 @media (max-width: 420px) {
   .mn4-slide-title { font-size: 22px; }
-  .mn4-slide-img { max-height: 400px; }
   .mn4-retailer-row { grid-template-columns: 32px 1fr auto; }
   .mn4-retailer-shop { padding: 7px 12px; font-size: 10px; }
 }
