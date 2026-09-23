@@ -1637,39 +1637,47 @@ button.mn4-btn--sm,
 .mn4-slide {
   position: relative;
   flex: 0 0 100%;
-  aspect-ratio: 3/4;
-  max-height: 520px;
   border-radius: var(--mn4-radius);
   overflow: hidden;
   scroll-snap-align: start;
   background: linear-gradient(160deg, #141414 0%, #0a0a0a 100%);
   border: 1px solid var(--mn4-border);
+  display: flex;
+  flex-direction: column;
 }
-.mn4-slide-media { position: absolute; inset: 0; }
-.mn4-slide-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.mn4-slide-media {
+  position: relative;
+  width: 100%;
+  flex: 0 0 auto;
+}
+.mn4-slide-img { width: 100%; height: auto; max-height: 520px; object-fit: contain; display: block; background: #0a0a0a; }
 .mn4-slide::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(10,10,10,0.5) 0%, rgba(10,10,10,0) 28%, rgba(10,10,10,0) 45%, rgba(10,10,10,0.92) 75%, rgba(10,10,10,0.97) 100%);
+  background: linear-gradient(180deg, rgba(10,10,10,0.4) 0%, rgba(10,10,10,0) 20%, rgba(10,10,10,0) 100%);
   pointer-events: none;
 }
 .mn4-slide-count {
   position: absolute;
-  top: 14px;
-  left: 16px;
-  z-index: 2;
+  top: 10px;
+  left: 12px;
+  z-index: 3;
   font-family: var(--mn4-font-mono);
   font-size: 10px;
   letter-spacing: 0.22em;
   color: rgba(255,255,255,0.85);
   text-transform: uppercase;
+  background: rgba(10,10,10,0.6);
+  padding: 4px 10px;
+  border-radius: var(--mn4-radius-pill);
+  backdrop-filter: blur(4px);
 }
 .mn4-save-btn {
   position: absolute;
   top: 10px;
   right: 12px;
-  z-index: 2;
+  z-index: 3;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -1690,13 +1698,11 @@ button.mn4-btn--sm,
 .mn4-save-btn--on { border-color: var(--mn4-teal); color: var(--mn4-teal); }
 .mn4-save-heart { font-size: 13px; line-height: 1; }
 .mn4-slide-overlay {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  position: relative;
   z-index: 2;
-  padding: 40px 18px 22px;
-  background: linear-gradient(180deg, rgba(10,10,10,0) 0%, rgba(10,10,10,0.7) 40%, rgba(10,10,10,0.92) 100%);
+  padding: 14px 18px 18px;
+  background: rgba(10,10,10,0.95);
+  border-top: 1px solid rgba(255,255,255,0.06);
 }
 .mn4-slide-title {
   font-size: 26px;
@@ -1932,7 +1938,7 @@ button.mn4-btn--sm,
 /* ── Mobile tweaks ── */
 @media (max-width: 420px) {
   .mn4-slide-title { font-size: 22px; }
-  .mn4-slide { max-height: 440px; }
+  .mn4-slide-img { max-height: 400px; }
   .mn4-retailer-row { grid-template-columns: 32px 1fr auto; }
   .mn4-retailer-shop { padding: 7px 12px; font-size: 10px; }
 }
