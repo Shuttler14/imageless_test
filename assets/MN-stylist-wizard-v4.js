@@ -555,7 +555,7 @@ var garments=lookGarmentUrls(look);
 resolveGarmentUrls(garments,function(finalGarments){
 if(!finalGarments.length){look.vtonFailed=true;render();next();return;}
 fetch(API+'/api/vton/try-on',{method:'POST',headers:{'Content-Type':'application/json'},
-body:JSON.stringify({person_image_url:personUrl,garment_image_url:finalGarments[0],garment_image_urls:finalGarments,extract_garment:false,seed:randomSeed()})})
+body:JSON.stringify({person_image_url:personUrl,garment_image_url:finalGarments[0],garment_image_urls:finalGarments,extract_garment:true,seed:randomSeed()})})
 .then(function(r){return r.json();})
 .then(function(d){
 var url=d.result_image||d.result_image_url||d.vton_image_url||d.image_url||d.output_image||d.image||d.url;
@@ -583,7 +583,7 @@ var garments=lookGarmentUrls(look);
 resolveGarmentUrls(garments,function(finalGarments){
 if(!finalGarments.length){look.vtonFailed=true;look.regenerating=false;render();return;}
 fetch(API+'/api/vton/try-on',{method:'POST',headers:{'Content-Type':'application/json'},
-body:JSON.stringify({person_image_url:personUrl,garment_image_url:finalGarments[0],garment_image_urls:finalGarments,extract_garment:false,seed:randomSeed()})})
+body:JSON.stringify({person_image_url:personUrl,garment_image_url:finalGarments[0],garment_image_urls:finalGarments,extract_garment:true,seed:randomSeed()})})
 .then(function(r){return r.json();})
 .then(function(d){
 var url=d.result_image||d.result_image_url||d.vton_image_url||d.image_url||d.output_image||d.image||d.url;
