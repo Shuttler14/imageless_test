@@ -94,7 +94,8 @@ closet:[],closetBusy:false,
 whyList:[],
 sliderVal:4000,
 vtonSubject:null,vtonRelationship:null,personLabel:'',
-dnaHeight:170,dnaBodyType:'',dnaShoulder:'',dnaTorso:'',dnaLegs:'',dnaFit:''
+dnaHeight:170,dnaBodyType:'',dnaShoulder:'',dnaTorso:'',dnaLegs:'',dnaFit:'',
+loginEmail:'',loginError:''
 };
 
 var progressEl,scrollEl,dotsEl,prevStep=-1;
@@ -257,8 +258,8 @@ saveServerProfile();
 }
 function isLoggedIn(){return !!(st.shopifyCustomer&&st.shopifyCustomer.id);}
 function promptLogin(){
-var returnTo=encodeURIComponent(window.location.pathname+window.location.search);
-window.location.href='/account/login?return_to='+returnTo;
+st.loginError='';
+goStep('login');
 }
 function completeGenderPrompt(){
 st.genderPrompted=true;
@@ -694,7 +695,7 @@ if(el2&&el2.value.trim()){st.occasion=el2.value.trim().toLowerCase();st.otherOcc
 case'create-look':{if(st.flow==='new'){goStep('creating');}else{goStep('r_creating');}break;}
 case'try-another':{st.vtonImage=null;goStep(st.flow==='new'?'creating':'r_creating');break;}
 case'personalize':
-if(!isLoggedIn()){promptLogin();}else if(!st.gender){goStep('signup');}else{goStep('dna_style');}
+if(!isLoggedIn()){goStep('login');}else if(!st.gender){goStep('signup');}else{goStep('dna_style');}
 break;
 case'personalize-later':goStep('done');break;
 case'gender-select':st.gender=v;render();break;
@@ -796,6 +797,20 @@ st.dnaHeight=parseInt(val,10)||170;
 var el=document.getElementById('mn4-height-val');
 if(el)el.textContent=st.dnaHeight+' cm';
 };
+W._submitLogin=function(){
+var el=document.getElementById('mn4-login-email');
+var email=el?el.value.trim():'';
+if(!email||email.indexOf('@')<0){
+st.loginError='Please enter a valid email';
+render();
+return;
+}
+st.loginEmail=email;
+st.loginError='';
+/* Redirect to Shopify login with email and return_to */
+var returnTo=window.location.pathname+window.location.search;
+window.location.href='/account/login?return_to='+encodeURIComponent(returnTo)+'&checkout_url='+encodeURIComponent('/account/login?return_to='+encodeURIComponent(returnTo));
+};
 
 /* ══════════ VTON Loader ══════════ */
 var _vtonStages=[
@@ -850,6 +865,7 @@ case'landing':h=rLanding();break;
 case'photo':h=rPhoto();break;
 case'occasion':h=rOccasion();break;
 case'creating':h=rCreating();break;
+case'login':h=rLogin();break;
 case'result':h=rResult();fetchBestPrice().then(function(){if(st.step==='result')render();});break;
 case'signup':h=rSignup();break;
 case'dna_style':h=rDnaStyle();break;
@@ -1167,6 +1183,27 @@ return'<div class="mn4-step">'
 +'<button class="mn4-btn mn4-btn--primary" data-action="personalize">Personalize my experience \u2192</button>'
 +'<button class="mn4-personalize-later" data-action="personalize-later">Maybe later</button>'
 +'</div>'
++'</div>';
+}
+
+/* ── Step: In-widget Login ── */
+function rLogin(){
+var email=st.loginEmail||'';
+var err=st.loginError||'';
+return'<div class="mn4-step">'
++'<div class="mn4-hdr"><h2 class="mn4-hdr-title">Sign in to save your style</h2>'
++'<p class="mn4-hdr-sub">We\'ll send you a login code \u2014 no password needed</p></div>'
++'<div style="padding:0 16px">'
++'<div style="margin-bottom:16px">'
++'<label style="display:block;font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">Email address</label>'
++'<input id="mn4-login-email" class="mn4-input" type="email" value="'+esc(email)+'" placeholder="you@example.com" '
++'onkeydown="if(event.key===\'Enter\')MN4._submitLogin()">'
++'</div>'
++(err?'<p class="mn4-error" style="margin-bottom:12px">'+esc(err)+'</p>':'')
++'<button class="mn4-btn mn4-btn--primary" style="width:100%;justify-content:center;margin-bottom:12px" onclick="MN4._submitLogin()">Send login code \u2192</button>'
++'<p style="font-size:11px;color:rgba(255,255,255,0.35);text-align:center;line-height:1.5">We\'ll redirect you to complete sign-in, then bring you right back here.</p>'
++'</div>'
++'<div class="mn4-footer" style="justify-content:center"><button class="mn4-btn mn4-btn--ghost" data-action="personalize-later">Maybe later</button></div>'
 +'</div>';
 }
 
