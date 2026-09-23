@@ -231,11 +231,14 @@ if(st.rMode==='mixed')st.steps.push('r_category');
 st.steps.push('r_budget','r_brands','r_creating','r_result');
 }
 }
-function curStep(){return st.steps[st.step]||'landing';}
 function goStep(id){
 var i=st.steps.indexOf(id);
-if(i>=0){st.step=i;render();}
+if(i>=0){st.step=i;render();return;}
+/* Step not in array (e.g. login) — render it directly */
+st._standaloneStep=id;render();
 }
+function curStep(){return st._standaloneStep||st.steps[st.step]||'landing';}
+function clearStandalone(){st._standaloneStep=null;}
 function nextStep(){if(st.step<st.steps.length-1){st.step++;render();}}
 function prevStep(){if(st.step>0){st.step--;render();}}
 function startNewFlow(){st.flow='new';buildSteps();st.step=0;render();}
@@ -697,7 +700,8 @@ case'try-another':{st.vtonImage=null;goStep(st.flow==='new'?'creating':'r_creati
 case'personalize':
 if(!isLoggedIn()){goStep('login');}else if(!st.gender){goStep('signup');}else{goStep('dna_style');}
 break;
-case'personalize-later':goStep('done');break;
+case'personalize-later':clearStandalone();goStep('done');break;
+case'cards-banner':if(!isLoggedIn()){goStep('login');}else{goStep('dna_style');}break;
 case'gender-select':st.gender=v;render();break;
 case'gender-confirm':completeGenderPrompt();break;
 case'gender-skip':st.gender=null;completeGenderPrompt();break;
@@ -1137,7 +1141,7 @@ return'<div class="mn4-compare-block">'
 +'</div>';
 }
 function cardsBannerHTML(){
-return'<div class="mn4-cards-banner">'
+return'<div class="mn4-cards-banner" data-action="cards-banner" style="cursor:pointer">'
 +'<span class="mn4-cards-icon">\u{1F4B3}</span>'
 +'<span class="mn4-cards-text"><b>Add Your Cards for Smarter Prices</b><i>Get the best deals, automatically applied.</i></span>'
 +'<span class="mn4-cards-logos"><span>VISA</span><span>MC</span><span>RuPay</span></span>'

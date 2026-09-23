@@ -1916,6 +1916,12 @@ button.mn4-btn--sm,
   border-radius: var(--mn4-radius);
   border: 1px solid var(--mn4-border);
   background: var(--mn4-glass);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.mn4-cards-banner:hover {
+  border-color: rgba(57, 165, 150, 0.4);
+  background: rgba(57, 165, 150, 0.06);
 }
 .mn4-cards-icon { font-size: 20px; }
 .mn4-cards-text { display: flex; flex-direction: column; gap: 2px; margin-right: auto; }
