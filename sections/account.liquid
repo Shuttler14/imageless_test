@@ -2309,6 +2309,7 @@ function closeEditModal() { document.getElementById('mnEditModalOverlay').classL
     window.MN_USER = window.MN_USER || {
       hidden_data: {},
       bank_cards: [],
+      people: [],
       ghost_mode: false,
       photo_analysis_history: [],
       completion_pct: 0
@@ -2789,6 +2790,61 @@ function closeEditModal() { document.getElementById('mnEditModalOverlay').classL
     }
 
     // =====================================================
+    // PEOPLE PROFILES
+    // =====================================================
+    
+    const PERSON_REL_ICONS = {self:'🧑',partner:'💑',parent:'👨‍👩‍👧',sibling:'👫',friend:'🤝',colleague:'💼'};
+
+    async function mnLoadPeople() {
+      try {
+        const cid = window.MN_SHOPIFY_CUSTOMER && window.MN_SHOPIFY_CUSTOMER.id;
+        if (!cid) return;
+        const res = await fetch('https://drishti-api-blond.vercel.app/api/user/persons', {
+          headers: {'X-Shopify-Customer-Id': String(cid), 'User-Agent': 'Mozilla/5.0'}
+        });
+        if (!res.ok) return;
+        const people = await res.json();
+        window.MN_USER.people = people;
+        mnRenderPeople();
+      } catch(e) { console.warn('[MN] people load failed', e); }
+    }
+
+    function mnRenderPeople() {
+      const container = document.getElementById('mnPeopleList');
+      if (!container) return;
+      const people = window.MN_USER.people || [];
+      if (people.length === 0) {
+        container.innerHTML = '<p style="color:rgba(255,255,255,0.4);font-size:12px;text-align:center;padding:16px;">No people saved yet. Use the style wizard and select "Someone else" to save a person.</p>';
+        return;
+      }
+      container.innerHTML = people.map(p => `
+        <div class="mn-saved-card" data-id="${p.person_id}">
+          <div class="mn-saved-card-info">
+            <div class="mn-saved-card-icon">${PERSON_REL_ICONS[p.relationship] || '👤'}</div>
+            <div class="mn-saved-card-details">
+              <div class="mn-saved-card-bank">${p.label || p.relationship}</div>
+              <div class="mn-saved-card-variant">${p.relationship}${p.height_cm ? ' · ' + p.height_cm + 'cm' : ''}${p.body_type ? ' · ' + p.body_type : ''}</div>
+            </div>
+          </div>
+          <button onclick="mnRemovePerson('${p.person_id}')" style="background:none;border:none;color:rgba(255,255,255,0.4);cursor:pointer;font-size:16px;">✕</button>
+        </div>
+      `).join('');
+    }
+
+    async function mnRemovePerson(personId) {
+      try {
+        const cid = window.MN_SHOPIFY_CUSTOMER && window.MN_SHOPIFY_CUSTOMER.id;
+        if (!cid) return;
+        await fetch('https://drishti-api-blond.vercel.app/api/user/persons?person_id=' + personId, {
+          method: 'DELETE',
+          headers: {'X-Shopify-Customer-Id': String(cid), 'User-Agent': 'Mozilla/5.0'}
+        });
+        window.MN_USER.people = (window.MN_USER.people || []).filter(p => p.person_id !== personId);
+        mnRenderPeople();
+      } catch(e) { console.warn('[MN] person delete failed', e); }
+    }
+
+    // =====================================================
     // STYLE PREFERENCE CARDS
     // =====================================================
     
@@ -2967,6 +3023,7 @@ function closeEditModal() { document.getElementById('mnEditModalOverlay').classL
       mnInitInterests();
       mnInitWeatherWidget();
       mnRenderSavedCards();
+      mnLoadPeople();
       
       // Set initial height vector
       const profile = getProfile();
@@ -4114,7 +4171,19 @@ function closeEditModal() { document.getElementById('mnEditModalOverlay').classL
             <div class="mn-saved-cards-list" id="mnSavedCardsList"></div>
           </div>
         </div>
-        
+
+        <!-- People Section -->
+        <div class="detail-card" style="grid-column: 1 / -1;">
+          <div class="mn-bank-section">
+            <div class="mn-bank-section-title">
+              <span>👤</span>
+              <span>Saved People</span>
+            </div>
+            <p style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:12px;">People you've saved for personalized gift and outfit recommendations.</p>
+            <div id="mnPeopleList" style="display:flex;flex-direction:column;gap:8px;"></div>
+          </div>
+        </div>
+
         <!-- Ghost Mode Toggle -->
         <div class="detail-card" style="grid-column: 1 / -1;">
           <div class="detail-label"><span class="detail-icon">🧵</span><span>Digital Closet Mode</span></div>

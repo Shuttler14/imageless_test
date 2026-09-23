@@ -93,7 +93,8 @@ shopifyCustomer:null,genderPrompted:false,
 closet:[],closetBusy:false,
 whyList:[],
 sliderVal:4000,
-vtonSubject:null,vtonRelationship:null,personLabel:''
+vtonSubject:null,vtonRelationship:null,personLabel:'',
+dnaHeight:170,dnaBodyType:'',dnaShoulder:'',dnaTorso:'',dnaLegs:'',dnaFit:''
 };
 
 var progressEl,scrollEl,dotsEl,prevStep=-1;
@@ -110,6 +111,47 @@ if(path.indexOf('/api/user/')===0&&st.shopifyCustomer&&st.shopifyCustomer.id){
 headers['X-Shopify-Customer-Id']=String(st.shopifyCustomer.id);
 }
 return fetch(API+path,{method:'POST',headers:headers,body:JSON.stringify(body)}).then(function(r){return r.json().then(function(d){if(!r.ok)throw new Error(d.detail||('HTTP '+r.status));return d;});});
+}
+
+/* Fetch best price using user's saved cards */
+var _bestPriceCache=null;
+function fetchBestPrice(){
+var look=st.looks?st.looks[st.activeLook]:null;
+if(!look||!look.items||!st.shopifyCustomer||!st.shopifyCustomer.id){_bestPriceCache=null;return Promise.resolve(null);}
+var items=look.items.map(function(it){
+var src=(it.source||'').toLowerCase();
+var merchant=src&&src!=='unknown'?it.source:(it.brand||'');
+return{price:it.price||0,merchant:merchant,category:'fashion'};
+}).filter(function(i){return i.price>0&&i.merchant;});
+if(!items.length){_bestPriceCache=null;return Promise.resolve(null);}
+return postJSON('/api/user/best-price',{items:items}).then(function(d){
+_bestPriceCache=d;
+return d;
+}).catch(function(){_bestPriceCache=null;return null;});
+}
+
+/* Save person profile to Supabase when user selects relationship */
+function savePersonProfile(relationship,label){
+if(!st.shopifyCustomer||!st.shopifyCustomer.id)return;
+if(relationship==='self')return;
+return postJSON('/api/user/persons',{
+relationship:relationship,
+label:label||relationship,
+is_self:false
+}).catch(function(e){console.warn('[MN4] person save failed:',e);});
+}
+
+/* Save try-on session to Supabase */
+function saveTryonSession(resultUrl,look){
+if(!st.shopifyCustomer||!st.shopifyCustomer.id)return;
+var personUrl=st.photoUrl||st.photo;
+var items=(look.items||[]).map(function(it){return{title:it.title,price:it.price,url:it.url,brand:it.brand};});
+return postJSON('/api/user/tryon-sessions',{
+host_image_url:personUrl||'',
+product_image_url:(look.items&&look.items[0])?look.items[0].image_url:'',
+result_image_url:resultUrl,
+status:'completed'
+}).catch(function(e){console.warn('[MN4] tryon session save failed:',e);});
 }
 function slotLabel(slot){
 return{top:'Top',bottom:'Bottom',shoes:'Shoes',accessory:'Accessory',full:'Outfit'}[slot]||'Piece';
@@ -161,6 +203,10 @@ method:'POST',
 headers:{'Content-Type':'application/json','X-Shopify-Customer-Id':String(c.id)},
 body:JSON.stringify({
 email:c.email,name:c.firstName+(c.lastName?' '+c.lastName:''),gender:st.gender||null,
+height_cm:st.dnaHeight||null,body_type:st.dnaBodyType||null,
+shoulder_structure:st.dnaShoulder||null,torso_length:st.dnaTorso||null,
+leg_proportion:st.dnaLegs||null,fit_preference:st.dnaFit||null,
+preferred_styles:st.dnaStyles||[],preferred_colors:[],
 style_profile:{styles:st.dnaStyles,occasions:st.dnaOccasions,brands:st.dnaBrands,places:st.dnaPlaces,budget:st.dnaBudget},
 preferences:{closet_count:st.closet.length}
 })}).then(function(){return r.json();}).catch(function(){});
@@ -173,10 +219,10 @@ if(st.flow==='new'){
 var hasProfile=st.shopifyCustomer&&st.gender;
 if(hasProfile){
 st.steps=['landing','photo','occasion','creating','result',
-'dna_style','dna_occasion','dna_budget','dna_brands','dna_cards','dna_closet','done'];
+'dna_style','dna_occasion','dna_budget','dna_brands','dna_body','dna_cards','dna_closet','done'];
 }else{
 st.steps=['landing','photo','occasion','creating','result','signup',
-'dna_style','dna_occasion','dna_budget','dna_brands','dna_cards','dna_closet','done'];
+'dna_style','dna_occasion','dna_budget','dna_brands','dna_body','dna_cards','dna_closet','done'];
 }
 }else{
 st.steps=['r_occasion','r_mode'];
@@ -512,7 +558,10 @@ body:JSON.stringify({person_image_url:personUrl,garment_image_url:finalGarments[
 .then(function(r){return r.json();})
 .then(function(d){
 var url=d.result_image||d.result_image_url||d.vton_image_url||d.image_url||d.output_image||d.image||d.url;
-if(url)look.vton=url;else look.vtonFailed=true;
+if(url){
+look.vton=url;
+saveTryonSession(url,look);
+}else{look.vtonFailed=true;}
 render();next();
 }).catch(function(){look.vtonFailed=true;render();next();});
 });
@@ -537,7 +586,10 @@ body:JSON.stringify({person_image_url:personUrl,garment_image_url:finalGarments[
 .then(function(r){return r.json();})
 .then(function(d){
 var url=d.result_image||d.result_image_url||d.vton_image_url||d.image_url||d.output_image||d.image||d.url;
-if(url)look.vton=url;else look.vtonFailed=true;
+if(url){
+look.vton=url;
+saveTryonSession(url,look);
+}else{look.vtonFailed=true;}
 look.regenerating=false;render();
 }).catch(function(){look.vtonFailed=true;look.regenerating=false;render();});
 });
@@ -654,6 +706,7 @@ case'dna-place-toggle':toggleIn(st.dnaPlaces,v);render();break;
 case'dna-brand-toggle':toggleIn(st.dnaBrands,v);render();break;
 case'dna-brand-ai':st.dnaBrands=[];st.dnaBrandMode='ai';render();break;
 case'dna-brand-manual':st.dnaBrandMode='manual';render();break;
+case'dna-body-set':st[el.getAttribute('data-key')]=v;render();break;
 case'dna-next':saveLocal();saveServerProfile();nextStep();break;
 case'closet-trigger':{var ci=document.getElementById('mn4-closet-input');if(ci)ci.click();break;}
 case'closet-remove':st.closet=st.closet.filter(function(c){return c.url!==v;});saveLocal();render();break;
@@ -671,7 +724,7 @@ case'car-next':carouselGo(1);break;
 case'car-goto':carouselGoto(parseInt(v,10)||0);break;
 case'subject-self':st.vtonSubject='self';st.vtonRelationship=null;render();break;
 case'subject-other':st.vtonSubject='other';st.vtonRelationship=null;render();break;
-case'subject-rel':st.vtonRelationship=v;render();break;
+case'subject-rel':st.vtonRelationship=v;savePersonProfile(v,v);render();break;
 case'subject-reset':st.vtonSubject=null;st.vtonRelationship=null;render();break;
 case'save-look':saveLook(parseInt(v,10)||0);break;
 case'regen-look':regenLook(parseInt(v,10)||0);break;
@@ -738,6 +791,11 @@ W._onBudgetCommit=function(val){
 st.dnaBudget=parseInt(val,10)||4000;st.sliderVal=st.dnaBudget;
 render();fetchDynamicBrands();
 };
+W._onHeightInput=function(val){
+st.dnaHeight=parseInt(val,10)||170;
+var el=document.getElementById('mn4-height-val');
+if(el)el.textContent=st.dnaHeight+' cm';
+};
 
 /* ══════════ VTON Loader ══════════ */
 var _vtonStages=[
@@ -792,12 +850,13 @@ case'landing':h=rLanding();break;
 case'photo':h=rPhoto();break;
 case'occasion':h=rOccasion();break;
 case'creating':h=rCreating();break;
-case'result':h=rResult();break;
+case'result':h=rResult();fetchBestPrice().then(function(){if(st.step==='result')render();});break;
 case'signup':h=rSignup();break;
 case'dna_style':h=rDnaStyle();break;
 case'dna_occasion':h=rDnaOccasion();break;
 case'dna_budget':h=rDnaBudget();break;
 case'dna_brands':h=rDnaBrands();break;
+case'dna_body':h=rDnaBody();break;
 case'dna_cards':h=rDnaCards();break;
 case'dna_closet':h=rDnaCloset();break;
 case'done':h=rDone();break;
@@ -807,7 +866,7 @@ case'r_category':h=rRCategory();break;
 case'r_budget':h=rRBudget();break;
 case'r_brands':h=rRBrands();break;
 case'r_creating':h=rRCreating();break;
-case'r_result':h=rRResult();break;
+case'r_result':h=rRResult();fetchBestPrice().then(function(){if(st.step==='r_result')render();});break;
 default:h=rLanding();
 }
 
@@ -1035,9 +1094,27 @@ rows+='<div class="mn4-retailer-row">'
 +(first.url?'<a class="mn4-retailer-shop" href="'+esc(first.url)+'" target="_blank" rel="noopener">Shop \u2197</a>':'')
 +'</div>';
 });
+var bestPriceHTML='';
+if(_bestPriceCache&&_bestPriceCache.total_discount>0){
+var bank=_bestPriceCache.items[0]&&_bestPriceCache.items[0].offer?_bestPriceCache.items[0].offer.bank_name:'your card';
+var conf=_bestPriceCache.items[0]&&_bestPriceCache.items[0].offer?_bestPriceCache.items[0].offer.confidence:0;
+var verified=conf>=0.85;
+bestPriceHTML='<div class="mn4-best-price-section" style="margin:12px 0;padding:14px 16px;border-radius:12px;background:linear-gradient(135deg,rgba(0,188,188,0.08),rgba(0,188,188,0.03));border:1px solid rgba(0,188,188,0.2)">'
++'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'
++'<span style="font-size:11px;font-weight:700;color:var(--mn4-teal);letter-spacing:0.5px;text-transform:uppercase">YOUR BEST PRICE</span>'
++(verified?'<span style="font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(0,188,188,0.15);color:var(--mn4-teal)">Verified</span>':'')
++'</div>'
++'<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:4px">'
++'<span style="font-size:22px;font-weight:800;color:#fff">'+fmtPrice(_bestPriceCache.total_effective)+'</span>'
++'<span style="font-size:13px;text-decoration:line-through;color:rgba(255,255,255,0.4)">'+fmtPrice(_bestPriceCache.total_original)+'</span>'
++'</div>'
++'<p style="font-size:12px;color:rgba(255,255,255,0.6);margin:0">₹'+Math.round(_bestPriceCache.total_discount)+' saved with '+esc(bank)+'</p>'
++'</div>';
+}
 return'<div class="mn4-compare-block">'
 +'<div class="mn4-compare-head"><span class="mn4-section-label" style="margin:0">Compare Prices & Shop</span>'
 +'<span class="mn4-compare-note">Best price shown</span></div>'
++bestPriceHTML
 +'<div class="mn4-retailer-list">'+rows+'</div>'
 +'<div class="mn4-look-total"><span>Total look</span><b>'+fmtPrice(look.total)+'</b></div>'
 +'<p class="mn4-prices-note">Prices checked just now</p>'
@@ -1197,6 +1274,65 @@ return'<div class="mn4-step">'
 +(st.dnaBrandMode==='manual'?'<div class="mn4-style-grid" style="margin-top:10px">'+brandChips+'</div>':'')
 +'<p class="mn4-section-label" style="margin-top:18px">Where do you like to shop?</p>'
 +'<div class="mn4-style-grid">'+places+'</div>'
++'<div class="mn4-footer"><button class="mn4-btn mn4-btn--ghost" data-action="back">Back</button>'
++'<button class="mn4-btn mn4-btn--primary" data-action="dna-next">Continue \u2192</button></div>'
++'</div>';
+}
+
+/* ── Step: Style DNA — body measurements ── */
+var BODY_TYPES=[
+{id:'slim',label:'Slim'},{id:'athletic',label:'Athletic'},
+{id:'average',label:'Average'},{id:'curvy',label:'Curvy'},
+{id:'plus',label:'Plus Size'}
+];
+var SHOULDER_TYPES=[
+{id:'narrow',label:'Narrow'},{id:'regular',label:'Regular'},
+{id:'broad',label:'Broad'},{id:'sloping',label:'Sloping'}
+];
+var TORSO_TYPES=[
+{id:'short',label:'Short'},{id:'regular',label:'Regular'},
+{id:'long',label:'Long'}
+];
+var LEG_TYPES=[
+{id:'short',label:'Short'},{id:'regular',label:'Regular'},
+{id:'long',label:'Long'}
+];
+var FIT_TYPES=[
+{id:'slim',label:'Slim fit'},{id:'regular',label:'Regular fit'},
+{id:'relaxed',label:'Relaxed fit'},{id:'oversized',label:'Oversized'}
+];
+
+function rDnaBody(){
+function chipGroup(arr,stateKey,current){
+var html='';
+arr.forEach(function(o){
+var on=st[stateKey]===o.id;
+html+='<button class="mn4-style-btn'+(on?' mn4-style-btn--on':'')+'" data-action="dna-body-set" data-key="'+stateKey+'" data-value="'+o.id+'">'+esc(o.label)+'</button>';
+});
+return html;
+}
+return'<div class="mn4-step">'
++'<div class="mn4-hdr"><div class="mn4-hdr-label">STYLE DNA</div>'
++'<h2 class="mn4-hdr-title">Your body profile</h2>'
++'<p class="mn4-hdr-sub">Helps us pick better fits</p></div>'
++'<div style="padding:0 16px">'
++'<p class="mn4-section-label">Height</p>'
++'<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">'
++'<input type="range" class="mn4-budget-slider" min="140" max="210" step="1" value="'+st.dnaHeight+'" '
++'style="flex:1" oninput="MN4._onHeightInput(this.value)">'
++'<span id="mn4-height-val" style="font-size:14px;font-weight:600;color:#fff;min-width:50px">'+st.dnaHeight+' cm</span>'
++'</div>'
++'<p class="mn4-section-label">Body type</p>'
++'<div class="mn4-style-grid" style="margin-bottom:16px">'+chipGroup(BODY_TYPES,'dnaBodyType')+'</div>'
++'<p class="mn4-section-label">Shoulders</p>'
++'<div class="mn4-style-grid" style="margin-bottom:16px">'+chipGroup(SHOULDER_TYPES,'dnaShoulder')+'</div>'
++'<p class="mn4-section-label">Torso length</p>'
++'<div class="mn4-style-grid" style="margin-bottom:16px">'+chipGroup(TORSO_TYPES,'dnaTorso')+'</div>'
++'<p class="mn4-section-label">Leg proportion</p>'
++'<div class="mn4-style-grid" style="margin-bottom:16px">'+chipGroup(LEG_TYPES,'dnaLegs')+'</div>'
++'<p class="mn4-section-label">Fit preference</p>'
++'<div class="mn4-style-grid">'+chipGroup(FIT_TYPES,'dnaFit')+'</div>'
++'</div>'
 +'<div class="mn4-footer"><button class="mn4-btn mn4-btn--ghost" data-action="back">Back</button>'
 +'<button class="mn4-btn mn4-btn--primary" data-action="dna-next">Continue \u2192</button></div>'
 +'</div>';
